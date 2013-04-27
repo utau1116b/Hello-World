@@ -1,0 +1,35 @@
+;敵ランク再計算
+@CHECK_ENEMY_RANK
+;LOCAL
+;0	LOOP
+;1	最低ランク
+;2	最高ランク
+
+LOCAL:1 = 0
+LOCAL:2 = 0
+
+;戦闘回数/(15-難易度補正)が基本ランク
+FLAG:敵レベル = FLAG:現在の戦闘回数 / (15 - FLAG:5 * 4 / 3)
+
+IF FLAG:敵レベル > 60
+	FLAG:敵レベル = 60
+ENDIF
+
+SELECTCASE FLAG:クリア済みステージ数
+	CASE 0
+		LOCAL:1 = 1
+		LOCAL:2 = 6
+	CASE 1
+		LOCAL:1 = 1
+		LOCAL:2 = 8
+	CASEELSE
+		LOCAL:1 = FLAG:5 * 3 / 2 - 1
+		LOCAL:2 = FLAG:5 * 3 + 4
+ENDSELECT
+
+;最低ランク・最高ランク補正
+IF FLAG:敵レベル < LOCAL:1
+	FLAG:敵レベル = LOCAL:1
+ELSEIF FLAG:敵レベル > LOCAL:2
+	FLAG:敵レベル = LOCAL:2
+ENDIF

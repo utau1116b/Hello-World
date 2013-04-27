@@ -1,0 +1,279 @@
+;敵の能力や装備を代入
+;ARG:0	敵の種族ID
+;ARG:1	レベル補正
+;ARG:2	代入先
+;ARG:3	ランク
+@SET_ENEMY_STATUS(ARG:0, ARG:1, ARG:2, ARG:3)
+IF ARG:0 <= 0
+	RETURN
+ENDIF
+
+TRYCCALLFORM SET_ENEMY_STATUS_{ARG:0}(ARG:1, ARG:2, ARG:3)
+
+TFLAG:(1000+ARG:2)=ARG
+
+;敵とのレベル差補正
+;戦闘メンバー人数計算　レベル合計計算
+
+LOCAL:3 = 0
+LOCAL:4 = 0
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		LOCAL:4 += 1
+		LOCAL:3 += BASE:(FLAG:(LOCAL:0)):戦闘レベル
+	ENDIF
+NEXT
+
+SELECTCASE LOCAL:4
+	CASE 1
+		;1人PT
+		IF FLAG:(LOCAL:0) > 0
+			LOCAL:4 += 1
+		ENDIF
+
+		;LOCAL:3 = ABL:(FLAG:リーダー):0
+		IF (BASE:(ARG:2):戦闘レベル) > 35 && ((LOCAL:3) - 5 > (BASE:(ARG:2):戦闘レベル))
+		
+;ベース能力その１
+			
+LOCAL:5 = BASE:(ARG:2):戦闘レベル
+LOCAL:6 = 0
+BASE:(ARG:2):戦闘レベル = (LOCAL:3) - 5
+LOCAL:6 = (BASE:(ARG:2):戦闘レベル * 100 / LOCAL:5)
+BASE:(ARG:2):ベースPOW *= LOCAL:6
+BASE:(ARG:2):ベースGUA *= LOCAL:6
+BASE:(ARG:2):ベースDEX *= LOCAL:6
+BASE:(ARG:2):ベースHIT *= LOCAL:6
+BASE:(ARG:2):ベースSPD *= LOCAL:6
+;CFLAG:(ARG:1):8 += 16 + (LOCAL:1 * 1)
+
+BASE:(ARG:2):ベースPOW /= 100
+BASE:(ARG:2):ベースGUA /= 100
+BASE:(ARG:2):ベースDEX /= 100
+BASE:(ARG:2):ベースHIT /= 100
+BASE:(ARG:2):ベースSPD /= 100
+LOCAL:7 = 0
+
+BASE:(ARG:2):戦闘レベル = (LOCAL:3) - 5
+
+LOCAL:7 = 100 * (BASE:(ARG:2):戦闘レベル - LOCAL:5) / 8 
+
+CFLAG:(ARG:2):敵★ *= 100 + LOCAL:7
+CFLAG:(ARG:2):敵V *= 100 + LOCAL:7
+
+CFLAG:(ARG:2):敵★ /= 100
+CFLAG:(ARG:2):敵V /= 100
+
+
+
+
+
+
+		ENDIF
+	CASE 2
+		;2人PT
+
+;LOCAL:3 = ABL:(FLAG:リーダー):0 + ABL:(FLAG:メンバー2):0
+
+		LOCAL:3 /= 2
+		IF (BASE:(ARG:2):戦闘レベル) > 35 && ((LOCAL:3) - 5 > (BASE:(ARG:2):戦闘レベル))
+
+;ベース能力その１
+LOCAL:5 = BASE:(ARG:2):戦闘レベル
+LOCAL:6 = 0
+BASE:(ARG:2):戦闘レベル = (LOCAL:3) - 5
+LOCAL:6 = (BASE:(ARG:2):戦闘レベル * 100 / LOCAL:5)
+
+BASE:(ARG:2):ベースPOW *= LOCAL:6
+BASE:(ARG:2):ベースGUA *= LOCAL:6
+BASE:(ARG:2):ベースDEX *= LOCAL:6
+BASE:(ARG:2):ベースHIT *= LOCAL:6
+BASE:(ARG:2):ベースSPD *= LOCAL:6
+;CFLAG:(ARG:1):8 += 16 + (LOCAL:1 * 1)
+
+BASE:(ARG:2):ベースPOW /= 100
+BASE:(ARG:2):ベースGUA /= 100
+BASE:(ARG:2):ベースDEX /= 100
+BASE:(ARG:2):ベースHIT /= 100
+BASE:(ARG:2):ベースSPD /= 100
+LOCAL:7 = 0
+
+BASE:(ARG:2):戦闘レベル = (LOCAL:3) - 5
+
+LOCAL:7 = 100 * (BASE:(ARG:2):戦闘レベル - LOCAL:5) / 8 
+
+CFLAG:(ARG:2):敵★ *= 100 + LOCAL:7
+CFLAG:(ARG:2):敵V *= 100 + LOCAL:7
+
+CFLAG:(ARG:2):敵★ /= 100
+CFLAG:(ARG:2):敵V /= 100
+
+
+
+
+		ENDIF
+	CASE 3
+		;3人PT
+
+;LOCAL:3 = ABL:(FLAG:リーダー):0 + ABL:(FLAG:メンバー2):0 + ABL:(FLAG:メンバー3):0
+
+		LOCAL:3 /= 3
+		IF (BASE:(ARG:2):戦闘レベル) > 35 && ((LOCAL:3) - 5 > (BASE:(ARG:2):戦闘レベル))
+
+;ベース能力その１
+LOCAL:5 = BASE:(ARG:2):戦闘レベル
+LOCAL:6 = 0
+BASE:(ARG:2):戦闘レベル = (LOCAL:3) - 5
+LOCAL:6 = (BASE:(ARG:2):戦闘レベル * 100 / LOCAL:5)
+
+BASE:(ARG:2):ベースPOW *= LOCAL:6
+BASE:(ARG:2):ベースGUA *= LOCAL:6
+BASE:(ARG:2):ベースDEX *= LOCAL:6
+BASE:(ARG:2):ベースHIT *= LOCAL:6
+BASE:(ARG:2):ベースSPD *= LOCAL:6
+;CFLAG:(ARG:1):8 += 16 + (LOCAL:1 * 1)
+
+BASE:(ARG:2):ベースPOW /= 100
+BASE:(ARG:2):ベースGUA /= 100
+BASE:(ARG:2):ベースDEX /= 100
+BASE:(ARG:2):ベースHIT /= 100
+BASE:(ARG:2):ベースSPD /= 100
+LOCAL:7 = 0
+
+BASE:(ARG:2):戦闘レベル = (LOCAL:3) - 5
+
+LOCAL:7 = 100 * (BASE:(ARG:2):戦闘レベル - LOCAL:5) / 8 
+
+CFLAG:(ARG:2):敵★ *= 100 + LOCAL:7
+CFLAG:(ARG:2):敵V *= 100 + LOCAL:7
+
+CFLAG:(ARG:2):敵★ /= 100
+CFLAG:(ARG:2):敵V /= 100
+
+
+
+
+
+
+		ENDIF
+
+
+	CASE 4
+		;4人PT
+
+;LOCAL:3 = ABL:(FLAG:リーダー):0 + ABL:(FLAG:メンバー2):0 + ABL:(FLAG:メンバー3):0 + ABL:(FLAG:メンバー4):0
+
+		LOCAL:3 /= 4
+		IF (BASE:(ARG:2):戦闘レベル) > 35 && ((LOCAL:3) - 5 > (BASE:(ARG:2):戦闘レベル))
+
+
+;ベース能力その１
+LOCAL:5 = BASE:(ARG:2):戦闘レベル
+LOCAL:6 = 0
+BASE:(ARG:2):戦闘レベル = (LOCAL:3) - 5
+LOCAL:6 = (BASE:(ARG:2):戦闘レベル * 100 / LOCAL:5)
+
+BASE:(ARG:2):ベースPOW *= LOCAL:6
+BASE:(ARG:2):ベースGUA *= LOCAL:6
+BASE:(ARG:2):ベースDEX *= LOCAL:6
+BASE:(ARG:2):ベースHIT *= LOCAL:6
+BASE:(ARG:2):ベースSPD *= LOCAL:6
+;CFLAG:(ARG:1):8 += 16 + (LOCAL:1 * 1)
+
+BASE:(ARG:2):ベースPOW /= 100
+BASE:(ARG:2):ベースGUA /= 100
+BASE:(ARG:2):ベースDEX /= 100
+BASE:(ARG:2):ベースHIT /= 100
+BASE:(ARG:2):ベースSPD /= 100
+LOCAL:7 = 0
+
+BASE:(ARG:2):戦闘レベル = (LOCAL:3) - 5
+
+LOCAL:7 = 100 * (BASE:(ARG:2):戦闘レベル - LOCAL:5) / 8 
+
+CFLAG:(ARG:2):敵★ *= 100 + LOCAL:7
+CFLAG:(ARG:2):敵V *= 100 + LOCAL:7
+
+CFLAG:(ARG:2):敵★ /= 100
+CFLAG:(ARG:2):敵V /= 100
+
+
+
+
+		ENDIF
+
+	CASEELSE
+		;5人PT
+
+LOCAL:3 = BASE:(FLAG:リーダー):戦闘レベル + BASE:(FLAG:メンバー2):戦闘レベル + BASE:(FLAG:メンバー3):戦闘レベル + BASE:(FLAG:メンバー4):戦闘レベル + BASE:(FLAG:メンバー5):戦闘レベル
+
+
+		LOCAL:3 /= 5
+		IF (BASE:(ARG:2):戦闘レベル) > 35 && ((LOCAL:3) - 5 > (BASE:(ARG:2):戦闘レベル))
+
+;ベース能力その１
+LOCAL:5 = BASE:(ARG:2):戦闘レベル
+LOCAL:6 = 0
+BASE:(ARG:2):戦闘レベル = (LOCAL:3) - 5
+LOCAL:6 = (BASE:(ARG:2):戦闘レベル * 100 / LOCAL:5)
+
+BASE:(ARG:2):ベースPOW *= LOCAL:6
+BASE:(ARG:2):ベースGUA *= LOCAL:6
+BASE:(ARG:2):ベースDEX *= LOCAL:6
+BASE:(ARG:2):ベースHIT *= LOCAL:6
+BASE:(ARG:2):ベースSPD *= LOCAL:6
+
+BASE:(ARG:2):ベースPOW /= 100
+BASE:(ARG:2):ベースGUA /= 100
+BASE:(ARG:2):ベースDEX /= 100
+BASE:(ARG:2):ベースHIT /= 100
+BASE:(ARG:2):ベースSPD /= 100
+LOCAL:7 = 0
+
+BASE:(ARG:2):戦闘レベル = (LOCAL:3) - 5
+
+LOCAL:7 = 100 * (BASE:(ARG:2):戦闘レベル - LOCAL:5) / 8 
+
+CFLAG:(ARG:2):敵★ *= 100 + LOCAL:7
+CFLAG:(ARG:2):敵V *= 100 + LOCAL:7
+
+CFLAG:(ARG:2):敵★ /= 100
+CFLAG:(ARG:2):敵V /= 100
+
+
+
+		ENDIF
+
+ENDSELECT
+
+
+;敵とのレベル差補正ここまで
+
+
+
+;敵のＥＰ一括管理
+
+IF FLAG:クリア済みステージ数 > 9 && ARG:0 >= 6000
+	;終盤のボス＆ＥＰ攻撃できるキャラが１．５人予定らしいのでEP2.0倍
+	CFLAG:(ARG:2):敵V *= 20
+	CFLAG:(ARG:2):敵V /= 10
+ENDIF
+
+
+
+;中ボスのＨＰ一括管理
+
+IF FLAG:クリア済みステージ数 > 9 && ARG:0 >= 6000 && ARG:0 < 10000
+	;中ボスなのでHP2.0倍
+	CFLAG:(ARG:2):敵★ *= 20
+	CFLAG:(ARG:2):敵★ /= 10
+ENDIF
+
+
+
+
+CATCH
+	PRINTFORMW エラー！未実装の敵ID{ARG:0}が指定されました(SET_ENEMY_STATUS)
+ENDCATCH
+
+

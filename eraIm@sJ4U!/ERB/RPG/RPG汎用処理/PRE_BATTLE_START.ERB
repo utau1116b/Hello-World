@@ -1,0 +1,30 @@
+;戦闘開始前共通処理
+;ARG:0	レベル補正
+;ARG:1	ランク(1～60)　0なら念のため現在ランク利用
+;RETURN	0:勝利 1:敗北 2:逃走	多分使わない
+@PRE_BATTLE_START(ARG:0, ARG:1)
+;LOCAL
+;0	LOOP
+;1	Lv
+;2	RANK
+;3	戦闘の種類
+;4	TEMP
+;5	ID計算用（撃破済み）
+;6	ID計算用（固有）
+
+;固定戦闘フラグ初期化
+FLAG:固定戦闘処理 = 0
+
+FOR LOCAL:0, 1, 7
+	LOCAL:(LOCAL:0) = 0
+NEXT
+
+LOCAL:1 = ARG:0
+
+IF ARG:1
+	LOCAL:2 = ARG:1
+ELSE
+	LOCAL:2 = FLAG:敵レベル
+ENDIF
+CALL BATTLE_START(0, LOCAL:1, LOCAL:2)
+RETURN RESULT

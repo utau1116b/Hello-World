@@ -1,0 +1,47 @@
+;212	歌姫の威光
+;覚醒千早
+;スキル説明を表示
+;ARG:0	スキルレベル
+;RETURN	0:レベルアップ不可能　1:レベルアップ可能
+@SHOW_SKILL_EXPLAIN_212(ARG:0)
+DRAWLINE
+PRINTFORML 歌姫の威光
+PRINTL スキル説明（アイドル達の語り口）
+DRAWLINE
+PRINTL スキル効果
+
+;TENSION軽減チェック
+IF ABL:(ARG:0):212 > 3
+CALL SHOW_EXPEND_MP(ARG:0, 0)
+ELSEIF ABL:(ARG:0):212 > 0
+CALL SHOW_EXPEND_MP(ARG:0, 0)
+ENDIF
+PRINTL 
+
+DRAWLINE
+
+
+IF ABL:(ARG:0):212 >= 5
+	RETURN 0
+ELSE
+	RETURN 1
+ENDIF
+
+
+;使用可能チェック
+;ARG:0	対象キャラ登録番号
+@COMABLE_212(ARG:0)
+;パッシブは使えない
+RETURN 0
+
+;スキル効果を設定
+;ARG:0	使用キャラ登録番号
+@SELECT_SKILL_TARGET_212(ARG:0)
+RETURN 0
+
+;スキル発動
+;ARG:0	使用キャラ
+;ARG:1	対象
+@USE_SKILL_212(ARG:0, ARG:1)
+RETURN 0
+

@@ -1,0 +1,419 @@
+;----------------------------------------------------------------------------------------
+;関数名	CALUCULATE_DAMAGE_P
+;内容	ダメージ計算(TOV,メルルのアトリエを参考にして推測)
+;ダメージ＝基本ダメージ×各補正値×対象の耐性
+;基本ダメージ…（最終攻撃力×攻撃適正）×威力係数ー（最終防御力/2×防御適正）×防御比率
+;各補正値
+;ガード補正…ガード中は0.4倍
+;スキル最終威力係数…各スキルごとに設定
+;クリティカル補正…クリティカル時は1.5倍
+;範囲攻撃倍率…
+;属性倍率…VO,VI,DA / 100
+;---------------------------------------------------------------------------------------
+;ARG:0	攻撃側キャラ番号
+;ARG:1	防御側キャラ番号
+;ARG:2	倍率
+;R:0	攻撃命中回数を返す
+;R:1	ダメージを返す
+@CALCULATE_DAMAGE_P(ARG:0, ARG:1, ARG:2)
+;LOCAL
+;0	LOOP
+;1	HIT COUNT
+;2	DAMAGE
+;3	属性倍率
+;4	防御倍率
+;5	攻撃回数
+;6	命中率
+;7	クリティカル
+;8	攻撃力
+;9	防御力
+;10	除算防御
+;11	属性タイプ
+;20	倍率一時記憶
+VARSET LOCAL
+VARSET R
+
+;初期化
+LOCAL:1 = 0
+LOCAL:2 = 0
+LOCAL:3 = 0
+LOCAL:4 = 100
+LOCAL:5 = 0
+LOCAL:6 = 0
+LOCAL:7 = 0
+LOCAL:8 = 0
+LOCAL:9 = 0
+LOCAL:10 = 0
+LOCAL:11 = 0
+
+;能力適正が設定されていなければ100に設定
+SIF BASE:(ARG:0):VO倍率 == 0
+	BASE:(ARG:0):VO倍率 = 100
+SIF BASE:(ARG:0):VI倍率 == 0
+	BASE:(ARG:0):VI倍率 = 100
+SIF BASE:(ARG:0):DA倍率 == 0
+	BASE:(ARG:0):DA倍率 = 100
+	
+SIF BASE:(ARG:1):VO倍率 == 0
+	BASE:(ARG:1):VO倍率 = 100
+SIF BASE:(ARG:1):VI倍率 == 0
+	BASE:(ARG:1):VI倍率 = 100
+SIF BASE:(ARG:1):DA倍率 == 0
+	BASE:(ARG:1):DA倍率 = 100
+
+SIF TFLAG:防御半分無視
+	LOCAL:4 = 50
+SIF TFLAG:防御無視
+	LOCAL:4 = 0
+
+;変数を初期化しておく
+LOCAL:0 = 0
+
+
+IF BASE:(ARG:0):ベース運 > (BASE:(ARG:1):ベース運 * 4)
+	;攻撃側の運が４倍あるなら、確率+12
+	LOCAL:0 = 12
+ENDIF
+
+			;王者の威圧チェック
+			CALL GET_MAX_ABL_PT(237)
+			IF RESULT == 0
+;覚醒反映
+A = 0
+IF ABL:ARG:覚醒
+	A += 20
+ENDIF
+;日高の血反映
+IF ABL:ARG:日高の血
+	A += 20
+ENDIF
+;riora反映
+IF ABL:ARG:riora
+	A += 10
+ENDIF
+			ENDIF
+;クリティカル判定
+IF RAND:100 < (BASE:(ARG:0):ベースクリティカル) + A || CFLAG:(ARG:0):クリティカル状態 >= 10 || ABL:ARG:静かな闘志 && BASE:ARG:ボルテージ == 100
+	FONTBOLD
+	PRINTFORML PERFECT APPEAL！！
+	LOCAL:7 = 1
+	;LOCAL:4 /= 2
+	;こちらがクリティカルならフラッシュ
+	IF ARG:0 > 10
+		CALL FLASH
+	ELSE
+	;敵がクリティカルなら画面振動
+		CALL QUAKE
+	ENDIF
+	FONTREGULAR
+ENDIF
+
+LOCAL:8 = BASE:(ARG:0):最終攻撃力
+LOCAL:9 = BASE:(ARG:1):最終防御力 * 100
+TIMES LOCAL:9, 0.6
+LOCAL:9 /= 100
+
+; + 1 * 係数(ABL:(FLAG:味方):POW)
+;攻撃力
+POWER R, LOCAL:8, 2
+R *= 1
+TIMES R, 0.25
+R:1 = LOCAL:8 * 174
+R:2 = 1115
+;ダメージソース
+R:3 = (R:0 + R:1 - R:2) / 100
+LOCAL:8 = R:3
+;雑だけど今のところここで迷走Mind反映
+IF CFLAG:(ARG:0):迷走Mind
+	LOCAL:8 *= 2
+ENDIF
+IF CFLAG:(ARG:1):迷走Mind
+	LOCAL:9 = 1
+ENDIF
+
+;攻撃・防御
+;LOCAL:2 = ((LOCAL:8 * TFLAG:威力係数 / 100 +TFLAG:威力補正 * 10) - (LOCAL:9 * LOCAL:4 / 100)) * TFLAG:ダメージ係数 / 100 + TFLAG:ダメージ補正 * 10
+;基本ダメージ算出
+;LOCAL:2 = (LOCAL:8 * TFLAG:威力係数 / 100 + TFLAG:威力補正)  - (LOCAL:9 * LOCAL:4 / 100)
+;
+;※一時的に威力補正系は省く※
+;
+;攻撃適正も掛ける
+	IF ARG >= 11
+
+LOCAL:2 = (LOCAL:8 * TFLAG:威力係数 / 100)  - (LOCAL:9 * LOCAL:4 / 100)
+	
+	ELSE
+
+LOCAL:2 = ((LOCAL:8 * TFLAG:威力係数 / 100)  - (LOCAL:9 * LOCAL:4 / 100) * 2) / 2
+
+	ENDIF
+	
+;PRINTFORML LOCAL:2{LOCAL:2}
+;クラス、アイドルランク等倍率反映も考慮
+
+;現時点のLOCAL:2が基本ダメージ
+;PRINTFORML 基本ダメージ{LOCAL:2}
+;↓から基本ダメージに各比率を反映させていく
+LOCAL:2 *= 100
+
+;防御中は0.4倍
+IF CFLAG:(ARG:1):ガード状態
+	TIMES LOCAL:2, 0.40
+ENDIF
+;クリティカル時は1．5倍
+IF LOCAL:7
+	TIMES LOCAL:2, 1.50
+ENDIF
+;ダメージ係数反映
+IF TFLAG:ダメージ係数
+	LOCAL:2 = LOCAL:2 * TFLAG:ダメージ係数 / 100
+ENDIF
+
+;回復系はダメージ補正に回復量を指定
+IF TFLAG:ダメージ補正
+	LOCAL:2 += TFLAG:ダメージ補正
+ENDIF
+
+;引数で指定された倍率反映（範囲）
+SIF ARG:2 <= 100
+	LOCAL:2 = LOCAL:2 * ARG:2 / 100
+
+;特性による倍率反映
+IF CFLAG:(ARG:1):敵攻撃軽減割合 != 0
+	LOCAL:2 = LOCAL:2 * (100 - CFLAG:(ARG:1):敵攻撃軽減割合) / 100
+ENDIF
+
+;VO,VI,DA倍率反映
+;IF TFLAG:VO属性
+;	LOCAL:2 = LOCAL:2 * BASE:(ARG:0):VO倍率 / 100
+;ELSEIF TFLAG:VI属性
+;	LOCAL:2 = LOCAL:2 * BASE:(ARG:0):VI倍率 / 100
+;ELSEIF TFLAG:DA属性
+;	LOCAL:2 = LOCAL:2 * BASE:(ARG:0):DA倍率 / 100
+;ELSE
+;ENDIF
+
+;属性倍率を取得
+FOR LOCAL:0, 0, 4
+	IF TFLAG:(LOCAL:0 + 1090)
+		;該当する属性を持っていれば、属性倍率計算
+		LOCAL:20 = (100 - CFLAG:(ARG:1):(LOCAL:0 + 1248))
+		IF LOCAL:20 > LOCAL:3
+			;その属性の倍率の方が高い場合、倍率更新
+			LOCAL:3 = LOCAL:20
+			LOCAL:11 = LOCAL:0
+		ENDIF
+	ENDIF
+NEXT
+;PRINTFORML LOCAL:2{LOCAL:2}
+IF LOCAL:3 == 0
+	LOCAL:3 = 100
+ENDIF
+
+;属性倍率反映
+LOCAL:2 = LOCAL:2 * LOCAL:3 / 100
+
+;忘れずに÷100
+LOCAL:2 /= 100
+
+;1回あたりのダメージ決定
+
+;攻撃回数取得
+CALL GET_ATTACK_NUMBER(ARG:0, ARG:1)
+LOCAL:5 = RESULT
+
+;引数の倍率が100を超えている場合、多段ヒットなので攻撃回数倍増
+SIF ARG:2 > 100
+	LOCAL:5 = LOCAL:5 * ARG:2 / 100
+
+;命中率取得
+CALL GET_HIT_RATE(ARG:0, ARG:1, 0)
+LOCAL:6 = RESULT
+
+;クリティカル時は必中
+SIF LOCAL:7
+	LOCAL:6 = 100
+
+;命中判定
+FOR LOCAL:0, 0, LOCAL:5
+	IF RAND:100 < LOCAL:6
+		;命中判定に成功した場合、命中回数+1
+		LOCAL:1 += 1
+	ENDIF
+NEXT
+;	PRINTFORML LOCAL:2{LOCAL:2}
+;ダメージを命中回数分だけ倍にする
+LOCAL:2 *= LOCAL:1
+
+;命中回数無視の固定ダメージ追加
+;IF LOCAL:1
+;	LOCAL:2 += TFLAG:命中回数無視固定ダメージ
+;ENDIF
+
+;寝ている場合は威力2倍
+IF CFLAG:(ARG:1):スリープ状態
+	LOCAL:2 *= 2
+ENDIF
+
+;ユニークスキル発動した場合文字色変える
+SETCOLOR 0x10EEEE
+					;王者の威圧チェック
+					CALL GET_MAX_ABL_PT(237)
+					IF RESULT == 0
+;エンジェル反映
+IF ABL:ARG:エンジェル
+	BASE:ARG:MP += LOCAL:1
+ENDIF
+;パワフル乙女反映
+IF ABL:ARG:パワフル乙女
+	TIMES LOCAL:2, 1.20
+ENDIF
+;dtpn反映
+IF ABL:(ARG:1):どたぷーん
+	TIMES LOCAL:2, 0.80
+ENDIF
+;覚醒反映
+IF ABL:(ARG:1):覚醒
+	TIMES LOCAL:2, 0.90
+ENDIF
+;突撃！豆タンク！反映
+IF ABL:ARG:突撃！豆タンク！
+	TIMES LOCAL:2, 1.10
+ENDIF
+;オーラ反映
+IF ABL:(ARG:1):オーラ
+	TIMES LOCAL:2, 0.90
+ENDIF
+;ハッピーマジック反映
+IF ABL:(ARG:1):ハッピーマジック
+	IF TFLAG:DA属性
+		IF RAND:100 <= 30
+			LOCAL:2 /= 2
+		PRINTFORML %CALLNAME:(ARG:1)%＞＞ハッピーマジック発動！
+		ENDIF
+	ENDIF
+ENDIF
+;大きい反映
+IF ABL:(ARG:1):大きい
+	TIMES LOCAL:2, 0.95
+ENDIF
+						ENDIF
+;プロテクション反映→雪歩や美希に
+;LOCAL:2 = LOCAL:2 * (100 - ABL:(ARG:1):5064 * 4) / 100
+
+;攻撃ブースト
+;IF CFLAG:(ARG:0):アピールブースト状態2
+;	LOCAL:2 = LOCAL:2 * CFLAG:(ARG:0):アピールブースト状態2 / 100
+;	CFLAG:(ARG:0):アピールブースト状態2 = 0
+;ENDIF
+;攻撃ブースト
+;IF CFLAG:(ARG:0):アタックブースト状態
+;	LOCAL:2 = LOCAL:2 * CFLAG:(ARG:0):アタックブースト状態 / 100
+;	CFLAG:(ARG:0):アタックブースト状態 = 0
+;ENDIF
+;物理強化
+;IF CFLAG:(ARG:0):アピール強化状態
+;	LOCAL:2 = LOCAL:2 * ((CFLAG:(ARG:0):アピール強化状態 % 10) + 10) / 10
+;ENDIF
+;バーストアピール状態
+IF CFLAG:(ARG:0):バーストアピール状態
+	LOCAL:2 *= 2
+	CFLAG:(ARG:0):バーストアピール状態 -= 1
+ENDIF
+;4分身
+;IF CFLAG:(ARG:0):四分身状態
+;	LOCAL:2 = LOCAL:2 * (100 + ((CFLAG:(ARG:0):四分身状態 % 10) * (CFLAG:(ARG:0):四分身状態 / 10) * 4)) / 100
+;ENDIF
+
+;防御側の半減効果
+;IF CFLAG:(ARG:1):アピール半減状態
+;	LOCAL:2 /= 2
+;ENDIF
+
+;攻撃1.1倍防御0.9倍　応用で真のヘルズクライ
+;攻撃側国士無双状態
+;IF CFLAG:(ARG:0):国士無双状態2
+;	LOCAL:2 = LOCAL:2 * (10 + (CFLAG:(ARG:0):国士無双状態2 % 10)) / 10
+;ENDIF
+;防御側国士無双状態
+;IF CFLAG:(ARG:1):国士無双状態2
+;	LOCAL:2 = LOCAL:2 * (10 - (CFLAG:(ARG:0):国士無双状態2 % 10)) / 10
+;ENDIF
+
+
+;全力防御による軽減
+;IF CFLAG:(ARG:1):全力ガード状態
+;	LOCAL:2 /= (CFLAG:(ARG:1):全力ガード状態 * 2)
+;ENDIF
+;フィールド、やよいゾーン発動
+;IF TFLAG:フィールド == 1
+;	LOCAL:2 /= 2
+;ENDIF
+;半減状態
+;IF CFLAG:(ARG:1):半減状態
+;	LOCAL:2 /= 2
+;ENDIF
+;四半減状態
+;IF CFLAG:(ARG:1):四半減状態
+;	LOCAL:2 /= 4
+;ENDIF
+
+;防御側被ダメ増
+;IF CFLAG:(ARG:1):被ダメージ上昇状態
+;	LOCAL:2 = LOCAL:2 * (100 + ((CFLAG:(ARG:1):被ダメージ上昇状態 % 10) * 20)) / 100
+;ENDIF
+
+;固定ダメージ追加
+;LOCAL:2 += TFLAG:固定ダメージ
+
+;レート乗算
+;VO
+IF TFLAG:VO属性
+	LOCAL:2 = (LOCAL:2 * TFLAG:VOレート / 10000)
+;DA
+ELSEIF TFLAG:VI属性
+	LOCAL:2 = (LOCAL:2 * TFLAG:DAレート / 10000)
+ELSE
+	LOCAL:2 = (LOCAL:2 * TFLAG:VIレート / 10000)
+ENDIF
+
+;乱数分を計算(±5%を2回足す　最終的には中央値が出やすい±10%)
+IF TFLAG:乱数無視 == 0
+	LOCAL:2 = LOCAL:2 * (1050 - RAND:101) / 1000
+	LOCAL:2 = LOCAL:2 * (1050 - RAND:101) / 1000
+ENDIF
+
+
+;命中回数に応じて最低ダメージ保障(主に対ののわさん用)
+IF LOCAL:2 < 1 && LOCAL:1 > 0
+	;命中しているのに1未満のダメージの場合、4HITごとに+1ダメージの補正を入れる
+	LOCAL:2 = LOCAL:1 / 4 + 1
+ENDIF
+;ののわ殺し
+IF ARG:1 <= 10
+	IF TFLAG:(1000 + ARG:1) == 708 && TFLAG:対ののわ == 1
+		LOCAL:1 = 1
+		LOCAL:2 = 2
+	ENDIF
+ENDIF
+			;王者の威圧チェック
+			CALL GET_MAX_ABL_PT(237)
+			IF RESULT == 0
+;最後に神秘のオーラ反映
+IF ABL:(ARG:1):神秘のオーラ
+	IF RAND:100 < 10
+		LOCAL:2 = 1
+		PRINTFORML %CALLNAME:(ARG:1)%＞＞神秘のオーラ発動！
+	ENDIF
+ENDIF
+			ENDIF
+
+RESETCOLOR
+;戻り値を入れる
+R:0 = LOCAL:1
+R:1 = LOCAL:2
+;PRINTFORML LOCAL:2{LOCAL:2}
+RETURN
+
+	

@@ -1,0 +1,191 @@
+;独自のタイトル画面の例（Emuera ver 1.700以降対象）
+;LOADGAME_EXが定義されていることが前提なので、SAVELOAD.ERBと同時に使用してください。
+;SAVELOAD.ERBを使用しない場合、CALL LOADGAME_EXをLOADGAMEに置き換えてください。
+;なお、SYSTEM_TITLEが定義されているとTITLE_LOADGAMEは呼ばれなくなります。
+;使用している命令、変数の詳細についてはEmueraの拡張文法.txtを参照してください。
+
+@SYSTEM_TITLE
+;@SYSTEM_TITLEが定義されていると、標準のタイトル画面の代わりにSYSTEM_TITLEが呼ばれる。
+
+;このタイミングでグローバル変数を読んでおけば取りこぼしが無くなる。
+;GLOBALはRESETDATAやLOADDATAによって初期化・上書きされない。
+;必要に応じてコメントアウトを解除すること。
+LOADGLOBAL
+;デバッグ中
+;GLOBAL:1003 = 1
+;名前の間違いがないかチェック
+;REPEAT 40
+;	CALL MMPLAY(COUNT)
+;REND
+;REPEAT 40
+;	CALL SEPLAY(COUNT)
+;REND
+CALL SE("タイトル", "お正月")
+;PICTUREOPEN 雪歩1.bmp
+CALL BGM("イベント", "タイトル")
+;バージョン表記をLOCALS:0に作成。
+;1001なら1.001、1100なら1.10と表示されるように。
+;ここで使用した変数はRESETDATAかLOADDATAによってクリアされるのでローカル変数を使わなくてもよい。
+LOCAL:0 = GAMEBASE_VERSION / 1000
+LOCAL:1 = GAMEBASE_VERSION % 1000 / 10
+LOCAL:2 = GAMEBASE_VERSION % 10
+STRLENFORM {LOCAL:1}
+LOCALS:1 = %"0" * (2 - RESULT:0)%{LOCAL:1}
+LOCALS:0 = ver{LOCAL:0}.%LOCALS:1%
+;SIF LOCAL:2 != 0
+	LOCALS:0 = %LOCALS:0%{LOCAL:2}
+IF GLOBAL:1001 == 0
+;タイトル表示。
+	IF GLOBAL:801 == 0
+		CLEARLINE 2
+		FLAG:メッセージ送り時ウェイト時間 = 500
+		FLAG:メッセージ速度 = 1
+		CALL FULLCUTIN(40, 10, "このゲームは　フィクションであり", "登場する人物や集団は　実在の個人", "および団体とは　一切関係ありません", "", "また　このゲームの登場人物は", "全て18歳以上です")
+		CALL FULLCUTIN(40, 10, "原作　　　　　　　　バンダイナムコゲームス", "", "eramaker制作　　　　　　　　　サークル獏様", "", " ", " ")
+		;CALL FULLCUTIN(40, 10, "PROJECT iM@S　2nd VISION", " ", " ", " ", " ", " ")
+		CALL FULLCUTIN(40, 10, "　　　　『アイドル』", " ", " ", " ", " ", " ")
+		CALL FULLCUTIN(40, 10, "　　　　それは女の子達の永遠の憧れ。", "だが、その頂点に立てるのは、ほんの一握り……", " ", " ", " ", " ")
+		CALL FULLCUTIN(40, 10, "　　　　そんなサバイバルな世界に、", " ", " ", " ", " ", " ")
+		CALL FULLCUTIN(40, 10, "　　　　たくさんの女の子達が足を踏み入れていた。", " ", " ", " ", " ", " ")
+		CALL FULLCUTIN(40, 10, "　　　　一人のプロデューサーとの出会いから、、", " ", " ", " ", " ", " ")
+		CALL FULLCUTIN(40, 10, "　　　　変わらなく流れていた少女たちの日常は、", "", " ", " ", " ", " ")
+		CALL FULLCUTIN(40, 10, "　　　　少しずつ変わり始めることになる……", " ", " ", " ", " ", " ", " ")
+		CALL FULLCUTIN(40, 10, "　　　　少女たちの想いをのせて……", " ", " ", " ", " ", " ")
+		GLOBAL:801 = 1
+		SAVEGLOBAL
+	ENDIF
+ENDIF
+ALIGNMENT LEFT
+PRINTL
+
+DRAWLINE
+LOCAL = 0Xff78f5
+TSTR = ●  最初からプロデュース
+LOCALS:2 = %TSTR, 44%
+CALLFORM PRINTCOLORL(LOCAL, "┏━━━━━━━━━━━━━━━━━━━━━━┓")
+CALLFORM PRINTCOLOR(LOCAL, "┃")
+PRINTBUTTON LOCALS:2, 0
+CALLFORM PRINTCOLORL(LOCAL, "┃")
+CALLFORM PRINTCOLORL(LOCAL, "┗━━━━━━━━━━━━━━━━━━━━━━┛")
+
+LOCAL =  0X89ffb4
+TSTR = ●  プロデュースを再開する
+LOCALS:2 = %TSTR, 40%
+CALLFORM PRINTCOLORL(LOCAL, "┏━━━━━━━━━━━━━━━━━━━━┓")
+CALLFORM PRINTCOLOR(LOCAL, "┃")
+RESETCOLOR
+PRINTBUTTON LOCALS:2, 1
+CALLFORM PRINTCOLORL(LOCAL, "┃")
+CALLFORM PRINTCOLORL(LOCAL, "┗━━━━━━━━━━━━━━━━━━━━┛")
+
+
+GETFONT
+CHKFONT "Comic Sans MS"
+SIF RESULT
+	SETFONT "Comic Sans MS"
+
+ALIGNMENT CENTER
+CALL PRINTCOLOR (SET_COLOR_FUNC(11), "E");色んな
+CALL PRINTCOLOR (SET_COLOR_FUNC(23), "R") ;色で
+CALL PRINTCOLOR (SET_COLOR_FUNC(21), "A");描いて
+CALL PRINTCOLOR (SET_COLOR_FUNC(17), "i");見よう
+CALL PRINTCOLOR (SET_COLOR_FUNC(12), "D");必ず
+CALL PRINTCOLOR (SET_COLOR_FUNC(24), "O");見える
+CALL PRINTCOLOR (SET_COLOR_FUNC(13), "L");新しい世界
+CALL PRINTCOLOR (SET_COLOR_FUNC(19), "M")
+CALL PRINTCOLOR (SET_COLOR_FUNC(14), "@")
+CALL PRINTCOLOR (SET_COLOR_FUNC(16), "S")
+CALL PRINTCOLOR (SET_COLOR_FUNC(20), "T")
+CALL PRINTCOLOR (SET_COLOR_FUNC(18), "E")
+CALL PRINTCOLOR (SET_COLOR_FUNC(15), "R")
+PRINT  
+CALL PRINTCOLOR (SET_COLOR_FUNC(22), "J4U !")
+;PRINT &R
+PRINTL
+PRINTL
+PRINTFORML %LOCALS:0%
+SETFONT RESULTS
+PRINTL
+ALIGNMENT LEFT
+LOCAL = 0X4085ff
+TSTR = ●  アルバム
+LOCALS:2 = %TSTR, 20%
+CALLFORM PRINTCOLORL(LOCAL, "┏━━━━━━━━━━┓")
+CALLFORM PRINTCOLOR(LOCAL, "┃")
+PRINTBUTTON LOCALS:2, 2
+CALLFORM PRINTCOLORL(LOCAL, "┃")
+CALLFORM PRINTCOLORL(LOCAL, "┗━━━━━━━━━━┛")
+
+LOCAL = 0Xffff00
+TSTR = ●  コンフィグ
+LOCALS:2 = %TSTR, 16%
+CALLFORM PRINTCOLORL(LOCAL, "┏━━━━━━━━┓")
+CALLFORM PRINTCOLOR(LOCAL, "┃")
+PRINTBUTTON LOCALS:2, 3
+CALLFORM PRINTCOLORL(LOCAL, "┃")
+CALLFORM PRINTCOLORL(LOCAL, "┗━━━━━━━━┛")
+
+LOCAL = 0Xcf408c
+TSTR = ●  ＥＸＩＴ
+LOCALS:2 = %TSTR, 12%
+CALLFORM PRINTCOLORL(LOCAL, "┏━━━━━━┓")
+CALLFORM PRINTCOLOR(LOCAL, "┃")
+PRINTBUTTON LOCALS:2, 9
+CALLFORM PRINTCOLORL(LOCAL, "┃")
+CALLFORM PRINTCOLORL(LOCAL, "┗━━━━━━┛")
+
+
+SETCOLOR COLOR("light-gray")
+ALIGNMENT CENTER
+PRINTFORM %UNICODE(0x24D2)%
+PRINTFORM %GAMEBASE_AUTHOR%
+PRINTFORM (%GAMEBASE_YEAR%\@ TOINT(SUBSTRING(GETTIMES(), ,4)) > 2012 ?{TOINT(SUBSTRING(GETTIMES(), ,4))}#\@)
+;PRINTL 
+;PRINTFORML 　 卯⌒⌒卯
+;PRINTFORML 　</(ﾉ从从)>
+;PRINTFORM 　 ﾚﾘﾟヮﾟﾉﾘ  
+;RESETCOLOR
+;PRINTFORML ＜
+PRINTFORML %GAMEBASE_INFO%
+;PRINTFORML 　　/)充(ﾆつ
+;PRINTFORML 　 (ｽ/_LL>
+;PRINTFORML 　　 ﾋ/ﾋ|
+RESETCOLOR
+ALIGNMENT LEFT
+
+;DRAWLINE
+
+
+
+;選択肢表示。_Rename.csvで指定した値を読むことはできないのでここで指定する必要がある。
+$TITLE_SELECT
+
+
+$TITLE_INPUT
+INPUT
+IF RESULT == 0
+	RESETDATA
+	ADDCHARA 0
+	SIF GAMEBASE_DEFAULTCHARA >= 0
+		ADDCHARA GAMEBASE_DEFAULTCHARA
+	BEGIN FIRST
+	RESTART
+ELSEIF RESULT == 1
+	CALL TITLE_LOADGAME
+	RESTART
+ELSEIF RESULT == 2
+	CALL アルバム
+	RESTART
+	;LOADGAME_EXでLOADを行わずに戻ってきた場合、もう一度選択しなおす。
+ELSEIF RESULT == 3
+	CALL CONFIG_GLOBAL
+	RESTART
+ELSEIF RESULT == 9
+	QUIT
+ELSE
+	REUSELASTLINE 無効な値です
+	GOTO TITLE_INPUT
+ENDIF
+
+;SYSTEM_TITLE中でRETURNすると次に実行する行が無くなり、エラーになる。
+;必ずBEGIN命令かLOADGAMEを行うこと。

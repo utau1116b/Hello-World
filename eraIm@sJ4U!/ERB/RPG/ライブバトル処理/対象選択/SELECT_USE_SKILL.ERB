@@ -1,0 +1,230 @@
+;戦闘中に使うスキルを選択
+;ARG:0	使うキャラ
+;実際の処理はSELECT_SKILL_TARGET_XXXXに任せる
+;選択をキャンセルした場合はRETURN 0
+@SELECT_USE_SKILL(ARG:0)
+;LOCALリスト
+;0	現在のページ位置
+;1	現在選択中のスキル
+;2	FOR文で使用
+;3	一時記憶に使用
+;4	ページ数管理に使用
+;5	表示上限フラグ
+;6	スキルの順番管理
+;7	短縮登録中フラグ
+;8	短縮登録対象
+
+;初期化
+LOCAL:0 = 1
+LOCAL:1 = 0
+LOCAL:2 = 0
+LOCAL:3 = 0
+LOCAL:4 = 0
+LOCAL:5 = 0
+LOCAL:6 = 0
+LOCAL:7 = 0
+LOCAL:8 = 0
+
+$START
+IF LOCAL:0 == 0
+	DRAWLINE
+	PRINTFORML %CALLNAME:(ARG:0)%が使う特技を選択してください　（短縮登録スキル）
+	DRAWLINE
+	FOR LOCAL:2, 1, 10
+		LOCAL:3 = CFLAG:(ARG:0):(LOCAL:2 + 1400)
+		IF LOCAL:3 == 0
+			LOCALS:0 = 未登録
+			PRINTFORM [{LOCAL:2}] %LOCALS:0, 35, LEFT% 
+		ELSE
+			PRINTFORM [{LOCAL:2}] %ABLNAME:(LOCAL:3), 35, LEFT% 
+		ENDIF
+		LOCAL:3 = CFLAG:(ARG:0):(LOCAL:2 + 1410)
+		IF LOCAL:3 == 0
+			LOCALS:0 = 未登録
+			PRINTFORML [{LOCAL:2 + 10}] %LOCALS:0, 35, LEFT%
+		ELSE
+			PRINTFORML [{LOCAL:2 + 10}] %ABLNAME:(LOCAL:3), 35, LEFT%
+		ENDIF
+	NEXT
+	PRINTL [10] 全スキルを確認
+ELSE
+	;スキルの表示上限計算用
+	LOCAL:4 = 20 * LOCAL:0
+	LOCAL:6 = 0
+	DRAWLINE
+	PRINTFORML %CALLNAME:(ARG:0)%が使う特技を選択してください
+	DRAWLINE
+	;全スキルに対して、覚えているかチェック
+	FOR LOCAL:2, 301, 601
+		IF ABL:(ARG:0):(LOCAL:2) > 0
+			;覚えていたら、それを記憶
+			LOCAL:6 += 1
+			IF (LOCAL:6 <= LOCAL:4) && (LOCAL:6 > (LOCAL:4 - 20))
+				;表示対象となるページに収まるものだった場合、それを表示
+				LOCAL:3 = LOCAL:2
+				IF LOCAL:6 % 2 == 0
+					SELECTCASE LOCAL:2
+						CASE 301 TO 400
+							CALL SET_COLOR(1)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASE 401 TO 500
+							CALL SET_COLOR(2)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASE 501 TO 600
+							CALL SET_COLOR(3)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASEELSE
+						
+					ENDSELECT
+					;偶数個目は改行つき
+					PRINTFORML [{LOCAL:2, 4}] %ABLNAME:(LOCAL:2), 30, LEFT%%FUNC_SKILL_EXPLAIN(LOCAL:2)%
+				ELSE
+					SELECTCASE LOCAL:2
+						CASE 301 TO 400
+							CALL SET_COLOR(1)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASE 401 TO 500
+							CALL SET_COLOR(2)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASE 501 TO 600
+							CALL SET_COLOR(3)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASEELSE
+						
+					ENDSELECT
+					PRINTFORML [{LOCAL:2, 4}] %ABLNAME:(LOCAL:2), 30, LEFT%%FUNC_SKILL_EXPLAIN(LOCAL:2)%
+				ENDIF
+			ENDIF
+			IF LOCAL:6 > LOCAL:4
+				;次のページがあることを確認できたら、後はスキップ
+				BREAK
+			ENDIF
+		ENDIF
+	NEXT
+	IF LOCAL:6 == 0
+		PRINTL 覚えている特技はありません
+	ENDIF
+	IF (LOCAL:6 <= LOCAL:4) && (LOCAL:6 % 2 == 1)
+		;最後まで表示しきっており、その個数が奇数だった場合、改行しておく
+		PRINTL 
+	ENDIF
+	DRAWLINE
+	IF LOCAL:0 > 1
+		PRINTLC [7] 前のページ
+	ELSE
+		PRINTLC  
+	ENDIF
+	PRINTFORMLC             {LOCAL:0,3}Page
+	IF LOCAL:6 > LOCAL:4
+		PRINTC [9] 次のページ   
+	ENDIF
+	PRINTL 
+;	IF LOCAL:7 == 0
+;		PRINTL [8] 短縮登録を確認
+;	ENDIF
+ENDIF
+PRINTL [0] 戻る
+
+$INPUT_LOOP
+INPUT
+IF RESULT == 0
+;戻る
+	IF LOCAL:7 == 0
+		RETURN 0
+	ELSE
+		PRINTW 短縮登録の変更を中断します
+		LOCAL:0 = 0
+		LOCAL:7 = 0
+		LOCAL:8 = 0
+	ENDIF
+ELSEIF (LOCAL:0 == 0) && (RESULT == 10)
+;全体確認へ
+	LOCAL:0 = 1
+ELSEIF (LOCAL:0 == 0) && (RESULT > 0) && (RESULT < 20)
+;短縮確認
+	IF CFLAG:(ARG:0):(RESULT + 1400) > 0
+		LOCAL:8 = RESULT
+		;Lv0になってないかチェック
+
+		;COMABLEチェック
+		TRYCCALLFORM COMABLE_{CFLAG:(ARG:0):(LOCAL:8 + 1400) + 800}(ARG:0)
+		CATCH
+			RESULT = 0
+		ENDCATCH
+		IF RESULT == 0
+			PRINTFORMW この特技は現在使用できません
+			GOTO START
+		ENDIF
+		IF RESULT < 0
+			CALL HEARTMARK_P
+			PRINTFORMW が足りません
+			GOTO START
+		ENDIF
+		
+		TRYCCALLFORM SELECT_SKILL_TARGET_{CFLAG:(ARG:0):(LOCAL:8 + 1400) + 800}(ARG:0)
+		CATCH
+			PRINTFORMW この特技は未実装のため使用できません
+		ENDCATCH
+		IF RESULT
+			RETURN 1
+		ENDIF
+	ELSE
+		PRINTFORMW ここにはまだ特技を短縮登録していません
+	ENDIF
+ELSEIF RESULT == 7
+;前のページ
+	IF LOCAL:0 > 1
+		LOCAL:0 -= 1
+	ENDIF
+ELSEIF RESULT == 9
+;次のページ
+	IF LOCAL:6 > LOCAL:4
+		LOCAL:0 += 1
+	ENDIF
+ELSEIF RESULT == 8
+;短縮確認へ
+	LOCAL:0 = 0
+ELSEIF (RESULT < 210) || (RESULT > 701)
+;スキル以外指定
+	REUSELASTLINE 入力値が不正です。再入力してください
+	GOTO INPUT_LOOP
+ELSEIF (ABL:(ARG:0):RESULT <= 0)
+;覚えてないスキル指定
+	REUSELASTLINE 入力値が不正です。再入力してください
+	GOTO INPUT_LOOP
+ELSE
+;覚えているスキル指定(短縮確認中でも、別ページでも、直接確認は可能)
+	LOCAL:8 = RESULT
+	;COMABLEチェック
+	TRYCCALLFORM COMABLE_{LOCAL:8}(ARG:0)
+	CATCH
+		RESULT = 0
+	ENDCATCH
+	IF RESULT == 0
+		PRINTFORMW この特技は現在使用できません
+		GOTO START
+	ENDIF
+	IF RESULT < 0
+		CALL HEARTMARK_P
+		PRINTFORMW が足りません
+		GOTO START
+	ENDIF
+
+	TRYCCALLFORM SELECT_SKILL_TARGET_{LOCAL:8}(ARG:0)
+	CATCH
+		PRINTFORMW この特技は未実装のため使用できません
+	ENDCATCH
+	IF RESULT
+		RETURN 1
+	ENDIF
+ENDIF
+
+GOTO START
+
+

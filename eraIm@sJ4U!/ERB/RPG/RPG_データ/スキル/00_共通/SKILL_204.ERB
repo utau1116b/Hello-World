@@ -1,0 +1,93 @@
+;204	Voアピール
+
+;スキル説明を表示
+;ARG:0	スキルレベル
+;RETURN	0:レベルアップ不可能　1:レベルアップ可能
+@SHOW_SKILL_EXPLAIN_204
+;説明なし＋Lvアップ不可
+RETURN 0
+
+;使用可能チェック
+;ARG:0	対象キャラ登録番号
+@COMABLE_204(ARG:0)
+LOCAL:0 = 1
+;戦闘中限定かどうか
+IF TFLAG:戦闘中 == 0
+	LOCAL:0 = 0
+ENDIF
+;封印状態かどうか
+IF CFLAG:(ARG:0):シール状態
+	LOCAL:0 = 0
+ENDIF
+RETURN LOCAL:0
+
+
+;スキル効果を設定
+;ARG:0	使用キャラ登録番号
+@SELECT_SKILL_TARGET_204(ARG:0)
+LOCAL:1 = ABL:(ARG:0):攻撃範囲
+IF ARG:0 <= 10
+	IF LOCAL:1 >= 7
+		CALL SELECT_TARGET_POSITION_ENEMY(ARG:0, 1)
+	ELSE
+		CALL SELECT_TARGET_POSITION_ENEMY(ARG:0, 0)
+	ENDIF
+ELSE
+	;CALL SHOW_SKILL_EXPLAIN_204(ABL:(ARG:0):1)
+	;POSITIONの引数は(0:敵単体　1:敵全体　2:自分　3:味方単体　4:味方全体　5:敵味方全体)
+	IF LOCAL:1 >= 7
+		CALL SELECT_TARGET_POSITION(1)
+	ELSE
+		CALL SELECT_TARGET_POSITION(0)
+	ENDIF
+ENDIF
+
+IF RESULT == 0
+	RETURN 0
+ELSE
+	LOCAL:0 = RESULT
+	;スキルID
+	CFLAG:(ARG:0):現在状態 = 204
+	;対象
+	CFLAG:(ARG:0):行動の対象 = LOCAL:0
+	RETURN 1
+ENDIF
+
+;スキル発動
+;ARG:0	使用キャラ
+;ARG:1	対象
+@USE_SKILL_204(ARG:0, ARG:1)
+
+CALL INIT_USE_SKILL_FLAG
+LOCAL:1 = ABL:(ARG:0):攻撃範囲
+IF LOCAL:1 < 7
+	TFLAG:対象範囲 = LOCAL:1
+ELSE
+	TFLAG:対象範囲 = 0
+ENDIF
+
+TFLAG:スキルID = 204
+TFLAG:使用キャラ = ARG:0
+TFLAG:対象キャラ = ARG:1
+TFLAG:スキル種別 = 1
+TFLAG:ダメージ係数 = 100
+TFLAG:クリティカル補正 = 2
+TFLAG:命中補正 = 10
+
+
+TFLAG:VO属性 = 1
+PRINTFORML %CALLNAME:(ARG:0)%＞＞Voアピール！
+;PRINTFORML %CALLNAME:(ARG:0)%の通常アピール！
+CALL COMMON_SKILL_FIX
+;王者の威圧チェック
+CALL GET_MAX_ABL_PT(237)
+IF RESULT == 0
+	A = RAND:3
+	IF ABL:(ARG:0):明鏡止水 && A == 0
+		;ユニークスキル発動した場合文字色変える
+		SETCOLOR 0x10EEEE
+		PRINTFORML %CALLNAME:(ARG:0)%＞＞%ABLNAME:235%発動！
+		RESETCOLOR
+		CALL COMMON_SKILL_FIX
+	ENDIF
+ENDIF

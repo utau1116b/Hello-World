@@ -1,0 +1,813 @@
+;スキルの共通処理解決
+;引数が大量になりすぎるので、再帰ができなくなるが、TFLAGで全部管理
+;複合属性はこちらで処理するけど、物理＋魔法などは、2回呼んでもらう？
+;念のためTFLAG:スキル種別は重複可能なようにビット管理
+
+;RETURN		0:失敗　1:成功
+;滅茶苦茶処理長くなってしまったけど、LOCAL使いまくりで分割し辛いし、もう気にしたら負けだと思おう
+@COMMON_ITEM_FIX
+;LOCALリスト　→　スタックに積むため、TFLAG:1200～250に移動
+;1200	ループカウンタ1
+;7201	ループカウンタ2
+;7202	効果量
+;7203	命中回数
+;7204	最終効果量
+;7205	雑多な処理用フラグ
+;7206	処理対象の倍率保存場所
+;7207	処理対象の登録番号
+;7208	雑多な計算用
+;7209	戻り値用
+;7211～7215	味方を対象とする場合の効果倍率
+;7216～7220	味方の登録番号
+;7221～7230	敵を対象とする場合の効果倍率
+;倍率-1で強制的に空振り(主にアイシクルフォール用)
+
+RESETCOLOR
+
+;初期化
+FOR TFLAG:1200, 1201, 1231
+	TFLAG:(TFLAG:1200) = 0
+NEXT
+
+;恐怖の場合50%で不発
+IF (CFLAG:(TFLAG:使用キャラ):フィアー状態) && RAND:2 == 0
+	PRINTFORML %CALLNAME:(TFLAG:使用キャラ)%は恐怖で動けない！
+;CALL BMSG_WAIT(1)
+	TFLAG:1209 = 0
+	GOTO FINISH
+ENDIF
+
+
+;処理し辛いので登録番号を拾っておく
+FOR TFLAG:1200, 0, 5
+	IF FLAG:(TFLAG:1200 + 1080) > 0
+		TFLAG:(TFLAG:1200 + 1216) = FLAG:(TFLAG:1200 + 1080)
+	ENDIF
+NEXT
+
+;対象キャラが個人の場合、みがわりチェック(ただし、攻撃系のみ)
+;IF (TFLAG:スキル種別 & 0b000111)
+;	IF TFLAG:対象キャラ < 6
+;		;味方の場合
+;		FOR TFLAG:1200, 16, 21
+;			IF TFLAG:(TFLAG:1200 + 1200) > 0 && CFLAG:(TFLAG:(TFLAG:1200 + 1200)):みがわり状態 && (CFLAG:(TFLAG:(TFLAG:1200 + 1200)):ストップ状態 == 0 && CFLAG:(TFLAG:(TFLAG:獲得経験値 + 1200)):7057 == 0 && CFLAG:(TFLAG:(TFLAG:1200 + 1200)):スリープ状態 == 0 && CFLAG:(TFLAG:(TFLAG:1200 + 1200)):1059 == 0 && CFLAG:(TFLAG:(TFLAG:1200 + 1200)):1060 == 0 && CFLAG:(TFLAG:(TFLAG:1200 + 1200)):1061 == 0)
+;				IF (TFLAG:対象キャラ != (TFLAG:1200 - 15))
+;					PRINTFORML %CALLNAME:(TFLAG:(TFLAG:1200 + 1200))%は%CALLNAME:(TFLAG:(TFLAG:対象キャラ + 7215))%をかばった！
+;				ENDIF
+;				TFLAG:対象キャラ = TFLAG:1200 - 15
+;			ENDIF
+;		NEXT
+;	ELSEIF TFLAG:対象キャラ < 21
+;		;敵の場合
+;		FOR TFLAG:1200, 1, 11
+;			IF TFLAG:(TFLAG:1200 + 1000) > 0 && CFLAG:(TFLAG:1200):みがわり状態 && (CFLAG:(TFLAG:200):7056 == 0 && CFLAG:(TFLAG:1200):1057 == 0 && CFLAG:(TFLAG:1200):スリープ状態 == 0 && CFLAG:(TFLAG:1200):1059 == 0 && CFLAG:(TFLAG:1200):1060 == 0 && CFLAG:(TFLAG:1200):1061 == 0)
+;				IF (TFLAG:対象キャラ != (TFLAG:1200 + 10))
+;;					PRINTFORML %CALLNAME:(TFLAG:1200)%は%CALLNAME:(TFLAG:対象キャラ - 10)%をかばった！
+;				ENDIF
+;				TFLAG:対象キャラ = TFLAG:1200 + 10
+;			ENDIF
+;		NEXT
+;	ENDIF
+;ENDIF
+
+;倍率系が入力されていない場合、初期値にしておく
+IF TFLAG:威力係数 == 0
+	TFLAG:威力係数 = 100
+ELSEIF TFLAG:威力係数 == -1
+	;-1指定は0倍扱い
+	TFLAG:威力係数 = 0
+ENDIF
+IF TFLAG:ダメージ係数 == 0
+	TFLAG:ダメージ係数 = 100
+ELSEIF TFLAG:ダメージ係数 == -1
+	;-1指定は0倍扱い
+	TFLAG:ダメージ係数 = 0
+ENDIF
+
+
+;対象：自分を個人指定に変更
+IF TFLAG:対象キャラ == 30
+	IF TFLAG:使用キャラ <= 10
+		TFLAG:対象キャラ = TFLAG:使用キャラ + 10
+	ELSE
+		FOR TFLAG:1200, 80, 85
+			SIF FLAG:(TFLAG:1200 + 1000) == TFLAG:使用キャラ
+				TFLAG:対象キャラ = TFLAG:1200 - 79
+		NEXT
+	ENDIF
+ENDIF
+
+;指定キャラ気絶チェック
+IF TFLAG:対象キャラ >= 1 && TFLAG:対象キャラ <= 5
+	;気絶者を対象にとらない場合で、対象が既に気絶していたら他のキャラからランダムで選ぶ
+	IF CFLAG:(FLAG:(TFLAG:対象キャラ + 1079)):気絶状態 && TFLAG:気絶キャラ認める == 0
+		CALL SELECT_LIVE_MEMBER_PT
+		TFLAG:対象キャラ = RESULT
+	ENDIF
+ELSEIF TFLAG:対象キャラ >= 11 && TFLAG:対象キャラ <= 20
+	;気絶者を対象にとらない場合で、対象が既に気絶していたら他のキャラからランダムで選ぶ
+	IF CFLAG:(TFLAG:対象キャラ - 10):気絶状態 && TFLAG:気絶キャラ認める == 0
+		CALL SELECT_LIVE_MEMBER_ENEMY
+		TFLAG:対象キャラ = RESULT + 10
+	ENDIF
+ENDIF
+
+;構え解除
+CFLAG:(TFLAG:使用キャラ):集中フラグ = 0
+
+;攻撃回数追加チェック
+IF CFLAG:(TFLAG:使用キャラ):攻撃回数増加 && (TFLAG:スキル種別 == 0b01 || TFLAG:スキル種別 == 0b10)
+	TFLAG:攻撃回数追加 += CFLAG:(TFLAG:使用キャラ):攻撃回数増加
+ENDIF
+
+
+;クリティカル追加チェック
+IF CFLAG:(TFLAG:使用キャラ):クリティカルアップ
+	TFLAG:クリティカル補正 += CFLAG:(TFLAG:使用キャラ):クリティカルアップ
+ENDIF
+
+
+
+
+;----------------------------------------------------------------------------------------------------------
+;対象代入
+;----------------------------------------------------------------------------------------------------------
+SELECTCASE TFLAG:対象範囲
+	CASE 0
+		;単体指定(範囲が全体の場合もこれになる)
+		IF TFLAG:対象キャラ >= 1 && TFLAG:対象キャラ <= 5
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+		ELSEIF TFLAG:対象キャラ >= 11 && TFLAG:対象キャラ <= 20
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+		ELSEIF TFLAG:対象キャラ == 31
+			FOR TFLAG:1200, 80, 85
+				IF FLAG:(TFLAG:1200 + 1000) > 0
+					TFLAG:(TFLAG:1200 - 69 + 1200) = 100
+				ENDIF
+			NEXT
+		ELSEIF TFLAG:対象キャラ == 32
+			FOR TFLAG:1200, 1, 11
+				IF TFLAG:(TFLAG:1200 + 1000) > 0
+					TFLAG:(TFLAG:1200 + 1220) = 100
+				ENDIF
+			NEXT
+		ELSEIF TFLAG:対象キャラ == 33
+			FOR TFLAG:1200, 1, 11
+				IF TFLAG:(TFLAG:1200 +1000) > 0
+					TFLAG:(TFLAG:1200 + 1220) = 100
+				ENDIF
+			NEXT
+			FOR TFLAG:1200, 80, 85
+				IF FLAG:(TFLAG:1200 + 1000) > 0
+					TFLAG:(TFLAG:1200 - 69 + 1200) = 100
+				ENDIF
+			NEXT
+		ELSE
+			PRINTFORMW エラー！不正な対象番号{TFLAG:対象キャラ}がCASE{TFLAG:対象範囲}で指定されました(COMMON_SKILL_FIX：対象代入)
+		ENDIF
+	CASE 1
+		;小範囲・減衰アリ　50/100/50
+		IF TFLAG:対象キャラ >= 1 && TFLAG:対象キャラ <= 5
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 1
+				;ID低いほうに50
+				TFLAG:(TFLAG:対象キャラ + 1209) = 50
+			ENDIF
+			IF TFLAG:対象キャラ < 5
+				;ID高いほうに50
+				TFLAG:(TFLAG:対象キャラ + 1211) = 50
+			ENDIF
+		ELSEIF TFLAG:対象キャラ >= 11 && TFLAG:対象キャラ <= 20
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 11
+				;ID低いほうに50
+				TFLAG:(TFLAG:対象キャラ + 1209) = 50
+			ENDIF
+			IF TFLAG:対象キャラ < 20
+				;ID高いほうに50
+				TFLAG:(TFLAG:対象キャラ + 1211) = 50
+			ENDIF
+		ELSE
+			PRINTFORMW エラー！不正な対象番号{TFLAG:対象キャラ}がCASE{TFLAG:対象範囲}で指定されました(COMMON_SKILL_FIX：対象代入)
+		ENDIF
+	CASE 2
+		;小範囲
+		IF TFLAG:対象キャラ >= 1 && TFLAG:対象キャラ <= 5
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 1
+				;ID低いほうに100
+				TFLAG:(TFLAG:対象キャラ + 1209) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 5
+				;ID高いほうに100
+				TFLAG:(TFLAG:対象キャラ + 1211) = 100
+			ENDIF
+		ELSEIF TFLAG:対象キャラ >= 11 && TFLAG:対象キャラ <= 20
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 11
+				;ID低いほうに100
+				TFLAG:(TFLAG:対象キャラ + 1209) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 20
+				;ID高いほうに100
+				TFLAG:(TFLAG:対象キャラ + 1211) = 100
+			ENDIF
+		ELSE
+			PRINTFORMW エラー！不正な対象番号{TFLAG:対象キャラ}がCASE{TFLAG:対象範囲}で指定されました(COMMON_SKILL_FIX：対象代入)
+		ENDIF
+	CASE 3
+		;中範囲・減衰アリ　40/70/100/70/40
+		IF TFLAG:対象キャラ >= 1 && TFLAG:対象キャラ <= 5
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 1
+				;ID-1に70
+				TFLAG:(TFLAG:対象キャラ + 1209) = 70
+			ENDIF
+			IF TFLAG:対象キャラ < 5
+				;ID+1に70
+				TFLAG:(TFLAG:対象キャラ + 1211) = 70
+			ENDIF
+			IF TFLAG:対象キャラ > 2
+				;ID-2に40
+				TFLAG:(TFLAG:対象キャラ + 1208) = 40
+			ENDIF
+			IF TFLAG:対象キャラ < 4
+				;ID+2に40
+				TFLAG:(TFLAG:対象キャラ + 1212) = 40
+			ENDIF
+		ELSEIF TFLAG:対象キャラ >= 11 && TFLAG:対象キャラ <= 20
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 11
+				;ID-1に70
+				TFLAG:(TFLAG:対象キャラ + 1209) = 70
+			ENDIF
+			IF TFLAG:対象キャラ < 20
+				;ID+1に70
+				TFLAG:(TFLAG:対象キャラ + 1211) = 70
+			ENDIF
+			IF TFLAG:対象キャラ > 12
+				;ID-2に40
+				TFLAG:(TFLAG:対象キャラ + 1208) = 40
+			ENDIF
+			IF TFLAG:対象キャラ < 19
+				;ID+2に40
+				TFLAG:(TFLAG:対象キャラ + 1212) = 40
+			ENDIF
+		ELSE
+			PRINTFORMW エラー！不正な対象番号{TFLAG:対象キャラ}がCASE{TFLAG:対象範囲}で指定されました(COMMON_SKILL_FIX：対象代入)
+		ENDIF
+	CASE 4
+		;中範囲
+		IF TFLAG:対象キャラ >= 1 && TFLAG:対象キャラ <= 5
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 1
+				;ID-1に100
+				TFLAG:(TFLAG:対象キャラ + 1209) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 5
+				;ID+1に100
+				TFLAG:(TFLAG:対象キャラ + 1211) = 100
+			ENDIF
+			IF TFLAG:対象キャラ > 2
+				;ID-2に100
+				TFLAG:(TFLAG:対象キャラ + 1208) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 4
+				;ID+2に100
+				TFLAG:(TFLAG:対象キャラ + 1212) = 100
+			ENDIF
+		ELSEIF TFLAG:対象キャラ >= 11 && TFLAG:対象キャラ <= 20
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 11
+				;ID-1に100
+				TFLAG:(TFLAG:対象キャラ + 1209) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 20
+				;ID+1に100
+				TFLAG:(TFLAG:対象キャラ + 1211) = 100
+			ENDIF
+			IF TFLAG:対象キャラ > 12
+				;ID-2に100
+				TFLAG:(TFLAG:対象キャラ + 1208) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 19
+				;ID+2に100
+				TFLAG:(TFLAG:対象キャラ + 1212) = 100
+			ENDIF
+		ELSE
+			PRINTFORMW エラー！不正な対象番号{TFLAG:対象キャラ}がCASE{TFLAG:対象範囲}で指定されました(COMMON_SKILL_FIX：対象代入)
+		ENDIF
+	CASE 5
+		;大範囲・減衰アリ　40/60/80/100/80/60/40
+		IF TFLAG:対象キャラ >= 1 && TFLAG:対象キャラ <= 5
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 1
+				;ID-1に80
+				TFLAG:(TFLAG:対象キャラ + 1209) = 80
+			ENDIF
+			IF TFLAG:対象キャラ < 5
+				;ID+1に80
+				TFLAG:(TFLAG:対象キャラ + 1211) = 80
+			ENDIF
+			IF TFLAG:対象キャラ > 2
+				;ID-2に60
+				TFLAG:(TFLAG:対象キャラ + 1208) = 60
+			ENDIF
+			IF TFLAG:対象キャラ < 4
+				;ID+2に60
+				TFLAG:(TFLAG:対象キャラ + 1212) = 60
+			ENDIF
+			IF TFLAG:対象キャラ > 3
+				;ID-3に40
+				TFLAG:(TFLAG:対象キャラ + 1207) = 40
+			ENDIF
+			IF TFLAG:対象キャラ < 3
+				;ID+3に40
+				TFLAG:(TFLAG:対象キャラ + 1213) = 40
+			ENDIF
+		ELSEIF TFLAG:対象キャラ >= 11 && TFLAG:対象キャラ <= 20
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 11
+				;ID-1に80
+				TFLAG:(TFLAG:対象キャラ + 1209) = 80
+			ENDIF
+			IF TFLAG:対象キャラ < 20
+				;ID+1に80
+				TFLAG:(TFLAG:対象キャラ + 1211) = 80
+			ENDIF
+			IF TFLAG:対象キャラ > 12
+				;ID-2に60
+				TFLAG:(TFLAG:対象キャラ + 1208) = 60
+			ENDIF
+			IF TFLAG:対象キャラ < 19
+				;ID+2に60
+				TFLAG:(TFLAG:対象キャラ + 1212) = 60
+			ENDIF
+			IF TFLAG:対象キャラ > 13
+				;ID-3に40
+				TFLAG:(TFLAG:対象キャラ + 1207) = 40
+			ENDIF
+			IF TFLAG:対象キャラ < 18
+				;ID+3に40
+				TFLAG:(TFLAG:対象キャラ + 1213) = 40
+			ENDIF
+		ELSE
+			PRINTFORMW エラー！不正な対象番号{TFLAG:対象キャラ}がCASE{TFLAG:対象範囲}で指定されました(COMMON_SKILL_FIX：対象代入)
+		ENDIF
+	CASE 6
+		;大範囲
+		IF TFLAG:対象キャラ >= 1 && TFLAG:対象キャラ <= 5
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 1
+				;ID-1に100
+				TFLAG:(TFLAG:対象キャラ + 1209) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 5
+				;ID+1に100
+				TFLAG:(TFLAG:対象キャラ + 1211) = 100
+			ENDIF
+			IF TFLAG:対象キャラ > 2
+				;ID-2に100
+				TFLAG:(TFLAG:対象キャラ + 1208) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 4
+				;ID+2に100
+				TFLAG:(TFLAG:対象キャラ + 1212) = 100
+			ENDIF
+			IF TFLAG:対象キャラ > 3
+				;ID-3に100
+				TFLAG:(TFLAG:対象キャラ + 1207) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 3
+				;ID+3に100
+				TFLAG:(TFLAG:対象キャラ + 1213) = 100
+			ENDIF
+		ELSEIF TFLAG:対象キャラ >= 11 && TFLAG:対象キャラ <= 20
+			TFLAG:(TFLAG:対象キャラ + 1210) = 100
+			IF TFLAG:対象キャラ > 11
+				;ID-1に100
+				TFLAG:(TFLAG:対象キャラ + 1209) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 20
+				;ID+1に100
+				TFLAG:(TFLAG:対象キャラ + 1211) = 100
+			ENDIF
+			IF TFLAG:対象キャラ > 12
+				;ID-2に100
+				TFLAG:(TFLAG:対象キャラ + 1208) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 19
+				;ID+2に100
+				TFLAG:(TFLAG:対象キャラ + 1212) = 100
+			ENDIF
+			IF TFLAG:対象キャラ > 13
+				;ID-3に100
+				TFLAG:(TFLAG:対象キャラ + 1207) = 100
+			ENDIF
+			IF TFLAG:対象キャラ < 18
+				;ID+3に100
+				TFLAG:(TFLAG:対象キャラ + 1213) = 100
+			ENDIF
+		ELSE
+			PRINTFORMW エラー！不正な対象番号{TFLAG:対象キャラ}がCASE{TFLAG:対象範囲}で指定されました(COMMON_SKILL_FIX：対象代入)
+		ENDIF
+	CASE 7
+		;ランダムN体重複無し
+		IF TFLAG:対象キャラ == 31
+			FOR TFLAG:1200, 1, TFLAG:処理回数
+				;全員選択済みでないかチェック
+				TFLAG:1205 = 0
+				FOR TFLAG:1201, 0, 5
+				
+				;元はBASE:(TFLAG:POW総計 + カウンター状態2):気絶状態 == 0　だったのを(BASE:(FLAG:(TFLAG:POW総計 + カウンター状態2)):気絶状態
+				
+					IF FLAG:(TFLAG:1201 + 1080) > 0 && (CFLAG:(FLAG:(TFLAG:1201 + 1080)):気絶状態 == 0 || TFLAG:気絶キャラ認める) && TFLAG:(TFLAG:1201 + 1211) == 0
+						;まだ選択されていないキャラが居ればフラグを立てる
+						TFLAG:1205 = 1
+					ENDIF
+				NEXT
+				
+				IF TFLAG:1205 == 0
+					;もう全員選択済みなら、ループを抜ける
+					BREAK
+				ENDIF
+
+				TFLAG:1201 = RAND:5
+				IF FLAG:(TFLAG:1201 + 1080) > 0 && (CFLAG:(FLAG:(TFLAG:1201 + 1080)):気絶状態 == 0 || TFLAG:気絶キャラ認める) && TFLAG:(TFLAG:1201 + 7211) == 0
+					TFLAG:(TFLAG:1201 + 7211) = 100
+				ELSE
+					TFLAG:1200 -= 1
+				ENDIF
+			NEXT
+		ELSEIF TFLAG:対象キャラ == 32
+			FOR TFLAG:1200, 1, TFLAG:処理回数
+				;全員選択済みでないかチェック
+				TFLAG:1205 = 0
+				FOR TFLAG:1201, 1, 11
+														;ミス候補
+					IF TFLAG:(TFLAG:1201 + 1000) > 0 && (CFLAG:(TFLAG:1201):気絶状態 == 0 || TFLAG:気絶キャラ認める) && TFLAG:(TFLAG:1201 + 1220) == 0
+						;まだ選択されていないキャラが居ればフラグを立てる
+						TFLAG:1205 = 1
+					ENDIF
+				NEXT
+				
+				IF TFLAG:1205 == 0
+					;もう全員選択済みなら、ループを抜ける
+					BREAK
+				ENDIF
+
+				TFLAG:1201 = RAND:10 + 1
+				IF TFLAG:(TFLAG:1201 + 1000) > 0 && (CFLAG:(TFLAG:1201):気絶状態 == 0 || TFLAG:気絶キャラ認める) && TFLAG:(TFLAG:1201 + 1220) == 0
+					TFLAG:(TFLAG:1201 + 1220) = 100
+				ELSE
+					TFLAG:1200 -= 1
+				ENDIF
+			NEXT
+		ELSE
+			PRINTFORMW エラー！不正な対象番号{TFLAG:対象キャラ}がCASE{TFLAG:対象範囲}で指定されました(COMMON_ITEM_FIX：対象代入)
+		ENDIF
+	CASE 8
+		;ランダムN体重複アリ
+		IF TFLAG:対象キャラ == 31
+			FOR TFLAG:1200, 1, TFLAG:処理回数
+				TFLAG:1201 = RAND:5
+				IF FLAG:(TFLAG:1201 + 1080) > 0 && (CFLAG:(FLAG:(TFLAG:1201 + 1080)):気絶状態 == 0 || TFLAG:気絶キャラ認める)
+					TFLAG:(TFLAG:1201 + 7211) += 100
+				ELSE
+					TFLAG:1200 -= 1
+				ENDIF
+			NEXT
+		ELSEIF TFLAG:対象キャラ == 32
+			FOR TFLAG:1200, 1, TFLAG:処理回数
+				TFLAG:1201 = RAND:10 + 1
+				IF TFLAG:(TFLAG:1201) > 0 && (CFLAG:(TFLAG:1201):気絶状態 == 0 || TFLAG:気絶キャラ認める)
+					TFLAG:(TFLAG:1201 + 7220) += 100
+				ELSE
+					TFLAG:1200 -= 1
+				ENDIF
+			NEXT
+		ELSEIF TFLAG:対象キャラ == 33
+			FOR TFLAG:1200, 1, TFLAG:処理回数
+				TFLAG:1201 = RAND:15
+				IF TFLAG:1201 < 5
+					;乱数5未満は味方から選ぶ
+					IF FLAG:(TFLAG:1201 + 1080) > 0 && (CFLAG:(FLAG:(TFLAG:1201 + 1080)):気絶状態 == 0 || TFLAG:気絶キャラ認める)
+						TFLAG:(TFLAG:1201 + 7211) += 100
+					ELSE
+						TFLAG:1200 -= 1
+					ENDIF
+				ELSE
+					;乱数5以上は敵から選ぶ
+					IF TFLAG:(TFLAG:1201 - 4) > 0 && (CFLAG:(TFLAG:1201 - 4):気絶状態 == 0 || TFLAG:気絶キャラ認める)
+						TFLAG:(TFLAG:1201 + 1216) += 100
+					ELSE
+						TFLAG:1200 -= 1
+					ENDIF
+				ENDIF
+			NEXT
+		ELSE
+			PRINTFORMW エラー！不正な対象番号{TFLAG:対象キャラ}がCASE{TFLAG:対象範囲}で指定されました(COMMON_ITEM_FIX：対象代入)
+		ENDIF
+ENDSELECT
+
+;----------------------------------------------------------------------------------------------------------
+;各自の分を処理
+;----------------------------------------------------------------------------------------------------------
+FOR TFLAG:1200, 0, 15
+	;0～4は味方分、5～14は敵分の処理
+	;対象確定
+	IF TFLAG:1200 < 5
+		;キャラが居なければスキップ
+		IF FLAG:(1080 + TFLAG:1200) <= 0
+			CONTINUE
+		ENDIF
+		TFLAG:1206 = TFLAG:1200 + 11
+		TFLAG:1207 = TFLAG:(TFLAG:1200 + 1216)
+	ELSE
+		;キャラが居なければスキップ
+		IF TFLAG:(TFLAG:1200 - 4 + 1000) <= 0
+			CONTINUE
+		ENDIF
+		TFLAG:1206 = TFLAG:1200 + 16
+		TFLAG:1207 = TFLAG:1200 - 4
+	ENDIF
+	;倍率-1は強制空振り
+	IF TFLAG:(TFLAG:1206 + 1200) == -1
+		PRINTFORML %CALLNAME:(TFLAG:1207)%には当たらなかった！
+		CONTINUE
+	ENDIF
+	;倍率0はスキップ
+	IF TFLAG:(TFLAG:1206 + 1200) == 0
+		CONTINUE
+	ENDIF
+
+	;気絶キャラ無視スキルが気絶しているキャラに飛んできた場合はスキップ
+	IF TFLAG:気絶キャラ認める == 0 && CFLAG:(TFLAG:1207):気絶状態
+		CONTINUE
+	ENDIF
+	
+	;特殊処理チェック→伊織の処理に使えそう
+	IF TFLAG:特殊処理 == 1
+		;睡眠中キャラのみが対象
+		IF CFLAG:(TFLAG:1207):スリープ状態 == 0
+			;睡眠中でなければスキップ
+			CONTINUE
+		ENDIF
+	ENDIF
+	;種別判定
+	IF TFLAG:スキル種別 == 0b000001
+		;物理
+		CALL CALCULATE_DAMAGE_I(TFLAG:使用キャラ, TFLAG:1207, TFLAG:(TFLAG:1206 + 1200))
+		;ダメージ取得
+		TFLAG:1202 = R:1
+		;命中回数取得
+		TFLAG:1203 = R:0
+		
+		;補正後のダメージ,ここ補正の欄
+		TFLAG:1204 = TFLAG:1202
+		
+		IF TFLAG:1203 > 0 && CFLAG:(TFLAG:1207):無敵状態
+			;無敵結界
+			PRINTFORML しかし%CALLNAME:(TFLAG:1207)%は攻撃を無効化した！
+			CFLAG:(TFLAG:1207):無敵状態 -= 1
+			TFLAG:1203 = 0
+		;ELSEIF TFLAG:1203 > 0 && CFLAG:(TFLAG:1207):アピール無効状態
+		;	;無効
+		;	PRINTFORML しかし%CALLNAME:(TFLAG:1207)%は攻撃を無効化した！
+		;	;状態異常は残したいので命中回数は弄らない
+		;ELSEIF TFLAG:1203 > 0 && CFLAG:(TFLAG:1207):アピール反射状態
+		;	;反射
+		;	PRINTFORML しかし%CALLNAME:(TFLAG:1207)%は攻撃を反射した！
+		;	PRINTFORML %CALLNAME:(TFLAG:使用キャラ)%に%ADD_COMMA(TFLAG:1204)%のダメージ！
+		;	BASE:(TFLAG:使用キャラ):HP -= TFLAG:1204
+		;	TFLAG:1203 = 0
+		;ELSEIF TFLAG:1203 > 0
+			IF CFLAG:(TFLAG:1207):アピール半減状態
+				;半減
+				TFLAG:1204 /= 2
+				SIF TFLAG:1204 == 0
+					TFLAG:1204 = 1
+			ENDIF
+			
+			BASE:(TFLAG:1207):HP -= TFLAG:1204
+			
+			;被ダメ口上
+			;FLAG:800 = 8
+			;CALL KOJO(TFLAG:207, TFLAG:204)
+			
+			PRINTFORML {TFLAG:1203}HIT！　%CALLNAME:(TFLAG:1207)%に%ADD_COMMA(TFLAG:1204)%のダメージ！
+			;呪いチェック
+			IF CFLAG:(TFLAG:使用キャラ):カース状態
+				PRINTFORML %CALLNAME:(TFLAG:使用キャラ)%は呪われている！　 %CALLNAME:(TFLAG:使用キャラ)%に%ADD_COMMA(TFLAG:1204 / 4)%のダメージ！
+				BASE:(TFLAG:使用キャラ):HP -= TFLAG:1204 / 4
+			ENDIF
+			
+			;吸収チェック
+			IF TFLAG:★吸収率
+				PRINTFORML %CALLNAME:(TFLAG:1207)%のSCOREを%ADD_COMMA(TFLAG:1204 * TFLAG:★吸収率 / 1000)%吸収した！
+				BASE:(TFLAG:使用キャラ):HP += TFLAG:1204 * TFLAG:★吸収率 / 1000
+				SIF BASE:(TFLAG:使用キャラ):HP > MAXBASE:(TFLAG:使用キャラ):HP
+					BASE:(TFLAG:使用キャラ):HP = MAXBASE:(TFLAG:使用キャラ):HP
+			ENDIF
+			IF TFLAG:ハート吸収率
+				PRINTFORML %CALLNAME:(TFLAG:1207)%のTENSIONを%ADD_COMMA(TFLAG:1204 * TFLAG:ハート吸収率 / 1000)%吸収した！
+				BASE:(TFLAG:使用キャラ):MP += TFLAG:1204 * TFLAG:ハート吸収率 / 1000
+				SIF BASE:(TFLAG:使用キャラ):MP > MAXBASE:(TFLAG:使用キャラ):MP
+					BASE:(TFLAG:使用キャラ):MP = MAXBASE:(TFLAG:使用キャラ):MP
+			ENDIF
+			
+			;ドレインチェック
+			IF CFLAG:(TFLAG:使用キャラ):ドレイン
+				PRINTFORML ドレイン発動！　%CALLNAME:(TFLAG:使用キャラ)%のSCOREが%ADD_COMMA(TFLAG:1204 / 5)%回復した！
+				BASE:(TFLAG:使用キャラ):HP += TFLAG:1204 / 5
+				SIF BASE:(TFLAG:使用キャラ):HP > MAXBASE:(TFLAG:使用キャラ):HP
+					BASE:(TFLAG:使用キャラ):HP = MAXBASE:(TFLAG:使用キャラ):HP
+			ENDIF
+		ELSE
+			PRINTFORML %CALLNAME:(TFLAG:1207)%は攻撃を全て避けきった！
+		ENDIF
+	ELSEIF TFLAG:スキル種別 == 0b001000
+		;★回復
+		;1回命中扱い
+		TFLAG:1203 = 1
+		;回復量計算
+		IF TFLAG:ダメージ係数 > 0
+			;最大値の割合指定がある場合
+			TFLAG:1202 = MAXBASE:(TFLAG:1207):0 * TFLAG:ダメージ係数 / 100
+		ELSE
+			TFLAG:1202 = 0
+		ENDIF
+		
+		TFLAG:1202 += TFLAG:ダメージ補正
+		
+		;範囲倍率反映
+		TFLAG:1202 = TFLAG:1202 * TFLAG:(TFLAG:1206 + 1200) / 100
+		
+		;!!!
+		;固有スキルとかの補正
+		TFLAG:1204 = TFLAG:1202
+		
+		
+		IF CFLAG:(TFLAG:1207):無敵状態
+			;無敵
+			PRINTFORML しかし%CALLNAME:(TFLAG:1207)%は%GET_ABLNAME(TFLAG:スキルID)%の効果を無効化した！
+			CFLAG:(TFLAG:1207):無敵状態 -= 1
+			TFLAG:1203 = 0
+		ELSEIF TFLAG:1204 > 0
+			BASE:(TFLAG:1207):HP += TFLAG:1204
+			
+			;回復口上
+			;FLAG:800 = 10
+			;CALL KOJO(TFLAG:207, TFLAG:204)
+			
+			PRINTFORML %CALLNAME:(TFLAG:1207)%の★が%ADD_COMMA(TFLAG:1204)%回復した！
+			IF BASE:(TFLAG:1207):HP > MAXBASE:(TFLAG:1207):HP
+				BASE:(TFLAG:1207):HP = MAXBASE:(TFLAG:1207):HP
+			ENDIF
+		ENDIF
+	ELSEIF TFLAG:スキル種別 == 0b010000
+		;MP回復
+		;1回命中扱い
+		TFLAG:1203 = 1
+		;回復量計算
+		IF TFLAG:ダメージ係数 > 0
+			;最大値の割合指定がある場合
+			TFLAG:1202 = MAXBASE:(TFLAG:1207):MP * TFLAG:ダメージ係数 / 100
+		ELSE
+			TFLAG:1202 = 0
+		ENDIF
+		
+		TFLAG:1202 += TFLAG:ダメージ補正
+		
+		;範囲倍率反映
+		TFLAG:1202 = TFLAG:1202 * TFLAG:(TFLAG:1206 + 1200) / 100
+		
+		;!!!
+		;固有スキルとかの補正
+		TFLAG:1204 = TFLAG:1202
+		
+		
+		IF CFLAG:(TFLAG:1207):無敵状態
+			;無敵
+			PRINTFORML しかし%CALLNAME:(TFLAG:1207)%は%GET_ABLNAME(TFLAG:スキルID)%の効果を無効化した！
+			CFLAG:(TFLAG:1207):無敵状態 -= 1
+			TFLAG:1203 = 0
+		ELSEIF TFLAG:1204 > 0
+			BASE:(TFLAG:1207):MP += TFLAG:1204
+			
+			;;回復口上
+			;FLAG:800 = 11
+			;CALL KOJO(TFLAG:207, TFLAG:204)
+			
+			PRINTFORML %CALLNAME:(TFLAG:1207)%のTENSIONが%ADD_COMMA(TFLAG:1204)%回復した！
+			IF BASE:(TFLAG:1207):MP > MAXBASE:(TFLAG:1207):MP
+				BASE:(TFLAG:1207):MP = MAXBASE:(TFLAG:1207):MP
+			ENDIF
+		ENDIF
+	ELSEIF TFLAG:スキル種別 == 0b100000
+		;Voltage上昇
+		;1回命中扱い
+		TFLAG:1203 = 1
+		;回復量計算
+		IF TFLAG:ダメージ係数 > 0
+			;最大値の割合指定がある場合
+			TFLAG:1202 = MAXBASE:(TFLAG:1207):ボルテージ * TFLAG:ダメージ係数 / 100
+		ELSE
+			TFLAG:1202 = 0
+		ENDIF
+		
+		TFLAG:1202 += TFLAG:ダメージ補正
+		
+		;範囲倍率反映
+		TFLAG:1204 = TFLAG:1202 * TFLAG:(TFLAG:1206 + 1200) / 100
+		
+		;!!!
+		;固有スキルとかの補正
+		TFLAG:1204 = TFLAG:1202
+		
+		IF CFLAG:(TFLAG:1207):無敵状態
+			;無敵
+			PRINTFORML しかし%CALLNAME:(TFLAG:1207)%は%GET_ABLNAME(TFLAG:スキルID)%の効果を無効化した！
+			CFLAG:(TFLAG:1207):無敵状態 -= 1
+			TFLAG:1203 = 0
+		ELSEIF TFLAG:1204 > 0
+			BASE:(TFLAG:1207):ボルテージ += TFLAG:1204
+			
+			;回復口上
+			;FLAG:800 = 12
+			;CALL KOJO(TFLAG:207, TFLAG:204)
+			
+			PRINTFORML %CALLNAME:(TFLAG:1207)%のVOLTAGEが%ADD_COMMA(TFLAG:1204)%上昇した！
+			IF BASE:(TFLAG:1207):ボルテージ > MAXBASE:(TFLAG:1207):ボルテージ
+				BASE:(TFLAG:1207):ボルテージ = MAXBASE:(TFLAG:1207):ボルテージ
+			ENDIF
+		ENDIF
+	ELSEIF TFLAG:スキル種別 == 0b000000
+		;補助
+		;1回命中扱い
+		TFLAG:1203 = 1
+		IF CFLAG:(TFLAG:1207):無敵状態
+			;無敵
+			PRINTFORML しかし%CALLNAME:(TFLAG:1207)%は%GET_ABLNAME(TFLAG:スキルID)%の効果を無効化した！
+			CFLAG:(TFLAG:1207):無敵状態 -= 1
+			TFLAG:1203 = 0
+		ENDIF
+	ELSE
+		PRINTFORMW エラー！無効なスキル種別{TFLAG:スキル種別}が指定されました
+	ENDIF
+	
+	;状態異常付加や治療のチェック
+	IF TFLAG:1203 > 0
+		CALL CHECK_CHANGE_STATE(TFLAG:1207)
+		;補助スキルで、特に何の効果も発揮しなかった場合は、その旨を表示
+		IF RESULT == 0 && TFLAG:スキル種別 == 0b000000
+			PRINTFORML しかし%CALLNAME:(TFLAG:1207)%には効かなかった！
+		ENDIF
+	ENDIF
+	;PRINTFORML {BASE:(TFLAG:1207):HP}
+	;状態チェック
+	CALL STATUS_RENEW_2(TFLAG:1207)
+	CALL CHECK_PERSONAL_HPEP_0(TFLAG:1207, TFLAG:1188)
+NEXT
+;PRINTFORML {BASE:(TFLAG:1207):HP}
+CALL STATUS_RENEW_2(TFLAG:使用キャラ)
+TFLAG:1209 = 1
+
+;----------------------------------------------------------------------------------------------------------
+
+;----------------------------------------------------------------------------------------------------------
+;行動後処理
+;----------------------------------------------------------------------------------------------------------
+$FINISH
+IF TFLAG:行動後行動 == -1
+	;行動後でも行動変更させないフラグ(反撃技など)が立っている場合は行動変更しない
+ELSE
+;基本は通常待機
+CALL SET_DEFAULT_WAIT(TFLAG:使用キャラ)
+	IF TFLAG:行動後行動 > 0
+		CFLAG:(TFLAG:使用キャラ):現在状態 = TFLAG:行動後行動
+	ENDIF
+	IF TFLAG:行動後遅延係数
+		CFLAG:(TFLAG:使用キャラ):残り待機時間 = CFLAG:(TFLAG:使用キャラ):残り待機時間 * TFLAG:行動後遅延係数 / 100
+	ENDIF
+	IF TFLAG:行動後遅延補正
+		CFLAG:(TFLAG:使用キャラ):残り待機時間 = CFLAG:(TFLAG:使用キャラ):残り待機時間 + TFLAG:行動後遅延補正
+	ENDIF
+
+	IF TFLAG:行動後遅延強制
+		CFLAG:(TFLAG:使用キャラ):残り待機時間 = TFLAG:行動後遅延強制
+	ENDIF
+ENDIF
+;----------------------------------------------------------------------------------------------------------
+
+
+;PRINTFORML {BASE:(TFLAG:1207):HP}
+
+CALL STATUS_RENEW(1)
+CALL STATUS_RENEW(2)
+;PRINTFORML {BASE:(TFLAG:1207):HP}
+RETURN TFLAG:1209
+
+
+
+

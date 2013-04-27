@@ -1,0 +1,600 @@
+;────────────────────────────────────
+;絶頂系の処理など
+;────────────────────────────────────
+;FileName_TRACHECK_ORGASM.ERB ---------------------- Rev1.00
+;絶頂処理
+;CALL		USER
+;ARG		ARG:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@ORGASM_ADD(ARG)
+#DIM 絶頂数
+VARSET LOCAL
+LOCAL = ((CUP:ARG:快Ｃ + PALAM:ARG:快Ｃ) >= PALAMLV:4) + (CUP:ARG:快Ｖ + PALAM:ARG:快Ｖ >= PALAMLV:4) + (CUP:ARG:快Ａ + PALAM:ARG:快Ａ >= PALAMLV:4) + (CUP:ARG:快Ｂ + PALAM:ARG:快Ｂ >= PALAMLV:4) + (CUP:ARG:快Ｍ + PALAM:ARG:快Ｍ >= PALAMLV:4)
+絶頂数 = LOCAL
+SELECTCASE LOCAL
+	CASE 5
+		LOCAL:1 = 9000
+	CASE 4
+		LOCAL:1 = 7000
+	CASE  3
+		LOCAL:1 = 5000
+	CASE 2
+		LOCAL:1 = 3000
+	CASE 1
+		LOCAL:1 = 2000
+ENDSELECT
+
+;視認性の問題で残しておく
+C = 0
+V = 0
+A = 0
+B = 0
+M = 0
+;絶頂Ｃ
+;うっかり絶頂
+LOCAL:2 = (CUP:ARG:快Ｃ > 0) * LOCAL:1
+IF CUP:ARG:快Ｃ + PALAM:ARG:快Ｃ + LOCAL:2 >= PALAMLV:10
+	C = 9
+	CDOWN:ARG:快Ｃ = PALAMLV:10 - LOCAL:2
+ELSEIF CUP:ARG:快Ｃ + PALAM:ARG:快Ｃ + LOCAL:2 >= PALAMLV:7 * 2
+	C = 4
+	CDOWN:ARG:快Ｃ = PALAMLV:7 * 2 - LOCAL:2
+ELSEIF CUP:ARG:快Ｃ + PALAM:ARG:快Ｃ + LOCAL:2 >= PALAMLV:4 * 2
+	C = 2
+	CDOWN:ARG:快Ｃ = PALAMLV:4 * 2 - LOCAL:2
+ELSEIF CUP:ARG:快Ｃ + PALAM:ARG:快Ｃ + LOCAL:2 >= PALAMLV:4
+	C = 1
+	CDOWN:ARG:快Ｃ = PALAMLV:4 - LOCAL:2
+ENDIF
+;DOWN:0で下げても絶頂以上なら
+;その値-1になるように調整（10000で絶頂なら9999）
+SIF CUP:ARG:快Ｃ + PALAM:ARG:快Ｃ - CDOWN:ARG:快Ｃ >= PALAMLV:4
+	CDOWN:ARG:快Ｃ = CUP:ARG:快Ｃ + PALAM:ARG:快Ｃ - PALAMLV:4 + 1
+
+;絶頂Ｖ
+LOCAL:2 = (CUP:ARG:快Ｖ > 0) * LOCAL:1
+IF CUP:ARG:快Ｖ + PALAM:ARG:快Ｖ + LOCAL:2 >= PALAMLV:10
+	V = 9
+	CDOWN:ARG:快Ｖ = PALAMLV:10 - LOCAL:2
+ELSEIF CUP:ARG:快Ｖ + PALAM:ARG:快Ｖ + LOCAL:2 >= PALAMLV:7 * 2
+	V = 4
+	CDOWN:ARG:快Ｖ = PALAMLV:7 * 2 - LOCAL:2
+ELSEIF CUP:ARG:快Ｖ + PALAM:ARG:快Ｖ + LOCAL:2 >= PALAMLV:4 * 2
+	V = 2
+	CDOWN:ARG:快Ｖ = PALAMLV:4 * 2 - LOCAL:2
+ELSEIF CUP:ARG:快Ｖ + PALAM:ARG:快Ｖ + LOCAL:2 >= PALAMLV:4
+	V = 1
+	CDOWN:ARG:快Ｖ = PALAMLV:4 - LOCAL:2
+ENDIF
+;CDOWN:ARG:1で下げても絶頂以上なら
+;その値-1になるように調整（10000で絶頂なら9999）
+SIF CUP:ARG:快Ｖ + PALAM:ARG:快Ｖ - CDOWN:ARG:快Ｖ >= PALAMLV:4
+	CDOWN:ARG:快Ｖ = CUP:ARG:快Ｖ + PALAM:ARG:快Ｖ - PALAMLV:4 + 1
+
+;絶頂Ａ
+LOCAL:2 = (CUP:ARG:快Ａ > 0) * LOCAL:1
+IF CUP:ARG:快Ａ + PALAM:ARG:快Ａ + LOCAL:2 >= PALAMLV:10
+	A = 9
+	CDOWN:ARG:快Ａ = PALAMLV:10 - LOCAL:2
+ELSEIF CUP:ARG:快Ａ + PALAM:ARG:快Ａ + LOCAL:2 >= PALAMLV:7 * 2
+	A = 4
+	CDOWN:ARG:快Ａ = PALAMLV:7 * 2 - LOCAL:2
+ELSEIF CUP:ARG:快Ａ + PALAM:ARG:快Ａ + LOCAL:2 >= PALAMLV:4 * 2
+	A = 2
+	CDOWN:ARG:快Ａ = PALAMLV:4 * 2 - LOCAL:2
+ELSEIF CUP:ARG:快Ａ + PALAM:ARG:快Ａ + LOCAL:2 >= PALAMLV:4
+	A = 1
+	CDOWN:ARG:快Ａ = PALAMLV:4 - LOCAL:2
+ENDIF
+;CDOWN:ARG:快Ａで下げても絶頂以上なら
+;その値-1になるように調整（10000で絶頂なら9999）
+SIF CUP:ARG:快Ａ + PALAM:ARG:快Ａ - CDOWN:ARG:快Ａ >= PALAMLV:4
+	CDOWN:ARG:快Ａ = CUP:ARG:快Ａ + PALAM:ARG:快Ａ - PALAMLV:4 + 1
+
+;絶頂Ｂ
+LOCAL:2 = (CUP:ARG:快Ｂ > 0) * LOCAL:1
+IF CUP:ARG:快Ｂ + PALAM:ARG:快Ｂ + LOCAL:2 >= PALAMLV:10
+	B = 9
+	CDOWN:ARG:快Ｂ = PALAMLV:10 - LOCAL:2
+ELSEIF CUP:ARG:快Ｂ + PALAM:ARG:快Ｂ + LOCAL:2 >= PALAMLV:7 * 2
+	B = 4
+	CDOWN:ARG:快Ｂ = PALAMLV:7 * 2 - LOCAL:2
+ELSEIF CUP:ARG:快Ｂ + PALAM:ARG:快Ｂ + LOCAL:2 >= PALAMLV:4 * 2
+	B = 2
+	CDOWN:ARG:快Ｂ = PALAMLV:4 * 2 - LOCAL:2
+ELSEIF CUP:ARG:快Ｂ + PALAM:ARG:快Ｂ + LOCAL:2 >= PALAMLV:4
+	B = 1
+	CDOWN:ARG:快Ｂ = PALAMLV:4 - LOCAL:2
+ENDIF
+;CDOWN:ARG:快Ｂで下げても絶頂以上なら
+;その値-1になるように調整（10000で絶頂なら9999）
+SIF CUP:ARG:快Ｂ + PALAM:ARG:快Ｂ - CDOWN:ARG:快Ｂ >= PALAMLV:4
+	CDOWN:ARG:快Ｂ = CUP:ARG:快Ｂ + PALAM:ARG:快Ｂ - PALAMLV:4 + 1
+	
+;絶頂Ｍ
+LOCAL:2 = (CUP:ARG:快Ｍ > 0) * LOCAL:1
+IF CUP:ARG:快Ｍ + PALAM:ARG:快Ｍ + LOCAL:2 >= PALAMLV:10
+	M = 9
+	CDOWN:ARG:快Ｍ = PALAMLV:10 - LOCAL:2
+ELSEIF CUP:ARG:快Ｍ + PALAM:ARG:快Ｍ + LOCAL:2 >= PALAMLV:7 * 2
+	M = 4
+	CDOWN:ARG:快Ｍ = PALAMLV:7 * 2 - LOCAL:2
+ELSEIF CUP:ARG:快Ｍ + PALAM:ARG:快Ｍ + LOCAL:2 >= PALAMLV:4 * 2
+	M = 2
+	CDOWN:ARG:快Ｍ = PALAMLV:4 * 2 - LOCAL:2
+ELSEIF CUP:ARG:快Ｍ + PALAM:ARG:快Ｍ + LOCAL:2 >= PALAMLV:4
+	M = 1
+	CDOWN:ARG:快Ｍ = PALAMLV:4 - LOCAL:2
+ENDIF
+;CDOWN:ARG:快Ｂで下げても絶頂以上なら
+;その値-1になるように調整（10000で絶頂なら9999）
+SIF CUP:ARG:快Ｍ + PALAM:ARG:快Ｍ - CDOWN:ARG:快Ｍ >= PALAMLV:4
+	CDOWN:ARG:快Ｍ = CUP:ARG:快Ｍ + PALAM:ARG:快Ｍ - PALAMLV:4 + 1
+	
+;NOWEXにデータを入れる（絶頂時口上に使う）
+NOWEX:ARG:0 = C
+NOWEX:ARG:1 = V
+NOWEX:ARG:2 = A
+NOWEX:ARG:3 = B
+NOWEX:ARG:6 = M
+;-------------------------------------------------
+;絶頂時の追加処理
+;-------------------------------------------------
+
+VARSET LOCAL
+;四重絶頂以上かチェック
+;LOCAL:1に絶頂中、最低の強度を保存
+LOCAL:2 = 99
+REPEAT 5
+	SIF COUNT == 0
+		LOCAL = C
+	SIF COUNT == 1
+		LOCAL = V
+	SIF COUNT == 2
+		LOCAL = A
+	SIF COUNT == 3
+		LOCAL = B
+	SIF COUNT == 4
+		LOCAL = M
+	SIF LOCAL > 0
+		LOCAL:1 = LOCAL
+	IF LOCAL:1 > 0
+		SIF LOCAL:1 < LOCAL:2
+			LOCAL:2 = LOCAL:1
+	ENDIF
+REND
+
+IF LOCAL:2 != 99
+	LOCAL = LOCAL:2
+ELSE
+	LOCAL = 0
+ENDIF
+
+;絶頂強度を保存(1,2,3,4)
+IF LOCAL >= 9
+	NOWEX:ARG:5 = 4
+ELSEIF LOCAL >= 4
+	NOWEX:ARG:5 = 3
+ELSEIF LOCAL >= 2
+	NOWEX:ARG:5 = 2
+ELSEIF LOCAL >= 1
+	NOWEX:ARG:5 = 1
+ENDIF
+
+NOWEX:ARG:4 = 絶頂数
+
+IF 絶頂数 == 5
+	LOCAL = MIN(C, V, A, B, M)
+	C *= 12
+	V *= 12
+	A *= 12
+	B *= 12
+	M *= 12
+ELSEIF 絶頂数 == 4
+	C *= 8
+	V *= 8
+	A *= 8
+	B *= 8
+	M *= 8
+ELSEIF 絶頂数 == 3
+	C *= 4
+	V *= 4
+	A *= 4
+	B *= 4
+	M *= 4
+ELSEIF 絶頂数 == 2
+	C *= 2
+	V *= 2
+	A *= 2
+	B *= 2
+	M *= 2
+ENDIF
+
+IF C
+	SOURCE:ARG:露出 += 500 * C
+	SOURCE:ARG:屈従 += 200 * C
+	SOURCE:ARG:反感 += 150 * C
+	;絶頂時の消耗を感覚Lvが高い場合は軽減してみる
+	DOWNBASE:ARG:体力 += (20 - GET_REVISION(ABL:ARG:Ｃ感覚, 10 , 10))
+	DOWNBASE:ARG:気力 += (10 - GET_REVISION(ABL:ARG:Ｃ感覚, 5 , 20))
+	IF C >= 2
+		;既成事実１に相当
+		SIF TFLAG:既成事実入手フラグ < 1
+			TFLAG:既成事実入手フラグ = 1
+	ENDIF
+ENDIF
+IF V
+	SOURCE:ARG:欲情 += 800 * V
+	SOURCE:ARG:恭順 += 500 * V
+	SOURCE:ARG:露出 += 700 * V
+	SOURCE:ARG:屈従 += 400 * V
+	SOURCE:ARG:反感 += 300 * V
+	;絶頂時の消耗を感覚Lvが高い場合は軽減してみる
+	DOWNBASE:ARG:体力 += (40 - GET_REVISION(ABL:ARG:Ｖ感覚, 20 , 5))
+	DOWNBASE:ARG:気力 += (20 - GET_REVISION(ABL:ARG:Ｖ感覚, 10 , 10))
+	IF V == 1
+		;既成事実１に相当
+		SIF TFLAG:既成事実入手フラグ < 1
+			TFLAG:既成事実入手フラグ = 1
+	ELSEIF V >= 2
+		;既成事実２に相当
+		SIF TFLAG:既成事実入手フラグ < 2
+			TFLAG:既成事実入手フラグ = 2
+	ENDIF
+ENDIF
+IF A
+	SOURCE:ARG:欲情 += 500 * A
+	SOURCE:ARG:恭順 += 700 * A
+	SOURCE:ARG:露出 += 900 * A
+	SOURCE:ARG:屈従 += 500 * A
+	SOURCE:ARG:反感 += 400 * A
+	;絶頂時の消耗を感覚Lvが高い場合は軽減してみる
+	DOWNBASE:ARG:体力 += (60 - GET_REVISION(ABL:ARG:Ａ感覚, 30 , 5))
+	DOWNBASE:ARG:気力 += (30 - GET_REVISION(ABL:ARG:Ａ感覚, 15 , 5))
+	;既成事実２に相当
+	SIF TFLAG:既成事実入手フラグ < 2
+		TFLAG:既成事実入手フラグ = 2
+ENDIF
+IF B
+	SOURCE:ARG:露出 += 500 * B
+	SOURCE:ARG:屈従 += 200 * B
+	SOURCE:ARG:反感 += 150 * B
+	;絶頂時の消耗を感覚Lvが高い場合は軽減してみる
+	DOWNBASE:ARG:体力 += (20 - GET_REVISION(ABL:ARG:Ｂ感覚, 10 , 10))
+	DOWNBASE:ARG:気力 += (10 - GET_REVISION(ABL:ARG:Ｂ感覚, 5 , 20))
+	IF B >= 2
+		;既成事実１に相当
+		SIF TFLAG:既成事実入手フラグ < 1
+			TFLAG:既成事実入手フラグ = 1
+	ENDIF
+	
+ENDIF
+IF M
+	SOURCE:ARG:情愛 += 500 * M
+	SOURCE:ARG:屈従 += 200 * M
+	SOURCE:ARG:反感 += 50 * M
+	;絶頂時の消耗を感覚Lvが高い場合は軽減してみる
+	DOWNBASE:ARG:体力 += (20 - GET_REVISION(ABL:ARG:Ｍ感覚, 10 , 10))
+	DOWNBASE:ARG:気力 += (10 - GET_REVISION(ABL:ARG:Ｍ感覚, 5 , 20))
+	IF M >= 2
+		;既成事実１に相当
+		SIF TFLAG:既成事実入手フラグ < 1
+			TFLAG:既成事実入手フラグ = 1
+	ENDIF
+ENDIF
+
+;絶頂回数を増やす
+EX:ARG:0 += C
+EX:ARG:1 += V
+EX:ARG:2 += A
+EX:ARG:3 += B
+EX:ARG:6 += M
+;絶頂経験を増やす
+EXP:ARG:絶頂経験 += C + V + A + B + M
+
+;ビデオ
+IF TEQUIP:ARG:ビデオ撮影
+	SELECTCASE 絶頂数
+		CASE 5
+			LOCALS = O2/O3/O4/O5/
+		CASE 4
+			LOCALS = O2/O3/O4/
+		CASE 3
+			LOCALS = O2/O3/
+		CASE 2
+			LOCALS = O2/
+	ENDSELECT
+	VSTR:1 += LOCALS
+	IF NOWEX:ARG:Ｃ絶頂 > 0
+		FOR LOCAL, 0, C
+			LOCALS = C/
+			VSTR:1 += LOCALS
+		NEXT
+	ENDIF
+	IF NOWEX:ARG:Ｖ絶頂 > 0
+		FOR LOCAL, 0, V
+			LOCALS = V/
+			VSTR:1 += LOCALS
+		NEXT
+	ENDIF
+	IF NOWEX:ARG:Ａ絶頂 > 0
+		FOR LOCAL, 0, A
+			LOCALS = A/
+			VSTR:1 += LOCALS
+		NEXT
+	ENDIF
+	IF NOWEX:ARG:Ｂ絶頂 > 0
+		FOR LOCAL, 0, B
+			LOCALS = B/
+			VSTR:1 += LOCALS
+		NEXT
+	ENDIF
+	IF NOWEX:ARG:Ｍ絶頂 > 0
+		FOR LOCAL, 0, M
+			LOCALS = M/
+			VSTR:1 += LOCALS
+		NEXT
+	ENDIF
+ENDIF
+RETURN 1
+;FileName_TRACHECK_ORGASM.ERB ---------------------- Rev1.00
+;絶頂メッセージ表示処理
+;CALL		USER
+;ARG		VOID
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@MESSAGE_PALAMCNG_B2
+;絶頂してなかったら戻る
+SIF !NOWEX:TARGET:4
+	RETURN
+;表示用
+LOCALS:0 = 絶頂Ｃ
+LOCALS:1 = 絶頂Ｖ
+LOCALS:2 = 絶頂Ａ
+LOCALS:3 = 絶頂Ｂ
+LOCALS:4 = 絶頂Ｍ
+FOR LOCAL, 0, 5
+	IF LOCAL < 4
+		LOCAL:1 = NOWEX:LOCAL
+	ELSE
+		LOCAL:1 = NOWEX:6
+	ENDIF
+	SIF LOCAL:1 <= 0
+		CONTINUE
+	SELECTCASE LOCAL:1
+		CASE 1
+			
+		CASE 2
+			PRINT 強
+		CASE 3
+			PRINT 超強
+		CASE 4
+			PRINT 最強
+		CASEELSE
+			PRINT エラー
+	ENDSELECT
+	PRINTFORML %LOCALS:LOCAL%
+NEXT
+LOCALS:0 = Ｃ
+LOCALS:1 = Ｖ
+LOCALS:2 = Ａ
+LOCALS:3 = Ｂ
+LOCALS:4 = Ｍ
+SELECTCASE NOWEX:TARGET:4
+	CASE 5
+		SELECTCASE NOWEX:TARGET:5
+			CASE 4
+				PRINTL 最 強 五 重 絶 頂
+			CASE 3
+				PRINTL 超 強 五 重 絶 頂
+			CASE 2
+				PRINTL 強 五 重 絶 頂
+			CASE 1
+				PRINTL 五 重 絶 頂
+		ENDSELECT
+		LOCAL:3 = 12
+	CASE 4
+		SELECTCASE NOWEX:TARGET:5
+			CASE 4
+				PRINTL 最 強 四 重 絶 頂
+			CASE 3
+				PRINTL 超 強 四 重 絶 頂
+			CASE 2
+				PRINTL 強 四 重 絶 頂
+			CASE 1
+				PRINTL 四 重 絶 頂
+		ENDSELECT
+		LOCAL:3 = 8
+	CASE 1,2,3
+		VARSET LOCAL
+		FOR LOCAL, 0, 5
+			IF LOCAL < 4
+				LOCAL:1 = NOWEX:LOCAL
+			ELSE
+				LOCAL:1 = NOWEX:Ｍ絶頂
+			ENDIF
+			IF LOCAL:1
+				SIF LOCAL:2 > 0
+					PRINT ＆
+				PRINTFORM %LOCALS:LOCAL%
+				LOCAL:2 ++
+			ENDIF
+		NEXT
+		PRINTL 絶頂
+		IF NOWEX:TARGET:4 == 3
+			LOCAL:3 = 4
+		ELSEIF NOWEX:TARGET:4 == 2
+			LOCAL:3 = 2
+		ENDIF
+	CASEELSE
+ENDSELECT
+SIF NOWEX:TARGET:4 > 1
+	PRINTL (それぞれ{LOCAL:3}倍の珠が得られます)
+
+
+;絶頂による欲望ＬＶアップ
+LOCAL = 0
+SIF NOWEX:Ｃ絶頂 >= 2 || NOWEX:Ｂ絶頂 >= 2 || NOWEX:Ｖ絶頂 || NOWEX:Ａ絶頂
+	LOCAL = 1
+SIF NOWEX:Ｖ絶頂 >= 2 || NOWEX:Ａ絶頂 >= 2
+	LOCAL = 3
+SIF (NOWEX:Ｃ絶頂 >= 2 || NOWEX:Ｂ絶頂 >= 2) && NOWEX:TARGET:4 > 1
+	LOCAL = 3
+SIF NOWEX:TARGET:4 > 2
+	LOCAL = 7
+;自制心があると１下がる
+SIF TALENT:自制心
+	LOCAL -= 1
+SIF NOWEX:TARGET:4 > 3
+	LOCAL = 10
+SIF NOWEX:TARGET:4 > 4
+	LOCAL = 20
+;最強絶頂時
+IF NOWEX:TARGET:5 == 4
+	SIF NOWEX:TARGET:4 > 3
+		LOCAL = 30
+	SIF NOWEX:TARGET:4 > 4
+		LOCAL = 50
+ENDIF
+IF ABL:欲望 < LOCAL
+	ABL:欲望 ++
+	PRINTFORML そして欲望がLV{LOCAL}になった
+	;欲望の上昇による[抑圧]の消滅をチェック
+	CALL YOKUBO_UP_CHECK
+ENDIF
+PRINTL 
+;FileName_TRACHECK_ORGASM.ERB ---------------------- Rev1.00
+;調教対象の噴乳チェック処理
+;CALL		USER
+;ARG		ARG:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@TARGET_MILK_CHECK(ARG)
+SIF !TALENT:ARG:母乳体質
+	RETURN 0
+
+LOCAL = CUP:ARG:快Ｃ / 5 + CUP:ARG:快Ｖ / 5 + CUP:ARG:快Ａ / 5 + CUP:ARG:快Ｂ * 3 + CUP:ARG:快Ｍ / 5
+SIF LOCAL == 0
+	RETURN 0
+
+;自制心
+SIF TALENT:ARG:自制心
+	LOCAL /= 2
+
+;快感に素直
+SIF TALENT:ARG:快感に素直
+	TIMES LOCAL , 1.20
+
+;快感の否定（淫乱、娼婦で無効）
+SIF TALENT:ARG:快感の否定 && !TALENT:ARG:淫乱
+	TIMES LOCAL , 0.80
+
+;B敏感
+SIF TALENT:ARG:Ｂ敏感
+	TIMES LOCAL , 1.20
+
+;媚薬
+SIF TEQUIP:ARG:媚薬
+	LOCAL *= 2
+
+;利尿剤
+SIF TEQUIP:ARG:利尿剤
+	LOCAL /= 2
+
+;調教者が幼児退行
+SIF TALENT:PLAYER:幼児
+	TIMES LOCAL , 1.20
+
+;調教者が幼稚
+SIF TALENT:PLAYER:幼稚
+	TIMES LOCAL , 1.20
+
+;貧乳
+SIF TALENT:ARG:貧乳
+	TIMES LOCAL , 0.50
+
+;絶壁
+SIF TALENT:ARG:絶壁
+	TIMES LOCAL , 0.50
+
+;淫蟲
+SIF TEQUIP:92 == 1
+	TIMES LOCAL , 1.20
+
+IF TFLAG:うふふ
+	LOCAL = 500 + LOCAL / 2
+ELSE
+	LOCAL /= 2
+ENDIF
+
+BASE:ARG:母乳 += LOCAL
+
+IF  BASE:ARG:母乳 > MAXBASE:ARG:母乳 * 2
+	LOCAL = 1
+ELSEIF BASE:ARG:母乳 > MAXBASE:ARG:母乳
+	LOCAL = 0
+ELSE
+	RETURN 0
+ENDIF
+LOCAL ++
+DOWNBASE:ARG:体力 += 20 * LOCAL
+DOWNBASE:ARG:気力 += 100 * (LOCAL - 1)
+;DOWNBASE:ARG:疲労 += 20 * LOCAL
+IF EXP:ARG:噴乳経験 < EXPLV:1
+	SOURCE:ARG:露出 += 5000 * LOCAL
+	SOURCE:ARG:屈従 += 2500 * LOCAL
+	SOURCE:ARG:不潔 += 1000 * LOCAL
+ELSEIF EXP:ARG:噴乳経験 < EXPLV:2
+	SOURCE:ARG:露出 += 2500 * LOCAL
+	SOURCE:ARG:屈従 += 1500 * LOCAL
+	SOURCE:ARG:不潔 += 750 * LOCAL
+ELSEIF EXP:ARG:噴乳経験 < EXPLV:3
+	SOURCE:ARG:露出 += 1500 * LOCAL
+	SOURCE:ARG:屈従 += 750 * LOCAL
+	SOURCE:ARG:不潔 += 500 * LOCAL
+ELSEIF EXP:ARG:噴乳経験 < EXPLV:4
+	SOURCE:ARG:露出 += 750 * LOCAL
+	SOURCE:ARG:屈従 += 400 * LOCAL
+	SOURCE:ARG:不潔 += 350 * LOCAL
+ELSEIF EXP:ARG:噴乳経験 < EXPLV:5
+	SOURCE:ARG:露出 += 500 * LOCAL
+	SOURCE:ARG:屈従 += 250 * LOCAL
+	SOURCE:ARG:不潔 += 200 * LOCAL
+ELSE
+	SOURCE:ARG:露出 += 250 * LOCAL
+	SOURCE:ARG:屈従 += 150 * LOCAL
+ENDIF
+
+PRINTFORML %CALLNAME:ARG%は乳首から\@ LOCAL == 2 ? 大量 # \@の母乳を噴出した
+
+;マスターとの子供であり、恋慕あり、又は恋慕が無くても恋人で反発２未満なら妊娠中・育児中は異常経験がつかない
+IF CFLAG:ARG:父親 == NO:MASTER && (TALENT:ARG:恋慕 || (TALENT:ARG:恋慕 == 0 && TALENT:ARG:恋人 && MARK:ARG:反発感情 < 2)) && (TALENT:ARG:妊娠 || TALENT:ARG:育児中 || TALENT:ARG:母性)
+	
+ELSEIF EXP:ARG:噴乳経験 - CFLAG:ARG:初期噴乳経験
+	EXP:ARG:異常経験 ++
+ENDIF
+EXP:ARG:噴乳経験 += LOCAL
+;Ｂに母乳汚れ
+STAIN:ARG:Ｂ |= 16
+
+BASE:ARG:母乳 -= MAXBASE:ARG:母乳 * LOCAL
+SIF BASE:ARG:母乳 >= MAXBASE:ARG:母乳
+	BASE:ARG:母乳 = MAXBASE:ARG:母乳 - 1
+
+NOWEX:ARG:10 += LOCAL
+EX:ARG:10 += LOCAL
+
+;ビデオ
+;IF TEQUIP:ARG:ビデオ撮影
+;	IF NOWEX:ARG:10 == 1
+;		LOCALS = MILK/
+;	ELSEIF NOWEX:ARG:10 == 2
+;		LOCALS = MILK/MILK/
+;	ENDIF
+;	TSTR:1 += LOCALS
+;ENDIF
+

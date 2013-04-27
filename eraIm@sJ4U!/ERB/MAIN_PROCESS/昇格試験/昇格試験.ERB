@@ -1,0 +1,402 @@
+@昇格試験
+VARSET LOCAL
+;@@@微妙に旧式処理と変えてある
+;＆文章は別にまとめてもよし
+REPEAT 150
+	PRINTL
+REND
+IF FLAG:24 == 0
+	CALL MMPLAY(12)
+	PRINTFORML 「さあ、いよいよ初めての昇格試験ね」
+	PRINTFORMW 「%CALLNAME:TARGET%達にアイドルになる資格があるかどうか、見極めさせて貰うわ」
+	PRINTFORMW 「合格の条件は簡単よ……」
+	CALL MMSTOP()
+	PRINTL 
+	PRINTFORML ズズズ……
+	PRINTL 
+	PRINTFORML 黒い霧が閣下の掌から噴き出していく……
+	PRINTFORMW やがてその霧は形を成していき、最後には一人の少女の姿になった
+	PRINTL 
+	PRINTFORML 「私が創り出したこの子にフェスで勝利しなさい」
+	PRINTFORMW 「曲がりなりにもアイドル神の力の一端。舐めてかかると痛い目見るわよ？」
+	CALL MMPLAY(7)
+	PRINTL
+	PRINTFORMW 「さあ、準備はいいかしら？　アイドルの資質があると私に認めさせてみなさい」
+	IF FLAG:ステージについて
+		PRINTL 
+		PRINTFORML ステージについてのチュートリアルを表示しますか？
+		PRINTFORML [0] はい
+		PRINTFORML [1] いいえ
+		$INPUT_LOOP710
+		INPUT
+		IF RESULT == 0
+			CALLNAME:1 = シャドー★ラクシュミ
+			TFLAG:味方スコア = 765
+			TFLAG:敵スコア = 961
+			TFLAG:味方思い出 = 1
+			CALL チュートリアル_LAF
+			TFLAG:味方スコア = 0
+			TFLAG:敵スコア = 0
+			TFLAG:味方思い出 = 0
+			CALLNAME:1 = ""
+		ELSEIF RESULT == 1
+			
+		ELSE
+			CALL 再入力
+			GOTO INPUT_LOOP710
+		ENDIF
+	ENDIF
+;ラストバトゥー
+ELSEIF FLAG:24 == 5
+;アイマスと言ったら、ドームですよ、ドーム！ですよね
+	;CALL SEPLAY("")
+	PRINTFORML ……とうとうこれが最後の昇格試験だ
+	PRINTFORML %CALLNAME:MASTER%と%CALLNAME:TARGET%達は、Ａランク昇格試験へとやってきた
+	PRINTFORML 試験はいつもの会場でなく、都内のドームを貸切って行われる
+	PRINTFORML 審査員に加え、舞台、照明、カメラまで回り、試験の様子は全国ネットで中継される
+	PRINTFORMW 観客席は、Ａランクアイドルが誕生する瞬間を見ようという人で満席だ
+	PRINTL 
+	PRINTFORML ここまで盛り上がりを見せているのは、久しぶりにＡランクアイドルが誕生するからか？
+	PRINTFORMW それとも、人々は心のどこかでアイドルを求めていたということだろうか？
+	PRINTL 
+	PRINTFORML 「逃げずによく来たわね」
+	PRINTFORML ステージでは、豪華な意匠が施された椅子に座り、グラスに注がれた赤い液体を片手に閣下が待ち構えていた
+	PRINTFORMW 足元に数人の男衆を侍らせているが、気にしたら負けなのだろう……
+	PRINTL
+	PRINTFORML ステージに上がった%CALLNAME:TARGET%達を、閣下は品定めするかのように、一人一人、つぶさに見ては視線を移していく
+	PRINTFORML 「うんうん、いいわねぇ。　%CSTR:0:22%はなかなかいいユニットに育ったみたいじゃない」
+	PRINTFORML 「こんなに煌めくアイドル達は”日高舞の世代”以来だわ。　あぁっ！私は嬉しすぎてトんでしまいそうよ！」
+	PRINTFORML 閣下は、はぁああああん！と悦の籠った声をあげ、恍惚とした表情で宙を仰いだ
+	PRINTFORMW しかし、ふぅ…と一呼吸すると、真剣なまなざしを%CALLNAME:TARGET%に向けてきた
+	PRINTL
+	PRINTFORML 「ここまできたんだもの。　あなた達が有終の美を飾ってくれると、信じてるわ……」
+	PRINTFORMW くい、っとグラスの中身を飲み干すと、傍にいた男達がステージ上をあっという間に掃除し、ステージには機材を除き、閣下と%CSTR:0:22%だけとなった
+	PRINTL 
+	PRINTFORML 「ようし、ステージの準備も整ったみたい。　うん、私の調子もバッチリ」
+	PRINTFORML 「会場のみんな、スタッフのみんな、今日は最高のステージにするわよ！」
+	PRINTFORML わあっ、と会場が歓声に包まれる
+	CALL SEPLAY("歓声")
+	PRINTFORMW ドームを震わせる程の歓声と熱気で、%CALLNAME:TARGET%達の気分が、かつてない程高揚していく……！
+	PRINTL 
+	CALL MMPLAY(24)
+	PRINTFORML 「さあ！　きらめくステージに、アイドルたる証、刻み付けなさい！」
+	PRINTW 
+ELSE
+	PRINTFORML %CALLNAME:MASTER%は%CALLNAME:TARGET%達と昇格試験の会場にやって来た
+	PRINTFORMW 対戦相手を待つ%CALLNAME:TARGET%達の前で、黒い霧が集まり形を成していく……！！
+	CALL MMPLAY(7)
+ENDIF
+
+CALL LAF(999)
+;勝利
+IF RESULT == 0
+	;チュートリアル
+	IF FLAG:24 == 0
+		CALL MMSTOP()
+		PRINTFORMW %CALLNAME:TARGET%達の勝利と共に、黒い霧は文字通り霧散していった……
+		PRINTL
+		PRINTFORML パチパチパチ
+		PRINTL 
+		CALL MMPLAY(20)
+		PRINTFORML 「うん、合格よ。　なかなかやるじゃない」
+		PRINTFORML 閣下は%CALLNAME:TARGET%達に拍手を送った
+		PRINTFORML 「とりあえず、あなた達にはアイドルとしての才能があるみたいね」
+		PRINTFORMW 「よし、本格的にアイドル活動をすることを許可するわ！」
+		PRINTFORML 「一応言っとくけれど、これは活動の始まりに過ぎないからね」
+		PRINTFORML 「勝利の余韻に浸らず、明日からは馬車馬の如く活動に精を出しなさい♪」
+		PRINTFORMW いひひ♪　と悪戯っぽく笑うと、閣下は背景に溶け込むようにして姿を消していった……
+		PRINTL 
+		PRINTFORMW ＜「お仕事」が解禁されました！＞
+		PRINTL 
+		CALL 昇格試験リザルト
+		;デフォルトの曲をリセット
+		ABL:0:309 = 0
+		FLAG:24 += 1
+	;ELSEIF FLAG:24 == 1
+
+	;ラストバトルだった
+	ELSEIF FLAG:24 == 5
+		CALL MMSTOP()
+		CALL GAME_CONTINUE
+		;クリアフラグをビットで管理
+		SIF FLAG:5 != 9 && (FLAG:28 & 1) == 0
+			FLAG:28 |= 1
+		FLAG:27 = 0
+		FLAG:24 += 1
+		PRINTFORML クリアおめでとうございます
+		PRINTFORML エンディングは作ってないんです。ごめんなさい
+		PRINTFORML とりあえずストーリーはここまでです
+		PRINTFORML クリア後の要素もいずれ用意すると思います
+		PRINTFORML 今後は期限がないので、ごゆるりとアイドル達とイチャイチャして下さい
+		PRINTFORML ここまで遊んで頂き誠にありがとうございます
+		PRINTFORMW TH@NK YOU FOR YOUR PL@YNG !!	
+	ELSE
+		CALL MMSTOP()
+		PRINTFORML %CALLNAME:TARGET%達の勝利と共に、黒い霧は文字通り霧散していった
+		PRINTFORMW 見事勝利を収めた%CSTR:0:22%に、審査員達は惜しみない拍手を浴びせた
+		CALL SEPLAY(19)
+		PRINTFORMW どうやら%CALLNAME:TARGET%は次のステージへと進む資格を得られたようだ！
+		
+		FLAG:24 += 1
+	ENDIF
+	;ステージ3クリア後
+	IF FLAG:24 == 3 && TALENT:MASTER:脱衣制限解除 != 1
+		CALL STAGE_3_CLEAR
+	ENDIF
+	;敗北
+ELSE
+	IF FLAG:24 == 0
+		CALL MMSTOP()
+		PRINTFORMW %CALLNAME:TARGET%達は%CALLNAME:1%に敗北してしまった……
+		PRINTL 
+		PRINTFORML 「やれやれ。　%CALLNAME:TARGET%達にはまだ早かったかしら？」
+		PRINTFORMW 「残念だけどこれで活動はお終いよ。　あなた達のアイドルへの道は絶たれてしまったわ……」
+		PRINTL 
+		PRINTFORMW 「………と、言いたいところだけど初体験だし、今回は特別よ」
+		CALL MMPLAY(17)
+		PRINTFORML 「うん、合格にしてあげる。　%CALLNAME:TARGET%達がアイドル活動を行う事を許可するわ」
+		PRINTFORMW 「ただし！　こんな事はこれが最初で最後だからね。　次からはちゃんと自力で合格できるように努力すること」
+		PRINTFORML 「早速明日から馬車馬の如く活動に精を出しなさい♪」
+		PRINTFORMW いひひ♪　と悪戯っぽく笑うと、閣下は背景に溶けるようにして姿を消していった……
+		PRINTL 
+		PRINTFORMW ＜「お仕事」が解禁されました！＞
+		PRINTL 
+		CALL 昇格試験リザルト
+		;デフォルトの曲をリセット
+		ABL:0:309 = 0
+		FLAG:24 += 1
+	ELSE
+		CALL MMSTOP()
+		PRINTFORMW 敗北しました……
+	ENDIF
+ENDIF
+
+;特殊処理を作るのがめんどくさかったのでもうコピペ
+;ライブ、オーディション、フェスクリア後
+;それぞれの仕事クリア報酬を受け取る
+;ARG	0,失敗 1, 成功
+@昇格試験リザルト(ARG)
+;地域ごとに分ける
+;LOCAL:0	ループ用
+;LOCAL:1	TEMP
+;LOCAL:2	総計交友値
+;LOCAL:4	獲得ファン人数
+;LOCAL:5	獲得ギャランティー
+;LOCAL:6	増加注目度
+;LOCAL:7	仕事がフェスだった
+#DIM PREV_FAN, 9
+#DIM PREV_PRF, 9
+#DIM NOW_FAN, 9
+#DIM NOW_PRF, 9
+#DIM PREV_FAN_G, 9
+#DIM NOW_FAN_G, 9
+#DIM PREV_MNY
+#DIM PREV_SUM_FAN
+#DIM NOW_MNY
+#DIM NOW_SUM_FAN
+#DIM PREV_MNY_G
+#DIM NOW_MNY_G
+#DIM 時間
+
+
+VARSET LOCAL
+
+
+FOR LOCAL, 0, 6
+	PREV_FAN:LOCAL = 地方ファン数(LOCAL)
+	PREV_PRF:LOCAL = 地方注目度(LOCAL)
+NEXT
+;合計ファン数
+PREV_SUM_FAN = SUM_ファン数()
+;合計マニー
+PREV_MNY = MONEY
+
+;仕事番号を取得
+LOCAL:1 = FLAG:現在挑戦中仕事
+
+LOCAL:4 = 500
+
+
+LOCAL:5 = 10000
+
+LOCAL:6 = 70
+
+LOCAL:1 = 0
+
+FOR LOCAL, 1080, 1083
+	FOR LOCAL:1, 51, 57
+		SELECTCASE LOCAL
+			CASE 1080
+				ABL:(FLAG:LOCAL):(LOCAL:1) += 167
+			CASE 1081
+				ABL:(FLAG:LOCAL):(LOCAL:1) += 167
+			CASE 1082
+				ABL:(FLAG:LOCAL):(LOCAL:1) += 166
+			CASEELSE
+			
+		ENDSELECT
+	NEXT
+NEXT
+A = 500
+					
+;ABL:(FLAG:(LOCAL)):首都ファン数 += A
+PREV_FAN_G:0 += A
+
+;ABL:(FLAG:(LOCAL)):北東ファン数 += A
+PREV_FAN_G:1 += A
+
+;ABL:(FLAG:(LOCAL)):中央ファン数 += A
+PREV_FAN_G:2 += A
+
+;ABL:(FLAG:(LOCAL)):上方ファン数 += A
+PREV_FAN_G:3 += A
+
+;ABL:(FLAG:(LOCAL)):西ファン数 += A
+PREV_FAN_G:4 += A
+
+;ABL:(FLAG:(LOCAL)):南ファン数 += A
+PREV_FAN_G:5 += A
+MONEY:0 += LOCAL:5
+PREV_MNY_G = LOCAL:5
+
+	;注目度加算
+
+FLAG:首都注目度 += LOCAL:6
+FLAG:北東注目度 += LOCAL:6
+FLAG:中央注目度 += LOCAL:6
+FLAG:上方注目度 += LOCAL:6
+FLAG:西注目度 += LOCAL:6
+FLAG:南注目度 += LOCAL:6
+
+FOR LOCAL, 0, 6
+	NOW_FAN:LOCAL = 地方ファン数(LOCAL)
+	NOW_PRF:LOCAL = 地方注目度(LOCAL)
+NEXT
+
+;変化後は0になるもの
+FOR LOCAL, 0 ,6
+	NOW_FAN_G:LOCAL = 0
+NEXT
+NOW_MNY_G = 0
+
+;合計ファン数
+NOW_SUM_FAN = SUM_ファン数()
+;合計マニー
+NOW_MNY = MONEY
+
+;ループ変数初期化
+LOCAL = 0
+LOCAL:1 = 0
+
+;ループ時間設定
+時間 = 32
+
+REDRAW 0
+
+;///お仕事結果表示///
+
+$REPEAT_LOOP
+
+CALL SAVELINE
+ALIGNMENT LEFT
+IF LOCAL:1 == 時間
+	FOR LOCAL, 0 ,6
+		LOCAL:(LOCAL + 10) = NOW_FAN:LOCAL
+		LOCAL:(LOCAL + 20) = NOW_FAN_G:LOCAL
+		FLAG:(LOCAL + 1017) = NOW_PRF:LOCAL
+	NEXT
+	FLAG:1017 = NOW_PRF:1
+	FLAG:1018 = NOW_PRF:0
+	LOCAL:16 = NOW_SUM_FAN
+	LOCAL:17 = NOW_MNY
+	LOCAL:18 = NOW_MNY_G
+ELSE
+	FOR LOCAL, 0, 6
+		LOCAL:(LOCAL + 10) = (NOW_FAN:LOCAL * LOCAL:1 + PREV_FAN:LOCAL * (時間 - LOCAL:1)) / 時間
+		LOCAL:(LOCAL + 20) = (NOW_FAN_G:LOCAL * LOCAL:1 + PREV_FAN_G:LOCAL * (時間 - LOCAL:1)) / 時間
+		FLAG:(LOCAL + 1017)= (NOW_PRF:LOCAL * LOCAL:1 + PREV_PRF:LOCAL * (時間 - LOCAL:1)) / 時間
+	NEXT
+	FLAG:1017 = (NOW_PRF:1 * LOCAL:1 + PREV_PRF:1 * (時間 - LOCAL:1)) / 時間
+	FLAG:1018 =(NOW_PRF:0 * LOCAL:1 + PREV_PRF:0 * (時間 - LOCAL:1)) / 時間
+	LOCAL:16 = (NOW_SUM_FAN * LOCAL:1 + PREV_SUM_FAN * (時間 - LOCAL:1)) / 時間
+	LOCAL:17 = (NOW_MNY * LOCAL:1 + PREV_MNY * (時間 - LOCAL:1)) / 時間
+	LOCAL:18 = (NOW_MNY_G * LOCAL:1 + PREV_MNY_G * (時間 - LOCAL:1)) / 時間
+ENDIF
+CUSTOMDRAWLINE =
+CALL PRINTCOLORL(0XEA70BF, "昇格ボーナス")
+DRAWLINE
+PRINTFORML FAN
+
+PRINTFORM 北東エリア{LOCAL:11, 8}
+LOCALS = +{LOCAL:21, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(1, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+
+PRINTFORM 首都エリア{LOCAL:10, 8}
+LOCALS = +{LOCAL:20, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(0, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+	
+PRINTFORM 中央エリア{LOCAL:12, 8}
+LOCALS = +{LOCAL:22, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(2, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+	
+PRINTFORM 上方エリア{LOCAL:13, 8}
+LOCALS = +{LOCAL:23, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(3, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+	
+PRINTFORM 西エリア{LOCAL:14, 10}
+LOCALS = +{LOCAL:24, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(4, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+	
+PRINTFORM 南エリア{LOCAL:15, 10}
+LOCALS = +{LOCAL:25, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(5, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+	
+PRINTFORM 合計 {LOCAL:16, 12} 
+SETCOLOR 0XEA70BF
+PRINTFORML +{(LOCAL:20 + LOCAL:21 + LOCAL:22 + LOCAL:23 + LOCAL:24 + LOCAL:25)}
+RESETCOLOR
+DRAWLINE
+
+PRINTL MONEY
+PRINTFORM %ADD_COMMA(LOCAL:17), 18%
+SETCOLOR 0XEA70BF
+PRINTFORML +%ADD_COMMA(LOCAL:18)%
+RESETCOLOR
+
+ALIGNMENT LEFT
+
+SIF LOCAL:1 == 時間
+	GOTO END_LOOP
+	
+TINPUT 100, -999, 0
+
+IF RESULT == -999
+	LOCAL:1 += 1
+	CALL RETURNLINE
+	GOTO REPEAT_LOOP
+ELSE
+	LOCAL:1 = 時間
+	GOTO REPEAT_LOOP
+ENDIF
+
+$END_LOOP
+PRINTW 
+;///表示終了///

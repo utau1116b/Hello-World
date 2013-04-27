@@ -1,0 +1,47 @@
+;出現する敵のグループを決定(天険の)
+;ARG:0	イベント戦フラグ(0:通常雑魚　1:EXエネミー　2:スキマ　3:固定敵　4:～ボス戦)
+@SELECT_ENEMY_PT_34(ARG:0, ARG:1)
+;LOCAL
+;0		LOOP
+;1～10	ID
+;11		TEMP
+;12		TEMP
+;接触禁忌フェス
+FOR LOCAL:0, 1, 13
+	LOCAL:(LOCAL:0) = 0
+NEXT
+;ランク昇格試験ならそれに応じた敵
+IF ARG:0 == 1000 || ARG:0 == 1001 || ARG:0 == 1002 || ARG:0 == 1003 || ARG:0 == 1004 || ARG:0 == 1005
+	IF ARG:0 == 1000
+		LOCAL:1 = 22014
+	ELSEIF ARG:0 == 1001
+		LOCAL:1 = 22021
+	ELSEIF ARG:0 == 1002
+		LOCAL:1 = 22015
+	ELSEIF ARG:0 == 1003
+		LOCAL:1 = 22016
+	ELSEIF ARG:0 == 1004
+		LOCAL:1 = 22023
+	ELSEIF ARG:0 == 1005
+		LOCAL:1 = 22100
+	ELSE
+		PRINTFORMW エラー！不明なステージ{ARG:0}が参照されました(SELECT_ENEMY_PT_34)
+	ENDIF
+;閣下に挑む→ボス戦強制的に閣下
+ELSEIF ARG:0 >= 4
+	LOCAL:1 = (21000 + (FLAG:ボスID保存場所))
+	LOCAL:1 = 21100
+ELSEIF ARG:0 == 2
+	;スキマ
+	;CALL SELECT_ENEMY_PT_COMMON(ARG:0, 11)
+	;RETURN
+ELSE
+	;雑魚
+	;場所に応じて一定確率で特定の敵とかやりたいけど保留
+	;CALL SELECT_ENEMY_PT_COMMON(ARG:0, 11)
+	;RETURN
+ENDIF
+
+FOR LOCAL:0, 1, 11
+	TFLAG:(LOCAL:0 + 1000) = LOCAL:(LOCAL:0)
+NEXT

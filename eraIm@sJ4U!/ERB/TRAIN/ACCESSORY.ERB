@@ -1,0 +1,220 @@
+;アクセサリ関係
+;[オトコ]にアクセサリってのもアレなので女の子専用
+;……と、言うのが気に入らない人用
+
+;アクセサリプレゼント判定
+;デート終了時に呼ぶ
+@ACCESSORY_CHECK
+;コンフィグでonでないとダメ
+SIF (FLAG:62 & 4) == 0
+	RETURN 0
+;判定はほとんど告白のコピペってのは秘密だぜ
+IF ABL:0 >= 3 && CFLAG:2 >= 300 && ASSIPLAY == 0
+	A = 0
+	;目標難易度は50
+	V = 50
+
+	;純愛系コマンド実行値取得
+	A = GET_JUN_VALUE()
+	;好感度
+	A += CFLAG:2 / 50
+
+	;恋慕
+	SIF TALENT:85
+		A += 30
+
+	;臆病
+	SIF TALENT:10
+		A -= 10
+
+	;恥じらい
+	SIF TALENT:35
+		A -= 10
+
+	;恥薄い
+	SIF TALENT:36
+		A += 5
+
+	;悲観的
+	SIF TALENT:26
+		A -= 5
+
+	;一線越えない
+	SIF TALENT:27
+		A -= 10
+
+	;Aの値を退避
+	Z = A
+	;主導権基準値ボーナス
+	T = TARGET
+	CALL GET_INITIATIVE_RATE
+	;退避させた値を戻す
+	A = Z
+	IF R < 0
+		A += R / 5 + 5
+	ELSEIF R > 0
+		A -= R / 5
+	ENDIF
+
+	;ムードボーナス この値が本命
+	IF TFLAG:37 < 10
+		A -= 10
+	ELSEIF TFLAG:37 < 30
+		A -= 1
+	ELSEIF TFLAG:37 < 50
+		A += 1
+	ELSEIF TFLAG:37 < 100
+		A += TFLAG:37 / 5
+	ELSEIF TFLAG:37 < 300
+		A += TFLAG:37 / 3
+	ELSE
+		A += TFLAG:37
+	ENDIF
+
+	;デート経験 これも割と大きい
+	IF EXP:94 < 50
+		A -= 5
+	ELSEIF EXP:94 < 100
+		A += 5
+	ELSEIF EXP:94 < 500
+		A += EXP:94 / 15
+	ELSE
+		A += EXP:94 / 10
+	ENDIF
+
+	;判定成功
+	IF A >= V
+		;既に貰っている個数に応じて発生判定
+		B = 6000 + NO:TARGET
+		IF FLAG:B > 10
+			C = RAND:5
+			SIF C
+				RETURN 1
+		ELSEIF FLAG:B > 5
+			C = RAND:3
+			SIF C
+				RETURN 1
+		ELSEIF FLAG:B > 0
+			C = RAND:2
+			SIF C
+				RETURN 1
+		ENDIF
+		FLAG:B += 1
+		;この辺の描写は口上との兼ね合いが難しいけど、とりあえず暫定処置
+		;口上表示
+		TFLAG:600 = 37
+		CALL KOJO_MESSAGE_SEND("JUN")
+		PRINTFORMW %CALLNAME:PLAYER%は%CALLNAME:TARGET%からアクセサリをもらった
+	ENDIF
+ENDIF
+
+;小物入れ
+@ACCESSORY_SHOW
+PRINTL 誰から貰ったアクセサリを付けますか？
+IF CFLAG:MASTER:24
+	CSVCALLNAME CFLAG:MASTER:24, 0
+	PRINTFORML %CALLNAME:MASTER%：(%RESULTS%から貰ったアクセサリ)
+ELSE
+	PRINTFORML %CALLNAME:MASTER%：(装備なし)
+ENDIF
+PRINTL 
+
+REPEAT CHARANUM
+	IF CFLAG:COUNT:アクセサリープレゼント数 > 0
+		CSVCALLNAME COUNT, 0
+		TSTR:COUNT = %RESULTS%から貰ったアクセサリ
+		PRINTFORML [{COUNT,3}]%TSTR:COUNT%
+		LOCAL:COUNT = 1
+	ENDIF
+REND
+DRAWLINE
+IF CHARANUM <= 100
+	PRINTL [100] 戻る
+ELSE
+	PRINTL [1000][-1] 戻る
+ENDIF
+IF CFLAG:MASTER:23
+	PRINTL [200] 自動的にアクセサリを付けないようにする
+ELSE
+	PRINTL [200] 自動的にアクセサリを付ける
+ENDIF
+$INPUT_LOOP
+INPUT
+
+IF RESULT == -1 || (CHARANUM <= 100 && RESULT == 100) || RESULT == 1000
+	RETURN 0
+ELSEIF RESULT == 200
+	IF CFLAG:MASTER:23
+		CFLAG:MASTER:23 = 0
+		PRINTL パートナーと過ごす時に相手のアクセサリを持っていて身につけていない場合、
+		PRINTW 自動的にアクセサリを付けず、付けるか選択するようにしました
+	ELSE
+		CFLAG:MASTER:23 = 1
+		PRINTL パートナーと過ごす時に相手のアクセサリを持っていて身につけていない場合、
+		PRINTW 自動的にアクセサリを付けるようにしました
+	ENDIF
+	RESTART
+ELSEIF LOCAL:RESULT
+	IF RESULT == CFLAG:MASTER:24
+		PRINTFORMW %TSTR:(CFLAG:MASTER:24)%をはずしました
+		CFLAG:MASTER:24 = 0
+	ELSE
+		CFLAG:MASTER:24 = RESULT
+		PRINTFORMW %TSTR:(CFLAG:MASTER:24)%を身につけました
+	ENDIF
+	RESTART
+ELSE
+	PRINTW 正しい数値を入力してください
+	GOTO INPUT_LOOP
+ENDIF
+
+RETURN 1
+
+
+;今から会う相手から貰ったアクセサリが有ってそれを付けていないなら、付けるか選択
+@ACCESSORY_EQUIP
+;コンフィグでonでないとダメ
+SIF (FLAG:62 & 4) == 0
+	RETURN 0
+SIF CFLAG:MASTER:アクセサリ2 == NO:TARGET
+	RETURN 0
+;B = 6000 + NO:TARGET
+;SIF FLAG:B == 0
+;	RETURN 0
+SIF CFLAG:TARGET:アクセサリープレゼント数 <= 0
+	RETURN 0
+;自動装着
+IF CFLAG:MASTER:23 == 1
+	CFLAG:MASTER:24 = NO:TARGET
+	RETURN 1
+ENDIF
+
+
+PRINTFORML %CALLNAME:TARGET%から貰ったアクセサリーが有りますが、付けますか？
+PRINTL [0] はい
+PRINTL [1] いいえ
+PRINTL [2] 次回から自動で付ける
+$INPUT_LOOP
+INPUT
+
+IF RESULT == 0
+	CFLAG:MASTER:24 = NO:TARGET
+ELSEIF RESULT == 1
+	;付けない
+ELSEIF RESULT == 2
+	;CFLAG:MASTER:23が1なら自動装着
+	CFLAG:MASTER:23 = 1
+ELSE
+	GOTO INPUT_LOOP
+ENDIF
+
+RETURN 1
+
+;付けているアクセサリを装備に入れる
+@EVENTTRAIN
+;コンフィグでonでないとダメ
+SIF (FLAG:62 & 4) == 0
+	RETURN 0
+
+TEQUIP:4 = CFLAG:MASTER:24
+

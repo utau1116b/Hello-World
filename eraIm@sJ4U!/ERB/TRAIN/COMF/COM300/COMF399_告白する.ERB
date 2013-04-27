@@ -1,0 +1,117 @@
+;告白する
+@COM399
+LOCAL = 0
+;告白対象確認
+;PRINTFORML %CALLNAME:TARGET%に告白します。【恋人】は1人しか取得出来ません。
+;PRINTL よろしいですか？
+;PRINTL [0] - やめる
+;PRINTL [1] - 告白する。
+;$INPUT_LOOP
+;INPUT
+;IF RESULT < 0 || RESULT > 1
+;	CLEARLINE 1
+;	GOTO INPUT_LOOP
+;ELSEIF RESULT == 0
+;	RETURN -1
+;ENDIF
+
+;パラメータにより成功基礎値判定
+;LOCAL = MARK:既成事実 * 3 + MARK:快楽依存 * 3
+;LOCAL += MIN(ABL:親密 * 10, 50) + MIN(ABL:欲望 * 10,50)
+;LOCAL += GETPALAMLV(PALAM:欲情,5) * 5 + GETPALAMLV(PALAM:好意,5) * 5
+;LOCAL += BASE:ムード / 50 + (1000 - BASE:理性) / 30
+
+;目標値110
+LOCAL:1 = 110
+LOCAL = 0
+LOCAL += GET_JUN_VALUE() + CFLAG:好感度 / 50 + TALENT:恋慕 * 30
+LOCAL -= (TALENT:悲観的 * 5 + TALENT:キス未経験 * 10 + TALENT:一線越えない * 15)
+;主導権が相手の時のみの補正
+IF TFLAG:45
+	LOCAL += ABL:欲望 / 2 + TALENT:恥薄い * 5
+	LOCAL -= (TALENT:臆病 * 10 + TALENT:恥じらい * 10)
+ENDIF
+
+CALL GET_INITIATIVE_RATE
+
+;従順なキャラには－ボーナス、強気なキャラには＋ボーナス
+IF (R > 0 && !TFLAG:45) || (R < 0 && TFLAG:45)
+	LOCAL += ABS(R) / 5 +5
+ELSEIF (R > 0 && TFLAG:45) || (R < 0 && !TFLAG:45)
+	LOCAL -= ABS(R) / 5
+ENDIF
+
+;この値が本命
+LOCAL += COM399_MOOD_BONUS()
+
+;告白成功
+IF  LOCAL > LOCAL:1
+	TFLAG:SELECTCOM分岐 = 1
+	;この辺の描写は口上との兼ね合いが難しいけど、とりあえず暫定処置
+	;口上表示
+	TFLAG:600 = 2
+	CALL KOJO_MESSAGE_SEND("JUN")
+	FLAG:48 += 1
+	CALL CHECK_FEAT
+	TFLAG:39 = 1
+	IF TALENT:151
+		EXP:96 += 1
+		EXP:PLAYER:96 += 1
+		TFLAG:38 = 1
+	ENDIF
+	;既成事実２に相当
+	TFLAG:200 = 2
+;告白失敗
+;失敗時はソース計算まで回さない
+ELSE
+	TFLAG:SELECTCOM分岐 = 0
+	;この辺の描写は口上との兼ね合いが難しいけど、とりあえず暫定処置
+	;口上表示
+	TFLAG:600 = 3
+	CALL KOJO_MESSAGE_SEND("JUN")
+	IF TALENT:恋慕 == 0
+		PRINTFORMW %CALLNAME:TARGET%の好感度が50下がりました
+		CFLAG:好感度 -= 50
+	ENDIF
+	RETURN -1
+ENDIF
+
+IF TFLAG:SELECTCOM分岐 == 1
+	SOURCE:歓楽 = 1000
+	SOURCE:受動 = 500 + 100 * ABL:親密
+	SOURCE:征服 = 500 + 100 * ABL:サドっ気
+ENDIF
+
+RETURN 1
+
+@COM399_MOOD_BONUS()
+#FUNCTION
+#LOCALSIZE 1
+LOCAL = 0
+;ムードボーナス この値が本命
+IF TFLAG:ムード < 10
+	LOCAL -= 10
+ELSEIF TFLAG:ムード < 30
+	LOCAL -= 1
+ELSEIF TFLAG:ムード < 50
+	LOCAL += 3
+ELSEIF TFLAG:ムード < 100
+	LOCAL += TFLAG:ムード / 4
+ELSEIF TFLAG:ムード < 300
+	LOCAL += TFLAG:ムード / 2
+ELSE
+	LOCAL += TFLAG:ムード
+ENDIF
+
+;デート経験 これも割と大きい
+IF EXP:デート経験 < 50
+	LOCAL -= 5
+ELSEIF EXP:94 < 100
+	LOCAL += 5
+ELSEIF EXP:94 < 500
+	LOCAL += EXP:94 / 10
+ELSE
+	LOCAL += EXP:94 / 7
+ENDIF
+
+RETURNF LOCAL

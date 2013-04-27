@@ -1,0 +1,43 @@
+;ARG:0	対象のキャラ登録番号
+;ARG:1	スキル番号
+;ARG:2	0アピール系1特技系2パッシブ
+@LEARN_SKILL(ARG:0, ARG:1, ARG:2)
+;LOCAL:0ループ用
+;LOCAL:1スキルを取得したかどうか
+;色を変えてもいいかも
+
+;ver0.720
+;フラグ番号を調整したため、確実にバグるので強制RETURN
+RETURN
+
+PRINTL 
+LOCAL:1 = 1
+IF ARG:2 == 0
+	FOR LOCAL:0, 1401, 1411
+		IF CFLAG:(ARG:0):(LOCAL:0) == 0 && LOCAL:1 == 1
+			CFLAG:(ARG:0):(LOCAL:0) = ARG:1
+			PRINTFORMW <%CALLNAME:(ARG:0)%は%ABLNAME:(ARG:1)%を修得した！>
+			LOCAL:1 -= 1
+		ENDIF
+	NEXT
+	IF LOCAL:1 == 1
+		PRINTFORMW これ以上新しい特技を覚えられません
+		PRINTFORMW （のちに忘れられるようにします）
+	ENDIF
+ELSEIF ARG:2 == 2
+	FOR LOCAL:0, 1401, 1411
+		IF CFLAG:(ARG:0):(LOCAL:0) == 0 && LOCAL:1 == 1
+			CFLAG:(ARG:0):(LOCAL:0) = ARG:1
+			PRINTFORMW <%CALLNAME:(ARG:0)%は%ABLNAME:(ARG:1)%を修得した！>
+			LOCAL:1 -= 1
+		ENDIF
+	NEXT
+	IF LOCAL:1 == 1
+		PRINTFORMW これ以上新しい特技を覚えられません
+		PRINTFORMW （のちに忘れられるようにします）
+	ENDIF
+ELSE
+	PRINTFORMW エラー！不明なスキル種別{ARG:2}が指定されました
+ENDIF
+;レベルをとりあえず1に
+ABL:(ARG:0):(ARG:1) = 1

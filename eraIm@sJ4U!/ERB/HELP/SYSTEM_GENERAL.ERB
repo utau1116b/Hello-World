@@ -1,0 +1,653 @@
+;=============================================================================
+;キャラ変数増加汎用処理
+;=============================================================================
+;-------------------------------------------------
+;特別な注意が無い場合の共通事項
+;-------------------------------------------------
+;ARG　……キャラ位置
+;ARG:1……どれが上昇するのかを指定
+;ARG:2……上昇量
+;ARG:3……表示形式(0=PRINTFORML, 1=PRINTFORMW, 2=表示しない)
+;ARG:4……表示形式その２(0=調教対象も表示する, 1=調教対象の表示を省略する, 2=対象の表示を省略する)
+;-------------------------------------------------
+;宝珠上昇汎用処理
+;-------------------------------------------------
+@COMMON_UP_JUEL, ARG, ARG:1, ARG:2, ARG:3, ARG:4
+;ぶぶ漬け
+SIF ARG:2 <= 0
+	RETURN 0
+
+;単純に丸投げ
+CALL COMMON_MOVE_JUEL, ARG, ARG:1, ARG:2, ARG:3, ARG:4
+RETURN RESULT
+
+;-------------------------------------------------
+;宝珠下降汎用処理
+;-------------------------------------------------
+;ARG:2にはどれだけ下げるかを入れる（100個減らすなら100、-100ではない）
+@COMMON_DOWN_JUEL, ARG, ARG:1, ARG:2, ARG:3, ARG:4
+;ぶぶ漬け
+SIF ARG:2 <= 0
+	RETURN 0
+
+;単純にARG:2の値を反転させて丸投げ
+CALL COMMON_MOVE_JUEL, ARG, ARG:1, -ARG:2, ARG:3, ARG:4
+RETURN RESULT
+
+;-------------------------------------------------
+;宝珠変動汎用処理
+;-------------------------------------------------
+@COMMON_MOVE_JUEL, ARG, ARG:1, ARG:2, ARG:3, ARG:4
+;変動後の珠の数を計算
+;-1p63-1は符号付き64ビットの2進数で表すことが出来る最大の数のはず
+LOCAL:1 = LIMIT(JUEL:ARG:(ARG:1)+ARG:2, 0, -1p63-1)
+;変動差分を計算
+LOCAL:2 = LOCAL:1-JUEL:ARG:(ARG:1)
+;表示する文字列を計算
+;ARG:4は0以下、１、2以上で分岐
+;SIGN(LOCAL:2) == 1により差分の正負で＋と－を分岐
+LOCALS = %PALAMNAME:(ARG:1)%の珠\@ ARG:4 - (ARG != TARGET) <= 0 ? (%CALLNAME:ARG%) # \@ \@ SIGN(LOCAL:2) == 1 ? ＋ # － \@ {ABS(LOCAL:2)}
+;珠変動を反映
+JUEL:ARG:(ARG:1) = LOCAL:1
+;変動差分の絶対値が0でないなら表示
+IF ABS(LOCAL:2) > 0
+	SELECTCASE ARG:3
+		;WAITを掛けない
+		CASE 0
+			PRINTSL LOCALS
+			RETURN 1
+		;WAITを掛ける
+		CASE 1
+			PRINTSW LOCALS
+			RETURN 1
+		;表示しない
+		CASEELSE
+			RETURN 0
+	ENDSELECT
+ENDIF
+
+;-------------------------------------------------
+;経験上昇汎用処理
+;-------------------------------------------------
+@COMMON_UP_EXP, ARG, ARG:1, ARG:2, ARG:3, ARG:4
+;値が上昇しないなら戻る
+SIF ARG:2 <= 0
+	RETURN 0
+
+EXP:ARG:(ARG:1) += ARG:2
+IF ARG:4 == 1
+	LOCALS = %EXPNAME:(ARG:1)%\@(ARG != TARGET) ? (%CALLNAME:ARG%) # \@ ＋ {ARG:2}
+ELSEIF ARG:4 == 2
+	LOCALS = %EXPNAME:(ARG:1)% ＋ {ARG:2}
+ELSE
+	LOCALS = %EXPNAME:(ARG:1)%(%CALLNAME:ARG%) ＋ {ARG:2}
+ENDIF
+IF ARG:2 > 0 && ARG:3 == 0
+	PRINTFORML %LOCALS%
+ELSEIF ARG:2 > 0 && ARG:3 == 1
+	PRINTFORMW %LOCALS%
+ENDIF
+;Ｖ経験増加特別処理
+IF ARG:1 == 0 && (CFLAG:ARG:11 & 1) == 0
+	CFLAG:ARG:11 |= 1
+;Ａ経験増加特別処理
+ELSEIF ARG:1 == 1 && (CFLAG:ARG:11 & 2) == 0
+	CFLAG:ARG:11 |= 2
+;異常経験増加特別処理
+ELSEIF ARG:1 == 50 && (CFLAG:ARG:11 & 4) == 0
+	CFLAG:ARG:11 |= 4
+ENDIF
+SIF ARG:3 != 2
+	RETURN 1
+
+;-------------------------------------------------
+;素質削除汎用処理
+;-------------------------------------------------
+;ARG　……キャラ位置
+;ARG:1……TALENT番号
+;ARG:2……表示処理用フラグ
+@LOST_TALENTS, ARG, ARG:1, ARG:2
+IF TALENT:ARG:(ARG:1)
+	SIF ARG:2 == 0
+		PRINTFORM %CALLNAME:ARG%は
+	PRINTFORM [%TALENTNAME:(ARG:1)%]
+	TALENT:ARG:(ARG:1) = 0
+	RETURN 1
+ENDIF
+RETURN ARG:2
+
+;-------------------------------------------------
+;素質追加汎用処理
+;-------------------------------------------------
+;ARG　……キャラ位置
+;ARG:1……TALENT番号
+;ARG:2……表示処理用フラグ
+@GET_TALENTS, ARG, ARG:1, ARG:2
+IF TALENT:ARG:(ARG:1) == 0
+	SIF ARG:2 == 1
+		PRINT を失い、
+	PRINTFORM [%TALENTNAME:(ARG:1)%]
+	TALENT:ARG:(ARG:1) = 1
+	RETURN 2
+ENDIF
+RETURN ARG:2
+
+;--------------------------------------------------
+;二者択一素質の変動汎用処理
+;--------------------------------------------------
+;ARGのTALENT1と2を1/2の確率で排他的選択するだけの処理
+;ARG=対象キャラ
+;ARG:1=TALENT1
+;ARG:2=TALENT2
+@TALENT_RAND_CHANGE_2, ARG, ARG:1, ARG:2
+IF RAND:2 == 1
+	TALENT:ARG:(ARG:1) = 1
+	TALENT:ARG:(ARG:2) = 0
+ELSE
+	TALENT:ARG:(ARG:1) = 0
+	TALENT:ARG:(ARG:2) = 1
+ENDIF
+
+;--------------------------------------------------
+;三者択一素質の変動汎用処理
+;--------------------------------------------------
+;ARGのTALENT1と2とどっちも付かないを1/3の確率で排他的選択するだけの処理
+;ARG=対象キャラ
+;ARG:1=TALENT1
+;ARG:2=TALENT2
+@TALENT_RAND_CHANGE_3, ARG, ARG:1, ARG:2
+IF RAND:3 == 0
+	TALENT:ARG:(ARG:1) = 1
+	TALENT:ARG:(ARG:2) = 0
+ELSEIF RAND:2 == 0
+	TALENT:ARG:(ARG:1) = 0
+	TALENT:ARG:(ARG:2) = 1
+ELSE
+	TALENT:ARG:(ARG:1) = 0
+	TALENT:ARG:(ARG:2) = 0
+ENDIF
+
+;-------------------------------------------------
+;CFLAG増減汎用処理(好感度とか)
+;-------------------------------------------------
+@COMMON_MOVE_CFLAG, ARG, ARG:1, ARG:2, ARG:3, ARG:4
+;変動差分を計算
+LOCAL = MAX(CFLAG:ARG:(ARG:1)+ARG:2, 0)-CFLAG:ARG:(ARG:1)
+;表示する文字列を計算
+;ARG:4は0以下、１、2以上で分岐
+;SIGN(LOCAL) == 1により差分の正負で＋と－を分岐
+LOCALS = %CFLAGNAME:(ARG:1)%\@ ARG:4 - (ARG != TARGET) <= 0 ? (%CALLNAME:ARG%) # \@ \@ SIGN(LOCAL) == 1 ? ＋ # － \@ {ABS(LOCAL)}
+;フラグ変動を反映
+CFLAG:ARG:(ARG:1) += LOCAL
+;変動差分が0でないなら表示
+IF LOCAL != 0
+	SELECTCASE ARG:3
+		;WAITを掛けない
+		CASE 0
+			PRINTSL LOCALS
+			RETURN 1
+		;WAITを掛ける
+		CASE 1
+			PRINTSW LOCALS
+			RETURN 1
+		;表示しない
+		CASEELSE
+			RETURN 0
+	ENDSELECT
+ENDIF
+
+;-------------------------------------------------
+;BASE値増減汎用処理(増減表示無し)
+;-------------------------------------------------
+@ADD_BASE(ARG, ARG:1, ARG:2)
+BASE:ARG:(ARG:1) = LIMIT(BASE:ARG:(ARG:1)+ARG:2, 0, MAXBASE:ARG:(ARG:1))
+
+;-------------------------------------------------
+;MARK値上昇汎用処理(ただし、MARK:0～MARK:10だけが対象)
+;-------------------------------------------------
+;ARG=対象キャラ
+;ARG:1=対象刻印
+;ARG:2=上昇後の対象刻印の値
+;ARG:3=表示形式(0=PRINTFORML, 1=PRINTFORMW, 2=表示しない)
+@COMMON_MARK_UP, ARG, ARG:1, ARG:2, ARG:3
+;処理しないで戻す場合(存在しない刻印は上昇しない)
+SIF ARG:1 < 0 || ARG:1 > 10
+	RETURN 0
+SIF STRLENS(MARKNAME:(ARG:1)) <= 0
+	RETURN 0
+;現在の刻印の数値が上昇後の値以上なら以降の処理をしない
+SIF MARK:ARG:(ARG:1) >= ARG:2
+	RETURN 0
+;刻印上昇処理
+MARK:ARG:(ARG:1) = ARG:2
+;恐怖刻印および反発刻印上昇時は刻印履歴も更新する
+IF ARG:1 == 8
+	MARK:ARG:96 = MAX(MARK:ARG:8 , ARG:2)
+ELSEIF ARG:1 == 9
+	MARK:ARG:97 = MAX(MARK:ARG:9 , ARG:2)
+ENDIF
+SELECTCASE ARG:3
+	;WAITを掛けない
+	CASE 0
+		PRINTFORM %CALLNAME:ARG%は、
+		FONTBOLD
+		PRINTFORM %MARKNAME:(ARG:1)%LV{MARK:ARG:(ARG:1)}
+		FONTREGULAR
+		PRINTL を取得した。
+		RETURN 1
+	;WAITを掛ける
+	CASE 1
+		PRINTFORM %CALLNAME:ARG%は、
+		FONTBOLD
+		PRINTFORM %MARKNAME:(ARG:1)%LV{MARK:ARG:(ARG:1)}
+		FONTREGULAR
+		PRINTW を取得した。
+		RETURN 1
+	;表示しない
+	CASEELSE
+		RETURN 0
+ENDSELECT
+
+;=============================================================================
+;各種汎用判定処理
+;=============================================================================
+;-------------------------------------------------
+;身体のサイズによる可否
+;-------------------------------------------------
+;身体のサイズが同程度か、身体のサイズを無視出来る(=禁断の知識持ち)状態でない場合は0を返す
+;ARG:0……調教者側キャラ位置
+;ARG:1……調教対象側キャラ位置
+@COMMON_BODYSIZE_CHECK(ARG:0, ARG:1)
+#FUNCTION
+
+;調教者側が[禁断の知識]を持たない場合、体格比較判定へ
+IF TALENT:ARG:56 == 0
+	;互いの体格による体格差を求める
+	LOCAL = COMMON_BODYSIZE_CHECK2(ARG:0, ARG:1)
+
+	;調教者側と対象との体格差が二段階以上だとダメ
+	SIF ABS(LOCAL) > 1
+		RETURNF 0
+ENDIF
+RETURNF 1
+
+;-------------------------------------------------
+;身体のサイズによる可否その２
+;-------------------------------------------------
+;二人のキャラの身体サイズの差を数値として返す関数
+;[禁断の知識]などの有無や判定そのものの可否は呼び出し元でやるようにする。
+;ARG:0……調教者側キャラ位置
+;ARG:1……調教対象側キャラ位置
+@COMMON_BODYSIZE_CHECK2(ARG:0, ARG:1)
+#FUNCTION
+
+;調教対象側の[小人体型]
+IF TALENT:(ARG:1):127
+	LOCAL = -2
+;調教対象側の[小柄体型]
+ELSEIF TALENT:(ARG:1):128
+	LOCAL = -1
+;調教対象側の[巨躯]
+ELSEIF TALENT:(ARG:1):129
+	LOCAL = 1
+;調教対象側の普通体型
+ELSE
+	LOCAL = 0
+ENDIF
+;調教者側の[小人体型]
+IF TALENT:ARG:127
+	LOCAL -= -2
+;調教者側の[小柄体型]
+ELSEIF TALENT:ARG:128
+	LOCAL -= -1
+;調教者側の[巨躯]
+ELSEIF TALENT:ARG:129
+	LOCAL -= 1
+;調教者側の普通体型
+ELSE
+	LOCAL -= 0
+ENDIF
+RETURNF LOCAL
+
+;-------------------------------------------------
+;キャラIDのキャラを登録キャラから探す関数
+;-------------------------------------------------
+;いたらそのキャラの登録キャラ番号を返す、いなければ-1を返す
+;ARG:0……探すべきキャラのID
+;ARG:1……0 = 全員から探す, 1 = 主人は除く
+@SEARCH_CHARA_ID(ARG:0, ARG:1)
+#FUNCTION
+LOCAL = -1
+FOR LOCAL:1, 0, CHARANUM
+	SIF ARG:1 == 1 && LOCAL:1 == MASTER
+		CONTINUE
+
+	IF CFLAG:(LOCAL:1):3109 == ARG:0
+		LOCAL = LOCAL:1
+		BREAK
+	ENDIF
+NEXT
+RETURNF LOCAL
+
+;-------------------------------------------------
+;主人か助手可能キャラに禁断もしくは調合知識があるか探す関数
+;-------------------------------------------------
+;禁断の知識持ちがいればBit1を立てる、調合知識持ちがいればBit2を立てる。
+@SEARCH_CHARA_WISDOM
+#FUNCTION
+LOCAL = 0
+FOR LOCAL:1, 0, CHARANUM
+	;その場にいないとだめ
+	SIF CFLAG:(LOCAL:1):4
+		CONTINUE
+	;主人か助手可能でないとだめ
+	SIF LOCAL:1 != MASTER && CFLAG:(LOCAL:1):1 < 2
+		CONTINUE
+	
+	;調合知識持ち
+	SIF TALENT:(LOCAL:1):55
+		LOCAL |= 1
+	;禁断の知識持ち
+	SIF TALENT:(LOCAL:1):56
+		LOCAL |= 2
+NEXT
+RETURNF LOCAL
+
+;-----------------------------------------
+;[使い魔]条件を満たしているかを調べる関数
+;-----------------------------------------
+;既に[使い魔]持ちor主人に関してはこれは使わないように。
+;ARG:0……探すべきキャラの登録キャラ番号
+@FAMILIAR_ABLE(ARG)
+#FUNCTION
+;親愛または妄信が必要
+SIF TALENT:ARG:151 == 0 && TALENT:ARG:152 == 0
+	RETURNF 0
+;従順、欲望の合計が8以上
+SIF ABL:ARG:10 + ABL:ARG:11 < 8
+	RETURNF 0
+;技巧、奉仕精神がそれぞれ4以上
+SIF ABL:ARG:12 < 4 || ABL:ARG:13 < 4
+	RETURNF 0
+;マゾっ気、自慰中毒がそれぞれ2以上
+SIF ABL:ARG:21 < 2 || ABL:ARG:30 < 2
+	RETURNF 0
+;料理技能が3以上または歌唱技能が3以上または精液中毒が4以上
+SIF ABL:ARG:70 < 3 && ABL:ARG:72 < 3 && ABL:ARG:31 < 4
+	RETURNF 0
+;強制自慰経験が50以上かつ奉仕快楽経験が500以上
+SIF EXP:ARG:11 < 50 || EXP:ARG:20 < 500
+	RETURNF 0
+;屈服刻印Lv3かつ反発刻印Lv0
+SIF MARK:ARG:2 < 3 || MARK:ARG:9
+	RETURNF 0
+;好感度が500必要
+SIF CFLAG:ARG:2 < 500
+	RETURNF 0
+;主人が[大甲斐性]を持っていないとき
+IF TALENT:MASTER:98 == 0
+	;男主人の場合
+	IF TALENT:MASTER:120
+		;相手が女ならレズ経験1500未満
+		SIF EXP:ARG:12 >= 1500 && TALENT:ARG:120== 0
+			RETURNF 0
+		;相手が男ならＢＬ経験1500以上
+		SIF EXP:ARG:13 < 1500 && TALENT:ARG:120
+			RETURNF 0
+	;女主人の場合
+	ELSE
+		;相手が女ならレズ経験が1500以上
+		SIF EXP:ARG:12 < 1500 && TALENT:ARG:120 == 0
+			RETURNF 0
+		;相手が男ならＢＬ経験1500未満
+		SIF EXP:ARG:13 >= 1500 && TALENT:ARG:120
+			RETURNF 0
+	ENDIF
+ENDIF
+RETURNF 1
+
+;-------------------------------------------------
+;キャラのMAXBASEに対するBASEの割合(百分率)算出
+;-------------------------------------------------
+;ARG:0……対象キャラの登録番号
+;ARG:1……対象ゲージの番号
+@CHECK_PERCENTAGE_BASE(ARG, ARG:1)
+#FUNCTION
+RETURNF (BASE:ARG:(ARG:1) <= 0 || MAXBASE:ARG:(ARG:1) <= 0) ? 0 # (BASE:ARG:(ARG:1) * 10 / MAXBASE:ARG:(ARG:1))
+
+;=============================================================================
+;キャラ追加時の共通処理
+;=============================================================================
+;ARGに追加したいキャラ番号を入力
+@CHARA_STATE_BASIC, ARG
+
+;=============================================================================
+;使用する口上の選択処理
+;=============================================================================
+@SELECT_TEXT_DISPLAY, ARG
+#LOCALSIZE 1
+;口上の存在判定
+TRYCCALLFORM TRY_{NO:ARG}
+	TRYCCALLFORM KOJO_{NO:ARG}_DISPLAY_SETTINGS
+		LOCAL = (RESULT >= 1 && RESULT <= 3) ? RESULT # 0
+	CATCH
+		LOCAL = 1
+	ENDCATCH
+CATCH
+	LOCAL = 0
+ENDCATCH
+DRAWLINE
+PRINTFORML %CALLNAME:ARG%に使用する口上を選択してください(※後から変更はできません)
+DRAWLINE
+PRINTLC [0]使用しない
+PRINTLC [1]地の文のみ
+PRINTLC [2]汎用口上のみ
+PRINTLC [3]汎用口上＋地の文
+SIF LOCAL == 1 || LOCAL == 2
+	PRINTLC [4]専用口上のみ
+SIF LOCAL == 1 || LOCAL == 3
+	PRINTLC [5]専用口上＋地の文
+PRINTL 
+$INPUT_LOOP
+INPUT
+IF RESULT == 0
+	PRINTFORMW %CALLNAME:ARG%に口上・地の文は使用しないよう設定しました
+	;口上表示の個別設定フラグに記憶
+	CFLAG:ARG:9 = 1
+ELSEIF RESULT == 1
+	PRINTFORMW %CALLNAME:ARG%に地の文を使用するよう設定しました
+	;口上表示の個別設定フラグに記憶
+	CFLAG:ARG:9 = 2
+ELSEIF RESULT == 2
+	PRINTFORMW %CALLNAME:ARG%に汎用口上を使用するよう設定しました
+	;口上表示の個別設定フラグに記憶
+	CFLAG:ARG:9 = 4
+	;「人格設定」
+	CALL DEFINE_JINKAKU_SELECT, ARG
+ELSEIF RESULT == 3
+	PRINTFORMW %CALLNAME:ARG%に汎用口上と地の文を使用するよう設定しました
+	;口上表示の個別設定フラグに記憶
+	CFLAG:ARG:9 = 6
+	;「人格設定」
+	CALL DEFINE_JINKAKU_SELECT, ARG
+ELSEIF RESULT == 4 && (LOCAL == 1 || LOCAL == 2)
+	PRINTFORMW %CALLNAME:ARG%に専用口上を使用するよう設定しました
+	;口上表示の個別設定フラグに記憶
+	CFLAG:ARG:9 = 8
+ELSEIF RESULT == 5 && (LOCAL == 1 || LOCAL == 3)
+	PRINTFORMW %CALLNAME:ARG%に専用口上と地の文を使用するよう設定しました
+	;口上表示の個別設定フラグに記憶
+	CFLAG:ARG:9 = 10
+ELSE
+	GOTO INPUT_LOOP
+ENDIF
+
+;=============================================================================
+;テーブル計算汎用処理
+;=============================================================================
+;-------------------------------------------------
+;テーブル計算その１
+;-------------------------------------------------
+;テーブル計算用
+;ARG:0 = 代入すべき変数(以下元変数)より引き渡された数
+;ARG:1 ・ ARG:2 = 元変数がARG:2より大きいならばARG:1を引いてARG:2を割る
+@TABLE_CALC(ARG, ARG:1, ARG:2)
+#FUNCTION
+#LOCALSIZE 1
+LOCAL = ARG
+SIF LOCAL > ARG:1
+	LOCAL = ARG:1 + (LOCAL - ARG:1) / ARG:2
+
+RETURNF LOCAL
+
+;-------------------------------------------------
+;テーブル計算その２
+;-------------------------------------------------
+;テーブル計算用
+;ARG:0 = 代入すべき変数(以下元変数)より引き渡された数
+;ARG:1 ・ ARG:2 = 元変数がARG:2より大きいならばARG:1を引いそれに、ARG:2の100分の1の値を掛ける
+@TABLE_CALC2(ARG, ARG:1, ARG:2)
+#FUNCTION
+#LOCALSIZE 1
+LOCAL = ARG
+SIF LOCAL > ARG:1
+	LOCAL = ARG:1 + (LOCAL - ARG:1) * ARG:2 / 100
+
+RETURNF LOCAL
+
+;=============================================================================
+;各種汎用表示処理
+;=============================================================================
+
+;=============================================================================
+;その他の汎用処理
+;=============================================================================
+;-------------------------------------------------
+;期限日セット処理
+;-------------------------------------------------
+@SET_DEADLINE(ARG)
+#FUNCTION
+SELECTCASE ARG
+	;EASY(1周目のみ期限＋20日)
+	CASE 1
+		RETURNF (FLAG:6 == 1) ? 140 # 120
+	;NORMAL(1周目のみ期限＋10日)
+	CASE 2
+		RETURNF (FLAG:6 == 1) ? 100 # 90
+	;HARD
+	CASE 3
+		RETURNF 99
+	;LUNATIC
+	CASE 4
+		RETURNF 90
+	;PHANTASM
+	CASE 5
+		RETURNF 60
+	;ULTRA
+	CASE 6
+		RETURNF 30
+	;OVERDRIVE
+	CASE 7
+		RETURNF 14
+	;UNKOWN
+	CASEELSE
+		RETURNF 90
+ENDSELECT
+
+;-------------------------------------------------
+;難易度表示処理
+;-------------------------------------------------
+@DISPLAY_DIFFICULTY(ARG)
+#FUNCTIONS
+SELECTCASE ARG
+	;EASY
+	CASE 1
+		RETURNF "EASY"
+	;NORMAL
+	CASE 2
+		RETURNF "NORMAL"
+	;HARD
+	CASE 3
+		RETURNF "HARD"
+	;LUNATIC
+	CASE 4
+		RETURNF "LUNATIC"
+	;PHANTASM
+	CASE 5
+		RETURNF "PHANTASM"
+	;ULTRA
+	CASE 6
+		RETURNF "ULTRA"
+	;OVERDRIVE
+	CASE 7
+		RETURNF "OVERDRIVE"
+	;UNKOWN
+	CASEELSE
+		RETURNF "UNKOWN"
+ENDSELECT
+
+;-------------------------------------------------
+;セーブする際の不要な変数リセット処理
+;-------------------------------------------------
+@RESET_VAR_SAVE
+;………………………………………………
+;システムで使用する不要変数リセット
+;………………………………………………
+;一文字変数リセット
+VARSET A, 0
+VARSET B, 0
+VARSET C, 0
+VARSET D, 0
+VARSET E, 0
+VARSET F, 0
+VARSET G, 0
+VARSET H, 0
+VARSET I, 0
+VARSET J, 0
+VARSET K, 0
+VARSET L, 0
+VARSET M, 0
+VARSET N, 0
+VARSET O, 0
+VARSET P, 0
+VARSET Q, 0
+VARSET R, 0
+VARSET S, 0
+VARSET T, 0
+VARSET U, 0
+VARSET V, 0
+VARSET W, 0
+VARSET X, 0
+VARSET Y, 0
+VARSET Z, 0
+;ステータス変動数値リセット
+VARSET UP:0, 0
+VARSET DOWN:0, 0
+
+;………………………………………………
+;各キャラの不要変数リセット
+;………………………………………………
+REPEAT CHARANUM
+	;入手する珠の変数をリセット
+	VARSET GOTJUEL:COUNT:0, 0
+	;パラメータをリセット
+	VARSET PALAM:COUNT:0, 0
+	;ステータス変動数値リセット
+	VARSET DOWNBASE:COUNT:0, 0
+	VARSET SOURCE:COUNT:0, 0
+	VARSET TCVAR:COUNT:0, 0, 0, 100
+	;絶頂のリセット
+	VARSET EX:COUNT:0, 0
+	VARSET NOWEX:COUNT:0, 0
+	;一時的装着道具のリセット
+	VARSET TEQUIP:COUNT:0, 0
+	;汚れのリセット
+	RESET_STAIN COUNT
+REND
+
+;-------------------------------------------------
+;消耗品の消費と補充汎用処理
+;-------------------------------------------------
+;ARG＝アイテム番号, ARG:1＝消費するアイテムの個数(1未満の時は1に修正)
+@USE_PLURAL_ITEM, ARG, ARG:1
+

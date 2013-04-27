@@ -1,0 +1,80 @@
+;---------------------------------------------------------
+;映画
+;---------------------------------------------------------
+@MOVIE_DATE
+VARSET LOCAL
+CALL NEWLINE_U(1)
+FOR LOCAL, 50, 55
+	SIF LOCAL == 54 && !TALENT:恋人
+		CONTINUE
+	PRINTFORM [{LOCAL, 2}] %TSTR:LOCAL, 12, LEFT%
+	LOCAL:LOCAL = 1
+	CALL NEWLINE_U
+NEXT
+PRINTL [100] 映画をやめる
+$INPUT_LOOP
+INPUT
+IF RESULT != 100 && (RESULT < 50 || RESULT > 54)
+	REUSELASTLINE 入力値が不正です。　正しい値を入力して下さい
+	GOTO INPUT_LOOP
+ELSEIF RESULT == 100
+	PRINTL 映画を見るのを止めました
+	CALL デート行き先
+ELSEIF RESULT == デート場所
+	REUSELASTLINE 同じ映画です
+	GOTO INPUT_LOOP
+ELSEIF LOCAL:RESULT && (RESULT >= 50 && RESULT <= 54)
+	TEQUIP:デート中 = RESULT
+ELSE
+	REUSELASTLINE 入力値が不正です。　正しい値を入力して下さい
+	GOTO INPUT_LOOP
+ENDIF
+
+RETURN 1
+
+;-------------------------------------------------
+;映画館から追い出される
+;同時に起きるTEQUIP解除と素質発覚イベントもここで設定
+;-------------------------------------------------
+@GET_OUT_MOVIE
+IF TEQUIP:デート中 >= 50 && TEQUIP:デート中 <= 54
+	PRINTFORML %CALLNAME:PLAYER%達は映画館から追い出されました
+	PRINTW 繁華街へ移動します
+	;ラブホへ行く
+	TEQUIP:デート中 = 33
+ENDIF
+;着衣ローター解除
+;TEQUIP:36 = 0
+;オムツを脱がす
+;TEQUIP:20 = 0
+;炬燵から出る
+;TEQUIP:7 = 0
+;素質発覚イベント
+;CALL FIND_BUSTSIZE
+
+@映画料金()
+#FUNCTION
+;LOCAL:3 プレイヤーの映画料金
+;LOCAL:4 パートナーの映画料金
+VARSET LOCAL
+;映画の金額処理（通常1人$1800）
+LOCAL = 0
+;1日は映画の日で1人$1000
+FOR LOCAL:1, 3, 5
+	SIF !LOCAL:1
+		LOCAL = PLAYER
+	SIF LOCAL:1
+		LOCAL = TARGET
+		
+	;火曜日はメンズディ（紳士$1000）、木曜日はレディースディ（淑女$1000）
+	SIF (DAY:5 == 1 && TALENT:LOCAL:オトコ) || DAY:1 == 1
+			 LOCAL:(LOCAL:1) = 1000
+	;木曜日はレディースディ（淑女$1000）
+	SIF (DAY:5 == 3 && !TALENT:LOCAL:オトコ) || DAY:1 == 1
+		LOCAL:(LOCAL:1) = 1000
+	;ここまでで何もなければ通常料金
+	SIF !LOCAL:(LOCAL:1)
+		LOCAL:(LOCAL:1) = 1800
+NEXT
+RETURNF (LOCAL:3+LOCAL:4)
+

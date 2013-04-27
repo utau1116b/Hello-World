@@ -1,0 +1,738 @@
+;≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+;東方調教典
+;≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+;--------------------------------------------------------------------------------------------
+;このファイル内では体質変化薬・特殊アイテム・触手の能力・特殊な風呂・
+;ゲームモード・CONFIGについて・エンディング条件の記述があります。
+;--------------------------------------------------------------------------------------------
+
+;=============================================================================
+;用語辞典――特殊アイテム
+;=============================================================================
+;--------------------------------------------------
+;施設解説メインページ
+;--------------------------------------------------
+@DICTIONARY_EXITEM_MAIN
+$PRINT_LIST
+DRAWLINE
+PRINTFORML 秘密の道具屋で買える特殊なアイテムに関する大まかな説明です。
+PRINTFORML 当然、秘密の道具屋に行けなければ購入することはできません。
+DRAWLINE
+PRINTLC [ 0] 秘密の地下室
+PRINTLC [ 1] 三角木馬
+PRINTLC [ 2] 杭
+PRINTLC [ 3] ナイフ
+PRINTLC [ 4] 鉈
+PRINTLC [ 5] アイアンメイデン
+PRINTLC [ 6] じょうご
+;PRINTLC [19] 檻
+PRINTLC [20] クリトリスリング
+PRINTLC [21] 奴隷管理用貞操帯
+PRINTLC [22] ベリージュエル
+PRINTLC [23] ボンデージ
+PRINTLC [24] ラビアピアス
+PRINTLC [25] ニプルピアス
+PRINTLC [40] 動物小屋
+PRINTLC [41] 犬
+PRINTLC [42] 豚
+PRINTLC [43] 馬
+PRINTLC [60] 庭園
+PRINTLC [61] 石燈籠
+PRINTLC [62] 添水
+PRINTLC [63] 茶室
+PRINTLC [64] 池
+PRINTLC [65] 魚
+PRINTLC [66] 噴水
+PRINTLC [67] 築山
+PRINTLC [68] 大樹
+PRINTLC [80] ハーブ園
+PRINTLC [81] ハーブ開発施設
+PRINTLC [82] ハーブ生産施設
+PRINTLC [98] 土地
+PRINTLC [99] 豪邸/小城/隠れ里
+PRINTL 
+PRINTL [1000]戻る
+DRAWLINE
+$INPUT_LOOP
+INPUT
+SIF RESULT == 1000
+	RETURN 0
+TRYCCALLFORM DICTIONARY_EXITEM_{RESULT}
+CATCH
+	GOTO INPUT_LOOP
+ENDCATCH
+GOTO PRINT_LIST
+
+;--------------------------------------------------
+;特殊アイテム解説
+;--------------------------------------------------
+;秘密の地下室
+
+;犬
+@DICTIONARY_EXITEM_41
+;豚
+@DICTIONARY_EXITEM_42
+;馬
+@DICTIONARY_EXITEM_43
+;庭園
+@DICTIONARY_EXITEM_60
+;石燈籠
+@DICTIONARY_EXITEM_61
+;添水
+@DICTIONARY_EXITEM_62
+;茶室
+@DICTIONARY_EXITEM_63
+@DICTIONARY_EXITEM_64
+;魚
+@DICTIONARY_EXITEM_65
+;噴水
+@DICTIONARY_EXITEM_66
+;築山
+@DICTIONARY_EXITEM_67
+;大樹
+@DICTIONARY_EXITEM_68
+;ハーブ園
+@DICTIONARY_EXITEM_80
+;ハーブ開発施設
+@DICTIONARY_EXITEM_81
+;ハーブ生産施設
+@DICTIONARY_EXITEM_82
+;土地
+@DICTIONARY_EXITEM_98
+;豪邸/小城/隠れ里
+@DICTIONARY_EXITEM_99
+
+;=============================================================================
+;用語辞典――ゲームモード
+;=============================================================================
+;--------------------------------------------------
+;ゲームモード解説メインページ
+;--------------------------------------------------
+@DICTIONARY_GAMEMODE_MAIN
+$PRINT_LIST
+DRAWLINE
+PRINTFORML eratohoYMに用意されたゲームモードに関する大まかな説明です。
+PRINTFORML ゲームモードを変更するにはゲームそのものをやり直すしかありません。
+DRAWLINE
+PRINTLC [ 0] eratohoYMモード
+PRINTLC [ 1] ABNORMALモード
+PRINTLC [ 2] EXTRAモード
+PRINTLC [ 3] REVERSALモード
+PRINTLC [ 4] CHALLENGEモード
+PRINTLC [ 5] PROSTITUTEモード
+PRINTLC [ 6] XEXTRAモード
+PRINTLC [ 7] YASAIモード
+SIF TALENT:MASTER:998
+	PRINTLC [ 8] DEBUGモード
+PRINTL 
+PRINTL [1000]戻る
+DRAWLINE
+$INPUT_LOOP
+INPUT
+IF RESULT == 1000
+	RETURN 0
+ELSEIF RESULT < 0 || RESULT > 8 || (RESULT == 8 && TALENT:MASTER:998 == 0)
+	GOTO INPUT_LOOP
+ENDIF
+TRYCALLFORM DICTIONARY_GAMEMODE_{RESULT}
+GOTO PRINT_LIST
+
+;--------------------------------------------------
+;ゲームモード解説
+;--------------------------------------------------
+;eraIm@sJモード
+@DICTIONARY_GAMEMODE_0
+;CLASSICモード
+@DICTIONARY_GAMEMODE_1
+;EXTRAモード
+@DICTIONARY_GAMEMODE_2
+;REVERSALモード
+@DICTIONARY_GAMEMODE_3
+;MISSIONモード
+@DICTIONARY_GAMEMODE_4
+;PROSTITUTEモード
+@DICTIONARY_GAMEMODE_5
+;XEXTRAモード
+@DICTIONARY_GAMEMODE_6
+;YASAIモード
+@DICTIONARY_GAMEMODE_7
+;DEBUGモード
+@DICTIONARY_GAMEMODE_8
+
+;=============================================================================
+;用語辞典――CONFIG
+;=============================================================================
+;--------------------------------------------------
+;CONFIG解説メインページ
+;--------------------------------------------------
+@DICTIONARY_CONFIG_MAIN_J
+VARSET LOCAL, 0
+;最大ページ数を示す
+LOCAL:1 = 6
+$PRINT_LIST
+DRAWLINE
+PRINTL eratohoYMに用意されたCONFIGに関する大まかな説明です。
+PRINTFORML 内容を知りたい項目の番号を入力してください。 ＜page.{LOCAL+1}/{LOCAL:1+1}＞
+DRAWLINE
+SELECTCASE LOCAL
+	;テキスト表示の設定
+	CASE 0
+		PRINTL [ 0] テキスト表示
+		PRINTL [ 1] 所持アイテム表示
+		PRINTL [ 2] 一言口上表示
+		PRINTL [ 3] 変動ステータス強調
+	;カスタムコマンドフィルタ
+		PRINTL [10] カスタムコマンドフィルタ
+	;射精箇所選択・妊娠出産関係
+	CASE 1
+		PRINTL [ 0] 射精箇所選択機能
+		PRINTL [ 1] 妊娠出産育児機能
+		PRINTL [ 2] 卵育て機能
+	 	PRINTL [ 3] 子供調教可能化モード
+		PRINTL [ 4] 息子も調教する
+		PRINTL [ 5] 子供成長機能
+	;ＳＨＯＰ・イベント拡張
+	CASE 2
+		PRINTL [ 0] 強くてニューゲーム
+		PRINTL [ 1] 表示形式変更
+		PRINTL [ 2] 好感度の表示
+		PRINTL [ 3] 弁当・ライブ
+		PRINTL [ 4] 展示室
+		PRINTL [ 5] 純愛モード
+		PRINTL [ 6] 日常生活
+	;	PRINTL [ 7] 夜イベント
+		PRINTL [ 8] 朝のイベント
+		PRINTL [ 9] 調教後行為
+		PRINTL [10] 食後の素敵な運動
+		PRINTL [11] 名無しキャラ性別ランダム
+		PRINTL [12] 技能訓練士を利用できないようにする
+		PRINTL [13] 売却時の口上を表示しない
+	;アイテム拡張
+	CASE 3
+		PRINTL [ 0] 特殊な薬
+		PRINTL [ 1] 強力アイテム・コマンド
+		PRINTL [ 2] 一般的な薬品アイテムの自動補充
+		PRINTL [ 3] 特殊な薬品アイテムの自動補充
+		PRINTL [ 4] 消耗品アイテムの自動補充
+		PRINTL [ 5] 鎮静茶の自動使用
+		PRINTL [ 6] 栄養剤の自動使用
+	;調教モード拡張
+	CASE 4
+		PRINTL [ 0] 調教コマンドフィルタ
+		PRINTL [ 1] 気力体力上昇
+		PRINTL [ 2] ヤンデレもーど
+		PRINTL [ 3] ランダム性排除
+		PRINTL [ 4] 猫フェラパッチ
+		PRINTL [ 5] ふたたまパッチ
+		PRINTL [ 6] 調教メニュー登録
+		PRINTL [ 7] ふたなりイベント抑制
+		PRINTL [ 8] 精飲絶頂
+	;コマンド拡張
+	CASE 5
+		PRINTL [ 0] Ｃ系拡張コマンド
+		PRINTL [ 1] Ｖ系拡張コマンド
+		PRINTL [ 2] Ａ系拡張コマンド
+		PRINTL [ 3] Ｂ系拡張コマンド
+		PRINTL [ 4] 拷問系、精神操作系コマンド
+		PRINTL [ 5] 薬品系拡張コマンド
+		PRINTL [ 6] 注射系コマンド
+		PRINTL [ 7] 撮影コマンド拡張
+		PRINTL [ 8] 野外調教コマンド拡張
+		PRINTL [ 9] 羞恥プレイ系拡張コマンド
+		PRINTL [10] 特殊風呂系コマンド
+		PRINTL [11] 調教者奉仕・ウフフ系コマンド
+		PRINTL [12] 紳士的な触手系コマンド
+		PRINTL [13] 獣姦系コマンド
+		PRINTL [14] キャラ専用コマンド
+	;特殊調教モード
+	CASE 6
+		PRINTL [ 0] パニックモード
+		PRINTL [ 1] 失神モード
+		PRINTL [ 2] 犯されモード
+		PRINTL [ 3] 自慰隠蔽発覚モード
+	;機能拡張
+	CASE 7
+		PRINTL [ 0] 娼館機能
+		PRINTL [ 1] 技師工作機能
+ENDSELECT
+DRAWLINE
+PRINTFORMLC \@(LOCAL <= 0) ? %" " * 18% # [1001]前のページ\@
+PRINTLC [1000]戻る
+PRINTFORMLC \@(LOCAL >= LOCAL:1) ? %" " * 18% # [1009]後ろのページ\@
+PRINTL 
+$INPUT_LOOP
+INPUT
+IF RESULT == 1000
+	RETURN 0
+ELSEIF RESULT == 1001 && LOCAL > 0
+	LOCAL -= 1
+	GOTO PRINT_LIST
+ELSEIF RESULT == 1009 && LOCAL < LOCAL:1
+	LOCAL += 1
+	GOTO PRINT_LIST
+ENDIF
+TRYCCALLFORM DICTIONARY_CONFIG_{LOCAL}_{RESULT}
+CATCH
+	GOTO INPUT_LOOP
+ENDCATCH
+GOTO PRINT_LIST
+
+;--------------------------------------------------
+;CONFIG解説
+;--------------------------------------------------
+;………………………………………………
+;テキスト表示の設定
+;………………………………………………
+;テキスト表示
+@DICTIONARY_CONFIG_0_0
+;所持アイテム表示
+@DICTIONARY_CONFIG_0_1
+;一言口上表示
+@DICTIONARY_CONFIG_0_2
+;変動ステータス強調
+@DICTIONARY_CONFIG_0_3
+;………………………………………………
+;カスタムコマンドフィルタ
+;………………………………………………
+;カスタムコマンドフィルタ
+@DICTIONARY_CONFIG_0_10
+;………………………………………………
+;射精箇所選択・妊娠出産関係
+;………………………………………………
+;射精箇所選択機能
+@DICTIONARY_CONFIG_1_0
+;妊娠出産育児機能
+@DICTIONARY_CONFIG_1_1
+;卵育てパッチ
+@DICTIONARY_CONFIG_1_2
+;子供調教可能化モード
+@DICTIONARY_CONFIG_1_3
+;息子も調教する
+@DICTIONARY_CONFIG_1_4
+;子供成長パッチ
+@DICTIONARY_CONFIG_1_5
+
+;………………………………………………
+;ＳＨＯＰ・イベント拡張
+;………………………………………………
+;強くてニューゲーム
+@DICTIONARY_CONFIG_2_0
+PRINTL ＜強くてニューゲーム＞
+PRINTL ＯＮにすれば期限ありのゲームモードのプレイにおいて周回プレイが可能になります。
+PRINTL 周回プレイとは、エンディングを迎えた後で「強くてニューゲーム」を選択することにより、
+PRINTL 能力や素質や資金やアイテムなどをある程度引き継いだ状態で
+PRINTL 「1日目」に戻ってプレイを続けることができるというものです。
+PRINTL どれが引き継がれるかというのは状況により異なることに注意してください。
+PRINTL ゲーム中の様々な条件の中にはこれにより周回プレイをこなさない限りは
+PRINTW 実現できなかったりするものもあります。
+
+;表示形式変更
+@DICTIONARY_CONFIG_2_1
+PRINTL ＜表示形式変更＞
+PRINTL 能力を見る画面などの表示形式を壱型方式と弐型方式のいずれかするかを選べます。
+PRINTL 壱型方式はeratohoRR用改造パッチのアレンジ版です。
+PRINTL 弐型方式はeratohoJに近いものとなっています。
+PRINTW 表示以外の点でゲームに影響はないので、難易度などにも違いは出ません。
+
+;好感度の表示
+@DICTIONARY_CONFIG_2_2
+PRINTL ＜好感度の表示＞
+PRINTL ＯＮにすれば調教コマンド選択時等で好感度や一部経験が常時表示されるようになります。
+PRINTW ＯＮの方が情報が見やすい分、難易度は易しくなるでしょう。
+
+;弁当・ライブ
+@DICTIONARY_CONFIG_2_3
+PRINTL ＜弁当・ライブ＞
+PRINTL 弁当やコンサートライブをやるかやらないかを選択できます。
+PRINTL これがＯＮである場合、条件を満たせば奴隷に料理を作らせたり、
+PRINTL 主人自ら料理を作ったり、野外ライブを開かせることができるようになります。
+PRINTL これらは奴隷陥落の補助的な役割と資金稼ぎの手段であるため、
+PRINTW ＯＦＦの方が多少難易度は難しくなるでしょう。
+
+;展示室
+@DICTIONARY_CONFIG_2_4
+PRINTL ＜展示室＞
+PRINTL 展示室機能を使うか使わないか選ぶことができます。
+PRINTL これをＯＮにすれば蒐集品を蒐集し展示することができるようになります。
+PRINTL これがＯＦＦになっている場合には蒐集品の入手もできなくなります。
+PRINTL また写真撮影をするにはこれと別項目の撮影コマンド拡張の両方を
+PRINTW ＯＮにしなければ使えません。
+
+;純愛モード
+@DICTIONARY_CONFIG_2_5
+PRINTL ＜純愛モード＞
+PRINTL これをＯＮにした場合、いわゆる純愛イベントが起きるようになったり、
+PRINTL 奴隷を売却せずに解放したりできるようになったり、
+PRINTL 朝のご奉仕イベントが起きたりするようになります。
+PRINTL また、[キス魔]取得などにもＯＮ必須となっています。
+PRINTL どちらかというとおまけ的な意味合いもありますが、
+PRINTW ＯＮにした方が間違いなく難易度は易しくなるでしょう。
+
+;日常生活
+@DICTIONARY_CONFIG_2_6
+PRINTL ＜日常生活＞
+PRINTL 奴隷の日常生活を覗くことができるようになります。
+PRINTL ＯＮの場合、休憩を選択したあとに奴隷たちの日常生活イベントが起きます。
+PRINTL ＯＮにした方が難易度は易しくなるでしょう。
+PRINTL ただし、これによりあまり易しくなりすぎないように珠や経験の入手に一定の
+PRINTL 調教経験が必要となっています。
+PRINTL なお、日常生活は、登録奴隷がいないときもしくは現在調教対象がいない場合には
+PRINTW 起こらないことにも注意していてください。
+
+;夜イベント
+;@DICTIONARY_CONFIG_2_7
+;PRINTL ＜夜イベント＞
+;PRINTL これをＯＮにした場合、奴隷による夜のイベントが発生するようになります。
+;PRINTW 難易度的にはＯＮだと易しくなるでしょう。
+
+;朝のイベント
+@DICTIONARY_CONFIG_2_8
+PRINTL ＜朝のイベント＞
+PRINTL これをＯＮにした場合、奴隷による朝のイベントが発生するようになります。
+PRINTW 難易度的にはＯＮだとほんの少し易しくなるでしょう。
+
+;調教後行為
+@DICTIONARY_CONFIG_2_9
+PRINTL ＜調教後行為＞
+PRINTL これをＯＮにした場合、調教後に対象が自慰や搾乳や性交等の
+PRINTL 調教後イベントが発生するようになります。
+PRINTL 強精神薬による反動や戻さなかった触手による陵辱はこの項目の影響を受けません。
+PRINTW 難易度的にはＯＮだと易しくなるでしょう。
+
+;食後の素敵な運動
+@DICTIONARY_CONFIG_2_10
+PRINTL ＜食後の素敵な運動を抑制する＞
+PRINTL これをＯＮにした場合、弁当コマンド後に起こる可能性のある
+PRINTL 食後の性行為イベントが発生するようになります。
+PRINTW 難易度的にはＯＮだと少し易しくなるでしょう。
+
+;名無しキャラ性別ランダム
+@DICTIONARY_CONFIG_2_11
+
+
+;技能訓練士を利用できないようにする
+@DICTIONARY_CONFIG_2_12
+
+
+;売却時の口上を表示しない
+@DICTIONARY_CONFIG_2_13
+
+
+;………………………………………………
+;アイテム拡張
+;………………………………………………
+;特殊な薬
+@DICTIONARY_CONFIG_3_0
+;強力アイテム・コマンド
+@DICTIONARY_CONFIG_3_1
+;一般的な薬品アイテムの自動補充
+@DICTIONARY_CONFIG_3_2
+PRINTL ＜一般的な薬品アイテムの自動補充＞
+PRINTL ＯＮすれば、ローションと媚薬について、それらを使った場合に資金があれば
+PRINTL 自動的に補充されるようになります。
+PRINTL お金がなければ補充されないだけで、アイテムそのものは使用されます。
+PRINTL 基本的にはＯＮのほうが楽ですが、お金の管理をおろそかにすると気づいたら
+PRINTW 資金切れになっていたということになりかねません。
+;特殊な薬品アイテムの自動補充
+@DICTIONARY_CONFIG_3_3
+;消耗品アイテムの自動補充
+@DICTIONARY_CONFIG_3_4
+PRINTL ＜消耗品アイテムの自動補充＞
+PRINTL ＯＮすれば、薬品以外の消耗品について、それらを使った場合に資金があれば
+PRINTL 自動的に補充されるようになります。
+PRINTL お金がなければ補充されないだけで、アイテムそのものは使用されます。
+PRINTL 基本的にはＯＮのほうが楽ですが、お金の管理をおろそかにすると気づいたら
+PRINTL 資金切れになっていたということになりかねません。
+PRINTL 対象アイテムは、ビデオテープ・フィルム・具材セット・コンドーム・
+PRINTW 抗菌綿棒・低温蝋燭・蓋付き瓶・ヲトナのオムツです。
+;鎮静茶の自動使用
+@DICTIONARY_CONFIG_3_5
+;栄養剤の自動使用
+@DICTIONARY_CONFIG_3_6
+PRINTL ＜栄養剤の自動使用＞
+PRINTL ＯＮにする事で時間経過時に栄養剤を自動使用するようになります。
+PRINTL ただし、主人が助手可能な奴隷のいずれかに
+PRINTL [禁断の知識]か[調合知識]のどちらを持っているものがいないと働きません。
+PRINTL また、[機械]の奴隷はこれで回復させることができません。
+PRINTL 基本的にはＯＮのほうが楽ですが、お金の管理をおろそかにすると気づいたら
+PRINTL 資金切れになっていたということになりかねませんので注意しましょう。
+PRINTW 鎮静茶と比較して単価が高い為、資金繰りが安定するまでは控えるべきです。
+
+;………………………………………………
+;調教モード拡張
+;………………………………………………
+;調教コマンドフィルタ
+@DICTIONARY_CONFIG_4_0
+PRINTL ＜調教コマンドフィルタ＞
+PRINTL これをＯＮにすれば、Ｖ系調教フィルタ・Ａ系調教フィルタ・異常調教フィルタの
+PRINTL 機能を使うことができます。なお、それぞれのフィルタのＯＮ／ＯＦＦは別途
+PRINTL 調教中のコマンドで行いますが、それぞれをＯＮにしていてもこの
+PRINTL 調教コマンドフィルタそのものをＯＦＦにすれば連動してＯＦＦになってしまいます。
+PRINTL Ｖ調教フィルタはＯＮになっていれば、Ｖ経験が入るコマンドが選択できなくなり、
+PRINTL Ａ調教フィルタはＯＮになっていれば、Ａ経験が入るコマンドが選択できなくなり、
+PRINTL 異常調教フィルタはＯＮになっていれば、異常経験が入るコマンドが選択できなくなります。
+PRINTL ただし、いずれも確実ではありません。そういう経験が入らなくても選択できなく
+PRINTL なってしまうコマンドがあったり、逆にフィルタを潜り抜けてそういう経験を増やしてしまう
+PRINTL ことはありえるので注意してください。
+PRINTL 基本的にはこれらのフィルタがない方が調教手段が多い分だけ難易度は易しくなるはずです。、
+PRINTW なお、カスタムコマンドフィルタに関してはこの項目とは無関係です。
+;気力体力上昇
+@DICTIONARY_CONFIG_4_1
+PRINTL ＜気力体力上昇＞
+PRINTL 有効にすると条件を満たしたときに奴隷の気力と体力が上昇するようになります。
+PRINTL 上昇するしないそのものはランダムですが、上昇する量の上限は決まっています。
+PRINTW ＯＮにした方が難易度は易しくなります。
+
+;ヤンデレもーど
+@DICTIONARY_CONFIG_4_2
+;ランダム性排除
+@DICTIONARY_CONFIG_4_3
+;猫フェラパッチ
+@DICTIONARY_CONFIG_4_4
+;ふたたまパッチ
+@DICTIONARY_CONFIG_4_5
+;調教メニュー登録
+@DICTIONARY_CONFIG_4_6
+;ふたなりイベント抑制
+@DICTIONARY_CONFIG_4_7
+
+;精飲絶頂
+@DICTIONARY_CONFIG_4_8
+PRINTL ＜精飲絶頂＞
+PRINTL これをＯＮにすると精液を飲ませた場合に一定条件で絶頂するようになります。
+PRINTL 精飲絶頂は従来のCVAB絶頂とは別にカウントされます。
+PRINTL なお、精飲絶頂に至るまでの条件は相当厳しいので注意してください。
+PRINTW ＯＮにした場合、難易度はほんの少し易しくなると思われます。
+
+;………………………………………………
+;コマンド拡張
+;………………………………………………
+;Ｃ系拡張コマンド
+@DICTIONARY_CONFIG_5_0
+PRINTL ＜Ｃ系拡張コマンド＞
+PRINTL これをＯＮにすれば、クリトリスやペニス責め関連の特殊なコマンドが使えるようになります。
+PRINTL そして、素質[淫核／淫茎][尿道狂]の取得が可能になります。
+PRINTW ＯＮにすれば調教手段が増えるため難易度的には易しくなるでしょう。
+
+;Ｖ系拡張コマンド
+@DICTIONARY_CONFIG_5_1
+PRINTL ＜Ｖ系拡張コマンド＞
+PRINTL これをＯＮにすれば、ヴァギナ責め関連の特殊なコマンドが使えるようになります。
+PRINTL そして、素質[淫壷]の取得が可能になります。
+PRINTW ＯＮにすれば調教手段が増えるため難易度的には易しくなるでしょう。
+
+;Ａ系拡張コマンド
+@DICTIONARY_CONFIG_5_2
+PRINTL ＜Ａ系拡張コマンド＞
+PRINTL これをＯＮにすれば、アナル責め関連の特殊なコマンドが使えるようになります。
+PRINTL そして、素質[淫尻]の取得が可能になります。
+PRINTW ＯＮにすれば調教手段が増えるため難易度的には易しくなるでしょう。
+
+;Ｂ系拡張コマンド
+@DICTIONARY_CONFIG_5_3
+PRINTL ＜Ｂ系拡張コマンド＞
+PRINTL これをＯＮにすれば、バスト責め関連の特殊なコマンドが使えるようになります。
+PRINTL そして、素質[淫乳]の取得が可能になります。
+PRINTW ＯＮにすれば調教手段が増えるため難易度的には易しくなるでしょう。
+
+;拷問系、精神操作系コマンド
+@DICTIONARY_CONFIG_5_4
+;薬品系拡張コマンド
+@DICTIONARY_CONFIG_5_5
+;注射系拡張コマンド
+@DICTIONARY_CONFIG_5_6
+;撮影コマンド拡張
+@DICTIONARY_CONFIG_5_7
+;野外調教コマンド拡張
+@DICTIONARY_CONFIG_5_8
+;羞恥プレイ系拡張コマンド
+@DICTIONARY_CONFIG_5_9
+;特殊風呂系コマンド
+@DICTIONARY_CONFIG_5_10
+;調教者奉仕・ウフフ系コマンド
+@DICTIONARY_CONFIG_5_11
+;紳士的な触手系コマンド
+@DICTIONARY_CONFIG_5_12
+;獣姦系コマンド
+@DICTIONARY_CONFIG_5_13
+;キャラ専用コマンド
+@DICTIONARY_CONFIG_5_14
+
+;………………………………………………
+;特殊調教モード
+;………………………………………………
+;パニックモード
+@DICTIONARY_CONFIG_6_0
+;失神モード
+@DICTIONARY_CONFIG_6_1
+;犯されモード
+@DICTIONARY_CONFIG_6_2
+;自慰隠蔽発覚モード
+@DICTIONARY_CONFIG_6_3
+
+;………………………………………………
+;機能拡張
+;………………………………………………
+;娼館機能
+@DICTIONARY_CONFIG_7_0
+;技師工作機能
+;@DICTIONARY_CONFIG_7_1
+;PRINTL ＜技師工作機能＞　※未実装
+
+;=============================================================================
+;用語辞典――エンディング条件
+;=============================================================================
+;--------------------------------------------------
+;エンディング条件解説メインページ
+;--------------------------------------------------
+@DICTIONARY_ENDING_MAIN
+VARSET LOCAL, 0
+;最大ページ数
+LOCAL:1 = 1
+
+$PRINT_LIST
+DRAWLINE
+PRINTL バッドエンドおよび触手系エンドを除くエンディング条件に関する大まかな説明です。
+PRINTFORML 内容を知りたい項目の番号を入力してください。 ＜page.{LOCAL+1}/{LOCAL:1+1}＞
+PRINTL なお、複数のエンディング条件を同時に満たした場合はどれにするかを選択することができます。
+PRINTL また、エンドレスプレイになっている場合、以下のエンディングは起こりません。
+DRAWLINE
+FOR COUNT , (50 * LOCAL) , (50 * (LOCAL+1)), 1
+	SIF STRLENS(STR:(COUNT + 1000)) > 0
+		PRINTFORMLC [{COUNT}] %STR:(1000+COUNT)%
+NEXT
+PRINTL 
+DRAWLINE
+PRINTFORMLC \@(LOCAL <= 0) ? %" " * 18% # [1001]前のページ\@
+PRINTLC [1000]戻る
+PRINTFORMLC \@(LOCAL >= LOCAL:1) ? %" " * 18% # [1009]後ろのページ\@
+PRINTL 
+$INPUT_LOOP
+INPUT
+IF RESULT == 1000
+	RETURN 0
+ELSEIF RESULT == 1001 && LOCAL > 0
+	LOCAL -= 1
+ELSEIF RESULT == 1009 && LOCAL < LOCAL:1
+	LOCAL += 1
+ELSEIF RESULT < 1 || RESULT > 100 || STRLENS(STR:(RESULT + 1000)) == 0
+	GOTO INPUT_LOOP
+ELSE
+	TRYCALLFORM DICTIONARY_ENDING_{RESULT}
+ENDIF
+GOTO PRINT_LIST
+
+;--------------------------------------------------
+;エンディング解説
+;--------------------------------------------------
+;ノーマルエンド
+@DICTIONARY_ENDING_1
+PRINTL 〔ノーマルエンド〕
+PRINTL これを選んでもプレイヤーがノーマルだとは限らない…い、いえなんでもないです。
+PRINTL 
+PRINTL （ノーマルエンド条件）
+PRINTW ・期日までに既定の金額を所持していること。
+;ハーレムエンド
+@DICTIONARY_ENDING_2
+;触手使いエンド
+@DICTIONARY_ENDING_3
+;触手姫エンド
+@DICTIONARY_ENDING_4
+;霊異エンド
+@DICTIONARY_ENDING_5
+;封魔録エンド
+@DICTIONARY_ENDING_6
+;夢時空エンド
+@DICTIONARY_ENDING_7
+;夢幻エンド
+@DICTIONARY_ENDING_8
+;魔界エンド
+@DICTIONARY_ENDING_9
+;紅魔エンド
+@DICTIONARY_ENDING_10
+;冥界エンド
+@DICTIONARY_ENDING_11
+;萃夢エンド
+@DICTIONARY_ENDING_12
+;永夜エンド
+@DICTIONARY_ENDING_13
+;彼岸エンド
+@DICTIONARY_ENDING_14
+;守矢エンド
+@DICTIONARY_ENDING_15
+;緋想エンド
+@DICTIONARY_ENDING_16
+;地霊エンド
+@DICTIONARY_ENDING_17
+;儚月エンド
+@DICTIONARY_ENDING_18
+;星蓮エンド
+@DICTIONARY_ENDING_19
+;香霖堂エンド
+@DICTIONARY_ENDING_20
+;三月精エンド
+@DICTIONARY_ENDING_21
+;文花帖エンド
+@DICTIONARY_ENDING_22
+;博麗神社エンド
+@DICTIONARY_ENDING_50
+;人形遣いエンド
+@DICTIONARY_ENDING_51
+;幻想楽団エンド
+@DICTIONARY_ENDING_52
+;妖稚園エンド
+@DICTIONARY_ENDING_53
+;お姉様エンド
+@DICTIONARY_ENDING_54
+;妹エンド
+@DICTIONARY_ENDING_55
+;妬まれエンド
+@DICTIONARY_ENDING_56
+;動物ランドエンド
+@DICTIONARY_ENDING_57
+;オトコの娘エンド
+@DICTIONARY_ENDING_58
+;漢の世界エンド
+@DICTIONARY_ENDING_59
+;メディア王エンド
+@DICTIONARY_ENDING_60
+;搾乳牧場エンド
+@DICTIONARY_ENDING_61
+;教祖様エンド
+@DICTIONARY_ENDING_62
+;東方ハーレムエンド
+@DICTIONARY_ENDING_63
+;中ボス連合エンド
+@DICTIONARY_ENDING_64
+;10人の貴婦人エンド
+@DICTIONARY_ENDING_65
+;淫魔エンド
+@DICTIONARY_ENDING_66
+;悪魔王エンド
+@DICTIONARY_ENDING_67
+;無名エンド
+@DICTIONARY_ENDING_68
+;山の神々エンド
+@DICTIONARY_ENDING_69
+;虹色エンド
+@DICTIONARY_ENDING_70
+;非売エンド
+@DICTIONARY_ENDING_71
+;大富豪エンド
+@DICTIONARY_ENDING_72
+;弁当屋エンド
+@DICTIONARY_ENDING_73
+;アイドルエンド
+@DICTIONARY_ENDING_74
+;宴会エンド
+@DICTIONARY_ENDING_75
+;夢想エンド
+@DICTIONARY_ENDING_76
+;純愛エンド
+@DICTIONARY_ENDING_77
+;大図書館エンド
+@DICTIONARY_ENDING_78
+;蓬莱人エンド
+@DICTIONARY_ENDING_79
+;魔法少女エンド
+@DICTIONARY_ENDING_80

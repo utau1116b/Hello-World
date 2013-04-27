@@ -1,0 +1,45 @@
+;先制攻撃判定
+;RETURN		0:通常　1:先制　2:不意打ち
+@CHECK_FIRST_ATTACK
+;LOCAL
+;0	LOOP
+;1	TEMP
+;2	先制率
+;3	不意打ち率
+
+;特殊な戦闘では先制も不意打ちも発生しない
+IF TFLAG:イベント戦
+	RETURN 0
+ENDIF
+
+;デフォルトは先制も不意打ちも5％
+LOCAL:2 = 5
+LOCAL:3 = 5
+;奇襲レベル*2の先制補正
+;CALL GET_MAX_ABL_PT(186, 0)
+;LOCAL:2 += RESULT * 2
+
+;確率操作チェック
+IF FLAG:先制攻撃率操作 >= 1000
+	LOCAL:2 += (FLAG:先制攻撃率操作 % 1000) - 100
+ENDIF
+IF FLAG:不意打ち率操作 >= 1000
+	LOCAL:2 += (FLAG:不意打ち率操作 % 1000) - 100
+ENDIF
+
+
+;先に先制判定
+IF RAND:100 < LOCAL:2
+	RETURN 1
+ENDIF
+
+;次に不意打ち判定　つまり、厳密にいうとデフォルトでも不意打ちは95%*5%
+IF RAND:100 < LOCAL:3
+	RETURN 2
+ENDIF
+
+;どちらにも引っかからなければ通常
+RETURN 0
+
+
+

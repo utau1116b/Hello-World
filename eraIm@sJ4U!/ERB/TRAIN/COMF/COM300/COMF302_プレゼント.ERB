@@ -1,0 +1,307 @@
+;-------------------------------------------------
+;プレゼント
+;日常系コマンド　レベル1
+;-------------------------------------------------
+@COM302
+VARSET LOCAL
+;スマイルはいつでもできる
+LOCAL = 1
+PRINTL 何を贈りますか？
+PRINTFORML [0] スマイル（タダ）
+IF MONEY >= 1000
+	PRINTFORML [1] お酒(%ADD_COMMA(1000)%Ｇ)
+	LOCAL:1 = 1
+ENDIF
+IF MONEY >= 2500
+	PRINTFORML [2] 日用品(%ADD_COMMA(2500)%Ｇ)
+	LOCAL:2 = 1
+ENDIF
+;●友情パッチ用改変
+IF MONEY >= 10000 && !IS_友情(TARGET)
+	PRINTFORML [3] アクセサリ(%ADD_COMMA(10000)%Ｇ)
+	LOCAL:3 = 1
+ENDIF
+IF MONEY >= 25000 && !IS_友情(TARGET)
+	PRINTFORML [4] 服(%ADD_COMMA(25000)%Ｇ)
+	LOCAL:4 = 1
+ENDIF
+;●ここまで
+IF MONEY >= 150000
+	;ナンカチガウコトハワカッテマスヨ？
+	PRINTFORML [5] 幻想郷のお酒(%ADD_COMMA(150000)%Ｇ)
+	LOCAL:5 = 1
+ENDIF
+IF MONEY >= 1000000 && TALENT:153 && TALENT:85 && TALENT:相愛 == 0 && TALENT:180 == 0 && CFLAG:好感度 >= 8000 && MARK:3 == 0 && ABL:0+ABL:1+ABL:2+ABL:6 >= 40 && FLAG:29 == 0 && ASSIPLAY == 0
+	PRINTFORML [6] エンゲージリング(%ADD_COMMA(1000000)%Ｇ)
+	LOCAL:6 = 1
+ENDIF
+;7,酒樽
+
+PRINTFORML [100] やっぱりやめる
+$INPUT_LOOP
+INPUT
+IF RESULT == 100
+	PRINTFORMW プレゼントを渡すのを止めました
+	RETURN -1
+ELSEIF RESULT < 0 || RESULT > 7 || LOCAL:RESULT == 0
+	REUSELASTLINE 正しい値を入力して下さい
+	GOTO INPUT_LOOP
+ELSE
+	TFLAG:コマンド内容 = RESULT
+	SELECTCASE RESULT
+		CASE 0
+		CASE 1
+			MONEY -= 1000
+			TFLAG:92 = 1
+		CASE 2
+			MONEY -= 2500
+		CASE 3
+			MONEY -= 10000
+		CASE 4
+			MONEY -= 25000
+		CASE 5
+			MONEY -= 150000
+			TFLAG:92 = 1
+		CASE 6
+			MONEY -= 1000000
+	ENDSELECT
+ENDIF
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+CALL COM300_SUCCESS(85, 19)
+;エンゲージリングは絶対に大成功
+IF TFLAG:コマンド内容 == 6
+	TFLAG:SELECTCOM分岐 = 1
+	TFLAG:成功判定 = 1
+ENDIF
+;●友情パッチ用改変(友情パッチ対象にスマイルプレゼントは強制的に失敗)
+SIF TFLAG:17 == 0 && IS_友情(TARGET)
+	TFLAG:18 = -1
+;●ここまで
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+VARSET LOCAL
+;消費体力、気力
+DOWNBASE:体力 += 0
+DOWNBASE:気力 += 100
+
+;固定で獲得するソース
+SOURCE:歓楽 = 400
+SOURCE:受動 = 400
+SOURCE:征服 = 400
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+;プレゼントの種類による分岐
+;ソース計算は繰り返し処理を避けるために、別途関数を通して処理しています
+;以下、好感度変化量を変数Aに記録
+TFLAG:プレゼント懐疑 = 0
+
+IF TFLAG:コマンド内容 == 0
+	;花　殆ど効果は無い。会話でもしてた方がマシ。でもデート中ならまぁ……ってところ
+	;好感度が一定値以下なら効果減少と共に懐疑のソースが入る
+	IF CFLAG:好感度 < 30 && TFLAG:成功判定 != 1
+		;左から歓楽、征服、受動のソースに掛る補正です
+		CALL COM302_特殊ソース処理(30, 120, 30)
+		SOURCE:懐疑 = 500
+		TFLAG:プレゼント懐疑 = 1
+		
+	;好感度が一定値以上なら効果増加
+	ELSEIF CFLAG:好感度 > 300
+		CALL COM302_特殊ソース処理(90, 90, 90)
+		TFLAG:プレゼント懐疑 = 2
+	ELSE
+		CALL COM302_特殊ソース処理(60, 60, 60)
+	ENDIF
+	
+	;デート中は効果微増
+	SIF TEQUIP:デート中
+		CALL COM302_特殊ソース処理(120)
+		
+ELSEIF TFLAG:コマンド内容 == 1
+	;酒　幻想郷の少女には非常に好まれる。でもデート中にプレゼントは流石にね……
+	;好感度が一定値以下なら効果減少と共に懐疑のソースが入る
+	IF (CFLAG:好感度 < -100) && TFLAG:成功判定 != 1
+		CALL COM302_特殊ソース処理(70, 200, 70)
+		SOURCE:懐疑 = 700
+		TFLAG:プレゼント懐疑 = 1
+		
+	;好感度が一定値以上なら効果増加
+	ELSEIF CFLAG:好感度 > 500
+		CALL COM302_特殊ソース処理(170)
+		TFLAG:プレゼント懐疑 = 2
+	ELSE
+		CALL COM302_特殊ソース処理(120)
+	ENDIF
+	
+	;デート中は効果激減
+	SIF TEQUIP:デート中
+		CALL COM302_特殊ソース処理(10)
+		
+	;ほろ酔い値＋
+	TFLAG:酩酊度 += 1
+		
+	;酒プレゼントフラグ
+	TFLAG:92 = 1
+		
+ELSEIF TFLAG:コマンド内容 == 2
+	;日用品　少しは仲良くなっておかないと変に思われる。序盤ではそれなりの効果を発揮
+	;好感度が一定値以下なら効果減少と共に懐疑のソースが入る
+	IF CFLAG:好感度 < 150 && TFLAG:成功判定 != 1
+		CALL COM302_特殊ソース処理(50, 300, 50)
+		SOURCE:懐疑 = 900
+		TFLAG:プレゼント懐疑 = 1
+		
+	;好感度が一定値以上なら効果増加
+	ELSEIF CFLAG:好感度 > 500
+		CALL COM302_特殊ソース処理(250)
+		TFLAG:プレゼント懐疑 = 2
+	ELSE
+		CALL COM302_特殊ソース処理(170)
+	ENDIF
+	
+	;デート中は効果微増
+	SIF TEQUIP:デート中
+		CALL COM302_特殊ソース処理(120)
+		
+ELSEIF TFLAG:コマンド内容 == 3
+	;アクセサリ　割と仲良くなっておかないと変に思われる。かなりの効果を発揮。デート中プレゼントと相性が良い
+	;好感度が一定値以下なら効果減少と共に懐疑のソースが入る
+	IF CFLAG:好感度 < 400 && TFLAG:成功判定 != 1
+		CALL COM302_特殊ソース処理(70, 900, 70)
+		SOURCE:懐疑 = 1800
+		TFLAG:プレゼント懐疑 = 1
+		
+	;好感度が一定値以上なら効果増加
+	ELSEIF CFLAG:好感度 > 1000
+		CALL COM302_特殊ソース処理(700)
+		TFLAG:プレゼント懐疑 = 2
+	ELSE
+		CALL COM302_特殊ソース処理(500)
+	ENDIF
+	
+	;デート中は効果増
+	SIF TEQUIP:デート中
+		CALL COM302_特殊ソース処理(200)
+		
+ELSEIF TFLAG:コマンド内容 == 4
+	;服　ラブラブじゃないと変に思われる。普通の服なのか変な服なのかは妄想次第
+	;好感度が一定値以下なら効果減少と共に懐疑のソースが入る
+	IF CFLAG:好感度 < 900 && TFLAG:成功判定 != 1
+		CALL COM302_特殊ソース処理(80, 1500, 80)
+		SOURCE:懐疑 = 3500
+		TFLAG:プレゼント懐疑 = 1
+		
+	;好感度が一定値以上なら効果増加
+	ELSEIF CFLAG:好感度 > 3000
+		CALL COM302_特殊ソース処理(1200)
+		TFLAG:プレゼント懐疑 = 2
+	ELSE
+		CALL COM302_特殊ソース処理(900)
+	ENDIF
+	
+	;デート中は効果微増
+	SIF TEQUIP:デート中
+		CALL COM302_特殊ソース処理(150)
+		
+ELSEIF TFLAG:コマンド内容 == 5
+	;凄い酒　絶対に喜ばれる。デート中に贈ると微妙なのは普通の酒と同じ
+	;好感度が一定値以上なら効果増加
+	IF CFLAG:好感度 > 5000
+		CALL COM302_特殊ソース処理(2500)
+		TFLAG:プレゼント懐疑 = 2
+	ELSE
+		CALL COM302_特殊ソース処理(1500)
+	ENDIF
+	
+	;デート中は効果激減
+	SIF TEQUIP:デート中
+		CALL COM302_特殊ソース処理(10)
+	;ほろ酔い値＋
+	TFLAG:酩酊度 += 3
+	
+	;酒プレゼントフラグ
+	TFLAG:92 = 1
+	
+ELSEIF TFLAG:コマンド内容 == 6
+	;エンゲージリング　最強のプレゼント。デート中プレゼントと相性が良い
+	;好感度が一定値以上なら効果増加
+	IF CFLAG:好感度 > 10000
+		CALL COM302_特殊ソース処理(10000)
+		TFLAG:プレゼント懐疑 = 2
+	ELSE
+		CALL COM302_特殊ソース処理(6000)
+	ENDIF
+	;デート中は効果大幅増
+	SIF TEQUIP:デート中
+		CALL COM302_特殊ソース処理(300)
+		
+ELSEIF TFLAG:コマンド内容 == 7
+	;酒樽を一樽丸ごとプレゼントする、酒豪もちじゃないと送る事すら思いつかない、デート中に贈ると微妙なのは普通の酒と同じ
+	;好感度が一定値以上なら効果増加
+	IF CFLAG:好感度 > 5000
+		CALL COM302_特殊ソース処理(5000)
+		TFLAG:プレゼント懐疑 = 2
+	ELSE
+		CALL COM302_特殊ソース処理(3000)
+	ENDIF
+	
+	;デート中は効果激減
+	SIF TEQUIP:デート中
+		CALL COM302_特殊ソース処理(10)
+	;ほろ酔い値＋
+	TFLAG:酩酊度 += 15
+ENDIF
+
+IF TFLAG:SELECTCOM分岐 == -1
+		TIMES SOURCE:歓楽 , 0.10
+		TIMES SOURCE:征服 , 0.50
+		TIMES SOURCE:受動 , 0.50
+ELSEIF TFLAG:SELECTCOM分岐 == 0
+
+ELSE
+	TIMES SOURCE:歓楽 , 2.10
+	TIMES SOURCE:征服 , 2.50
+	TIMES SOURCE:受動 , 2.50
+ENDIF
+
+;-------------------------------------------------
+;汚れの処理
+;-------------------------------------------------
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+;同性愛　レズなら戻り値1ゲイなら戻り値2
+;IF HETEROSEX(TARGET,PLAYER)
+;	EXP:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;ENDIF
+
+RETURN 1
+
+;ARG	歓楽のソースに掛る補正(実際の値の100倍)
+;ARG:1	征服のソースに掛る補正(実際の値の100倍)
+;ARG:2	受動のソースに掛る補正(実際の値の100倍)
+@COM302_特殊ソース処理(ARG, ARG:1, ARG:2)
+;エラー回避用
+SIF ARG == 0
+	ARG = 100
+;ARG:2,ARG:3が0の場合はARGと同じ倍率
+SIF ARG:1 == 0
+	ARG:1 = ARG
+	
+SIF ARG:2 == 0
+	ARG:2 = ARG
+	
+SOURCE:歓楽 = TIMESF(SOURCE:歓楽, ARG)
+SOURCE:征服 = TIMESF(SOURCE:征服, ARG:1)
+SOURCE:受動 = TIMESF(SOURCE:受動, ARG:2)
+IF TEQUIP:デート中
+
+ENDIF

@@ -1,0 +1,39 @@
+@ストレスチェック(ARG)
+VARSET LOCAL
+;1日の終わりに1回復	
+;ストレスなければスキップ
+SIF BASE:ARG:ストレス <= 0
+	RETURN
+		
+BASE:ARG:ストレス -= 1
+
+;ストレスなければスキップ
+SIF BASE:ARG:ストレス <= 0
+	RETURN
+
+;ここから病気判定
+SIF TALENT:ARG:病気
+	RETURN
+	
+POWER LOCAL:1, BASE:ARG:ストレス, 2
+
+LOCAL:1 = LOCAL:1 * 15 / 32
+
+IF RAND:10000 < LOCAL:1
+	PRINTFORMW 疲労の蓄積した%CALLNAME:ARG%は病気になってしまった……
+	TALENT:ARG:病気 = 1
+	CFLAG:ARG:アイドル状態 = 11
+ENDIF
+
+RETURN
+
+;ARG	キャラ番号
+;ARG:1	調整量
+@ストレス調整(ARG,ARG:1)
+SIF CFLAG:ARG:勧誘状況 != -1
+	RETURN
+BASE:ARG:ストレス += ARG:1
+SIF BASE:ARG:ストレス < 0
+	BASE :ARG:ストレス = 0
+SIF BASE:ARG:ストレス > 100
+	BASE:ARG:ストレス = 100

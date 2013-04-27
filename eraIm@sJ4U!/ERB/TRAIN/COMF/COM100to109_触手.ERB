@@ -1,0 +1,300 @@
+;---------------------------------------------------------
+;触手変身
+;---------------------------------------------------------
+@COM99
+;触手変身
+IF TEQUIP:90
+	TEQUIP:90 = 0
+	;触手挿入(バイブ)
+	TEQUIP:11 = 0
+	;アナル触手(アナルバイブ)
+	TEQUIP:13 = 0
+	;触手クリ責め(クリキャップ)
+	TEQUIP:14 = 0
+	;触手乳首責め(二プルキャップ)
+	TEQUIP:15 = 0
+	;触手搾乳(搾乳器)
+	TEQUIP:16 = 0
+	;触手ペニス責め(オナホ)
+	TEQUIP:17 = 0
+	;触手緊縛(縄)
+	TEQUIP:44 = 0
+	;触手浣腸(浣腸器)
+	TEQUIP:46 = 0
+	;触手口辱
+	TEQUIP:98 = 0
+	;触手変身
+	TEQUIP:89 = 0
+ELSE
+	TEQUIP:90 = 1
+	;触手変身
+	TEQUIP:89 = 1
+
+	;触手の共通ソース
+	CALL T_SOURCE
+ENDIF
+RETURN 1
+
+@COM100
+;触手召喚
+IF TEQUIP:90
+	TEQUIP:90 = 0
+	;触手挿入(バイブ)
+	TEQUIP:11 = 0
+	;アナル触手(アナルバイブ)
+	TEQUIP:13 = 0
+	;触手クリ責め(クリキャップ)
+	TEQUIP:14 = 0
+	;触手乳首責め(二プルキャップ)
+	TEQUIP:15 = 0
+	;触手搾乳(搾乳器)
+	TEQUIP:16 = 0
+	;触手ペニス責め(オナホ)
+	TEQUIP:17 = 0
+	;触手緊縛(縄)
+	TEQUIP:44 = 0
+	;触手浣腸(浣腸器)
+	TEQUIP:46 = 0
+	;触手口辱
+	TEQUIP:98 = 0
+ELSE
+	TEQUIP:90 = 1
+	;触手の共通ソース
+	CALL T_SOURCE
+ENDIF
+RETURN 1
+
+@COM101
+;触手バイブ
+JUMP COM11
+RETURN 1
+
+@COM102
+;アナル触手
+JUMP COM13
+RETURN 1
+
+@COM103
+;触手クリ責め
+JUMP COM14
+RETURN 1
+
+@COM104
+;触手乳首責め
+JUMP COM15
+RETURN 1
+
+@COM105
+;触手搾乳
+JUMP COM16
+RETURN 1
+
+@COM106
+;触手緊縛
+JUMP COM44
+RETURN 1
+
+@COM107
+;触手浣腸
+JUMP COM46
+RETURN 1
+
+@COM108
+;触手口辱
+
+DOWNBASE:0 += 80
+DOWNBASE:1 += 100
+
+;ABL:奉仕精神をみる
+IF ABL:6 == 0
+	SOURCE:4 += 200
+	 LOCAL = 100
+ELSEIF ABL:6 == 1
+	SOURCE:4 += 300
+	LOCAL = 200
+ELSEIF ABL:6 == 2
+	SOURCE:4 += 400
+	LOCAL = 400
+ELSEIF ABL:6 == 3
+	SOURCE:4 += 500
+	LOCAL = 600
+ELSEIF ABL:6 == 4
+	SOURCE:4 += 600
+	LOCAL = 800
+ELSE
+	SOURCE:4 += 300 + (ABL:6 * 100)
+	LOCAL = 350 + (ABL:6 * 150)
+ENDIF
+
+SOURCE:13 += LOCAL
+SOURCE:16 += LOCAL
+
+;Ｍ感覚を設定している場合快Ｍソース等取得
+SIF GETBIT(FLAG:62 ,22)
+	CALL SOURCE_M_COM108
+	
+;触手の抜き挿し
+IF TEQUIP:98
+	TEQUIP:98 = 0
+ELSE
+	TEQUIP:98 = 1
+	STAIN:0 |= 2
+	STAIN:0 |= 4
+ENDIF
+
+EXP:22 += 1
+RETURN 1
+
+@COM109
+;触手ペニス責め
+JUMP COM17
+RETURN 1
+
+;---------------------------------------------------------
+;触手の共通ソース
+;---------------------------------------------------------
+@T_SOURCE
+LOCAL = 100
+;触手変身中
+IF TEQUIP:89
+	;触手変身中は好感度と触手経験が影響
+	IF EXP:55 < EXPLV:1
+		TIMES LOCAL , 1.80
+	ELSEIF EXP:55 < EXPLV:2
+		TIMES LOCAL , 1.75
+	ELSEIF EXP:55 < EXPLV:3
+		TIMES LOCAL , 1.60
+	ELSEIF EXP:55 < EXPLV:4
+		TIMES LOCAL , 0.90
+	ELSEIF EXP:55 < EXPLV:5
+		TIMES LOCAL , 0.80
+	ELSE
+		TIMES LOCAL , 0.70
+	ENDIF
+
+	IF CFLAG:2 < 10000
+		TIMES LOCAL , 1.80
+	ELSEIF CFLAG:2 < 10400
+		TIMES LOCAL , 1.75
+	ELSEIF CFLAG:2 < 12000
+		TIMES LOCAL , 1.60
+	ELSEIF CFLAG:2 < 15000
+		TIMES LOCAL , 0.90
+	ELSEIF CFLAG:2 < 30000
+		TIMES LOCAL , 0.80
+	ELSE
+		TIMES LOCAL , 0.70
+	ENDIF
+ELSE
+	;触手召喚中は触手経験が影響
+	IF EXP:55 < EXPLV:1
+		TIMES LOCAL , 3.00
+	ELSEIF EXP:55 < EXPLV:2
+		TIMES LOCAL , 2.50
+	ELSEIF EXP:55 < EXPLV:3
+		TIMES LOCAL , 2.00
+	ELSEIF EXP:55 < EXPLV:4
+		TIMES LOCAL , 1.00
+	ELSEIF EXP:55 < EXPLV:5
+		TIMES LOCAL , 0.80
+	ELSE
+		TIMES LOCAL , 0.60
+	ENDIF
+ENDIF
+
+;触手変身中かつ好感度30000以上なら臆病の影響無し
+IF TEQUIP:89 && CFLAG:2 >= 30000
+	;臆病
+	SIF TALENT:10
+		TIMES LOCAL , 2.00
+ELSE
+	;臆病
+	SIF TALENT:10
+		TIMES LOCAL , 2.00
+ENDIF
+
+;感情乏しい
+SIF TALENT:22
+	TIMES LOCAL , 0.60
+
+DOWNBASE:0 += LOCAL
+DOWNBASE:1 += LOCAL * 2
+
+CUP:10 += LOCAL * 20
+SOURCE:14 += LOCAL * 5
+
+;---------------------------------------------------------
+;触手調教中
+;---------------------------------------------------------
+@EQUIP_COM触手
+;触手調教中
+IF TEQUIP:89
+	PRINTL ＜触手変身中＞
+ELSE
+	PRINTL ＜触手召喚中＞
+ENDIF
+
+;触手の共通ソース
+CALL T_SOURCE
+
+SOURCE:8 += LOCAL * 10
+SOURCE:10 += 2000
+
+TIMES SOURCE:0 , 2.00
+TIMES SOURCE:1 , 2.00
+TIMES SOURCE:2 , 2.00
+TIMES SOURCE:17 , 2.00
+TIMES SOURCE:24 , 2.00
+TIMES SOURCE:13 , 1.80
+
+EXP:50 += 3
+EXP:55 ++
+
+RETURN 1
+
+
+@EQUIP_COM触手口辱
+;触手口辱中
+PRINTL ＜触手口辱中＞
+
+DOWNBASE:0 += 80
+DOWNBASE:1 += 100
+
+;Ｍ感覚を設定している場合快Ｍソース取得
+;CALL SOURCE_M_COM108
+;SOURCE:24 += M / 10
+
+;ABL:奉仕精神をみる
+IF ABL:6 == 0
+	SOURCE:4 += 200
+	 LOCAL = 100
+ELSEIF ABL:6 == 1
+	SOURCE:4 += 300
+	LOCAL = 200
+ELSEIF ABL:6 == 2
+	SOURCE:4 += 400
+	LOCAL = 400
+ELSEIF ABL:6 == 3
+	SOURCE:4 += 500
+	LOCAL = 600
+ELSEIF ABL:6 == 4
+	SOURCE:4 += 600
+	LOCAL = 800
+ELSE
+	SOURCE:4 += 300 + (ABL:6 * 100)
+	LOCAL = 350 + (ABL:6 * 150)
+ENDIF
+
+SOURCE:13 += LOCAL
+SOURCE:16 += LOCAL
+
+EXP:22 ++
+
+;@SYOKUSYU_MILK
+;［Ｂ感度］３以上、［母乳体質］無しかつ［小柄体系］で［貧乳］無しかつ［オトコ］無し
+;IF ABL:TARGET:14 >= 3 && TALENT:130 == 0 && (TALENT:100 == 0 || TALENT:109 == 0 ) && TALENT:122 == 0 
+;	PRINT 触手に乳を吸われるうちに
+;	PRINTS NAME:TARGET
+;	PRINTW は母乳が出るようになった。
+;	TALENT:130 = 1
+;ENDIF

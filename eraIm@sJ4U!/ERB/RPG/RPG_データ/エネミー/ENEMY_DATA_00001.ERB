@@ -1,0 +1,95 @@
+;00001	テストアイドル
+
+;ARG:0	Lv補正
+;ARG:1	登録場所
+;ARG:2	ランク　このランク扱いにレベルを補正する
+@SET_ENEMY_STATUS_1(ARG:0, ARG:1, ARG:2)
+;LOCAL
+;0	LOOP
+;1	実レベル
+;2	一時記憶用
+;3	ベースランク
+
+CALLNAME:(ARG:1) = テストアイドル
+
+;ベースランク設定
+LOCAL:3 = 1
+
+;基礎レベル取得
+LOCAL:1 = 1 + ARG:0
+
+;ランク補正強化
+IF ARG:2 > LOCAL:3
+	LOCAL:1 += (ARG:2 - LOCAL:3) * 2
+ENDIF
+
+IF LOCAL:1 < 1
+	LOCAL:1 = 1
+ENDIF
+
+CALL SET_DEFAULT_ENEMY_STATUS(ARG:1)
+
+;レベル設定
+BASE:(ARG:1):戦闘レベル = LOCAL:1
+
+
+;ベース能力
+BASE:(ARG:1):ベースPOW = 35 + (LOCAL:1 * 7)
+BASE:(ARG:1):ベースGUA = 6 + (LOCAL:1 * 3)
+BASE:(ARG:1):ベースDEX = 35 + (LOCAL:1 * 7)
+BASE:(ARG:1):ベースHIT = 7 + (LOCAL:1 * 3)
+BASE:(ARG:1):ベースSPD = 8 + (LOCAL:1 * 3)
+BASE:(ARG:1):ベースLUC = 4 + (LOCAL:1 * 2)
+
+;HP/MP/EP固定
+CFLAG:(ARG:1):敵★ = 10 + (LOCAL:1 * 5)
+CFLAG:(ARG:1):敵ハート = 10 + (LOCAL:1 * 5)
+CFLAG:(ARG:1):敵V = 10 + (LOCAL:1 * 5)
+
+
+;経験値とか
+CFLAG:(ARG:1):獲得経験値 = 100
+CFLAG:(ARG:1):獲得金額 = 4
+;本来の敵ランクより低ければ、減らす
+LOCAL:2 = 100
+IF (FLAG:3 / 2 + 1) > LOCAL:3
+	LOCAL:2 -= ((FLAG:敵レベル / 2 + 1) - LOCAL:3) * CFLAG:(ARG:1):ランク毎の獲得低減率
+	;ランク補正が入っている場合、半分だけ考慮
+	IF ARG:2 > LOCAL:3
+		LOCAL:2 += (ARG:2 - LOCAL:3) * CFLAG:(ARG:1):ランク毎の獲得低減率 / 2
+	ENDIF
+	;10%以下にはならない
+	SIF LOCAL:2 < 10
+		LOCAL:2 = 10
+ENDIF
+CFLAG:(ARG:1):獲得経験値 = CFLAG:(ARG:1):獲得経験値 * LOCAL:2 / 100
+CFLAG:(ARG:1):獲得金額 = CFLAG:(ARG:1):獲得金額 * LOCAL:2 / 100
+
+;行動決定
+;ARG:0	登録番号
+@SELECT_ENEMY_ACTION_1(ARG:0)
+;LOCAL
+;0	LOOP
+;1	予定行動
+;2	TEMP
+
+LOCAL:1 = 0
+
+;行動テーブル決定
+;一旦初期化
+FOR LOCAL:0, 1296, 1306
+	CFLAG:(ARG:0):(LOCAL:0) = 0
+NEXT
+
+;通常テーブル
+CFLAG:(ARG:0):通常行動1 = 1
+CFLAG:(ARG:0):通常行動2 = 1
+CFLAG:(ARG:0):通常行動3 = 2
+IF BASE:(ARG:0):戦闘レベル >= 5
+
+ENDIF
+
+
+;実際の行動決定
+CALL SELECT_ENEMY_ACTION_COMMON(ARG:0)
+

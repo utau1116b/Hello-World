@@ -1,0 +1,368 @@
+
+;-------------------------------------------------
+;PCを選択式にしてみる
+;-------------------------------------------------
+@START_CHARA_SELECT
+;頁数に使用。0で１ページ目
+TFLAG:100 = 0
+
+CALL START_CHARA_SHOW
+
+$INPUT_LOOP
+INPUT
+IF RESULT == 1001
+	;前のページ　0ページ以下にはならないようにする
+	TFLAG:100 -= 1
+	SIF TFLAG:100 <= 0
+		TFLAG:100 = 0
+	CALL START_CHARA_SHOW
+	GOTO INPUT_LOOP
+ELSEIF RESULT == 1003
+;9
+	;後のページ 最終ページ以上にはならないようにする
+	TFLAG:100 += 1
+	SIF TFLAG:100 >= 5
+		TFLAG:100 = 4
+
+	CALL START_CHARA_SHOW
+	GOTO INPUT_LOOP
+ELSEIF RESULT == 0
+	MASTER = 0
+ELSE
+	C = RESULT - 99
+	D = RESULT + 1000 - 100
+	;キャラがいない＝フラグ値が0なら再入力
+	SIF FLAG:D == 0
+		GOTO INPUT_LOOP
+	ADDCHARA C
+	DELCHARA 0
+	MASTER = 0
+	FLAG:D = 0
+ENDIF
+
+;汎用キャラだった場合の素質決定
+SIF NO:MASTER == 99
+	CALL CHARA_RANDOM_STATE_M
+
+;最低技巧Lv2　レズっ気Lv3にまで引き上げておく
+IF ABL:MASTER:2 < 2
+	ABL:MASTER:2 = 2
+	PRINTFORML ※EXモード特別仕様※　%NAME:MASTER%の%ABLNAME:2%のレベルが{ABL:MASTER:2}になりました
+ENDIF
+IF ABL:MASTER:9 < 3 && TALENT:MASTER:122 == 0
+	ABL:MASTER:9 = 3
+	PRINTFORML ※EXモード特別仕様※　%NAME:MASTER%の%ABLNAME:9%のレベルが{ABL:MASTER:9}になりました
+ENDIF
+PRINTFORMW プレイヤーを「%NAME:MASTER%」に設定します
+
+RETURN 1
+
+@START_CHARA_SHOW
+DRAWLINE
+PRINTL ★★プレイヤーを変更できます★★
+PRINTL ★★キャラを選択してください★★  ( )内表記は　(戦闘素質/浪費癖 性格)
+
+CALL PRINT_CHARA_LIST
+
+DRAWLINE
+
+CALL PRINT_PAGESELECT(TFLAG:100)
+PRINTFORML {RESULT}
+
+;-------------------------------------------------
+;パートナー選択
+;-------------------------------------------------
+@START_PARTNER_SELECT
+SIF TFLAG:100 == 0
+	TFLAG:100 = 0
+CALL START_PARTNER_SHOW
+
+$INPUT_LOOP
+INPUT
+IF RESULT == 1001
+	;前のページ　0ページ以下にはならないようにする
+	TFLAG:100 -= 1
+	SIF TFLAG:100 <= 0
+		TFLAG:100 = 0
+	CALL START_PARTNER_SHOW
+	GOTO INPUT_LOOP
+ELSEIF RESULT == 1003
+;9
+	;後のページ 最終ページ以上にはならないようにする
+	TFLAG:100 += 1
+	SIF TFLAG:100 >= 4
+		TFLAG:100 = 3
+	CALL START_PARTNER_SHOW
+	GOTO INPUT_LOOP
+ELSEIF RESULT == 0
+	GOTO INPUT_LOOP
+ELSEIF RESULT >= 100 && RESULT < (100 + FLAG:キャラ数)
+	LOCAL:1 = RESULT
+	CALL CHARA_MANUAL(LOCAL:1)
+	CALL CHOOSE_MEMBER(LOCAL:1)
+	IF RESULT == 0
+		RESTART
+	ELSE
+		TARGET = P
+		
+		;[パートナー]付加 
+		TALENT:TARGET:150 = 1
+		CALL NEWCHARA_INIT(P)
+		;初期好感度
+		CFLAG:TARGET:2 = 30
+		CALL SEPLAY()
+		PRINTFORMW パートナーを「%NAME:TARGET%」に設定します
+		FLAG:リーダー = TARGET
+		;念のため一時ターゲット保存
+		LOCAL:0 = TARGET
+		;反抗的なキャラはツンデレにすることが可能
+		IF TALENT:11 && TALENT:13 == 0 && TALENT:18 == 0
+			CALL PLUS_TALENT18
+			CALL START_UNIT_MEMBER_SELECT
+			CALL START_UNIT_MEMBER_SELECT2
+			TARGET = LOCAL:0
+			RETURN 1
+		;真に不思議の根をつけるか選択可能
+		ELSEIF NO:TARGET == 17
+			CALL PLUS_TALENT120
+			CALL START_UNIT_MEMBER_SELECT
+			CALL START_UNIT_MEMBER_SELECT2
+			TARGET = LOCAL:0
+			RETURN 1
+		;小鳥に具現をつけるか選択可能
+		ELSEIF NO:TARGET == 22
+			CALL PLUS_TALENT127
+			CALL START_UNIT_MEMBER_SELECT
+			CALL START_UNIT_MEMBER_SELECT2
+			TARGET = LOCAL:0
+			RETURN 1
+		ENDIF
+		CALL START_UNIT_MEMBER_SELECT
+		CALL START_UNIT_MEMBER_SELECT2
+		TARGET = LOCAL:0
+		RETURN 1
+	ENDIF
+	CALL START_UNIT_MEMBER_SELECT
+	CALL START_UNIT_MEMBER_SELECT2
+	TARGET = LOCAL:0
+	RETURN 1
+ELSE
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP
+ENDIF
+
+@START_PARTNER_SHOW
+DRAWLINE
+IF TFLAG:汎用1 == 0
+	PRINT ★★パートナーを選択してください★★
+ELSEIF TFLAG:汎用2 == 0
+	PRINT ★★２人目のユニットメンバーを選択してください★★
+ELSEIF TFLAG:汎用3 == 0
+	PRINT ★★３人目のユニットメンバーを選択してください★★
+ELSE
+	PRINTFORMW ★★これが表示されていたらエラー★★
+ENDIF
+PRINT   ( )内表記は　(
+CALL SET_COLOR(1)
+PRINT Vo
+RESETCOLOR
+CALL SET_COLOR(2)
+PRINT Vi
+RESETCOLOR
+CALL SET_COLOR(3)
+PRINT Da
+RESETCOLOR
+PRINT 適正/浪費癖 性格)
+PRINTL 　
+CALL PRINT_CHARA_LIST
+CALL PRINT_PAGESELECT(TFLAG:100, 3)
+
+@PRINT_CHARA_LIST
+LOCAL:0 = 0
+N = 1
+REPEAT FLAG:キャラ数 + 11
+	IF CFLAG:COUNT:パートナー選択可 == 0 && COUNT > 120 && TFLAG:100 == 3
+		;番号が飛んでいる特殊なキャラ用の処理
+	ELSE
+		;30キャラずつ表示
+		SIF COUNT > (30 + (30 * TFLAG:100)) || COUNT <= (0 + (30 * TFLAG:100))
+			CONTINUE
+	ENDIF
+	T = COUNT
+	IF CFLAG:COUNT:パートナー選択可 == 0
+		CALL GET_STUFF
+		CALL GET_CHARA_NAME
+		PRINTFORM [{T+89}]
+		TRYCALLFORM KOJO_EXIST_K{T}
+		SIF RESULT
+			CALLFORM SET_COLOR(T)
+		PRINTFORM  %STR:N,10,LEFT% 
+		RESETCOLOR
+		PRINTFORM (
+		 
+		CALL SET_COLOR(1)
+		IF S:0 < 100
+			PRINTFORM  {S:0,2}
+		ELSE
+			PRINTFORM {S:0,2}
+		ENDIF
+		RESETCOLOR
+		PRINTFORM , 
+		CALL SET_COLOR(2)
+		IF S:1 < 100
+			PRINTFORM  {S:1,2}
+		ELSE
+			PRINTFORM {S:1,2}
+		ENDIF
+		RESETCOLOR
+		PRINTFORM ,
+		CALL SET_COLOR(3)
+		IF S:2 < 100
+			PRINTFORM  {S:2,2}
+		ELSE
+			PRINTFORM {S:2,2}
+		ENDIF
+		RESETCOLOR
+		PRINTFORM /{ABL:COUNT:浪費癖,2} 
+
+		IF S:4 <= -40
+			PRINTFORM 超弱気)
+		ELSEIF S:4 < -10
+			PRINTFORM  弱気 )
+		ELSEIF S:4 <= 10
+			PRINTFORM  普通 )
+		ELSEIF S:4 < 40
+			PRINTFORM  強気 )
+		ELSE
+			PRINTFORM 超強気)
+		ENDIF
+		;FONTREGULAR
+		LOCAL:0 += 1
+		IF LOCAL:0 % 2 == 0
+			PRINTL 
+		ELSE
+			PRINT 　
+		ENDIF
+	ENDIF
+REND
+SIF LOCAL:0 % 2 != 0
+	PRINTL 
+RETURN 1
+
+
+@CHOOSE_MEMBER(ARG)
+
+CSVNAME (ARG:0 - 89), 0
+P = (ARG:0 - 89)
+STR:N = %RESULTS%
+DRAWLINE
+IF TFLAG:汎用1 && TFLAG:汎用2
+	PRINTFORML %STR:N%を3人目のメンバーにしますか？
+ELSEIF TFLAG:汎用1
+	PRINTFORML %STR:N%を2人目のメンバーにしますか？
+ELSE
+	PRINTFORML %STR:N%をパートナーにしますか？
+ENDIF
+PRINTFORML [0]はい
+PRINTFORML [1]いいえ
+PRINTFORMLC [2]外見を見る
+PRINTFORMLC [3]能力適正を見る
+$INPUT_LOOP
+INPUT
+IF RESULT == 0
+	IF P != TFLAG:汎用1 && P != TFLAG:汎用2 && P != TFLAG:汎用3 && P != MASTER
+		IF TFLAG:汎用1 == 0
+			TFLAG:汎用1 = P
+		ELSEIF TFLAG:汎用2 == 0
+			TFLAG:汎用2 = P
+		ELSEIF TFLAG:汎用3 == 0
+			TFLAG:汎用3 = P
+		ELSE
+			REUSELASTLINE エラー！キャラクターマニュアルで不正なキャラ番号{P}が指定されました
+		ENDIF
+		RETURN P
+	ELSE
+		PRINTFORMW そのキャラは既に選択されています。
+		RETURN
+	ENDIF
+ELSEIF RESULT == 1
+	RETURN 0
+ELSEIF RESULT == 2
+	CALL SHOW_CHARA_LOOKS(ARG - 89)
+	WAIT
+ELSEIF RESULT == 3
+	CALL SHOW_CHARA_DUNAMIS(ARG - 89)
+	WAIT
+ELSE
+	GOTO INPUT_LOOP
+ENDIF
+RESTART
+;-------------------------------------------------
+;ツンデレ選択
+;-------------------------------------------------
+@PLUS_TALENT18
+PRINTL 
+PRINTFORML %CALLNAME:TARGET%をツンデレにすることが出来ます
+PRINTFORML (親密が高くなると【反抗的】が【素直】に反転します)
+PRINTFORML どうしますか？
+PRINTL 
+PRINTFORML [0] %CALLNAME:TARGET%をツンデレにする
+PRINTFORML [1] %CALLNAME:TARGET%がツンデレなはずが無い／ツンデレとか嫌いですから
+
+$INPUT_LOOP2
+INPUT
+
+IF RESULT != 0 && RESULT != 1
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP2
+ENDIF
+IF RESULT == 0
+	PRINTFORMW %CALLNAME:TARGET%をツンデレにしました
+	TALENT:18 = 1
+ENDIF
+
+;-------------------------------------------------
+;不思議の根選択
+;-------------------------------------------------
+@PLUS_TALENT120
+PRINTL 
+PRINTFORML %CALLNAME:TARGET%に【不思議の根】をつけることが出来ます
+PRINTFORML (精液経験が一定値を超えると【不思議の根】が【ふたなり】に変化します)
+PRINTFORML どうしますか？
+PRINTL 
+PRINTFORML [0] %CALLNAME:TARGET%に【不思議の根】をつける
+PRINTFORML [1] %CALLNAME:TARGET%に【不思議の根】をつけない
+$INPUT_LOOP2
+INPUT
+
+IF RESULT != 0 && RESULT != 1
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP2
+ENDIF
+IF RESULT == 0
+	PRINTFORMW %CALLNAME:TARGET%に【不思議の根】をつけました
+	TALENT:120 = 1
+ENDIF
+
+;-------------------------------------------------
+;具現選択
+;-------------------------------------------------
+@PLUS_TALENT127
+PRINTL 
+PRINTFORML %CALLNAME:TARGET%に【具現】をつけることが出来ます
+PRINTFORML (精液経験が一定値を超えると【具現】が【ふたなり】に変化します)
+PRINTFORML どうしますか？
+PRINTL 
+PRINTFORML [0] %CALLNAME:TARGET%に【具現】をつける
+PRINTFORML [1] %CALLNAME:TARGET%に【具現】をつけない
+$INPUT_LOOP2
+INPUT
+
+IF RESULT != 0 && RESULT != 1
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP2
+ENDIF
+IF RESULT == 0
+	PRINTFORMW %CALLNAME:TARGET%に【具現】をつけました
+	TALENT:127 = 1
+ENDIF

@@ -1,0 +1,433 @@
+
+;-------------------------------------------------
+;500番台,派生コマンド(コメントアウト解除禁止)
+;-------------------------------------------------
+
+@COM_ABLE501
+;シックスナイン実行判定
+SIF !TFLAG:COMABLE管理
+	RETURN 0
+
+;一括管理
+SIF GLOBAL_COMABLE(501)
+	RETURN RESULT
+;欲望3以下・レズっ気3以下のASSIの場合シックスナインはできない（小悪魔、相性良好ならＯＫ）
+IF ASSIPLAY
+	SIF (ABL:ASSI:欲望 <= 3 || ABL:ASSI:レズっ気 <= 3) && TALENT:ASSI:小悪魔 == 0
+		RETURN 0
+ELSE
+;調教者が助手でないなら親密3以上、奉仕精神3以上必要
+	SIF ABL:親密 < 3 || ABL:奉仕精神 < 3
+		RETURN 0
+ENDIF
+;体格差があるとダメ
+SIF ABS(TALENT_LV(TARGET, "体型") - TALENT_LV(PLAYER, "体型")) > 2
+	RETURN 0
+;猫舌の調教者の場合は技巧Lv2以上必要
+SIF TALENT:PLAYER:猫舌 && ABL:PLAYER:技巧 < 2
+	RETURN 0
+;猫舌の奴隷の場合は技巧Lv2以上必要
+SIF TALENT:猫舌 && ABL:技巧 < 2
+	RETURN 0
+
+;下半身着衣
+SIF !IS_ZURASI(TARGET)
+	RETURN 0
+;オナホール使用中はダメ
+SIF TEQUIP:12
+	RETURN 0
+;ボールギャグ使用中は不可
+SIF TEQUIP:ボールギャグ
+	RETURN 0
+;縄使用中は不可
+SIF TEQUIP:縄
+	RETURN 0
+;お風呂場プレイ中はプレイマットが無いとダメ
+IF TEQUIP:31
+	SIF ITEM:20 == 0 && NOITEM == 0
+		RETURN 0
+ENDIF
+;ベッドルームでないとダメ
+;SIF !BEDROOM(CFLAG:PLAYER:現在位置)
+;	RETURN 0
+
+RETURN 1
+
+@COM_ABLE502
+;岩清水実行判定
+SIF !TFLAG:COMABLE管理
+	RETURN 0
+
+;一括管理
+SIF GLOBAL_COMABLE(502)
+	RETURN RESULT
+;羞恥プレイ中じゃないとダメ
+SIF TEQUIP:30 == 0
+	RETURN 0
+;猫舌の調教者の場合は技巧Lv2以上必要
+SIF TALENT:PLAYER:猫舌 && ABL:PLAYER:技巧 < 2
+	RETURN 0
+;性器が汚れているとMASTERの場合クンニはできない（調教者が汚れ無視か愛液、母乳のよごれならＯＫ）
+SIF STAIN:3 >= 2 && (STAIN:3 != 16 && STAIN:3 != 17) && ASSIPLAY == 0 && TALENT_LV(MASTER, "汚臭耐性") < 2
+	RETURN 0
+;性器が汚れており、汚臭敏感で親密3以下のASSIの場合クンニはできない（調教者が汚れ無視か愛液、母乳のよごれならＯＫ）
+IF STAIN:3 >= 2 && (STAIN:3 != 16 && STAIN:3 != 17) && ASSIPLAY
+	SIF ABL:ASSI:親密 <= 3 && TALENT_LV(ASSI, "汚臭耐性") < 0
+		RETURN 0
+ENDIF
+
+;下半身着衣
+SIF CHECK_BOTTOM(TARGET,3)
+	RETURN 0
+;オトコだとダメ
+SIF  TALENT:オトコ
+	RETURN 0
+
+RETURN 1
+
+@COM_ABLE503
+;Gスポット刺激
+
+;一括管理
+SIF GLOBAL_COMABLE(503)
+	RETURN RESULT
+;オトコだとダメ
+SIF  TALENT:オトコ
+	RETURN 0
+;潤滑不足で、親密3以下・レズっ気3以下のASSIの場合指挿入れはできない（サドならＯＫ）
+IF PALAM:潤滑 < PALAMLV:2 && ASSIPLAY
+	SIF (ABL:ASSI:親密 <= 3 || ABL:ASSI:レズっ気 <= 3) && TALENT:ASSI:サド == 0
+		RETURN 0
+ENDIF
+
+;下半身着衣
+SIF !IS_ZURASI(TARGET)
+	RETURN 0
+;主人の技巧が3以下はだめ
+SIF ABL:PLAYER:技巧 < 3
+	RETURN 0
+RETURN 1
+
+@COM_ABLE504
+;乱れ牡丹実行判定
+SIF !TFLAG:COMABLE管理
+	RETURN 0
+
+;一括管理
+SIF GLOBAL_COMABLE(504)
+	RETURN RESULT
+;羞恥プレイ中じゃないとダメ
+SIF TEQUIP:30 == 0
+	RETURN 0
+;バイブ挿入中はダメ
+SIF TEQUIP:13
+	RETURN 0
+;オトコだとダメ
+SIF  TALENT:オトコ
+	RETURN 0
+;全裸でないとダメ（靴下、特殊は除く）
+SIF CHECK_BOTTOM(TARGET,5) != 0
+	RETURN 0
+;調教者がオトコ、半人半妖、ふたなり、もしくはペニスバンドがないとダメ
+SIF CHECK_PENIS(PLAYER) && ITEM:PBAND == 0
+	RETURN 0
+;潤滑不足で、親密3以下・レズっ気3以下のASSIの場合乱れ牡丹はできない（サドならＯＫ）
+IF PALAM:潤滑 < PALAMLV:2 && ASSIPLAY
+	SIF (ABL:ASSI:親密 <= 3 || ABL:ASSI:レズっ気 <= 3) && TALENT:ASSI:サド == 0
+		RETURN 0
+ENDIF
+
+RETURN 1
+
+@COM_ABLE505
+;手淫フェラ実行判定
+SIF !TFLAG:COMABLE管理
+	RETURN 0
+
+;一括管理
+SIF GLOBAL_COMABLE(505)
+	RETURN RESULT
+;技巧Lv1以上必要
+SIF ABL:技巧 < 1
+	RETURN 0
+;猫舌の奴隷の場合は技巧Lv2以上必要
+SIF TALENT:猫舌 && ABL:技巧 < 2
+	RETURN 0
+;ボールギャグ使用中は不可
+SIF TEQUIP:ボールギャグ
+	RETURN 0
+;縄使用中は不可
+SIF TEQUIP:縄
+	RETURN 0
+;調教者がオトコか半人半妖かふたなりじゃないとダメ
+SIF CHECK_PENIS(PLAYER)
+	RETURN 0
+
+RETURN 1
+
+@COM_ABLE506
+;挿入Ｇスポット責め
+
+;一括管理
+SIF GLOBAL_COMABLE(506)
+	RETURN RESULT
+;下半身着衣
+SIF !IS_ZURASI(TARGET)
+	RETURN 0
+RETURN 1
+
+@COM_ABLE507
+;挿入子宮口責め
+
+;下半身着衣
+SIF !IS_ZURASI(TARGET)
+	RETURN 0
+RETURN 1
+
+@COM_ABLE508
+;６９パイズリ
+
+;一括管理
+SIF GLOBAL_COMABLE(508)
+	RETURN RESULT
+;オトコだとダメ
+SIF TALENT:オトコ
+	RETURN 0
+;体格差があるとダメ
+SIF ABS(TALENT_LV(TARGET, "体型") - TALENT_LV(PLAYER, "体型")) > 2
+	RETURN 0
+;[絶壁]だと不可
+SIF TALENT:絶壁
+	RETURN 0
+;[爆乳]なら技巧LV2以上、[巨乳]でなければ技巧4以上、[貧乳]だと技巧5必要
+SIF TALENT_LV(TARGET, "バストサイズ") + ABL:技巧 < 4
+	RETURN 0
+;調教者がオトコか半人半妖かふたなりじゃないとダメ
+SIF CHECK_PENIS(PLAYER)
+	RETURN 0
+;猫舌の調教者の場合は技巧Lv2以上必要
+SIF TALENT:PLAYER:猫舌 && ABL:PLAYER:技巧 < 2
+	RETURN 0
+;猫舌の奴隷の場合は技巧Lv2以上必要
+SIF TALENT:猫舌 && ABL:技巧 < 2
+	RETURN 0
+;上半身着衣
+SIF TEQUIP:1 > 1
+	RETURN 0
+;縄使用中は不可
+SIF TEQUIP:縄
+	RETURN 0
+;ベッドルームでないとダメ
+;SIF !BEDROOM(CFLAG:PLAYER:現在位置)
+;	RETURN 0
+
+RETURN 1
+
+@COM_ABLE509
+;ダブルフェラ実行判定
+SIF !TFLAG:COMABLE管理
+	RETURN 0
+
+;一括管理
+SIF GLOBAL_COMABLE(509)
+	RETURN RESULT
+LOCAL = MASTER_POSE(4,1,1)
+;主人がオトコか半人半妖かふたなりじゃないとダメ
+SIF CHECK_PENIS(PLAYER)
+	RETURN 0
+;猫舌の奴隷の場合は技巧Lv2以上必要
+SIF TALENT:猫舌 && ABL:技巧 < 2
+	RETURN 0
+;猫舌の助手の場合は技巧Lv2以上必要
+SIF TALENT:LOCAL:猫舌 && ABL:LOCAL:技巧 < 2
+	RETURN 0
+;二人目が奉仕精神ＬＶ３以上、技巧ＬＶ３以上じゃないとダメ
+SIF ABL:LOCAL:技巧 < 3 || ABL:LOCAL:奉仕精神 < 3
+	RETURN 0
+;ボールギャグ使用中は不可
+SIF TEQUIP:ボールギャグ || TEQUIP:LOCAL:ボールギャグ
+	RETURN 0
+;縄使用中は不可
+SIF TEQUIP:縄 || TEQUIP:LOCAL:縄
+	RETURN 0
+RETURN 1
+
+@COM_ABLE510
+;ダブル素股
+
+;一括管理
+SIF GLOBAL_COMABLE(510)
+	RETURN RESULT
+LOCAL = MASTER_POSE(2,1,1)
+;下半身着衣
+SIF CHECK_BOTTOM(TARGET,3)
+	RETURN 0
+SIF CHECK_BOTTOM(LOCAL,3)
+	RETURN 0
+;ベッドルームでないとダメ
+;SIF !BEDROOM(CFLAG:PLAYER:現在位置)
+;	RETURN 0
+
+RETURN 1
+
+@COM_ABLE511
+;ダブルパイズリ
+;一括管理
+SIF GLOBAL_COMABLE(511)
+	RETURN RESULT
+LOCAL = MASTER_POSE(5,1,1)
+;主人がオトコか半人半妖かふたなりじゃないとダメ
+SIF CHECK_PENIS(PLAYER)
+	RETURN 0
+;猫舌の奴隷の場合は技巧Lv2以上必要
+SIF TALENT:猫舌 && ABL:技巧 < 2
+	RETURN 0
+;猫舌の助手の場合は技巧Lv2以上必要
+SIF TALENT:LOCAL:猫舌 && ABL:LOCAL:技巧 < 2
+	RETURN 0
+
+;助手が奉仕精神ＬＶ３以上、技巧ＬＶ４以上じゃないとダメ
+SIF ABL:LOCAL:技巧 < 4 || ABL:LOCAL:奉仕精神 < 3
+	RETURN 0
+;助手とTARGETの両方に胸がないとダメ
+SIF TALENT:オトコ || TALENT:LOCAL:オトコ
+	RETURN 0
+;上半身着衣
+SIF TEQUIP:1 > 1
+	RETURN 0
+;縄使用中は不可
+SIF TEQUIP:縄 || TEQUIP:LOCAL:縄
+	RETURN 0
+
+RETURN 1
+
+
+@COM_ABLE512
+;パイズリフェラ
+;一括管理
+SIF GLOBAL_COMABLE(57)
+	RETURN RESULT
+;オトコだとダメ
+SIF TALENT:オトコ
+	RETURN 0
+;[絶壁]だと不可
+SIF TALENT:絶壁
+	RETURN 0
+;[爆乳]なら技巧LV2以上、[巨乳]でなければ技巧4以上、[貧乳]だと技巧5必要
+SIF (TALENT_LV(TARGET, "バストサイズ") + ABL:技巧) < 4
+	RETURN 0
+;調教者がオトコか半人半妖かふたなりじゃないとダメ
+SIF CHECK_PENIS(PLAYER)
+	RETURN 0
+;猫舌の奴隷の場合は技巧Lv2以上必要
+SIF TALENT:猫舌 && ABL:技巧 < 2
+	RETURN 0
+;上半身着衣
+SIF TEQUIP:1 > 1
+	RETURN 0
+;縄使用中は不可
+SIF TEQUIP:19
+	RETURN 0
+;ボールギャグ使用中は不可
+SIF TEQUIP:20
+	RETURN 0
+
+RETURN 1
+
+@COM_ABLE513
+;交互挿入
+
+;一括管理
+SIF GLOBAL_COMABLE(513)
+	RETURN RESULT
+LOCAL = MASTER_POSE(6,1,1)
+;バイブ挿入中はダメ
+SIF TEQUIP:13
+	RETURN 0
+SIF TEQUIP:LOCAL:13
+	RETURN 0
+;オトコだとダメ
+SIF TALENT:オトコ
+	RETURN 0
+SIF TALENT:LOCAL:オトコ
+	RETURN 0
+;体格差がある場合は主人が禁断の知識持ちじゃないとダメ
+SIF ABS(TALENT_LV(TARGET, "体型") - TALENT_LV(PLAYER, "体型")) > 2 && !TALENT:PLAYER:禁断の知識
+	RETURN 0
+SIF ABS(TALENT_LV(LOCAL, "体型") - TALENT_LV(PLAYER, "体型")) > 2 && !TALENT:PLAYER:禁断の知識
+	RETURN 0
+;調教者がオトコ、半人半妖、ふたなり、もしくはペニスバンドがないとダメ
+SIF CHECK_PENIS(PLAYER) && ITEM:PBAND == 0
+	RETURN 0
+;処女で、親密4以下・レズっ気4以下のASSIの場合はできない（サドならＯＫ）
+IF TALENT:処女 && ASSIPLAY
+	SIF (ABL:ASSI:親密 <= 4 || ABL:ASSI:レズっ気 <= 4) && TALENT:ASSI:サド == 0
+		RETURN 0
+ENDIF
+;処女かつ潤滑不足はだめ
+SIF PALAM:潤滑 < PALAMLV:2 && TALENT:処女
+		RETURN 0
+SIF PALAM:LOCAL:潤滑 < PALAMLV:2 && TALENT:LOCAL:処女
+		RETURN 0
+
+;下半身着衣
+SIF !IS_ZURASI(TARGET)
+	RETURN 0
+SIF !IS_ZURASI(LOCAL)
+	RETURN 0
+	
+;お風呂場プレイ中はプレイマットが無いとダメ
+IF TEQUIP:31
+	SIF ITEM:20 == 0 && NOITEM == 0
+		RETURN 0
+ENDIF
+
+;助手が騎乗位からはダメ
+SIF TEQUIP:LOCAL:体位２ == 3
+	RETURN 0
+	
+RETURN 1
+
+;強制放尿実行判定
+@COM_ABLE514
+;一括管理
+SIF GLOBAL_COMABLE(514)
+	RETURN RESULT
+;ウフフ中じゃないと無理
+SIF !TFLAG:うふふ
+	RETURN 0
+;利尿剤使用中かおもらし癖ありでないとダメ
+SIF TEQUIP:22 == 0 && TALENT:57 == 0
+	RETURN 0
+;従順10以上でないとダメ（お風呂場ならＯＫ）
+IF TEQUIP:58 == 0
+	SIF ABL:0 < 10
+		RETURN 0
+ENDIF
+;おもらし癖ありで利尿剤が無いまたはおもらし癖なしかつ従順４以上欲望３以上マゾっ気３以上でないとダメ
+SIF (TALENT:57 == 0 && (ABL:0 <= 3 || ABL:1 <= 2 || ABL:8 <= 2)) || (TALENT:57 && TEQUIP:22 == 1)
+	RETURN 0
+RETURN 1
+
+;-------------------------------------------------
+;560～579,日常派生コマンド
+;-------------------------------------------------
+;耳かき
+@COM_ABLE560
+;一括管理
+SIF GLOBAL_COMABLE(560)
+	RETURN RESULT
+;相手が居ないとダメ
+SIF !TARGET
+	RETURN 0
+RETURN 1
+
+;デコちゅー
+@COM_ABLE562
+;一括管理
+SIF GLOBAL_COMABLE(562)
+	RETURN RESULT
+;相手が居ないとダメ
+SIF !TARGET
+	RETURN 0
+RETURN 1

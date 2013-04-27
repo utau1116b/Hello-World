@@ -1,0 +1,14 @@
+;ARG	使用キャラ
+;ARG:1	VO,VI,DA
+@通常アピール(ARG, ARG:1)
+LOCAL:3 = アピール成功判定(ARG, ARG:1)
+CALL APPEAL_CALCLATE(ARG, LOCAL:3, ARG:1)
+;PRINTFORML {ARG}の得点{RESULT}
+TFLAG:得点一時保存 = RESULT
+IF TFLAG:チェイン数 > 1 && ARG >= 11
+	TFLAG:得点一時保存 += (5 + (TFLAG:チェイン数 - 2) * 1)
+	TFLAG:トータルチェイン += (5 + (TFLAG:チェイン数 - 2) * 1)
+ENDIF
+SIF ARG >= 11
+	CALL アピール表示(ARG, LOCAL:3, RESULT)
+	

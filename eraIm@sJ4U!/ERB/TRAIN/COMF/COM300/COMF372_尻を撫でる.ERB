@@ -1,0 +1,226 @@
+@COM372
+;尻を撫でる
+LOCAL = RAND:110
+LOCAL:1 = 90 + GET_SUCCESS_RATE() / 5
+SIF LOCAL:1 > 109
+	LOCAL:1 = 109
+IF LOCAL <= 9
+	;大成功
+	TFLAG:SELECTCOM分岐 = 1
+	TFLAG:成功判定 = 1
+ELSEIF LOCAL >= LOCAL:1
+	;失敗
+	TFLAG:SELECTCOM分岐 = -1
+	TFLAG:成功判定 = -1
+ELSE
+	;残りは成功
+	TFLAG:SELECTCOM分岐 = 0
+	TFLAG:成功判定 = 0
+ENDIF
+
+DOWNBASE:気力 += 50
+DOWNBASE:MASTER:気力 += 50
+
+;信頼
+;TFLAG:成功判定 = -3
+
+;固定で獲得するソース
+SOURCE:歓楽 = 100
+SOURCE:情愛 = 100
+SOURCE:露出 = 100
+SOURCE:欲情 = 100
+SOURCE:受動 = 100
+SOURCE:反感 = 200
+
+IF TFLAG:SELECTCOM分岐 == -1
+	TIMES SOURCE:歓楽 , 0.10
+	TIMES SOURCE:情愛 , 0.50
+	TIMES SOURCE:受動 , 0.50
+	TIMES SOURCE:欲情 , 0.50
+	TIMES SOURCE:反感 , 1.50
+ELSEIF TFLAG:SELECTCOM分岐 == 0
+	TIMES SOURCE:歓楽 , 1.00
+	TIMES SOURCE:情愛 , 1.00
+	TIMES SOURCE:受動 , 1.00
+	TIMES SOURCE:欲情 , 1.00
+ELSE
+	TIMES SOURCE:歓楽 , 2.00
+	TIMES SOURCE:情愛 , 2.00
+	TIMES SOURCE:受動 , 2.00
+	TIMES SOURCE:欲情 , 2.00
+	TIMES SOURCE:反感 , 0.75
+ENDIF
+
+RETURN 1
+
+@CAN_COM372(ARG)
+;-------------------------------------------------
+;実行判定処理
+;-------------------------------------------------
+SKIPDISP ARG
+PRINTL 尻を撫でる
+A = 0
+S = 0
+V = 110
+
+;すべての命令に共通の要素を考慮
+;(従順が高いと命令に従いやすいなど)
+CALL COM_ORDER
+
+	;ABL:欲望
+	IF ABL:1
+		SIF S
+			PRINT  + 
+		PRINTS ABLNAME:1
+		PRINTV 'LV,ABL:1,'(,ABL:1 * 3,')
+		S = 1
+		A+=ABL:1*3
+	ENDIF
+	;ABL:A感覚
+	IF ABL:5
+		SIF S
+			PRINT  + 
+		PRINTS ABLNAME:5
+		PRINTV 'LV,ABL:5,'(,ABL:5 * 2,')
+		S = 1
+		A+=ABL:5*2
+	ENDIF
+	;ABL:奉仕精神
+	IF ABL:6
+		SIF S
+			PRINT  + 
+		PRINTS ABLNAME:6
+		PRINTV 'LV,ABL:6,'(,ABL:6 * 4,')
+		S = 1
+		A+=ABL:6*4
+	ENDIF
+	IF MARK:1
+		SIF S
+			PRINT  + 
+		PRINTS MARKNAME:1
+		PRINTV 'LV,MARK:1,'(,MARK:1 * 3,')
+		S = 1
+		A+=MARK:1*3
+	ENDIF
+	;PALAM:欲情
+	IF PALAM:5 < PALAMLV:1
+		L = 0
+	ELSEIF PALAM:5 < PALAMLV:2
+		L = 1
+	ELSEIF PALAM:5 < PALAMLV:3
+		L = 2
+	ELSEIF PALAM:5 < PALAMLV:4
+		L = 3
+	ELSEIF PALAM:5 < PALAMLV:5
+		L = 4
+	ELSE
+		L = 5
+	ENDIF
+	IF L
+		SIF S
+			PRINT  + 
+		PRINTS PALAMNAME:5
+		PRINTV 'LV,L,'(,L * 3,')
+		S = 1
+		A+=L*3
+	ENDIF
+
+	;恥じらい
+	IF TALENT:35
+		PRINT  - 
+		PRINTS TALENTNAME:35
+		PRINTV '(,2,')
+		S = 1
+		A-=2
+	ENDIF
+	;快感の否定
+	IF TALENT:71
+		PRINT  - 
+		PRINTS TALENTNAME:71
+		PRINTV '(,5,')
+		S = 1
+		A-=5
+	ENDIF
+	;男嫌い
+	IF TALENT:82 && TALENT:PLAYER:122
+		PRINT  - 
+		PRINTS TALENTNAME:82
+		PRINTV '(,12,')
+		S = 1
+		A-=12
+	ENDIF
+	;恋慕
+	IF TALENT:85 && ASSIPLAY == 0
+		SIF S
+			PRINT  + 
+		PRINTS TALENTNAME:85
+		PRINTV '(,5,')
+		S = 5
+		A+=5
+	ENDIF
+
+	;媚薬
+	IF TEQUIP:21
+		SIF S
+			PRINT  + 
+		PRINTS ITEMNAME:26
+		PRINTV '(,6,')
+		S = 1
+		A+=6
+	ENDIF
+
+	;好感度
+	IF CFLAG:2 < 3000
+		B = 0
+		PRINT  - 
+		IF CFLAG:2 < 1000
+			B = 50
+		ELSEIF CFLAG:2 < 2000
+			B = 20
+		ELSEIF CFLAG:2 < 2500
+			B = 10
+		ELSE
+			B = 5
+		ENDIF
+		PRINT 好感度不足
+		PRINTV '(,B,')
+		S = 1
+		A-=B
+	ENDIF
+	;好感度
+	IF CFLAG:2 >= 4000
+		B = 0
+		SIF S
+			PRINT  + 
+		IF CFLAG:2 < 5000
+			B = 5
+		ELSE
+			B = CFLAG:2 / 300
+		ENDIF
+		PRINT 好感度
+		PRINTV '(,B,')
+		S = 1
+		A+=B
+	ENDIF
+
+	;合計を表示(110以上で実行)
+	PRINT  = 
+	PRINTV A
+
+	SIF A < V
+		PRINT  < 
+	SIF A == V
+		PRINT  = 
+	SIF A > V
+		PRINT  > 
+	PRINT 実行値
+	PRINTV V
+
+	WAIT
+
+	SKIPDISP 0
+	;実行できない
+	SIF A < V
+		RETURN 0
+
+RETURN 1

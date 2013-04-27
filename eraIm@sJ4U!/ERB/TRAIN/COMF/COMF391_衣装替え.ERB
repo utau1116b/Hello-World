@@ -1,0 +1,382 @@
+;衣装替え
+@COM291
+VARSET LOCAL
+DOWNBASE:0 += 0
+DOWNBASE:1 += 20
+
+;衣装名取得
+CALL CLOTH_NAME
+
+;リボンは相愛必要
+SIF TALENT:89 == 0
+	TSTR:17 = ""
+
+;普段着、%CALLNAME:MASTER%の服は常に所持
+SETBIT FLAG:70, 23
+SETBIT FLAG:70, 24
+
+LOCAL:99 = 0
+REPEAT 30
+	;TSTR:COUNTが設定されていなかったら表示しない
+	IF TSTR:COUNT == ""
+		CONTINUE
+	;LOCAL:COUNTが-1なら表示しない
+	ELSEIF LOCAL:COUNT < 0
+		CONTINUE
+	ENDIF
+
+	IF GETBIT(FLAG:70, COUNT)
+		PRINTFORMLC [{COUNT,2}] %TSTR:COUNT%
+		LOCAL:LOCAL = 1
+	ELSE
+		LOCAL:100 = 1
+		CONTINUE
+	ENDIF
+	
+	LOCAL:99 ++
+	;改行するのか？ 続けて出力するのか？
+	IF LOCAL:99 > 2
+		PRINTL 
+		LOCAL:99 = 0
+	ELSE
+		PRINT 
+	ENDIF
+REND
+;最後のループで改行してなかったら、ここで改行しておく
+SIF LOCAL:99 != 0
+	PRINTL 
+SIF TEQUIP:65
+	PRINTL [100] 脱がせる
+PRINTL [999] 戻る
+$INPUT_LOOP
+INPUT
+IF RESULT == 999
+	RETURN -1
+ELSEIF RESULT > 1000
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP
+ELSEIF RESULT == 100 && TEQUIP:65
+	TEQUIP:65 = 0
+	PRINTFORMW %CALLNAME:TARGET%の服を脱がした
+ELSEIF RESULT == 17 && GETBIT(FLAG:70 , 17) && TALENT:89 && TEQUIP:65 != 17
+	TEQUIP:65 = 17
+	PRINTFORMW %CALLNAME:TARGET%は自らの裸体にリボンを巻きつけている……
+ELSEIF LOCAL:RESULT == 0
+	PRINTL 正しい値を入力して下さい
+	GOTO INPUT_LOOP
+ELSE
+	TEQUIP:65 = RESULT
+	PRINTFORMW %CALLNAME:TARGET%に%TSTR:RESULT%を着せた
+ENDIF
+
+;CALL KOJO_MESSAGE_COM
+RETURN 1
+
+;装備中の処理
+@EQUIP_COMコスプレ(ARG)
+VARSET LOCAL
+;一時ソース計算
+;これに補正をかける
+
+;露出に使用
+LOCAL = 500
+;逸脱に使用
+LOCAL:1 = 500
+;欲情、歓楽に使用
+LOCAL:2 = 500
+
+;素直
+SIF TALENT:13
+	TIMES LOCAL:2 , 1.20
+
+;好奇心
+SIF TALENT:23
+	TIMES LOCAL:2 , 1.20
+
+;目立ちたがり
+SIF TALENT:28
+	TIMES LOCAL , 0.80
+;解放
+SIF TALENT:33
+	TIMES LOCAL , 0.80
+
+;恥じらい
+SIF TALENT:35
+	TIMES LOCAL , 2.00
+;恥薄い
+SIF TALENT:36
+	TIMES LOCAL , 0.50
+
+;どんな服でも濡れると恥かしい
+IF TEQUIP:58 ||(TEQUIP:54 && (TIME:5 == 3 || TIME:5 == 4 || TIME:5 == 5 || TIME:5 == 7 || TIME:5 == 8))
+	;ずぶ濡れ
+	TIMES LOCAL , 1.30
+ELSEIF (DAY:2 == 1 && (TIME:5 == 3 || TIME:5 == 4|| TIME:5 == 7))
+	;やや濡れ
+	TIMES LOCAL , 1.10
+ENDIF
+;ここまで
+
+;名前表示
+CALL CLOTH_EQUIP_NAME
+PRINTFORML ＜コスプレ中[%TSTR:(TEQUIP:65)%]＞
+
+IF TEQUIP:65 == 1
+	;PRINTL ＜コスプレ中[学ラン]＞
+	;露出度低
+	TIMES LOCAL , 0.50
+ELSEIF TEQUIP:65 == 2
+	;PRINTL ＜コスプレ中[セーラー服]＞
+	IF TEQUIP:58 ||(TEQUIP:54 && (TIME:5 == 3 || TIME:5 == 4 || TIME:5 == 5 || TIME:5 == 7 || TIME:5 == 8))
+		PRINTFORML セーラー服のシャツが透けて下着がくっきりと見える…
+		;濡れると透ける
+		TIMES LOCAL , 2.00
+		TIMES LOCAL:2 , 0.80
+	ELSEIF (DAY:2 == 1 && (TIME:5 == 3 || TIME:5 == 4|| TIME:5 == 7))
+		PRINTFORML セーラー服のシャツが透けて下着が見えてる…
+		;湿気が強い湿って透ける
+		TIMES LOCAL , 1.50
+	ELSE
+		;露出度低
+		TIMES LOCAL , 0.50
+		TIMES LOCAL:2 , 1.50
+	ENDIF
+ELSEIF TEQUIP:65 == 3
+	;PRINTL ＜コスプレ中[ブルマ]＞
+	;露出度高
+	TIMES LOCAL , 1.50
+	TIMES LOCAL:2 , 1.20
+ELSEIF TEQUIP:65 == 4
+	;PRINTL ＜コスプレ中[水着]＞
+	;露出度高
+	TIMES LOCAL , 1.50
+	TIMES LOCAL:2 , 1.50
+	;貧乳だと恥かしい
+	SIF TALENT:109
+		TIMES LOCAL , 1.50
+	;絶壁だと恥かしい
+	SIF TALENT:140
+		TIMES LOCAL , 3.50
+ELSEIF TEQUIP:65 == 5
+	;PRINTL ＜コスプレ中[スク水（紺）]＞
+	;露出度高
+	TIMES LOCAL , 2.00
+	TIMES LOCAL:2 , 0.80
+	;貧乳だと恥かしい
+	SIF TALENT:109
+		CUP:8 += LOCAL /8
+	;絶壁だと恥かしい
+	SIF TALENT:140
+		CUP:8 += LOCAL /4
+	;巨乳だと痛い
+	SIF TALENT:110
+		SOURCE:6 = 100
+	;爆乳だと痛い
+	SIF TALENT:141
+		SOURCE:6 = 300
+ELSEIF TEQUIP:65 == 6
+	;PRINTL ＜コスプレ中[スク水（白）]＞
+	IF TEQUIP:58 ||(TEQUIP:54 && (TIME:5 == 3 || TIME:5 == 4 || TIME:5 == 5 || TIME:5 == 7 || TIME:5 == 8))
+		PRINTFORML %CALLNAME:TARGET%の水着はスケスケになっている…
+		;濡れると透ける
+		TIMES LOCAL , 3.00
+		TIMES LOCAL:2 , 0.40
+	ELSEIF PALAM:3 > PALAMLV:3 || (DAY:2 == 1 && (TIME:5 == 3 || TIME:5 == 4|| TIME:5 == 7))
+		PRINTFORML %CALLNAME:TARGET%の水着は少し透けている…
+		;湿気が強いor濡れると湿って透ける
+		TIMES LOCAL , 2.50
+		TIMES LOCAL:2 , 0.60
+	ELSE
+		;露出度高
+		TIMES LOCAL , 2.00
+		TIMES LOCAL:2 , 0.80
+	ENDIF
+	;貧乳だと恥かしい
+	SIF TALENT:109
+		CUP:8 += LOCAL /8
+	;絶壁だと恥かしい
+	SIF TALENT:140
+		CUP:8 += LOCAL /4
+	;巨乳だと痛い
+	SIF TALENT:110
+		SOURCE:6 = 100
+	;爆乳だと痛い
+	SIF TALENT:141
+		SOURCE:6 = 300
+		
+ELSEIF TEQUIP:65 == 7
+	;PRINTL ＜コスプレ中[白衣]＞
+	;露出度低
+	TIMES LOCAL , 0.50
+	TIMES LOCAL:2 , 1.50
+ELSEIF TEQUIP:65 == 8
+	;PRINTL ＜コスプレ中[ナース服]＞
+	;露出度低
+	TIMES LOCAL , 0.50
+	TIMES LOCAL:2 , 1.50
+ELSEIF TEQUIP:65 == 9
+	;PRINTL ＜コスプレ中[女性警官制服]＞
+	;露出度高
+	TIMES LOCAL , 1.50
+	TIMES LOCAL:2 , 1.70
+ELSEIF TEQUIP:65 == 10
+	;PRINTL ＜コスプレ中[ボンテージスーツ]＞
+	;露出度高
+	TIMES LOCAL , 1.50
+	IF TALENT:83
+		TIMES LOCAL:2 , 2.50
+	ELSE
+		TIMES LOCAL:2 , 1.50
+	ENDIF
+	;征服
+	SOURCE:20 += LOCAL /2
+	;貧乳だと恥かしい
+	SIF TALENT:109
+		CUP:8 += LOCAL /8
+	;絶壁だと恥かしい
+	SIF TALENT:140
+		CUP:8 += LOCAL /4
+ELSEIF TEQUIP:65 == 11
+	;PRINTL ＜コスプレ中[浴衣]＞
+	;露出度低
+	TIMES LOCAL , 0.50
+	IF DAY:2 == 1
+		TIMES LOCAL:2 , 2.50
+	ELSE
+		TIMES LOCAL:2 , 2.00
+	ENDIF
+ELSEIF TEQUIP:65 == 12
+	;PRINTL ＜コスプレ中[巫女服]＞
+	;露出度低
+	TIMES LOCAL , 0.50
+	TIMES LOCAL:2 , 1.20
+ELSEIF TEQUIP:65 == 13
+	;PRINTL ＜コスプレ中[巫女服（博）]＞
+	;露出度中
+	TIMES LOCAL , 1.20
+	TIMES LOCAL:2 , 1.50
+ELSEIF TEQUIP:65 == 14
+	;PRINTL ＜コスプレ中[巫女服（守）]＞
+	;露出度中
+	TIMES LOCAL , 1.20
+	TIMES LOCAL:2 , 1.50
+ELSEIF TEQUIP:65 == 15
+	;PRINTL ＜コスプレ中[メイド服]＞
+	;露出度低
+	TIMES LOCAL , 0.50
+	TIMES LOCAL:2 , 1.30
+	;家務
+	SOURCE:16 += LOCAL /8
+ELSEIF TEQUIP:65 == 16
+	;PRINTL ＜コスプレ中[メイド服（紅）]＞
+	;露出度中
+	TIMES LOCAL , 1.20
+	TIMES LOCAL:2 , 1.60
+	;家務
+	SOURCE:16 += LOCAL /6
+	;達成感
+	SOURCE:5 += LOCAL /12
+ELSEIF TEQUIP:65 == 17
+	;PRINTL ＜コスプレ中[裸リボン]＞
+	;露出度超
+	;愛のためならこのくらい…
+	TIMES LOCAL , 2.50
+	TIMES LOCAL:2 , 2.00
+	IF TIME:4 & 2
+		;結婚記念日
+		IF TIME:1 == 17 || TIME:1 == 44 || TIME:1 == 47|| TIME:1 == 48
+			;イベント時愛情経験+5
+			EXP:23 += 5
+		ELSE
+			;それ以外+3
+			EXP:23 += 3
+		ENDIF
+	ELSEIF TIME:4 & 1
+		;誕生日愛情経験+3
+		EXP:23 += 3
+	ELSEIF TIME:1 == 17 || TIME:1 == 44 || TIME:1 == 47|| TIME:1 == 48
+		;イベント時愛情経験+2
+		EXP:23 += 2
+	ELSE
+		;愛情経験+1
+		EXP:23 += 1
+	ENDIF
+ELSEIF TEQUIP:65 == 18
+	;PRINTL ＜コスプレ中[小悪魔風衣装]＞
+	;露出度低
+	TIMES LOCAL , 0.50
+	IF TALENT:87
+		TIMES LOCAL:2 , 2.50
+	ELSE
+		TIMES LOCAL:2 , 1.50
+	ENDIF
+ELSEIF TEQUIP:65 == 19
+	;PRINTL ＜コスプレ中[魔法少女コス]＞
+	;露出度中
+	TIMES LOCAL , 1.20
+	TIMES LOCAL:2 , 1.50
+ELSEIF TEQUIP:65 == 20
+	;PRINTL ＜コスプレ中[ゴスロリ]＞
+	;露出度低
+	TIMES LOCAL , 0.50
+	TIMES LOCAL:2 , 1.50
+ELSEIF TEQUIP:65 == 21
+	;PRINTL ＜コスプレ中[バニーガール]＞
+	;露出度高
+	TIMES LOCAL , 1.50
+	TIMES LOCAL:2 , 0.80
+	;巨乳だと露出度うｐ
+	SIF TALENT:110
+		TIMES LOCAL , 1.20
+	;爆乳だと露出度うｐ
+	SIF TALENT:141
+		TIMES LOCAL , 2.50
+	;貧乳だと恥かしい
+	SIF TALENT:109
+		CUP:8 += LOCAL /8
+	;絶壁だと恥かしい
+	SIF TALENT:140
+		CUP:8 += LOCAL /4
+ELSEIF TEQUIP:65 == 22
+	;PRINTL ＜コスプレ中[裸Yシャツ]＞
+	IF TEQUIP:58 ||(TEQUIP:54 && (TIME:5 == 3 || TIME:5 == 4 || TIME:5 == 5 || TIME:5 == 7 || TIME:5 == 8))
+		PRINTFORML %CALLNAME:TARGET%のシャツはスケスケになって肌にへばりついている…
+		;濡れると透ける
+		TIMES LOCAL , 2.50
+		TIMES LOCAL:2 , 0.60
+	ELSEIF (DAY:2 == 1 && (TIME:5 == 3 || TIME:5 == 4 || TIME:5 == 7))
+		PRINTFORML %CALLNAME:TARGET%のシャツは少し透けている…
+		;湿気が強い湿って透ける
+		TIMES LOCAL , 2.00
+		TIMES LOCAL:2 , 0.80
+	ELSE
+		;露出度高
+		TIMES LOCAL , 1.50
+		TIMES LOCAL:2 , 1.20
+	ENDIF
+ELSEIF TEQUIP:65 == 23
+	;PRINTFORML ＜コスプレ中[%CALLNAME:TARGET%の服]＞
+	;露出度極低
+	TIMES LOCAL , 0.20
+	TIMES LOCAL:2 , 1.20
+ELSEIF TEQUIP:65 == 24
+	;PRINTFORML ＜コスプレ中[%CALLNAME:MASTER%の服]＞
+	;露出度極低
+	TIMES LOCAL , 0.20
+	TIMES LOCAL:2 , 1.80
+ELSEIF TEQUIP:65 == 255
+	;PRINTL ＜コスプレ中[ボロボロの布切れ]＞
+	;露出度高
+	TIMES LOCAL , 2.50
+	TIMES LOCAL:1 , 1.50
+	TIMES LOCAL:2 , 0.20
+	;そして屈辱的である
+	SOURCE:13 += LOCAL /20
+ENDIF
+
+SOURCE:12 += LOCAL /20
+SOURCE:13 += LOCAL /40
+SOURCE:14 += LOCAL:1 + (LOCAL /60)
+SOURCE:18 += LOCAL:2 / 20
+SOURCE:10 += (LOCAL /30)+(LOCAL:2 / 60)
+RETURN 1

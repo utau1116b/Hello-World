@@ -1,0 +1,424 @@
+@EVENTEND
+#LATER
+;押し倒されフラグONならパートナーを介抱する
+IF TFLAG:押し倒され == 2
+	PRINTFORML %CALLNAME:TARGET%を休ませました。
+;通常
+ELSE
+	PRINTFORML %CALLNAME:TARGET%と一旦別れました。
+ENDIF
+
+;体力等調整処理(最大値まで)
+CALL LIFE_LIMIT_MAXBASE
+
+;リング資金稼ぎ
+CALL EARN_MONEY_TM(TARGET)
+
+;調教後行為のチェック
+CALL SELF_CHECK
+
+;搾乳した母乳の売却
+CALL SELL_MILK
+
+;変化した素質の復帰
+CALL RETURN_TALENT
+
+;ビデオ処理
+SIF STRLENS(VSTR:1)
+	CALL SELL_VIDEO
+
+
+;気力・体力の上昇チェック
+SIF FLAG:イベントコンフィグ & 512
+	CALL EVENT_GROWTH
+
+;何の珠を得られたか
+FOR LOCAL,0,CHARANUM
+	SIF LOCAL != MASTER && LOCAL != TARGET && LOCAL != ASSI
+		CONTINUE
+	CALL JUEL_CHECK(LOCAL)
+	CALL DENIAL_CHECK(LOCAL)
+NEXT
+
+;調教中フラグリセット
+FOR LOCAL,0,CHARANUM
+	SIF LOCAL != MASTER && LOCAL != TARGET && LOCAL != ASSI
+		CONTINUE
+	VARSET TCVAR:LOCAL:0
+	VARSET TEQUIP:LOCAL:0
+	VARSET PALAM:LOCAL:0
+	VARSET SOURCE:LOCAL:0
+	VARSET GOTJUEL:LOCAL:0
+	VARSET EX:LOCAL:0
+	VARSET NOWEX:LOCAL:0
+	VARSET CUP:LOCAL:0
+	VARSET CDOWN:LOCAL:0
+	VARSET DOWNBASE:LOCAL:0
+NEXT
+VARSET TFLAG
+VARSET TSTR
+VARSET VSTR
+CALL MMSTOP()
+;リザルト画面用BGMを
+BEGIN ABLUP
+
+;-------------------------------------------------
+;何の珠を得られたか
+;-------------------------------------------------
+@JUEL_CHECK(ARG)
+VARSET LOCAL, 0
+
+;PALAMから取得する珠の種類・量を判断するためPALAMの並び設定使用
+CALL PALAM_SORT
+REPEAT A
+	;並べ直したPALAMをLOCALに代入
+	LOCAL = X:COUNT
+	
+	IF PALAM:ARG:LOCAL < PALAMLV:1
+		G = 0
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:1*3
+		G = 1
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:2
+		G = 2
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:2*3
+		G = 10
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:3
+		G = 20
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:3*2
+		G = 100
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:4
+		G = 200
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:5
+		G = 1000
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:6
+		G = 2000
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:7
+		G = 3000
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:8
+		G = 5000
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:9
+		G = 8000
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:10
+		G = 12000
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:11
+		G = 25000
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:12
+		G = 40000
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:13
+		G = 60000
+	ELSEIF PALAM:ARG:LOCAL < PALAMLV:14
+		G = 100000
+	ELSE
+		G = 150000
+	ENDIF
+
+	IF LOCAL == 0
+		;快Ｃの珠取得
+		GOTJUEL:ARG:LOCAL += G + EX:ARG:0 * 1000
+	ELSEIF LOCAL == 1
+		;快Ｖの珠取得
+		GOTJUEL:ARG:LOCAL += G + EX:ARG:1 * 1000
+	ELSEIF LOCAL == 2
+		;快Ａの珠取得
+		GOTJUEL:ARG:LOCAL += G + EX:ARG:2 * 1000
+	ELSEIF LOCAL == 14
+		;快Ｂの珠取得
+		GOTJUEL:ARG:LOCAL += G + EX:ARG:3 * 1000
+	ELSEIF LOCAL == 18
+		;快Ｍの珠取得
+		GOTJUEL:ARG:LOCAL += G + EX:ARG:6 * 1000
+	ELSEIF LOCAL == 11 || LOCAL == 12 || LOCAL == 13
+		;反感、不快、抑鬱のPALAMから否定の珠を取得
+		GOTJUEL:ARG:100 += G
+	ELSE
+		GOTJUEL:ARG:LOCAL += G
+	ENDIF
+REND
+
+VARSET C, 0
+VARSET D, 0
+;JUELの並び設定
+CALL JUEL_SORT
+REPEAT A
+	;並べ直したJUELをLOCALに代入
+	LOCAL = X:COUNT
+	;JUELの最高桁数取得
+	T = JUEL:ARG:LOCAL
+	CALL GET_DIGIT
+	SIF C < RESULT
+		C = RESULT
+	;GOTJUELの最高桁数取得
+	T = GOTJUEL:ARG:LOCAL
+	CALL GET_DIGIT
+	SIF D < RESULT
+		D = RESULT
+REND
+
+;JUELの並び設定
+CALL JUEL_SORT
+REPEAT A
+	;並べ直したJUELをLOCALに代入
+	LOCAL = X:COUNT
+	
+	;否定の宝珠＋取得否定の宝珠がない場合をまず弾く
+	IF LOCAL == 100 && JUEL:ARG:100 == 0 && GOTJUEL:ARG:100 == 0
+		GOTJUEL:ARG:LOCAL = -1
+		CONTINUE
+	;否定の宝珠以外の表示において、相殺がない場合には、新規獲得宝珠のない宝珠は弾く
+	ELSEIF LOCAL != 100 && JUEL:ARG:100 == 0 && GOTJUEL:ARG:100 == 0 && GOTJUEL:ARG:LOCAL == 0
+		GOTJUEL:ARG:LOCAL = -1
+		CONTINUE
+	;否定の宝珠以外で相殺がある場合、宝珠＋取得宝珠がない宝珠を弾く
+	ELSEIF LOCAL != 100 && JUEL:ARG:LOCAL == 0 && GOTJUEL:ARG:LOCAL == 0
+		GOTJUEL:ARG:LOCAL = -1
+		CONTINUE
+	ENDIF
+	
+	JUEL:ARG:LOCAL += GOTJUEL:ARG:LOCAL
+
+	;TARGETの時のみ表示する
+	SIF ARG != TARGET
+		CONTINUE
+
+	;「今回の行動で」や「以上の珠を得ました。」の表示を判断するためにLOCAL:1を使用
+	LOCAL:1 += 1
+	;初めて表示がある場合は仕切りと冒頭の表示をする
+	IF LOCAL:1 == 1
+		DRAWLINE
+		PRINTL 今回の行動で
+	ENDIF
+	
+	;対応する施設が建っていれば否定を除く珠上昇
+;	IF LOCAL != 100
+;		IF FLAG:シャワールーム == 1 && FLAG:大浴場 == 1 && FLAG:温泉 == 1
+;			TIMES GOTJUEL:LOCAL , 1.5
+;		ELSEIF FLAG:シャワールーム == 1 && FLAG:大浴場 == 1
+;			TIMES GOTJUEL:LOCAL , 1.3
+;		ELSEIF FLAG:シャワールーム == 1
+;			TIMES GOTJUEL:LOCAL , 1.1
+;		ENDIF
+;	ENDIF
+	
+	;色分けONで否定の宝珠表示のときは色を変える
+	SIF FLAG:コンフィグ & 256 && LOCAL == 100
+		SETCOLOR 0xC07070
+
+	PRINTFORML %PALAMNAME:LOCAL%の珠 ({JUEL:LOCAL,C}）＋（{GOTJUEL:LOCAL,D})
+	;JUEL:ARG:LOCAL += GOTJUEL:ARG:LOCAL
+
+	;色分けONで否定の宝珠表示のときの後始末
+	SIF FLAG:コンフィグ & 256 && LOCAL == 100
+		RESETCOLOR
+	
+REND
+
+;TARGETの時のみ表示
+SIF ARG != TARGET
+	RETURN
+
+;獲得宝珠表示があった場合のみ末尾の表示をする
+SIF LOCAL:1 > 0
+	PRINTW 以上の珠を得ました。
+
+;-------------------------------------------------
+;否定の珠の打ち消しチェック
+;-------------------------------------------------
+@DENIAL_CHECK(ARG)
+SIF JUEL:ARG:100 == 0
+	RETURN 0
+DRAWLINE
+SIF ARG == TARGET
+	PRINTL 否定の珠と他の珠の打ち消しが発生しています。
+
+$LABEL_1
+A = RAND:4 + 4
+SIF A == 7
+	A = 15
+B = JUEL:ARG:100 / 2
+SIF B == 0 && JUEL:ARG:100 > 0
+	B = 1
+SIF JUEL:ARG:A < B
+	B = JUEL:ARG:A
+JUEL:ARG:A -= B
+JUEL:ARG:100 -= B
+
+SIF B > 0 && ARG == TARGET
+	PRINTFORML %PALAMNAME:A%の珠－{B}減少
+SIF JUEL:ARG:100 > 0 && (JUEL:ARG:4 + JUEL:ARG:5 + JUEL:ARG:6 + JUEL:ARG:15) > 0
+	GOTO LABEL_1
+
+$LABEL_2
+A = RAND:3 + 8
+B = JUEL:ARG:100 / 2
+SIF B == 0 && JUEL:ARG:100 > 0
+	B = 1
+SIF JUEL:ARG:A < B
+	B = JUEL:ARG:A
+JUEL:ARG:A -= B
+JUEL:ARG:100 -= B
+SIF B > 0 && ARG == TARGET
+	PRINTFORML %PALAMNAME:A%の珠－{B}個減少
+SIF JUEL:ARG:100 > 0 && (JUEL:ARG:8 + JUEL:ARG:9 + JUEL:ARG:10) > 0
+	GOTO LABEL_2
+
+DRAWLINE
+SIF ARG == TARGET
+	PRINTL その結果、
+;JUELの並び設定
+CALL JUEL_SORT
+REPEAT A
+	;並べ直したJUELをLOCALに代入
+	LOCAL = X:COUNT
+	;JUELの最高桁数取得
+	T = JUEL:ARG:LOCAL
+	CALL GET_DIGIT
+	SIF C < RESULT
+		C = RESULT
+REND
+
+REPEAT A
+	;並べ直したJUELをLOCALに代入
+	LOCAL = X:COUNT
+
+	;色分けONで否定の宝珠表示のときは色を変える
+	SIF FLAG:コンフィグ & 256 && LOCAL == 100
+		SETCOLOR 0xC07070
+
+	SIF GOTJUEL:ARG:LOCAL != -1 && ARG == TARGET
+		PRINTFORML %PALAMNAME:LOCAL%の珠 → ({JUEL:ARG:LOCAL,C})
+
+	;色分けONで否定の宝珠表示のときの後始末
+	SIF FLAG:コンフィグ & 256 && LOCAL == 100
+		RESETCOLOR
+REND
+
+SIF ARG == TARGET
+	PRINTW 以上のように変化しました。
+
+;-------------------------------------------------
+;桁数取得
+;Tの桁数を取得しRESULTに代入
+;-------------------------------------------------
+@GET_DIGIT
+IF 0
+ELSEIF (T / 100000000) >= 1
+	RETURN 9
+ELSEIF (T / 10000000) >= 1
+	RETURN 8
+ELSEIF (T / 1000000) >= 1
+	RETURN 7
+ELSEIF (T / 100000) >= 1
+	RETURN 6
+ELSEIF (T / 10000) >= 1
+	RETURN 5
+ELSEIF (T / 1000) >= 1
+	RETURN 4
+ELSEIF (T / 100) >= 1
+	RETURN 3
+ELSEIF (T / 10) >= 1
+	RETURN 2
+ELSEIF (T / 1) >= 1
+	RETURN 1
+ELSE
+	RETURN 0
+ENDIF
+
+;-------------------------------------------------
+;一時的な素質変化の復帰
+;-------------------------------------------------
+@RETURN_TALENT
+;TEQUIP:40で元の素質を記録
+;1,貧乳
+;2,並乳
+;4,巨乳
+;8,小型体型なし
+;16,小型体型
+;32,獣耳なし
+;64,紫色の秘薬使用判定
+;128,濡れにくい
+;256,C鈍感
+;512,V鈍感
+;1024,A鈍感
+;2048,B鈍感
+;4096,娼婦の秘薬使用判定
+;8192,性別反転
+;16384,1p14,猫舌
+;1p15,羽
+;1p16,しっぽ
+;1p17,M鈍感
+
+;↓は正確に動いているか不明
+;140,絶壁
+;141,巨乳
+
+
+;胸の復帰
+IF TEQUIP:40 & 7
+	TALENT:109 = 0
+	TALENT:110 = 0
+	IF TEQUIP:40 & 1
+		TALENT:109 = 1
+	ELSEIF TEQUIP:40 & 4
+		TALENT:110 = 1
+	ELSEIF TEQUIP:40 & 140
+		TALENT:140 = 1
+	ELSEIF TEQUIP:40 & 141
+		TALENT:141 = 1
+	ENDIF
+ENDIF
+;体型を正常に
+SIF TEQUIP:40 & 8
+	TALENT:100 = 0
+
+SIF TEQUIP:40 & 16
+	TALENT:100 = 1
+
+;獣耳喪失
+SIF TEQUIP:40 & 32
+	TALENT:124 = 0
+
+;魔性のテクニック喪失
+SIF TEQUIP:40 & 4096
+	ABL:2 -= 10
+
+;超敏感体質喪失
+IF TEQUIP:40 & 64
+	;有利素質は手抜き
+	TALENT:42 -= 1
+	TALENT:102 -= 1
+	TALENT:104 -= 1
+	TALENT:106 -= 1
+	TALENT:108 -= 1
+	TALENT:597 -= 1
+	SIF (TEQUIP:40 & 128) > 0
+		TALENT:43 = 1
+	SIF (TEQUIP:40 & 256) > 0
+		TALENT:101 = 1
+	SIF (TEQUIP:40 & 512) > 0
+		TALENT:103 = 1
+	SIF (TEQUIP:40 & 1024) > 0
+		TALENT:105 = 1
+	SIF (TEQUIP:40 & 2048) > 0
+		TALENT:107 = 1
+	SIF (TEQUIP:40 & 1p7) > 0
+		TALENT:596 = 1
+ENDIF
+
+;性別を元に戻す
+IF TEQUIP:40 & 8192
+	;性別反転。虹の飴玉(性転換)の処理を利用
+	CALL USE_DRUG_83
+ENDIF
+
+;猫舌喪失
+SIF TEQUIP:40 & 1p14
+	TALENT:54 = 0
+
+;羽喪失
+SIF TEQUIP:40 & 1p15
+	TALENT:213 = 0
+
+;しっぽ喪失
+SIF TEQUIP:40 & 1p16
+	TALENT:215 = 0
+	

@@ -1,0 +1,101 @@
+;======================================================
+;装備品のデータ
+;======================================================
+
+@装備タイプ_609
+;1 = FLORAL 2 = LUXURY 3 = STARRY 4 = EXTRA
+RETURN 1
+
+;1 = 衣装 2 = HEAD 3 = BODY 4 = HAND 5 = LEG 6 = お守り
+@装備箇所_609
+RETURN 1
+
+@装備レベル_609
+RETURN 1
+
+@装備シリーズ_609
+RETURN 0
+
+@購入条件_609
+SIF MONEY < 1000
+	RETURN 0
+RETURN 1
+
+@装備解説_609
+PRINTL 
+
+@装備条件_609,ARG
+RETURN 1
+
+@装備条件説明_609
+PRINTL 装備条件：
+
+;合成可能か
+@合成条件_609
+;SIF
+;	RETURN 0
+RETURN 1
+
+;合成素材(変数に素材、個数を入れる)
+@合成素材_609
+RETURN 1
+
+@VO_609
+RETURN 6 * 5 * 100
+
+@VI_609
+RETURN 1 * 5 * 100
+
+@DA_609
+RETURN 4 * 5 * 100
+
+@HP_609
+RETURN 0
+
+@MP_609
+RETURN 0
+
+@POW_609
+RETURN 1200
+
+@GUA_609
+RETURN 200
+
+@DEX_609
+RETURN 0
+
+@SPD_609
+RETURN 800
+
+@LUC_609
+RETURN 0
+
+@VO耐性_609
+RETURN 0
+
+@VI耐性_609
+RETURN 0
+
+@DA耐性_609
+RETURN 0
+
+@攻撃回数_609
+RETURN 1
+
+@攻撃範囲_609
+RETURN 0
+
+@スキル1_609
+RETURN 0
+
+@スキル2_609
+RETURN 0
+
+@スキル3_609
+RETURN 0
+
+@スキル4_609
+RETURN 0
+
+@スキル5_609
+RETURN 0

@@ -1,0 +1,776 @@
+;-------------------------------------------------
+;関数名:FUNC_SKILL_EXPLAIN
+;概　要:スキル説明取得関数
+;引　数:ARG:0…スキル番号(ABL)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@FUNC_SKILL_EXPLAIN(ARG:0, ARG:1)
+#FUNCTIONS
+#LOCALSSIZE 1
+SELECTCASE ARG
+	CASE 210
+		LOCALS = 状態異常になる確率を軽減
+	CASE 211
+		LOCALS = ソロユニット以外の時能力が低下
+	CASE 212
+		LOCALS = 
+	CASE 213
+		LOCALS = ピンチになると、戦線離脱する
+	CASE 214
+		LOCALS = 
+	CASE 215
+		LOCALS = 味方全体に自分のGUAを25％付与する
+	CASE 216
+		LOCALS = 
+	CASE 217
+		LOCALS = 25％の確率で気絶に耐える
+	CASE 218
+		LOCALS = Liveバトル終了後に獲得するゲイツ増加
+	CASE 219
+		LOCALS = Liveバトル中に相手のステータスを詳細に見ることができる
+	CASE 220
+		LOCALS = 補助系スキルの効果が50％上昇
+	CASE 221
+		LOCALS = お店で商品が安く買える
+	CASE 222
+		LOCALS = アピール対象の状態異常と能力値変化状態の数に応じて与ダメージアップ
+	CASE 223
+		LOCALS = Liveバトル時の与ダメージ1.2倍
+	CASE 224
+		LOCALS = Liveバトル時の被ダメージ0.8倍
+	CASE 225
+		LOCALS = 
+	CASE 226
+		LOCALS = 亜美、真美の二人共ユニットメンバーの時、ランダムスキルでいい効果が出やすくなる
+	CASE 227
+		LOCALS = アイテムドロップ率アップ
+	CASE 228
+		LOCALS = 獲得経験値アップ
+	CASE 229
+		LOCALS = ダメージを10％軽減。クリティカル率20％上昇
+	CASE 230
+		LOCALS = ユニットの誰かのVLが300以上になった時、一定確率で自分もVL300になる
+	CASE 231
+		LOCALS = 
+	CASE 232
+		LOCALS = 
+	CASE 233
+		LOCALS = 行動後WTが30％減少
+	CASE 234
+		LOCALS = 味方全体のSPD、HITを上昇させる
+	CASE 235
+		LOCALS = 通常アピールが確率で連続発動
+	CASE 236
+		LOCALS = クリティカル率アップ。ボス戦時能力値上昇
+	CASE 237
+		LOCALS = 敵、味方全員のユニークスキルを無効にする
+	CASE 238
+		LOCALS = 全アピールの威力上昇
+	CASE 239
+		LOCALS = 
+	CASE 240
+		LOCALS = 
+	CASE 241
+		LOCALS = 敵の技をラーニング可能
+	CASE 242
+		LOCALS = ハートが1/2以下の時、消費ハート1/4
+	CASE 243
+		LOCALS = 
+	CASE 244
+		LOCALS = 涼と夢子が恋人同士の時、お互いの能力値上昇
+	CASE 245
+		LOCALS = 
+	CASE 246
+		LOCALS = 味方がピンチの時、能力値上昇
+	CASE 247
+		LOCALS = 
+	CASE 248
+		LOCALS = 
+	CASE 249
+		LOCALS = クリティカル率10％上昇
+	CASE 250
+		LOCALS = 
+	CASE 251
+		LOCALS = 気絶している状態で自分にターンが回ってくると自動的に復活する
+	CASE 252
+		LOCALS = 回避率15％上昇。命中率50％上昇
+	CASE 253
+		LOCALS = アピールに気絶効果付与
+	CASE 254
+		LOCALS = アピールがヒットする度にハートが回復する
+	CASE 255
+		LOCALS = 
+	CASE 256
+		LOCALS = 敵のアピールを受けた際、一定確率で反撃する
+	CASE 257
+		LOCALS = 
+	CASE 258
+		LOCALS = 
+	CASE 259
+		LOCALS = 回避率15％上昇。自分にターンが回ってくるたびハートが回復する
+	CASE 260
+		LOCALS = 通常アピールで敵のハートにもダメージを与える
+	CASE 261
+		LOCALS = VLの上昇量アップ
+	CASE 262
+		LOCALS = 
+	CASE 263
+		LOCALS = 
+	CASE 264
+		LOCALS = 回避率33％上昇
+	CASE 265
+		LOCALS = 全ダメージを微軽減
+	CASE 266
+		LOCALS = ガードか待機する度に★、ハートが回復していく
+	CASE 267
+		LOCALS = 20％の確率で行動後WT減少
+	CASE 268
+		LOCALS = VLが400の時、アピールが100％パーフェクトアピールになる
+	CASE 269
+		LOCALS = ダメージと状態異常になる確率を軽減
+	CASE 270
+		LOCALS = アピールを受けた際、一定確率でダメージが1になる
+	CASE 271
+		LOCALS = 
+	CASE 272
+		LOCALS = 気絶を確率で回避。回避率が10％上昇
+	CASE 273
+		LOCALS = 気絶を確率で回避。命中率が10％上昇
+	CASE 274
+		LOCALS = 
+	CASE 275
+		LOCALS = 敵を気絶させた際、一定確率で全ステータス上昇
+	CASE 276
+		LOCALS = LUCが15％ダウン
+	CASE 277
+		LOCALS = 10％の確率で行動後のWTを半減
+	CASE 278
+		LOCALS = スキル使用の際、一定確率で消費ハート1
+	CASE 279
+		LOCALS = 
+	CASE 280
+		LOCALS = 
+	CASE 281
+		LOCALS = Da.属性ダメージを受けた際、一定確率でダメージを半分にする
+	CASE 282
+		LOCALS = 
+	CASE 283
+		LOCALS = ユニットメンバーの掛けている眼鏡の数に応じてステータスアップ
+	CASE 284
+		LOCALS = 
+	CASE 285
+		LOCALS = 
+	CASE 286
+		LOCALS = 
+	CASE 287
+		LOCALS = VL消費スキルを使った際、一定確率で消費VL0
+;Vo.系
+	CASE 301
+		LOCALS = [消費20]敵小範囲にVo.属性ダメージ+スリープ付加
+	CASE 302
+		LOCALS = [消費47]敵大範囲にVo.属性ダメージ＋タイムカード3枚セット
+	CASE 303
+		LOCALS = [消費21]敵大範囲にVo.属性ダメージ・中＋POW低下
+	CASE 304
+		LOCALS = [消費17]敵大範囲にフィアー付与
+	CASE 305
+		LOCALS = [消費34]敵全体にVo.属性大ダメージ
+	CASE 306
+		LOCALS = [消費43]味方全体の状態異常を回復＋POW、SPD、GUAを上昇
+	CASE 307
+		LOCALS = [消費22]残り★に反比例して自身の能力値上昇＆★回復
+	CASE 308
+		LOCALS = [消費31]敵小範囲にVo.属性ダメージと共に選択した状態異常を与える
+	CASE 309
+		LOCALS = [消費40]敵単体にGUA無視のVo.属性ダメージ＋スリップ状態・ブライン状態・カース状態を一度に発生させる
+	CASE 310
+		LOCALS = [消費14]GUAを1にするのと引き換えにPOWを大幅に上昇
+	CASE 311
+		LOCALS = 
+	CASE 312
+		LOCALS = [消費54]敵全体にランダムでVo.属性ダメージ×自分のレベル
+	CASE 313
+		LOCALS = [消費60]味方小範囲の★回復・超。戦闘不能回復。状態異常、能力低下回復。ハート回復
+	CASE 314
+		LOCALS = [消費20]味方全体のスリップ、ブライン、カース、シール、フィアー状態を回復
+	CASE 315
+		LOCALS = [消費23]敵全体のHIT・SPD・POWを低下
+	CASE 316
+		LOCALS = [消費43]味方全体のアピール回数を増加
+	CASE 317
+		LOCALS = [消費48]味方全体にリレイズ付与
+	CASE 318
+		LOCALS = 
+	CASE 319
+		LOCALS = 
+	CASE 320
+		LOCALS = 
+	CASE 321
+		LOCALS = [消費30]味方単体の★回復・中。★継続回復
+	CASE 322
+		LOCALS = 
+	CASE 323
+		LOCALS = [消費14]敵単体にVo.属性ダメージ×4。確率で連続行動
+	CASE 324
+		LOCALS = 
+	CASE 325
+		LOCALS = 
+	CASE 326
+		LOCALS = [消費26]自分の全能力値上昇
+	CASE 327
+		LOCALS = 
+	CASE 328
+		LOCALS = [消費50]GUA半分無視のVo.属性ダメージ（追加ダメージ+30）×3＋スロウ付与
+	CASE 329
+		LOCALS = [消費27]敵単体にVo.属性ダメージ＋気絶付与
+	CASE 330
+		LOCALS = [消費26]自分の★に反比例して味方全体の★回復＋★継続回復効果
+	CASE 331
+		LOCALS = 
+	CASE 332
+		LOCALS = 
+	CASE 333
+		LOCALS = [消費55]敵全体の時の流れを遅くする
+	CASE 334
+		LOCALS = 
+	CASE 335
+		LOCALS = [消費15]★を回復+ボルテージ微増
+	CASE 336
+		IF CFLAG:11:2 > 3000
+			LOCALS = [消費10]味方単体の★回復+気絶回復+ハート回復
+		ELSEIF CFLAG:11:2 > 1000
+			LOCALS = [消費10]味方単体の★回復+気絶回復
+		ELSE
+			LOCALS = [消費10]味方単体の★回復
+		ENDIF
+	CASE 337
+		LOCALS = 
+	CASE 338
+		LOCALS = 
+	CASE 339
+		LOCALS = [消費60]自分を除く全員を強制的にストップ状態にする
+	CASE 340
+		LOCALS = [消費18]敵単体にVo.属性ダメージ＋フィアー付加
+	CASE 341
+		LOCALS = 
+	CASE 342
+		LOCALS = 
+	CASE 343
+		LOCALS = 
+	CASE 344
+		LOCALS = 
+	CASE 345
+		LOCALS = 
+	CASE 346
+		LOCALS = [消費23]敵小範囲にVo.属性ダメージ+スリップ付加
+	CASE 347
+		LOCALS = [消費15]味方単体のPOW上昇＋Vo.耐性上昇
+	CASE 348
+		LOCALS = [消費20]敵全体にブライン付加
+	CASE 349
+		LOCALS = 
+	CASE 350
+		LOCALS = 
+	CASE 351
+		LOCALS = 
+	CASE 352
+		LOCALS = 
+	CASE 353
+		LOCALS = 
+	CASE 354
+		LOCALS = 
+	CASE 355
+		LOCALS = 
+	CASE 356
+		LOCALS = 
+	CASE 357
+		LOCALS = 
+	CASE 358
+		LOCALS = 
+	CASE 359
+		LOCALS = 
+	CASE 360
+		LOCALS = 
+	CASE 361
+		LOCALS = 
+	CASE 362
+		LOCALS = 
+	CASE 363
+		LOCALS = 
+	CASE 364
+		LOCALS = 
+	CASE 365
+		LOCALS = 
+	CASE 366
+		LOCALS = 
+	CASE 367
+		LOCALS = 
+	CASE 368
+		LOCALS = 
+	CASE 369
+		LOCALS = 
+	CASE 370
+		LOCALS = 
+	CASE 371
+		LOCALS = 
+	CASE 372
+		LOCALS = 
+	CASE 373
+		LOCALS = 
+	CASE 374
+		LOCALS = 
+	CASE 375
+		LOCALS = 
+	CASE 376
+		LOCALS = 
+	CASE 377
+		LOCALS = 
+	CASE 378
+		LOCALS = 
+	CASE 379
+		LOCALS = 
+	CASE 380
+		LOCALS = 
+	CASE 381
+		LOCALS = 
+	CASE 382
+		LOCALS = 
+	CASE 383
+		LOCALS = 
+	CASE 384
+		LOCALS = 
+	CASE 385
+		LOCALS = 
+	CASE 386
+		LOCALS = 
+	CASE 387
+		LOCALS = 
+	CASE 388
+		LOCALS = 
+	CASE 389
+		LOCALS = 
+	CASE 390
+		LOCALS = 
+	CASE 391
+		LOCALS = 
+	CASE 392
+		LOCALS = 
+	CASE 393
+		LOCALS = 
+	CASE 394
+		LOCALS = 
+	CASE 395
+		LOCALS = 
+	CASE 396
+		LOCALS = 
+	CASE 397
+		LOCALS = 
+	CASE 398
+		LOCALS = 
+	CASE 399
+		LOCALS = 
+;Vi.系
+	CASE 401
+		LOCALS = 
+	CASE 402
+		LOCALS = 
+	CASE 403
+		LOCALS = [消費32]敵小範囲にVi.属性ダメージ・大
+	CASE 404
+		LOCALS = 
+	CASE 405
+		LOCALS = 
+	CASE 406
+		LOCALS = [消費40]使用してから2ターン後に強力なダメージ
+	CASE 407
+		LOCALS = [消費30]敵単体にVi.属性ダメージ＋WT押し戻し(中)
+	CASE 408
+		LOCALS = [消費21]敵単体にダメージ+能力値上昇を解除
+	CASE 409
+		LOCALS = 
+	CASE 410
+		LOCALS = 
+	CASE 411
+		LOCALS = [消費24]自分に行動後のWT短縮付与
+	CASE 412
+		LOCALS = [消費48]味方全体のハートが毎ターン回復
+	CASE 413
+		LOCALS = [消費26]3属性耐性上昇
+	CASE 414
+		LOCALS = [消費10]味方単体の★回復
+	CASE 415
+		LOCALS = [消費61]敵単体に防御無視のVi.属性ダメージ+スロウ付与+全能力低下+味方全体のSPD上昇
+	CASE 416
+		LOCALS = 
+	CASE 417
+		LOCALS = 
+	CASE 418
+		LOCALS = [消費20]気絶状態を回復
+	CASE 419
+		LOCALS = 
+	CASE 420
+		LOCALS = 
+	CASE 421
+		LOCALS = [消費64]敵単体にVi.属性ダメージ＋高確率でスリープ、ブライン付加＋WT押し戻し（大）
+	CASE 422
+		LOCALS = 
+	CASE 423
+		LOCALS = [消費40]味方全体の★回復+気絶回復
+	CASE 424
+		LOCALS = [消費37]味方全体の★回復＋状態異常回復
+	CASE 425
+		LOCALS = 
+	CASE 426
+		LOCALS = [消費35]好感度依存のVi.属性必中ダメージ・中×3
+	CASE 427
+		LOCALS = [消費24]全状態異常回復+GUA上昇
+	CASE 428
+		LOCALS = [消費57]敵単体にVi.属性ダメージ×4＋WT押し戻し(大)
+	CASE 429
+		LOCALS = [消費16]敵全体にVi.属性ダメージ+スリープ付加
+	CASE 430
+		LOCALS = 
+	CASE 431
+		LOCALS = 
+	CASE 432
+		LOCALS = [消費15]味方単体にPOW上昇＋VO.耐性付与
+	CASE 433
+		LOCALS = 
+	CASE 434
+		LOCALS = 
+	CASE 435
+		LOCALS = 
+	CASE 436
+		LOCALS = [消費13]敵中範囲にVi.属性ダメージ
+	CASE 437
+		LOCALS = [消費22]敵全体のSPD,GUA低下
+	CASE 438
+		LOCALS = [消費43]味方全体の全能力を上昇+クリティカル率20％上昇
+	CASE 439
+		LOCALS = 
+	CASE 440
+		LOCALS = 
+	CASE 441
+		LOCALS = [消費18]敵大範囲Vi.属性ダメージ・小+POW低下
+	CASE 442
+		LOCALS = [消費23]敵小範囲にVi.属性ダメージ+選択した能力値を低下
+	CASE 443
+		LOCALS = 
+	CASE 444
+		LOCALS = [消費45]味方全体に一度だけ敵のアピールを無効にするバリアを張る
+	CASE 445
+		LOCALS = 
+	CASE 446
+		LOCALS = [消費7]敵単体に必中Vi.属性ダメージ+シール付加
+	CASE 447
+		LOCALS = [消費10]敵単体に必中Vi.属性ダメージ＋POW低下
+	CASE 448
+		LOCALS = [消費10]敵全体のPOWを下げる
+	CASE 449
+		LOCALS = [消費18]敵全体のGUAを下げる
+	CASE 450
+		LOCALS = [消費25]味方全体のGUA上昇＋Vi.耐性上昇
+	CASE 451
+		LOCALS = 
+	CASE 452
+		LOCALS = 
+	CASE 453
+		LOCALS = 
+	CASE 454
+		LOCALS = 
+	CASE 455
+		LOCALS = 
+	CASE 456
+		LOCALS = 
+	CASE 457
+		LOCALS = 
+	CASE 458
+		LOCALS = 
+	CASE 459
+		LOCALS = 
+	CASE 460
+		LOCALS = 
+	CASE 461
+		LOCALS = 
+	CASE 462
+		LOCALS = 
+	CASE 463
+		LOCALS = 
+	CASE 464
+		LOCALS = 
+	CASE 465
+		LOCALS = 
+	CASE 466
+		LOCALS = 
+	CASE 467
+		LOCALS = 
+	CASE 468
+		LOCALS = 
+	CASE 469
+		LOCALS = 
+	CASE 470
+		LOCALS = 
+	CASE 471
+		LOCALS = 
+	CASE 472
+		LOCALS = 
+	CASE 473
+		LOCALS = 
+	CASE 474
+		LOCALS = 
+	CASE 475
+		LOCALS = 
+	CASE 476
+		LOCALS = 
+	CASE 477
+		LOCALS = 
+	CASE 478
+		LOCALS = 
+	CASE 479
+		LOCALS = 
+	CASE 480
+		LOCALS = 
+	CASE 481
+		LOCALS = 
+	CASE 482
+		LOCALS = 
+	CASE 483
+		LOCALS = 
+	CASE 484
+		LOCALS = 
+	CASE 485
+		LOCALS = 
+	CASE 486
+		LOCALS = 
+	CASE 487
+		LOCALS = 
+	CASE 488
+		LOCALS = 
+	CASE 489
+		LOCALS = 
+	CASE 490
+		LOCALS = 
+	CASE 491
+		LOCALS = 
+	CASE 492
+		LOCALS = 
+	CASE 493
+		LOCALS = 
+	CASE 494
+		LOCALS = 
+	CASE 495
+		LOCALS = 
+	CASE 496
+		LOCALS = 
+	CASE 497
+		LOCALS = 
+	CASE 498
+		LOCALS = 
+	CASE 499
+		LOCALS = 
+;Da.系
+	CASE 501
+		LOCALS = [消費36]敵全体にDa.属性ダメージ
+	CASE 502
+		LOCALS = [消費24]敵単体にDa.属性ダメージ＋与えたダメージの半分を自分の★に還元
+	CASE 503
+		LOCALS = [消費19]敵単体にDa.属性ダメージ・中＋GUA低下
+	CASE 504
+		LOCALS = 
+	CASE 505
+		LOCALS = [消費55]味方単体に時の祝福+★一時増加+SPD上昇
+	CASE 506
+		LOCALS = [消費34]3～6回Da.属性ダメージ＋SPD低下
+	CASE 507
+		LOCALS = [消費43]敵単体に好感度に依存するDa.属性ダメージ+Vi.属性ダメージ
+	CASE 508
+		LOCALS = [消費58]敵全体に好感度に依存するDa.属性ダメージ
+	CASE 509
+		LOCALS = [消費54]敵全体の★を吸収
+	CASE 510
+		LOCALS = 
+	CASE 511
+		LOCALS = [消費35]敵全体にDa.属性ダメージ+ジャンパイの役によって追加ダメージ
+	CASE 512
+		LOCALS = 
+	CASE 513
+		LOCALS = 
+	CASE 514
+		LOCALS = [消費19]味方全体のGUAを上昇させる+状態異常軽減
+	CASE 515
+		LOCALS = [消費46]敵のアピールを全て自分が引き受ける
+	CASE 516
+		LOCALS = [消費51]味方全体のSPD上昇+ハート消費を軽減
+	CASE 517
+		LOCALS = 
+	CASE 518
+		LOCALS = 
+	CASE 519
+		LOCALS = 
+	CASE 520
+		LOCALS = [消費49]敵単体のGUAを減少＋ブライン・カース・スリップを一度に発生させる＋数ターン継続ダメージ
+	CASE 521
+		LOCALS = 
+	CASE 522
+		LOCALS = 
+	CASE 523
+		LOCALS = 
+	CASE 524
+		LOCALS = 
+	CASE 525
+		LOCALS = 
+	CASE 526
+		LOCALS = [消費50]自分に2回行動効果付与
+	CASE 527
+		LOCALS = [消費27]敵単体にDa.属性ダメージ。VLによってアピール回数が変化
+	CASE 528
+		LOCALS = 
+	CASE 529
+		LOCALS = [消費15]敵単体にDa.属性ダメージ+スリープ付加
+	CASE 530
+		LOCALS = [消費26]敵全体にDa.属性ダメージ+状態異常耐性を下げる
+	CASE 531
+		LOCALS = [消費13]敵単体にDa.属性ダメージ+対象のPOWを吸収
+	CASE 532
+		LOCALS = [消費26]敵小範囲に強力なDa.属性ダメージ×2
+	CASE 533
+		LOCALS = 
+	CASE 534
+		LOCALS = [消費14]敵単体にDa.属性ダメージ（残りハートに比例）
+	CASE 535
+		LOCALS = 
+	CASE 536
+		LOCALS = [消費16]味方全体のPOWを上昇
+	CASE 537
+		LOCALS = [消費10]敵単体にGUA無視のDa.属性ダメージ
+	CASE 538
+		LOCALS = 
+	CASE 539
+		LOCALS = 
+	CASE 540
+		LOCALS = 
+	CASE 541
+		LOCALS = [消費56]4人に分身する
+	CASE 542
+		LOCALS = [消費40]敵全体にDa.属性ダメージ
+	CASE 543
+		LOCALS = [消費20]敵全体にスリープ付与
+	CASE 544
+		LOCALS = [消費23]敵全体にスロウ付与
+	CASE 545
+		LOCALS = 
+	CASE 546
+		LOCALS = 
+	CASE 547
+		LOCALS = [消費16]敵全体のSPDを下げる
+	CASE 548
+		LOCALS = [消費16]敵単体にDa.属性ダメージ＋HIT・DEXを下げる
+	CASE 549
+		LOCALS = [消費22]味方全体のSPD上昇＋Da.耐性上昇
+	CASE 550
+		LOCALS = [消費8]敵単体にDa.属性ダメージ＋カース付加
+	CASE 551
+		LOCALS = 
+	CASE 552
+		LOCALS = 
+	CASE 553
+		LOCALS = 
+	CASE 554
+		LOCALS = 
+	CASE 555
+		LOCALS = 
+	CASE 556
+		LOCALS = 
+	CASE 557
+		LOCALS = 
+	CASE 558
+		LOCALS = 
+	CASE 559
+		LOCALS = 
+	CASE 560
+		LOCALS = 
+	CASE 561
+		LOCALS = 
+	CASE 562
+		LOCALS = 
+	CASE 563
+		LOCALS = 
+	CASE 564
+		LOCALS = 
+	CASE 565
+		LOCALS = 
+	CASE 566
+		LOCALS = 
+	CASE 567
+		LOCALS = 
+	CASE 568
+		LOCALS = 
+	CASE 569
+		LOCALS = 
+	CASE 570
+		LOCALS = 
+	CASE 571
+		LOCALS = 
+	CASE 572
+		LOCALS = 
+	CASE 573
+		LOCALS = 
+	CASE 574
+		LOCALS = 
+	CASE 575
+		LOCALS = 
+	CASE 576
+		LOCALS = 
+	CASE 577
+		LOCALS = 
+	CASE 578
+		LOCALS = 
+	CASE 579
+		LOCALS = 
+	CASE 580
+		LOCALS = 
+	CASE 581
+		LOCALS = 
+	CASE 582
+		LOCALS = 
+	CASE 583
+		LOCALS = 
+	CASE 584
+		LOCALS = 
+	CASE 585
+		LOCALS = 
+	CASE 586
+		LOCALS = 
+	CASE 587
+		LOCALS = 
+	CASE 588
+		LOCALS = 
+	CASE 589
+		LOCALS = 
+	CASE 590
+		LOCALS = 
+	CASE 591
+		LOCALS = 
+	CASE 592
+		LOCALS = 
+	CASE 593
+		LOCALS = 
+	CASE 594
+		LOCALS = 
+	CASE 595
+		LOCALS = 
+	CASE 596
+		LOCALS = 
+	CASE 597
+		LOCALS = 
+	CASE 598
+		LOCALS = 
+	CASE 599
+		LOCALS = 
+	CASEELSE
+		LOCALS = 未実装
+ENDSELECT
+RETURNF LOCALS

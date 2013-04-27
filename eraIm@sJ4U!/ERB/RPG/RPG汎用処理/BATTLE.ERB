@@ -1,0 +1,368 @@
+;戦闘開始処理
+;ARG:0	イベント戦フラグ(0:通常雑魚　1:EXエネミー　2:スキマ　3:固定敵　4:～ボス戦)
+;ARG:1	レベル補正
+;ARG:2	ランク(1～60)
+;RETURN	0:勝利 1:敗北 2:逃走
+@BATTLE_START(ARG:0, ARG:1, ARG:2)
+;LOCAL
+;0	ループ用1
+;1	ループ用2
+;2	戦闘結果
+;3	一時記憶用
+;11～20	同名キャラ判定用
+;VARSET LOCAL
+;関連フラグ全初期化
+;FOR LOCAL, 1, 11
+;	VARSET CFLAG:LOCAL:0, 0
+;	VARSET ABL:LOCAL:0, 0
+;	VARSET TALENT:LOCAL:0, 0
+;	VARSET CALLNAME:LOCAL
+;	;パートナーとしては選択できない
+;	CFLAG:LOCAL:パートナー選択可 = -1
+;NEXT
+VARSET LOCAL
+FOR LOCAL, 1080, 1085
+	IF FLAG:LOCAL > 0
+		CFLAG:(FLAG:LOCAL):現在状態 = 0
+		CFLAG:(FLAG:LOCAL):残り待機時間 = 1
+		CFLAG:(FLAG:LOCAL):行動の対象 = 0
+		CFLAG:(FLAG:LOCAL):集中フラグ = 0
+		;既に気絶している場合最初から行動不能
+		IF CFLAG:(FLAG:LOCAL):気絶状態 == 0
+			CFLAG:(FLAG:LOCAL):現在状態 = -1
+		ENDIF
+	ENDIF
+NEXT
+;
+;CALL INIT_INVOKE_SKILL
+;CALL BATTLE_FIRST_EVENT(ARG:0)
+
+;戦闘中フラグを立てる
+TFLAG:戦闘中 = 1
+;メインタイマー初期化
+TFLAG:カウントタイマー = 10
+TFLAG:ループカウント = 0
+;イベント戦フラグ記憶
+TFLAG:イベント戦 = ARG
+
+;敵の種類決定
+;CALL SELECT_ENEMY(ARG:0, ARG:2)
+;敵の能力
+;FOR LOCAL, 1, 11
+;	CALL SET_ENEMY_STATUS(TFLAG:(LOCAL + 1000), ARG:1, LOCAL, (ARG:2 / 2 + 1))
+;NEXT
+
+;口上
+IF TFLAG:0 >= 4
+	FLAG:フェス中口上 = 18
+ELSE
+	FLAG:フェス中口上 = 14
+ENDIF
+
+FOR LOCAL, 1080, 1085
+	IF FLAG:LOCAL >= 0
+		CALL KOJO(FLAG:LOCAL, ARG:0)
+	ENDIF
+NEXT
+
+;PRINTFORMW Ｌｉｖｅバトル！
+;PRINTFORM %CALLNAME:1%
+;IF TFLAG:1002
+;	PRINTFORM 達
+;ENDIF
+;PRINTFORMW が現れた！
+
+
+;同名キャラが居た場合にABC追加
+FOR LOCAL, 11, 21
+	LOCAL:LOCAL = 0
+NEXT
+FOR LOCAL, 1, 11
+	IF TFLAG:(LOCAL + 1000) > 0
+		FOR LOCAL:1, 11, 21
+			IF LOCAL:(LOCAL:1) == 0
+				;最初の同名キャラ見つけた場合、IDを保存
+				LOCAL:(LOCAL:1) = TFLAG:(LOCAL + 1000) * 100
+				;LOCAL1の処理をやめ、次のLOCAL0に移動する
+				BREAK
+			ELSEIF (LOCAL:(LOCAL:1) / 100) == TFLAG:(LOCAL + 1000)
+				;保存済みの同名キャラが居た場合、IDを+1してABC追加
+				LOCAL:(LOCAL:1) += 1
+				CALL ADD_NAME(LOCAL, (LOCAL:(LOCAL:1) % 100))
+				BREAK
+			ENDIF
+		NEXT
+	ENDIF
+NEXT
+;最後にAのチェック
+FOR LOCAL:1, 11, 21
+	IF LOCAL:(LOCAL:1) > 0
+		FOR LOCAL, 1, 11
+			;最初に見つけた同IDがA　一人だけならつけない
+			IF ((LOCAL:(LOCAL:1) / 100) == TFLAG:(LOCAL + 1000)) && ((LOCAL:(LOCAL:1) % 100) > 0)
+				CALL ADD_NAME(LOCAL, 0)
+				BREAK
+			ENDIF
+		NEXT
+	ENDIF
+NEXT
+
+;PTと敵のステータス再計算
+CALL STATUS_RENEW(1)
+CALL STATUS_RENEW(2)
+
+;敵を完全回復
+FOR LOCAL, 1, 11
+	IF TFLAG:(LOCAL + 1000) > 0
+		BASE:LOCAL:HP = MAXBASE:LOCAL:HP
+		BASE:LOCAL:MP = MAXBASE:LOCAL:MP
+	ELSE
+		CFLAG:LOCAL:気絶状態 = 1
+	ENDIF
+NEXT
+
+RESULT = 0
+;先制攻撃判定
+IF TFLAG:イベント戦 == 0
+	CALL CHECK_FIRST_ATTACK
+ENDIF
+
+IF RESULT == 1
+	;味方の先制攻撃
+	PRINTFORMW イニシアティブを取った！
+	TFLAG:先制攻撃 = 1
+	FOR LOCAL, 1080, 1085
+		CALL SET_DEFAULT_WAIT(FLAG:LOCAL)
+		IF FLAG:LOCAL > 0
+			CFLAG:(FLAG:LOCAL):残り待機時間 = 1
+		ENDIF
+	NEXT
+	FOR LOCAL, 1, 11
+		IF TFLAG:(LOCAL + 1000) > 0
+			CALL SET_DEFAULT_WAIT, LOCAL
+			CFLAG:LOCAL:残り待機時間 += CFLAG:LOCAL:残り待機時間 + 30 + RAND:21
+		ENDIF
+	NEXT
+ELSEIF RESULT == 2
+	;敵の先制攻撃
+	PRINTFORMW イニシアティブを取られた！
+	FOR LOCAL, 1080, 1085
+		CALL SET_DEFAULT_WAIT(FLAG:LOCAL)
+		IF FLAG:LOCAL > 0
+			CFLAG:(FLAG:LOCAL):残り待機時間 += CFLAG:(FLAG:LOCAL):残り待機時間 * 2 + RAND:41
+		ENDIF
+	NEXT
+	FOR LOCAL, 1, 11
+		IF TFLAG:(LOCAL + 1000) > 0
+			CALL SET_DEFAULT_WAIT, LOCAL
+			CFLAG:LOCAL:残り待機時間 = 1
+		ENDIF
+	NEXT
+ELSE
+	;通常
+	FOR LOCAL, 1080, 1085
+		CALL SET_DEFAULT_WAIT(FLAG:LOCAL)
+		IF FLAG:LOCAL > 0
+			CFLAG:(FLAG:LOCAL):残り待機時間 += RAND:41
+		ENDIF
+	NEXT
+	;何故かループの最後が10の部分
+	FOR LOCAL, 1, 11
+		IF TFLAG:(LOCAL + 1000) > 0
+			CALL SET_DEFAULT_WAIT, LOCAL
+			CFLAG:LOCAL:残り待機時間 += RAND:61
+		ENDIF
+	NEXT
+ENDIF
+
+;CALL BATTLE_FIRST_EVENT(ARG:0)
+;レート設定
+TFLAG:VOレート = 10000
+TFLAG:VIレート = 10000
+TFLAG:DAレート = 10000
+
+TFLAG:カウントタイマー = 10
+TFLAG:ループカウント = 0
+
+FOR LOCAL, 1080, 1085
+	IF FLAG:LOCAL > 0
+		;★を一時保存
+		CFLAG:(FLAG:LOCAL):変化前最大★保存 = MAXBASE:(FLAG:LOCAL):HP
+	ENDIF
+NEXT
+FOR LOCAL, 1, 11
+	IF TFLAG:(1000 + LOCAL) > 0
+		;★を一時保存
+		CFLAG: LOCAL:変化前最大★保存 = CFLAG:LOCAL:敵★
+	ENDIF
+NEXT
+FOR LOCAL, 1080, 1085
+	IF FLAG:LOCAL > 0
+		;ハート（思い出）を一時保存
+		CFLAG:(FLAG:LOCAL):変化前最大ハート保存 = MAXBASE:(FLAG:LOCAL):MP
+	ENDIF
+NEXT
+
+;敵の座標を設定
+FOR LOCAL ,1, 11
+	IF LOCAL < 6
+		CFLAG:LOCAL:X座標 = LOCAL
+		CFLAG:LOCAL:Y座標 = 0
+	ELSE
+		CFLAG:LOCAL:X座標 = LOCAL - 1
+		CFLAG:LOCAL:Y座標 = 1
+	ENDIF
+NEXT
+
+;メイン処理に移行
+CALL BATTLE_MAIN_LOOP
+LOCAL:2 = RESULT
+
+;終了処理
+
+;戦闘中のみの状態変化を戻す
+FOR LOCAL, 1080, 1085
+	IF FLAG:LOCAL > 0
+		;★、ハートを元に戻す
+		MAXBASE:(FLAG:LOCAL):HP = CFLAG:(FLAG:LOCAL):変化前最大★保存
+		MAXBASE:(FLAG:LOCAL):MP = CFLAG:(FLAG:LOCAL):変化前最大ハート保存
+		VARSET CFLAG:(FLAG:LOCAL):0, 0, 1031, 1039
+		VARSET CFLAG:(FLAG:LOCAL):0, 0, 1041, 1160
+			
+	ENDIF
+NEXT
+
+
+
+;PTのステータス再計算
+CALL STATUS_RENEW(1)
+
+;戦闘中フラグを下げる
+TFLAG:戦闘中 = 0
+
+IF LOCAL:2 == 0
+	;勝利
+	;口上
+	IF TFLAG:イベント戦 >= 4
+		FLAG:フェス中口上 = 21
+	ELSE
+		FLAG:フェス中口上 = 17
+	ENDIF
+	FOR LOCAL, 1080, 1085
+		IF FLAG:LOCAL >= 0
+			CALL KOJO(FLAG:LOCAL, ARG:0)
+		ENDIF
+	NEXT
+	;CALL SENGOTEATE
+	PRINTFORMW %CALLNAME:(FLAG:リーダー)%達はLiveバトルに勝利した！
+	FLAG:現在の戦闘回数 += 1
+	CALL GET_EXP(TFLAG:獲得経験値)
+	CALL LV_UP
+		IF TFLAG:獲得金額 > 0
+		;能力などによる補正
+		;金
+		CALL GET_MAX_CFLAG_PT(1167)
+		LOCAL:3 = RESULT
+		TFLAG:獲得金額 = TFLAG:獲得金額 * (100 + LOCAL:3) / 100
+		
+		;スカウトフィンガー(気絶していないPT全員のLV総計*7%増加(最大35*5＝175%増))
+		LOCAL:3 = 0
+		FOR LOCAL, 1080, 1085
+			IF FLAG:LOCAL >= 0 && CFLAG:(FLAG:LOCAL):気絶状態 == 0
+				LOCAL:3 += ABL:(FLAG:LOCAL):スカウトフィンガー
+			ENDIF
+		NEXT
+		TFLAG:獲得金額 = TFLAG:獲得金額 * (100 + LOCAL:3 * 7) / 100
+		
+		PRINTFORML %ADD_COMMA(TFLAG:獲得金額)%Ｇ手に入れた！
+		MONEY:0 += TFLAG:獲得金額
+	ENDIF
+	WAIT
+	;個別ドロップ判定
+	CALL GET_MAX_ABL_PT(227)
+	SIF RESULT
+		TFLAG:変化アイテム発見率 = 500
+	FOR LOCAL, 1, 11
+		IF TFLAG:(LOCAL + 1000) > 0
+			IF TFLAG:変化アイテム発見率 > 0
+				IF CFLAG:LOCAL:ドロップ確率1 > 0
+					CFLAG:LOCAL:ドロップ確率1 += TFLAG:変化アイテム発見率
+				ENDIF
+				IF CFLAG:LOCAL:ドロップ確率2 > 0
+					CFLAG:LOCAL:ドロップ確率2 += TFLAG:変化アイテム発見率
+				ENDIF
+				IF CFLAG:LOCAL:ドロップ確率3 > 0
+					CFLAG:LOCAL:ドロップ確率3 += TFLAG:変化アイテム発見率
+				ENDIF
+				IF CFLAG:LOCAL:ドロップ確率1 > RAND:10000
+					CALL GET_UNCERTAIN_ITEM(CFLAG:LOCAL:ドロップアイテム1)
+				ENDIF
+				IF CFLAG:LOCAL:ドロップ確率2 > RAND:10000
+					CALL GET_UNCERTAIN_ITEM(CFLAG:LOCAL:ドロップアイテム2)
+				ENDIF
+				IF CFLAG:LOCAL:ドロップ確率3 > RAND:10000
+					CALL GET_UNCERTAIN_ITEM(CFLAG:LOCAL:ドロップアイテム3)
+				ENDIF
+			ELSE
+				IF CFLAG:LOCAL:ドロップ確率1 > RAND:10000
+					CALL GET_UNCERTAIN_ITEM(CFLAG:LOCAL:ドロップアイテム1)
+				ENDIF
+				IF CFLAG:LOCAL:ドロップ確率2 > RAND:10000
+					CALL GET_UNCERTAIN_ITEM(CFLAG:LOCAL:ドロップアイテム2)
+				ENDIF
+				IF CFLAG:LOCAL:ドロップ確率3 > RAND:10000
+					CALL GET_UNCERTAIN_ITEM(CFLAG:LOCAL:ドロップアイテム3)
+				ENDIF
+			ENDIF
+		ENDIF
+	NEXT
+	
+	;本当はここで呼び出したくないけど
+	;竜宮小町戦後
+	IF FLAG:現在挑戦中仕事 == 31
+		CALL STAGE_31_CLEAR
+	ENDIF
+	;ジュピター戦後
+	IF FLAG:現在挑戦中仕事 == 33 && TFLAG:イベント戦 == 16
+		CALL STAGE_33_CLEAR
+	ENDIF
+	;ボス戦終了処理
+	IF TFLAG:イベント戦 >= 4
+		CALL BOSS_END
+	ENDIF
+	FLAG:戦闘回避カウンタ = 4
+	RETURN 0
+ELSEIF LOCAL:2 == 1
+	;敗北
+	;口上
+	IF TFLAG:イベント戦 >= 4
+		FLAG:フェス中口上 = 20
+	ELSE
+		FLAG:フェス中口上 = 16
+	ENDIF
+	FOR LOCAL, 1080, 1085
+		IF FLAG:LOCAL >= 0
+			CALL KOJO(FLAG:LOCAL, ARG:0)
+		ENDIF
+	NEXT
+	CALL WIPEOUT
+	RETURN 1
+ELSEIF LOCAL:2 == 2
+	;逃走
+	;口上
+	IF TFLAG:イベント戦 >= 4
+		FLAG:フェス中口上 = 19
+	ELSE
+		FLAG:フェス中口上 = 15
+	ENDIF
+	FOR LOCAL, 1080, 1085
+		IF FLAG:LOCAL >= 0
+			CALL KOJO(FLAG:LOCAL, ARG:0)
+		ENDIF
+	NEXT
+	PRINTFORMW %CALLNAME:(FLAG:リーダー)%達は逃げ出した！
+	;難易度LUNAは逃げても戦闘回数増加
+	RETURN 2
+ENDIF
+
+;

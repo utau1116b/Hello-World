@@ -1,0 +1,20 @@
+;アイテム入手処理
+;ARG:0	手に入れるアイテムのID
+;ARG:1	個数
+@GET_ITEM(ARG:0, ARG:1)
+;LOCAL
+;0	LOOP
+
+;ARG:1省略時は1個入手扱い
+IF ARG:1 == 0
+	ARG:1 = 1
+ENDIF
+
+ITEM:(ARG:0) += ARG:1
+
+;入手済みフラグを立てる
+IF (FLAG:(3500 + ARG:0) == 0) && (ARG:1 >= 1)
+	FLAG:(3500 + ARG:0) = 1
+ENDIF
+
+CALL CHECK_STORAGE

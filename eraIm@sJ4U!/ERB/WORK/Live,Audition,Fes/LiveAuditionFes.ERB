@@ -1,0 +1,181 @@
+;まずオーディションを始めるなら、仕事番号を受け取る;
+;そして挨拶は今のところ省く
+;オーディションのデータを入力;
+;曲を設定してスタート
+;ARG	仕事番号
+@LAF(ARG)
+;敵フラグ初期化
+FOR LOCAL:0, 1, 11
+	VARSET CFLAG:(LOCAL:0):0, 0
+	VARSET ABL:(LOCAL:0):0, 0
+	VARSET TALENT:(LOCAL:0):0, 0
+	VARSET CALLNAME:(LOCAL:0)
+	;パートナー選択できないフラグは立てたまま
+	CFLAG:LOCAL:パートナー選択可 = -1
+NEXT
+VARSET TFLAG
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		CFLAG:(FLAG:(LOCAL:0)):現在状態 = 0
+		CFLAG:(FLAG:(LOCAL:0)):残り待機時間 = 1
+		CFLAG:(FLAG:(LOCAL:0)):行動の対象 = 0
+		CFLAG:(FLAG:(LOCAL:0)):集中フラグ = 0
+		;既に気絶している場合最初から行動不能
+		IF CFLAG:(FLAG:(LOCAL:0)):気絶状態 == 0
+			CFLAG:(FLAG:(LOCAL:0)):現在状態 = -1
+		ENDIF
+	ENDIF
+NEXT
+SELECTCASE ARG
+	;オーディション
+	CASE 1000 TO 1099
+		;合格点を入力
+		CALL SET_AUDITION(ARG)
+		TFLAG:戦闘中 = 2
+	;ライブ
+	CASE 1100 TO 1199
+		CALL SET_LIVE(ARG)
+		TFLAG:戦闘中 = 3
+	;フェス
+	CASE 1200 TO 1299
+		CALL SET_FES(ARG)
+		TFLAG:戦闘中 = 4
+	;昇格試験
+	CASE 999
+		CALL SET_FES(999)
+		TFLAG:戦闘中 = 4
+	CASEELSE
+	
+ENDSELECT
+
+;思い出代入
+TFLAG:味方思い出 = SUM_思い出() + 1
+TFLAG:敵思い出 = BASE:1:思い出
+
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:LOCAL > 0
+		CALL SET_DEFAULT_WAIT(FLAG:(LOCAL:0))
+		IF FLAG:(LOCAL:0) > 0
+			CFLAG:(FLAG:(LOCAL:0)):残り待機時間 += RAND:41
+		ENDIF
+	ENDIF
+NEXT
+
+;PTと敵のステータス再計算
+CALL STATUS_RENEW(1)
+CALL STATUS_RENEW(2)
+
+;フェスなら敵待機時間代入
+SIF TFLAG:戦闘中 == 4
+	CFLAG:1:残り待機時間 = 10
+
+;	各レート設定
+TFLAG:VOレート = 10000
+TFLAG:VIレート = 10000
+TFLAG:DAレート = 10000
+
+
+
+;	時間設定
+
+CALL MUSIC_TIME()
+TFLAG:アピールタイム = RESULT
+TFLAG:アピールタイム記憶 = TFLAG:アピールタイム
+
+;	ボルテージ設定
+
+BASE:0:ボルテージ = 0
+BASE:1:ボルテージ = 0
+
+;	メインタイマーの設定
+
+TFLAG:カウントタイマー = 10
+TFLAG:ループカウント = 0
+
+PRINTL 
+CALL MESSAGE, "", "ステージが始まります！" , "/" , 0 , "LEFT", "", , 2
+IF ARG == 999
+	CALL PRINT_クリア目標(1)
+ELSE
+	CALL PRINT_クリア目標(0)
+ENDIF
+CALL COUNTDOWN(3900)
+
+;	オーディション開始
+;PRINTFORMW 戦闘中フラグ{TFLAG:戦闘中}
+CALL LAF_MAIN_LOOP
+CALL MESSAGE, "", "そこまで！" , "/" , 0 , "LEFT", "", , 2
+PRINTL 
+PRINTFORMW ・
+PRINTFORMW ・
+PRINTFORMW ・
+PRINTL 
+PRINTFORMW ！
+PRINTL 
+
+SELECTCASE ARG
+	;オーディション
+	CASE 1000 TO 1099
+	;ライブ
+	CASE 1100 TO 1199
+	;フェス
+	CASE 1200 TO 1299
+;		合格
+		IF TFLAG:味方スコア >= TFLAG:敵スコア
+			TFLAG:合格フラグ = 1
+		ELSE
+			TFLAG:合格フラグ = 0
+		ENDIF
+	;昇格試験
+	CASE 999
+		IF TFLAG:味方スコア >= TFLAG:敵スコア
+			CALL PRINTGRADW(0Xffc400, -256 * 5, "WINNER!!")
+			CALL リザルト画面
+			RETURN 0
+		ELSE
+			CALL PRINTGRADW(0X7283c8, -256 * 5, "LOSER…")
+			CALL リザルト画面
+			RETURN 1
+		ENDIF
+	CASEELSE
+	
+ENDSELECT
+
+;ハイスコア更新
+IF TFLAG:味方スコア > FLAG:リリース中ハイスコア
+	FLAG:リリース中ハイスコア = TFLAG:味方スコア
+	SONG:(FLAG:リリース中楽曲):0 = TFLAG:味方スコア
+	IF TFLAG:味方スコア > FLAG:ハイスコア
+		FLAG:ハイスコア = TFLAG:味方スコア
+	ENDIF
+ENDIF
+
+
+IF TFLAG:合格フラグ == 1
+	FLAG:仕事成功 = 1
+	FONTBOLD
+	IF TFLAG:戦闘中 == 4
+		CALL PRINTGRADW(0Xffc400, -256 * 5, "WINNER!!")
+	ELSE
+		CALL PRINTGRADW(0Xffc400, -256 * 3, "STAGE CLEAR!!")
+	ENDIF
+	FONTREGULAR
+	CALL リザルト画面
+	CALL LAF終了メッセージ
+	CALL RELATIONS_UP(2)
+	CALL 自信_UP(1)
+	SIF TFLAG:記者判定
+		CALL GET_記者
+	CALL LAFクリア(1)
+ELSE
+	IF TFLAG:戦闘中 == 4
+		CALL PRINTGRADW(0X7283c8, -256 * 5, "LOSER…")
+	ELSE
+		CALL PRINTGRADW(0X7283c8, -256 * 3, "STAGE FAILED…")
+	ENDIF
+	CALL リザルト画面
+	CALL LAF終了メッセージ
+	CALL RELATIONS_UP(-2)
+	CALL 自信_UP(-1)
+	CALL LAFクリア(0)
+ENDIF

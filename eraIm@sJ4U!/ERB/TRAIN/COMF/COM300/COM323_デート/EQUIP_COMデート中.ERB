@@ -1,0 +1,317 @@
+;-------------------------------------------------
+;装着継続の処理
+;-------------------------------------------------
+@EQUIP_COMデート中(ARG)
+;ターゲットの時のみ
+SIF ARG != TARGET
+	RETURN 0
+CALL DATE_NAME
+PRINTFORML ＜%PLACE_NAME(TEQUIP:デート中)%でデート中＞
+
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+DOWNBASE:ARG:体力 += 0
+DOWNBASE:ARG:気力 += 35
+
+SOURCE:ARG:歓楽 += 200
+SOURCE:ARG:接触 += 100
+SOURCE:ARG:征服 += 300
+SOURCE:ARG:受動 += 600
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+;恋慕・恋人・親愛による気力消費軽減（デートが長続きする、の再現だとでも脳内補完）
+SIF TALENT:85
+	DOWNBASE:気力 -= 5
+SIF TALENT:153
+	DOWNBASE:気力 -= 5
+SIF TALENT:88
+	DOWNBASE:気力 -= 10
+
+SELECTCASE RAND:7
+	CASE 0
+		TIMES SOURCE:歓楽 , 0.10
+		TIMES SOURCE:接触 , 0.50
+		TIMES SOURCE:征服 , 0.50
+		TIMES SOURCE:受動 , 0.50
+	CASE 6
+		TIMES SOURCE:歓楽 , 1.00
+		TIMES SOURCE:接触 , 1.00
+		TIMES SOURCE:征服 , 1.00
+		TIMES SOURCE:受動 , 1.00
+	CASEELSE
+		TIMES SOURCE:歓楽 , 1.50
+		TIMES SOURCE:接触 , 1.50
+		TIMES SOURCE:征服 , 1.50
+		TIMES SOURCE:受動 , 1.50
+ENDSELECT
+
+;恋慕
+IF TALENT:85
+	TIMES SOURCE:歓楽 , 1.10
+	TIMES SOURCE:接触 , 1.30
+	TIMES SOURCE:征服 , 1.10
+	TIMES SOURCE:受動 , 1.20
+ENDIF
+;恋人
+IF TALENT:153
+	TIMES SOURCE:歓楽 , 1.20
+	TIMES SOURCE:接触 , 1.50
+	TIMES SOURCE:征服 , 1.20
+	TIMES SOURCE:受動 , 1.10
+ENDIF
+;親愛
+IF TALENT:88
+	TIMES SOURCE:歓楽 , 1.50
+	TIMES SOURCE:接触 , 2.00
+	TIMES SOURCE:征服 , 1.50
+	TIMES SOURCE:受動 , 1.50
+ENDIF
+
+;実行中の効果は、実行時の20%
+TIMES SOURCE:歓楽 , 0.20
+TIMES SOURCE:接触 , 0.20
+TIMES SOURCE:征服 , 0.20
+TIMES SOURCE:受動 , 0.20
+
+;-------------------------------------------------
+;行き先に応じた補正
+;-------------------------------------------------
+
+SELECTCASE TEQUIP:デート中
+	;霧の湖
+	CASE 2
+		;露出のソースに+200～500
+		SOURCE:12 += RAND:301 + 200
+		;夏は更にUP
+		IF DAY:2 == 1
+			SOURCE:12 += RAND:201
+		;冬は更にDOWNするかわりに接触のソースに+0～10
+		ELSEIF DAY:2 == 3
+			SOURCE:12 -= RAND:201
+			SOURCE:9 += RAND:11
+		ENDIF
+	;花畑
+	CASE 3
+	;肝試し
+	CASE 4
+		;不安のソースに+200～500
+		SOURCE:23 += RAND:301 + 200
+		;夏は更にUP
+		IF DAY:2 == 1
+			SOURCE:23 += 100
+		ENDIF
+		;素質発覚イベント
+		;CALL FIND_BUSTSIZE
+	;カラオケ
+	CASE 5
+		;ネチョ中は、歌わない代わりに狭いところなのでよくくっつく
+		IF TFLAG:44
+			SOURCE:9 += RAND:301 + 200
+		ELSE
+			;歌唱経験に＋1
+			
+			EXP:歌唱経験 += 1
+		ENDIF
+	;温泉
+	CASE 6
+		;どちらかと言うとこのままウフフ突入する時向け
+		;毎ターン汚れリセット
+		;合意持ちだと露出に+500～+1000（一緒に入るよ！）
+	
+		STAIN:0 = 0
+		STAIN:1 = 0
+		STAIN:2 = 2
+		STAIN:3 = 1
+		STAIN:4 = 8
+		STAIN:5 = 0
+	
+		STAIN:PLAYER:0 = 0
+		STAIN:PLAYER:1 = 0
+		STAIN:PLAYER:2 = 2
+		STAIN:PLAYER:3 = 1
+		STAIN:PLAYER:4 = 8
+		STAIN:PLAYER:5 = 0
+
+		IF TALENT:152
+			SOURCE:12 += RAND:501 + 500
+			;冬は更にUP
+			IF DAY:2 == 3
+				SOURCE:12 += RAND:501 + 500
+			ENDIF
+		ENDIF
+	;図書館
+	CASE 7
+		;事務能力もここで上がる
+		;習得増加
+		CUP:習得 += 200
+		REPEAT ABL:2 + 1
+			CUP:習得 += RAND:101
+		REND
+		;秋は更にUP
+		IF DAY:2 == 2
+			REPEAT ABL:2 + 1
+				CUP:習得 += RAND:51
+			REND
+		ENDIF
+	;遊園地
+	CASE 30
+		;歓楽のソースに+0～200
+		SOURCE:歓楽 += RAND:201
+		;接触のソースに+0～400
+		SOURCE:9 += RAND:401
+	;水族館
+	CASE 31
+		;歓楽のソースに+0～200
+		SOURCE:歓楽 += RAND:201
+	;動物園
+	CASE 32
+		;歓楽のソースに+0～200
+		SOURCE:歓楽 += RAND:201
+		;不安のソースに+0～300
+		SOURCE:23 += RAND:301
+	;繁華街
+	CASE 33
+	;海
+	CASE 34
+		;歓楽のソースに+0～200
+		SOURCE:歓楽 += RAND:201
+		;露出のソースに+100～400
+		SOURCE:12 += RAND:301 + 100
+		;夏は更にUP
+		IF DAY:2 == 1
+			SOURCE:歓楽 += RAND:201
+			SOURCE:12 += RAND:201
+		;冬は更にDOWNするかわりに接触のソースに+0～10
+		ELSEIF DAY:2 == 3
+			SOURCE:12 -= RAND:101
+			SOURCE:9 += RAND:11
+		ENDIF
+	;ゲームセンター
+	CASE 35
+	;歓楽のソースに-300～+900
+		REPEAT 2
+			SOURCE:歓楽 += RAND:601 - 150
+		REND
+	;カジノ
+	CASE 36
+		;習得増加
+		CUP:習得 += 100
+		REPEAT ABL:2 + 1
+			CUP:習得 += RAND:51
+		REND
+		;賭博選択時以外は自動変動
+		IF !TFLAG:うふふ && SELECTCOM != [[調教:賭博]]
+			;念のため初期化
+			LOCAL = 0
+			;現金変動
+			SELECTCASE RAND:100
+				CASE 0 TO 32
+					;33%でお金が+1000～1990
+					LOCAL = RAND:991 + 1000
+				CASE 33 TO 98
+					;66%でお金が-500～1000
+					LOCAL -= 500
+					REPEAT 3
+						LOCAL += RAND:501
+					REND
+				CASEELSE
+					REPEAT 10
+						LOCAL += RAND:910
+					REND
+					;1%でお金が+10000～20000
+					LOCAL += RAND:911 + 10000
+			ENDSELECT
+			IF LOCAL < 0
+				PRINTFORML ＜ギャンブル中＞　　{LOCAL*(-1)}Ｇ負けました…
+			ELSEIF LOCAL
+				PRINTFORML ＜ギャンブル中＞　　{LOCAL}Ｇ勝ちました！
+			ENDIF
+			MONEY += LOCAL
+		ENDIF
+	;博物館
+	CASE 37
+		;習得増加
+		CUP:習得 += 100
+		REPEAT ABL:2 + 1
+			CUP:習得 += RAND:51
+		REND
+		;秋は更にUP
+		IF DAY:2 == 2
+			REPEAT ABL:2 + 1
+				CUP:習得 += RAND:26
+			REND
+		ENDIF
+		;接触のソースに+0～10
+		SOURCE:9 += RAND:11
+	;コメディ
+	CASE 50
+		;歓楽のソースに+150～450
+		SOURCE:歓楽 += RAND:301 + 150
+		;接触のソースに+0～50
+		SOURCE:9 += RAND:51
+	;アクション
+	CASE 51
+		;歓楽のソースに+200～700
+		SOURCE:歓楽 += RAND:501 + 200
+		;接触のソースに+0～50
+		SOURCE:9 += RAND:51
+	;ホラー
+	CASE 52
+		;不安のソースに+200～600
+		SOURCE:23 += RAND:401 + 200
+		;接触のソースに+5～55
+		SOURCE:9 += RAND:51 + 5
+	;恋愛
+	CASE 53
+		;接触のソースに+10～60
+		SOURCE:9 += RAND:51 + 10
+	;ポルノ
+	CASE 54
+		;ネチョしても追い出されない（ポルノだしね！）
+		IF TFLAG:44
+			;露出のソースに+200～1100
+			SOURCE:12 += RAND:901 + 200
+			;接触のソースに+200～700
+			SOURCE:9 += RAND:501 + 200
+		ELSE
+			;露出のソースに+200～600
+			SOURCE:12 += RAND:401 + 200
+			;接触のソースに+100～500
+			SOURCE:9 += RAND:401 + 100
+		ENDIF
+	;遊覧船
+	CASE 39
+		;歓楽のソースに+0～200
+		SOURCE:歓楽 += RAND:201
+		;接触のソースに+10～110
+		SOURCE:9 += RAND:101 + 10
+	;牧場
+	CASE 40
+		;歓楽のソースに+50～250
+		SOURCE:歓楽 += RAND:201 + 50
+		;不安のソースに+100～400
+		SOURCE:23 += RAND:301 + 100
+	;教会
+	CASE 41
+		;習得増加(やぶ牧師だから命蓮寺より低い？)
+		CUP:習得 += 30
+		REPEAT ABL:2 + 1
+			CUP:習得 += RAND:11
+		REND
+	;スポーツ観戦
+	CASE 42
+		;体力気力消費(応援とか雰囲気で消費するよ！)
+		DOWNBASE:体力 += RAND:11 + 5
+		DOWNBASE:気力 += RAND:20 + 10
+		;歓楽のソースに+400～800
+		SOURCE:歓楽 += RAND:401 + 400
+ENDSELECT
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+EXP:デート経験++
+RETURN 1

@@ -1,0 +1,754 @@
+;=============================================================================
+;キャラの能力・素質・経験・刻印検索
+;=============================================================================
+;TFLAG:0の値で検索する属性を指定(1:能力, 2:素質, 3:経験, 4:刻印)
+;@SHOW_SEARCH_CHARADATAのARGの値(@SEARCH_CHARADATA_INPUTのRESULTの値に依存)で属性の番号を指定
+;(例：TFLAG:0 = 1, @SEARCH_CHARADATA_INPUTのRESULT = 1でＣ感覚を所持しているキャラを検索・表示されるように)
+;--------------------------------------------------
+;検索メインメニュー
+;--------------------------------------------------
+@SEARCH_CHARADATA_MENU
+TFLAG:0 = 0
+DRAWLINE
+PRINTL 何を検索しますか？
+PRINTL  [1] 能力
+PRINTL  [2] 素質
+PRINTL  [3] 経験
+PRINTL  [4] 刻印
+PRINTL  [5] 珠
+PRINTL  [6] 記念日
+PRINTL  [7] 体力気力
+;PRINTL  [8] 好感度稼ぎストレスなど
+PRINTL  [9] 称号・主人への呼び名
+IF TALENT:MASTER:998
+	PRINTL [10] Debug用CFLAG
+	PRINTL [11] Debug用CSTR
+ENDIF
+PRINTL [100]やめる
+DRAWLINE
+$INPUT_LOOP
+INPUT
+IF RESULT == 100
+	RETURN 1
+ELSEIF RESULT == 1
+	TSTR:99 = 能力
+ELSEIF RESULT == 2
+	TSTR:99 = 素質
+ELSEIF RESULT == 3
+	TSTR:99 = 経験
+ELSEIF RESULT == 4
+	TSTR:99 = 刻印
+ELSEIF RESULT == 5
+	TSTR:99 = 珠
+ELSEIF RESULT == 6
+	TSTR:99 = 記念日
+ELSEIF RESULT == 7
+	TSTR:99 = 体力気力
+;ELSEIF RESULT == 8
+;	TSTR:99 = 好感度稼ぎストレスなど
+ELSEIF RESULT == 9
+	TSTR:99 = 称号・主人への呼び名
+ELSEIF RESULT == 10 && TALENT:MASTER:998
+	TSTR:99 = Debug用CFLAG
+ELSEIF RESULT == 11 && TALENT:MASTER:998
+	TSTR:99 = Debug用CSTR
+ELSE
+	GOTO INPUT_LOOP
+ENDIF
+TFLAG:0 = RESULT
+CALL SEARCH_CHARADATA_INPUT
+RESTART
+
+;--------------------------------------------------
+;キャラ能力検索
+;--------------------------------------------------
+@SEARCH_CHARADATA_INPUT
+VARSET LOCAL, 0
+VARSET LOCALS,""
+SPLIT "誕生日,仲間になった日,結婚記念日,契約記念日,",",",LOCALS
+$PRINT_LIST
+LOCAL:2 = 0
+DRAWLINE
+PRINTFORML 検索する%TSTR:99%\@(TFLAG:0 == 10) ? (0～9999) # \@\@(TFLAG:0 == 11) ? (0～99) # \@を選択してください。 ＜page.{LOCAL:1}＞
+IF TFLAG:0 == 6
+	REPEAT 4
+		LOCAL:(COUNT + 100) = 0
+		TSTR:0 = %LOCALS:COUNT%
+		SIF LOCAL:2 / 30 >= LOCAL:1 && LOCAL:2 / 30 < 1 + LOCAL:1
+			PRINTFORMLC [{COUNT, 3}] %TSTR:0, 12, LEFT%
+		LOCAL:2 += 1
+		LOCAL:(COUNT + 100) = 1
+	REND
+ELSEIF TFLAG:0 != 10 && TFLAG:0 != 11
+	REPEAT 300
+		LOCAL:(COUNT + 100) = 0
+		IF TFLAG:0 == 1
+			SIF COUNT >= 100
+				CONTINUE
+			SIF STRLENS(ABLNAME:COUNT) <= 0
+				CONTINUE
+			TSTR:0 = %ABLNAME:COUNT%
+		ELSEIF TFLAG:0 == 2
+			SIF STRLENS(TALENTNAME:COUNT) <= 0
+				CONTINUE
+			TSTR:0 = %TALENTNAME:COUNT%
+			SIF COUNT == 164 && (NO:MASTER == 21 || NO:MASTER == 13)
+				TSTR:0 = 式
+		ELSEIF TFLAG:0 == 3
+			SIF COUNT >= 100
+				CONTINUE
+			SIF STRLENS(EXPNAME:COUNT) <= 0
+				CONTINUE
+			TSTR:0 = %EXPNAME:COUNT%
+		ELSEIF TFLAG:0 == 4
+			SIF COUNT >= 12
+				CONTINUE
+			SIF STRLENS(MARKNAME:COUNT) <= 0
+				CONTINUE
+			TSTR:0 = %MARKNAME:COUNT%
+		ELSEIF TFLAG:0 == 5
+			SIF (COUNT >= 20 && COUNT < 30) || COUNT > 198
+				CONTINUE
+			SIF STRLENS(PALAMNAME:COUNT) <= 0
+				CONTINUE
+			TSTR:0 = %PALAMNAME:COUNT%の珠
+		ELSEIF TFLAG:0 == 7
+			SIF COUNT >= 2
+				CONTINUE
+			SIF STRLENS(BASENAME:COUNT) <= 0
+				CONTINUE
+			TSTR:0 = %BASENAME:COUNT%
+		ELSEIF TFLAG:0 == 8
+			SIF STRLENS(CFLAGNAME:COUNT) <= 0
+				CONTINUE
+			SIF (COUNT == 31 || (COUNT >= 60 && COUNT <= 64)) && TALENT:MASTER:198 == 0 && TALENT:MASTER:998 == 0
+				CONTINUE
+			SIF (COUNT == 80 || COUNT == 81) && FLAG:13 & 1024 == 0
+				CONTINUE
+			TSTR:0 = %CFLAGNAME:COUNT%
+		ELSEIF TFLAG:0 == 9
+			IF COUNT == 0
+				TSTR:0 = 称号
+			ELSEIF COUNT == 1
+				TSTR:0 = 主人への呼び名
+			ELSE
+				CONTINUE
+			ENDIF
+		ENDIF
+		SIF LOCAL:2 / 30 >= LOCAL:1 && LOCAL:2 / 30 < 1 + LOCAL:1
+			PRINTFORMLC [{COUNT, 3}] %TSTR:0, 12, LEFT%
+		LOCAL:2 += 1
+		LOCAL:(COUNT + 100) = 1
+	REND
+ENDIF
+PRINTL 
+DRAWLINE
+IF TFLAG:0 != 10 && TFLAG:0 != 11
+	PRINTFORMLC \@(LOCAL:1 <= 0) ? %" " * 16% # [1001]前のページ\@
+	PRINTLC [1000]戻る
+	PRINTFORMLC \@(LOCAL:1 >= LOCAL:2 / 30) ? %" " * 16% # [1009]次のページ\@
+ELSE
+	PRINTLC [10000]戻る
+ENDIF
+PRINTL 
+$INPUT_LOOP_0
+INPUT
+IF TFLAG:0 != 10 && TFLAG:0 != 11 && RESULT == 1000
+	RETURN 1
+ELSEIF TFLAG:0 > 9 && TFLAG:0 < 12 && RESULT == 10000
+	RETURN 1
+ELSEIF RESULT == 1001 && TFLAG:0 != 10
+	IF LOCAL:1 > 0
+		LOCAL:1 -= 1
+		GOTO PRINT_LIST
+	ELSE
+		GOTO INPUT_LOOP_0
+	ENDIF
+ELSEIF RESULT == 1009 && TFLAG:0 != 10
+	IF LOCAL:1 < LOCAL:2 / 30
+		LOCAL:1 += 1
+		GOTO PRINT_LIST
+	ELSE
+		GOTO INPUT_LOOP_0
+	ENDIF
+ELSEIF RESULT < 0 || (TFLAG:0 != 10 && TFLAG:0 != 11 && (RESULT > 300 || LOCAL:(RESULT + 100) == 0)) || (TFLAG:0 == 10 && RESULT > 9999) || (TFLAG:0 == 11 && RESULT > 99)
+	GOTO INPUT_LOOP_0
+ENDIF
+
+IF TFLAG:0 == 1
+	TSTR:0 = %ABLNAME:RESULT%
+ELSEIF TFLAG:0 == 2
+	TSTR:0 = %TALENTNAME:RESULT%
+ELSEIF TFLAG:0 == 3
+	TSTR:0 = %EXPNAME:RESULT%
+ELSEIF TFLAG:0 == 4
+	TSTR:0 = %MARKNAME:RESULT%
+ELSEIF TFLAG:0 == 5
+	TSTR:0 = %PALAMNAME:RESULT%の珠
+ELSEIF TFLAG:0 == 6
+	TSTR:0 = %LOCALS:RESULT%
+ELSEIF TFLAG:0 == 7
+	TSTR:0 = %BASENAME:RESULT%
+ELSEIF TFLAG:0 == 8
+	SIF (RESULT == 80 || RESULT == 81) && FLAG:13 & 1024 == 0
+		GOTO INPUT_LOOP_0
+	TSTR:0 = %CFLAGNAME:RESULT%
+ELSEIF TFLAG:0 == 9
+	IF RESULT == 0
+		TSTR:0 = 称号
+	ELSEIF RESULT == 1
+		TSTR:0 = 主人への呼び名
+	ENDIF
+ELSEIF TFLAG:0 == 10
+	TSTR:0 = CFLAG:{RESULT}
+ELSEIF TFLAG:0 == 11
+	TSTR:0 = CSTR:{RESULT}
+ENDIF
+CALL SHOW_SEARCH_CHARADATA, RESULT
+RESTART
+
+;--------------------------------------------------
+;キャラ検索ページ表示
+;--------------------------------------------------
+@SHOW_SEARCH_CHARADATA, ARG
+;表示させるキャラを抽出（LOCAL:2に人数）
+VARSET LOCAL, 0
+CALLF CLEAR_LIST
+REPEAT CHARANUM
+	MARK:COUNT:98 = 0
+	;失踪中のキャラは排除
+	SIF CFLAG:COUNT:4 == 1
+		CONTINUE
+	IF TFLAG:0 == 1
+		SIF ABL:COUNT:ARG == 0
+			CONTINUE
+	ELSEIF TFLAG:0 == 2
+		SIF TALENT:COUNT:ARG == 0
+			CONTINUE
+;●友情パッチ用改変
+		SIF (ARG == 85 || ARG == 153) && IS_友情(COUNT)
+			CONTINUE
+;●ここまで
+	ELSEIF TFLAG:0 == 3
+		SIF EXP:COUNT:ARG == 0
+			CONTINUE
+	ELSEIF TFLAG:0 == 4
+		SIF MARK:COUNT:ARG == 0
+			CONTINUE
+	ELSEIF TFLAG:0 == 5
+		SIF JUEL:COUNT:ARG == 0
+			CONTINUE
+	ELSEIF TFLAG:0 == 6
+		SIF CFLAG:COUNT:(ARG+3110) == 0
+			CONTINUE
+	ELSEIF TFLAG:0 == 8 || TFLAG:0 == 10
+		SIF CFLAG:COUNT:ARG == 0
+			CONTINUE
+	ELSEIF TFLAG:0 == 9 && TSTR:0 == "称号"
+		STRLENS NICKNAME:COUNT
+		SIF RESULT <= 0
+			CONTINUE
+	ELSEIF TFLAG:0 == 9 && TSTR:0 == "主人への呼び名"
+		STRLENS MASTERNAME:COUNT
+		SIF RESULT <= 0
+			CONTINUE
+	ELSEIF TFLAG:0 == 11
+		STRLENS CSTR:COUNT:ARG
+		SIF RESULT <= 0
+			CONTINUE
+	ENDIF
+
+	CALLF SET_LIST, LOCAL:2, COUNT
+	LOCAL:2 += 1
+	MARK:COUNT:98 = 1
+REND
+LOCAL:1 = (LOCAL:2 - 1) / 20
+
+$PRINT_LIST
+DRAWLINE
+PRINTFORML %TSTR:0%を所持しているキャラの一覧です ＜page.{LOCAL+1}＞
+CALL SHOW_SEARCH_LIST, LOCAL, ARG
+DRAWLINE
+PRINTFORMLC \@(LOCAL <= 0) ? %" " * 16% # [1001]前のページ\@
+PRINTLC [1000]戻る
+PRINTFORMLC \@(LOCAL >= LOCAL:1) ? %" " * 16% # [1009]次のページ\@
+PRINTL 
+$INPUT_LOOP_1
+INPUT
+IF RESULT == 1000
+	RETURN 0
+ELSEIF RESULT == 1001 && LOCAL > 0
+	LOCAL -= 1
+	GOTO PRINT_LIST
+ELSEIF RESULT == 1009 && LOCAL < LOCAL:1
+	LOCAL += 1
+	GOTO PRINT_LIST
+ELSEIF RESULT < 0 || RESULT >= CHARANUM || MARK:RESULT:98 == 0
+	GOTO INPUT_LOOP_1
+ENDIF
+
+CALL SHOW_CHARADATA_PAGE, RESULT
+RESTART
+
+;--------------------------------------------------
+;キャラ能力検索の表示
+;--------------------------------------------------
+@SHOW_SEARCH_LIST, ARG, ARG:1
+LOCAL = 0
+LOCAL:2 = 0
+IF MARK:MASTER:98 == 1
+	DRAWLINE
+	CALL ARRANGE_SEARCH_LIST, MASTER, ARG:1
+	PRINTFORML 　[0] %CALLNAME:MASTER%(主人) %STR:3%
+	LOCAL:2 += 1
+ENDIF
+DRAWLINE
+REPEAT 20
+	LOCAL = GET_LIST(COUNT + ARG * 20)
+	;条件に合わないキャラは排除
+	SIF LOCAL == 0
+		CONTINUE
+	SIF MARK:LOCAL:98 == 0
+		CONTINUE
+	IF LOCAL == TARGET
+		PRINT ☆
+	ELSEIF LOCAL == ASSI
+		PRINT ★
+	ELSEIF CFLAG:LOCAL:4 == 4
+		PRINT ◆
+	ELSEIF CFLAG:LOCAL:4 == 2
+		PRINT ◇
+	ELSEIF CFLAG:LOCAL:4 == 16
+		PRINT ■
+	ELSEIF CFLAG:LOCAL:4 == 1024
+		PRINT ▼
+	ELSEIF CFLAG:LOCAL:4 == 2048 || CFLAG:LOCAL:4 == 4096
+		PRINT ▽
+	ELSEIF CFLAG:LOCAL:1 == 2
+		PRINT ○
+	ELSE
+		PRINT 　
+	ENDIF
+	CALL ARRANGE_CHARALIST, LOCAL
+	CALL ARRANGE_CHARALIFE, LOCAL
+	CALL ARRANGE_SEARCH_LIST, LOCAL, ARG:1
+	IF (FLAG:10 & 8) && (TFLAG:0 == 3 && ((ARG:1 == 0 && CFLAG:LOCAL:11 & 1) || (ARG:1 == 1 && CFLAG:LOCAL:11 & 2) || (ARG:1 == 50 && CFLAG:LOCAL:11 & 4) || (ARG:1 == 12 && EXP:LOCAL:(ARG:1) > 999 && TALENT:MASTER:120 && CFLAG:LOCAL:18 == 0) || (ARG:1 == 13 && EXP:LOCAL:(ARG:1) > 999 && TALENT:MASTER:120 == 0 && CFLAG:LOCAL:18 == 0)))
+		FONTBOLD
+		PRINTFORML  %STR:3%
+		FONTREGULAR
+	ELSE
+		PRINTFORML  %STR:3%
+	ENDIF
+	LOCAL:2 += 1
+REND
+IF LOCAL:2 == 0
+	PRINTL 　該当するキャラはいません
+ELSE
+	PRINTL 　☆:調教中 ★:助手 ○:助手可 ◇:育児中 ◆:触手幽閉中 ■:牢収監中 ▼：売春中 ▽:ハーブ作業中を表しています
+ENDIF
+
+;-------------------------------------------------
+;検索表示補助処理
+;-------------------------------------------------
+@ARRANGE_SEARCH_LIST, ARG, ARG:1
+
+IF TFLAG:0 == 1
+	LOCAL = ABL:ARG:(ARG:1)
+ELSEIF TFLAG:0 == 3
+	LOCAL = EXP:ARG:(ARG:1)
+ELSEIF TFLAG:0 == 4
+	LOCAL = MARK:ARG:(ARG:1)
+ELSEIF TFLAG:0 == 5
+	LOCAL = JUEL:ARG:(ARG:1)
+ELSEIF TFLAG:0 == 6
+	LOCAL = CFLAG:ARG:(3110 + ARG:1)
+ELSEIF TFLAG:0 == 7
+	LOCAL = BASE:ARG:(ARG:1)
+ELSEIF TFLAG:0 == 8 || TFLAG:0 == 10
+	LOCAL = CFLAG:ARG:(ARG:1)
+ELSE
+	LOCAL = 0
+ENDIF
+;1000万以上は表示しない
+LOCAL = MIN (LOCAL, 9999999)
+
+IF TFLAG:0 == 1 || TFLAG:0 == 4
+	STR:2 = (LV{LOCAL})
+ELSEIF TFLAG:0 == 2 && ARG:1 == 0 && TALENT:ARG:(ARG:1) > 1
+	STR:2 = (再生)
+ELSEIF TFLAG:0 == 2 && ARG:1 == 121 && TALENT:ARG:(ARG:1) > 1
+	STR:2 = (玉あり)
+ELSEIF TFLAG:0 == 2 && ARG:1 == 265
+	STR:2 = {TALENT:ARG:(ARG:1)}人
+ELSEIF TFLAG:0 == 2
+	STR:2 = 
+ELSEIF TFLAG:0 == 7
+	STR:2 = ({LOCAL})
+ELSEIF TFLAG:0 == 6
+	STR:2 = ({LOCAL}日目)
+ELSEIF TFLAG:0 == 9 && TSTR:0 == "称号"
+	STR:2 = : %NICKNAME:ARG%
+ELSEIF TFLAG:0 == 9 && TSTR:0 == "主人への呼び名"
+	STR:2 = : %MASTERNAME:ARG%
+ELSEIF TFLAG:0 == 11
+	STR:2 = : %CSTR:ARG:(ARG:1)%
+ELSE
+	STR:2 = ({LOCAL})
+ENDIF
+STR:3 = %TSTR:0, 12%%STR:2%
+SIF TFLAG:0 == 2 && ARG:1 == 153 && CFLAG:ARG:156 & 1
+	STR:3 = %"相思相愛", 12%%STR:2%
+
+RETURN 1
+
+;-------------------------------------------------
+;ステータス表示(各キャラごと)
+;-------------------------------------------------
+@SHOW_CHARADATA_PAGE, ARG
+#DIM ALRAUNE, 3
+;ページ判別はLOCALで
+LOCAL = 1
+
+$PRINT_PAGE
+
+;前後のキャラを表示できるか判定
+ALRAUNE:1 = -1
+ALRAUNE:2 = -1
+FOR ALRAUNE, 0, CHARANUM
+	SIF MARK:ALRAUNE:98 == 0 || ALRAUNE == ARG
+		CONTINUE
+	IF ALRAUNE < ARG
+		ALRAUNE:1 = ALRAUNE
+	ELSE
+		ALRAUNE:2 = ALRAUNE
+		BREAK
+	ENDIF
+NEXT
+
+CALL NEW_DRAWLINE
+CALL GET_RACE , ARG
+PRINTFORM %CALLNAME:ARG%\@(NO:ARG >= 150 && NO:ARG < 200 && CALLNAME:ARG != NAME:ARG) ? (%ITEMNAME:(100+NO:ARG)%) # %" "*4%\@ 種族：%STR:2%
+SIF TALENT:MASTER:998
+	PRINTFORM 　キャラ番号:{NO:ARG, 3}
+PRINTFORML 　体力:({BASE:ARG:0, 4}/{MAXBASE:ARG:0, 4})　気力:({BASE:ARG:1, 4}/{MAXBASE:ARG:1, 4})
+IF ARG != MASTER && FLAG:12 & 4
+	CALL PRINT_SLAVE_STATUS, ARG
+ELSEIF ARG == MASTER && FLAG:12 & 4
+	CALL PRINT_MASTER_STATUS, ARG
+ENDIF
+CALLFORM SHOW_INFO_PAGE_{LOCAL}, ARG
+PRINTFORMLC \@(LOCAL == 1) ? %" " * 16% # [1001]前のページ\@
+PRINTLC   [1000]リストに戻る
+PRINTFORMLC \@(LOCAL == 5) ? %" " * 16% # [1009]次のページ\@
+PRINTL 
+;登録番号が現在表示されている前後のキャラの判定が『リストに表示される』になっている場合、そのキャラに切り替えるボタンを表示
+;なお、判定基準は呼び出し元に依存
+PRINTFORMLC \@(ALRAUNE:1 < 0) ? %" " * 16% # [1011]前のキャラ\@
+PRINTFORMLC %" " * 18%
+PRINTFORMLC \@(ALRAUNE:2 < 0) ? %" " * 16% # [1019]次のキャラ\@
+PRINTL 
+$INPUT_LOOP_2
+INPUT
+IF RESULT == 1000
+	RETURN 0
+ELSEIF RESULT == 1001 && LOCAL > 1
+	LOCAL -= 1
+ELSEIF RESULT == 1009 && LOCAL < 5
+	LOCAL += 1
+ELSEIF RESULT == 1011 && ALRAUNE:1 >= 0
+	ARG = ALRAUNE:1
+ELSEIF RESULT == 1019 && ALRAUNE:2 >= 0
+	ARG = ALRAUNE:2
+ELSE
+	GOTO INPUT_LOOP_2
+ENDIF
+GOTO PRINT_PAGE
+
+
+
+;-------------------------------------------------
+;能力確認の処理(1ページ目・総合)
+;-------------------------------------------------
+;オプションによって表示タイプ変更
+;調教中での能力表示はこのページが表示される
+@SHOW_INFO_PAGE_1, ARG
+;弐型表示
+IF FLAG:12 & 2
+	;能力
+	CALL NEW_PRINT_ABL, ARG
+	;素質
+	SIF FLAG:3 < 4 || ARG == MASTER || TALENT:ARG:998
+		CALL NEW_PRINT_TALENT, ARG
+	;刻印
+	SIF ARG != MASTER
+		CALL NEW_PRINT_MARK, ARG
+	;経験
+	CALL NEW_PRINT_EXP, ARG
+;壱型表示
+ELSE
+	;能力
+	CALL SHOW_INFO_ABL, ARG
+	;素質
+	SIF FLAG:3 < 4 || ARG == MASTER || TALENT:ARG:998
+		CALL SHOW_INFO_TALENT, ARG
+	;刻印
+	SIF ARG != MASTER
+		CALL SHOW_INFO_MARK, ARG
+	;経験
+	CALL SHOW_INFO_EXP, ARG
+ENDIF
+
+;-------------------------------------------------
+;能力確認の処理(2ページ目)
+;-------------------------------------------------
+;主人かそれ以外かで表示タイプ変更
+@SHOW_INFO_PAGE_2, ARG
+IF ARG == MASTER
+	;主人の○○数
+	CALL PRINT_MASTER_NUMBER
+	;主人の触手関連のステータス
+	SIF FLAG:15 & 4096
+		CALL PRINT_MASTER_JUEL, ARG
+ELSE
+	;珠
+	IF FLAG:12 & 2
+		CALL NEW_PRINT_JUEL, ARG
+	ELSE
+		CALL SHOW_INFO_JUEL, ARG
+	ENDIF
+ENDIF
+;記念日
+SIF CFLAG:ARG:3110 || CFLAG:ARG:3111 || CFLAG:ARG:3112 || CFLAG:ARG:3113 || CFLAG:ARG:3114 || CFLAG:ARG:3115 || CFLAG:ARG:3116 || CFLAG:ARG:3117
+	CALL PRINT_MEMORIALDAY, ARG
+
+;両親(子の場合)
+SIF NO:ARG == 148 || NO:ARG == 149
+	CALL PRINT_PARENT, ARG
+;相性
+CALL PRINT_RELATION, ARG
+
+;-------------------------------------------------
+;能力確認の処理(3ページ目)
+;-------------------------------------------------
+;主人かそれ以外かで表示タイプ変更
+@SHOW_INFO_PAGE_3, ARG
+IF ARG == MASTER
+	;酔い具合
+	CALL PRINT_DRUNK_LIQUOR, ARG
+	;難易度
+	CALL SHOW_DIFFICULTY
+	;この周に迎えたエンディング
+	SIF FLAG:598
+		CALL SHOW_ENDING
+	;変化可能な種族
+	SIF FLAG:70
+		CALL PRINT_MASTER_CHANGEABLE_RACE
+	;助手引継ぎ人数関連
+	SIF FLAG:8
+		CALL PRINT_ASSISTANT_SUCCESSION
+	;収入金額の最高額
+	SIF MONEY:998 > 0
+		CALL INCOME_LIST
+ELSE
+	;酔い具合
+	CALL PRINT_DRUNK_LIQUOR, ARG
+	;習得済み陥落系素質
+	SIF CFLAG:ARG:14 || CFLAG:ARG:15 || CFLAG:ARG:16 || CFLAG:ARG:17
+		CALL PRINT_SLAVE_TALENT_FALL, ARG
+	;蒐集品
+	SIF FLAG:500 > 0 && FLAG:12 & 8
+		CALL PRINT_COLLECTION_YN, ARG
+	;陰核成長具合
+	SIF BASE:ARG:7 && TALENT:ARG:120 == 0 && TALENT:ARG:121 == 0
+		CALL PRINT_GROWTH_SLAVE_CLITORIS, ARG
+	;陰毛の状態
+	CALL PRINT_PUBIC_HAIR, ARG
+	;烙印キャラ用特殊装備
+	SIF CFLAG:ARG:42
+		CALL PRINT_BRAND_SLAVE_EQUIPMENT, ARG
+	;触手インプラント
+	SIF CFLAG:ARG:41
+		CALL PRINT_TENTACLE_INPLANT_SLAVE, ARG
+	;各種開発度表示処理
+	SIF TALENT:MASTER:198 && (CFLAG:ARG:31 || CFLAG:ARG:60 || CFLAG:ARG:61 || CFLAG:ARG:62 || CFLAG:ARG:63 || CFLAG:ARG:64)
+		CALL PRINT_DEVELOPMENT_LEVEL_SLAVE, ARG
+	;奴隷調教の進行状況表示処理
+	CALL PRINT_SLAVE_TRAIN_PROCESS, ARG
+ENDIF
+
+;-------------------------------------------------
+;能力確認の処理(4ページ目)
+;-------------------------------------------------
+;主人かそれ以外かで表示タイプ変更
+@SHOW_INFO_PAGE_4, ARG
+IF ARG == MASTER
+	;蒐集品の総計
+	SIF FLAG:500 > 0 && FLAG:12 & 8
+		CALL MASTER_COLLECTION_STATUS
+ELSE
+	;奴隷ごとの収入金額の最高額
+	SIF CFLAG:ARG:96 > 0
+		CALL INCOME_LIST_SLAVE, ARG
+ENDIF
+;逆相性
+CALL PRINT_RERELATION, ARG
+
+;-------------------------------------------------
+;能力確認の処理(5ページ目)
+;-------------------------------------------------
+;主人かそれ以外かで表示タイプ変更
+@SHOW_INFO_PAGE_5, ARG
+IF ARG == MASTER
+	;現有全奴隷の各収入合計一覧表示
+	SIF CHARANUM > 1 && SUMCARRAY(CFLAG:ARG:97, 1, CHARANUM) > 0
+		CALL PRINT_INCOME_ALLSLAVE, ARG
+	;主人の各種フラグ関連表示
+	CALL PRINT_MASTER_FLAG, ARG
+ELSE
+	;助手経験のある奴隷のみ他の奴隷への調教経験を表示
+	SIF ISASSI:ARG == 1 || ARG == ASSI
+		CALL PRINT_ASSI_TRAIN, ARG
+	;奴隷の各種フラグ関連表示
+	CALL PRINT_SLAVE_FLAG, ARG
+	;使用する個別口上形式を表示
+	CALL PRINT_MESSAGE_TYPE, ARG
+ENDIF
+
+
+;-------------------------------------------------
+;能力表示関係の汎用処理群
+;-------------------------------------------------
+;………………………………………………
+;ABL表示の共通処理部分
+;………………………………………………
+;表示順
+; 0,Ｃ感覚　　 1,Ｖ感覚　　 2,Ａ感覚　　 3,Ｂ感覚
+;10,従順　　　11,欲望　　　12,技巧　　　13,奉仕精神
+;14,露出癖　　20,サドっ気　21,マゾっ気　22,レズっ気(23,ＢＬっ気)
+;30,自慰中毒　31,精液中毒　32,レズ中毒(33,ＢＬ中毒)　34,噴乳中毒
+;35,触手中毒　36,排泄中毒　37,射精中毒　70,料理技能
+;71,撮影技能　72,歌唱技能　73,工作技能　98,触手使役
+@PRINT_ABL_COUNT(ARG)
+#FUNCTION
+#LOCALSIZE 1
+LOCAL = -1
+SELECTCASE COUNT
+	CASE 0 TO 3
+		LOCAL = COUNT
+	CASE 4 TO 8
+		LOCAL = COUNT + 6
+	CASE 9, 10
+		LOCAL = COUNT + 11
+	CASE 11
+		;男ならレズっ気、女ならＢＬっ気はないよね？
+		LOCAL = 22 + TALENT:ARG:120
+	CASE 12, 13
+		LOCAL = COUNT + 18
+	CASE 14
+		;男ならレズ中毒、女ならＢＬ中毒はないよね？
+		LOCAL = 32 + TALENT:ARG:120
+	CASE 15
+	;男なら噴乳中毒は無いよね？
+		SIF TALENT:ARG:120 == 0
+			LOCAL = 34
+	CASE 16, 17
+		LOCAL = COUNT + 19
+	CASE 18
+	;女でふたなりでないなら射精中毒は無いよね？
+		SIF TALENT:ARG:120 || TALENT:ARG:121
+			LOCAL = 37
+	CASE 19 TO 22
+		LOCAL = COUNT + 51
+	CASE 23
+		SIF ARG == MASTER && FLAG:15 & 4096
+			LOCAL = 98
+	CASE 24
+		SIF ARG == MASTER
+			LOCAL = 99
+ENDSELECT
+RETURNF LOCAL
+
+;………………………………………………
+;@SHOW_INFO_TALENT系の共通処理
+;………………………………………………
+@SHOW_INFO_EACH_TALENT, ARG
+IF COUNT == 0
+	IF TALENT:ARG:0 == 1 && JUEL:ARG:1 == 0 && EXP:ARG:0 == 0 && ABL:ARG:1 == 0
+		PRINT [生娘] 
+	ELSE
+		PRINTFORM [\@(TALENT:ARG:0 == 1) ? 処女 # 乙女\@] 
+	ENDIF
+ELSEIF COUNT == 121
+	PRINTFORM [ふたなり\@(TALENT:ARG:121 == 2) ? (玉あり) # \@] 
+ELSEIF COUNT == 153
+	PRINTFORM [\@(CFLAG:ARG:156 & 1) ? 相思相愛 # 相愛\@] 
+ELSEIF COUNT == 164
+	PRINTFORM [\@(NO:MASTER == 21 || NO:MASTER == 22) ? 式 # 使い魔\@] 
+ELSEIF COUNT == 171
+	PRINTFORM [\@(TALENT:ARG:120 || TALENT:ARG:121) ? 淫茎 # 淫核\@] 
+ELSEIF COUNT == 265 && TALENT:ARG:COUNT
+	PRINTFORM [常連客{TALENT:ARG:COUNT}人] 
+ELSE
+	IF (FLAG:10 & 8) && CFLAG:ARG:11 == 0 && (COUNT == 11 || COUNT == 15 || COUNT == 21 || COUNT == 27 || COUNT == 32 || COUNT == 34 || COUNT == 37 || COUNT == 38 || COUNT == 71)
+		FONTBOLD
+		PRINTFORM [%TALENTNAME:COUNT%] 
+		FONTREGULAR
+	ELSE
+		PRINTFORM [%TALENTNAME:COUNT%] 
+	ENDIF
+ENDIF
+
+;………………………………………………
+;EXP表示の共通処理部分
+;………………………………………………
+;表示順(順番は共通)
+; 0,Ｖ経験　　　　 1,Ａ経験　　　　 2,絶頂経験　　　 
+; 3,射精経験　　　 4,精液経験　　　 5,噴乳経験　　　 
+; 6,放尿経験　　　 7,調教排泄経験　 8,精飲絶頂経験　 
+;10,自慰経験　　　11,調教自慰経験　12,レズ経験(13,ＢＬ経験)　
+;14,露出快楽経験　20,奉仕快楽経験　21,愛情経験　　　
+;22,フェラ経験　　23,キス経験　　　30,苦痛快楽経験　
+;31,緊縛経験　　　32,Ｖ拡張経験　　33,Ａ拡張経験　　
+;34,Ｕ拡張経験　　39,ＳＭ教育経験　40,薬物経験　　　
+;41,Ｃ調律経験　　42,Ｖ調律経験　　43,Ａ快楽経験　　
+;44,Ｂ快楽経験　　45,乳腺開発経験　46,尿道開発経験　
+;50,異常経験　　　51,産卵経験　　　52,出産経験　　　
+;53,触手経験　　　54,吸血経験　　　55,調教失神経験　
+;56,動物性愛経験　70,調理経験　　　71,撮影経験　　　
+;72,被写経験　　　73,歌唱経験　　　74,工作経験　　　
+;75,教育経験　　　76,売春経験　　　77,娼館人気　　　
+;97,極楽絶頂経験　98,主人調教経験　99,助手経験　　　
+@PRINT_EXP_COMMON, ARG
+LOCAL:1 = 0
+REPEAT 100
+	SELECTCASE COUNT
+		CASE 12
+			LOCAL = (TALENT:ARG:120 == 0) ? COUNT # -1
+		CASE 13
+			LOCAL = (TALENT:ARG:120) ? COUNT # -1
+		CASE 56
+			LOCAL = (FLAG:15 & 8192) ? 56 # -1
+		CASEELSE
+			LOCAL = (STRLENS(EXPNAME:COUNT) > 0) ? COUNT # -1
+	ENDSELECT
+	IF LOCAL < 0
+		CONTINUE
+	ELSEIF EXP:ARG:LOCAL > 0
+		IF (FLAG:10 & 8) && ((LOCAL == 0 && CFLAG:ARG:11 & 1) || (LOCAL == 1 && CFLAG:ARG:11 & 2) || (LOCAL == 50 && CFLAG:ARG:11 & 4)|| (LOCAL == 12 && EXP:ARG:LOCAL > 999 && TALENT:MASTER:120 && CFLAG:ARG:18 == 0) || (LOCAL == 13 && EXP:ARG:LOCAL > 999 && TALENT:MASTER:120 == 0 && CFLAG:ARG:18 == 0))
+			FONTBOLD
+			PRINTFORM %EXPNAME:LOCAL,12%:\@(EXP:ARG:LOCAL > 99999999) ? 99999999 # {EXP:ARG:LOCAL, 8}\@
+			FONTREGULAR
+		ELSE
+			PRINTFORM %EXPNAME:LOCAL,12%:\@(EXP:ARG:LOCAL > 99999999) ? 99999999 # {EXP:ARG:LOCAL, 8}\@
+		ENDIF
+		LOCAL:1 += 1
+		;改行するのか？ 続けて出力するのか？
+		IF LOCAL:1%3 == 0
+			PRINTL 
+		ELSE
+			PRINT 　
+		ENDIF
+	ENDIF
+REND
+SIF LOCAL:1%3 != 0
+	PRINTL 

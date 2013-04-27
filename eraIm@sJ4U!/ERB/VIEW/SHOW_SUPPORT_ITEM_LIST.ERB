@@ -1,0 +1,59 @@
+
+;補助アイテム一覧表示
+@SHOW_USE_ITEM_LIST
+;LOCALリスト
+;0	ループ用
+;1～所持フラグ
+;50	一時記憶用
+
+;初期化
+FOR LOCAL:0, 1, 16
+	LOCAL:(LOCAL:0) = 0
+NEXT
+
+
+DRAWLINE
+PRINTFORML 使用するアイテムを選んでください　　補助アイテム
+DRAWLINE
+
+IF ITEM:スコップ > 0
+	LOCAL:1 = 1
+	PRINTFORML [ 1] %ITEMNAME:181, 20, LEFT%  {ITEM:スコップ}/15個   戦闘から確実に逃げます
+ELSEIF FLAG:2070 > 0
+	SETCOLOR 0x333333
+	PRINTFORML [ 1] %ITEMNAME:181, 20, LEFT%  {ITEM:スコップ}/15個   戦闘から確実に逃げます
+	RESETCOLOR
+ELSE
+	SETCOLOR 0x333333
+	PRINTFORML [ 1] －－－
+	RESETCOLOR
+ENDIF
+PRINTL [ 0] 戻る
+
+
+$INPUT_LOOP
+INPUT
+
+IF RESULT == 0
+	RETURN
+ELSEIF (RESULT >= 1) && (RESULT <= 1) && (LOCAL:RESULT > 0) && TFLAG:戦闘中
+	;RESULT退避
+	LOCAL:50 = RESULT
+
+	SELECTCASE LOCAL:50
+		;逃走アイテム
+		CASE 1
+			PRINTFORMW 雪歩印スコップを使った！
+			TFLAG:逃走成功 = 1
+		CASEELSE
+			PRINTFORMW IDエラー　不正なアイテムID{LOCAL:50}が指定されました
+	ENDSELECT
+	RETURN 1
+ELSEIF (RESULT >= 1) && (RESULT <= 1) && (LOCAL:RESULT > 0) && TFLAG:戦闘中 == 0
+		REUSELASTLINE このアイテムは戦闘中にしか使えません
+		GOTO INPUT_LOOP
+ELSE
+	REUSELASTLINE 入力値が不正です。再入力してください
+	GOTO INPUT_LOOP
+ENDIF
+

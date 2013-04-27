@@ -1,0 +1,161 @@
+
+;-------------------------------------------------
+;虹の飴玉(性転換)
+;-------------------------------------------------
+@USE_DRUG_83(ARG)
+;LOCAL:1 初期性別記憶	0,女,1,オトコ
+VARSET LOCAL
+SIF TALENT:ARG:オトコ
+	LOCAL:1 = 1
+	
+TALENT:ARG:オトコ = 0
+
+LOCALS =ふたなり
+LOCALS:1 =不思議な根
+LOCALS:2 =具現
+LOCALS:3 =貧乳
+LOCALS:4 =巨乳
+LOCALS:5 =処女
+LOCALS:6 =母乳体質
+LOCALS:7 =童貞
+LOCALS:8 =早漏
+LOCALS:9 =爆乳
+LOCALS:10 =絶壁
+LOCALS:11 =男の娘
+
+;主素質設定
+;初めて
+IF !CFLAG:ARG:TS管理
+	FOR LOCAL, 0, 12
+		SIF TALENT:ARG:(LOCALS:LOCAL)
+			SETBIT CFLAG:ARG:41, LOCAL
+	NEXT
+;それ以外
+ELSE
+	FOR LOCAL, 0, 12
+		;オトコ
+		IF LOCAL:1
+			SELECTCASE LOCAL
+				CASE 7,8,11
+					IF !TALENT:ARG:(LOCALS:LOCAL)
+						CLEARBIT CFLAG:ARG:41, LOCAL
+					ELSE
+						SETBIT CFLAG:ARG:41, LOCAL
+					ENDIF
+			ENDSELECT
+		;女
+		ELSE
+			SELECTCASE LOCAL
+				CASE 7,11
+				CASEELSE
+					IF !TALENT:ARG:(LOCALS:LOCAL)
+						CLEARBIT CFLAG:ARG:41, LOCAL
+					ELSE
+						SETBIT CFLAG:ARG:41, LOCAL
+					ENDIF
+			ENDSELECT
+		ENDIF
+		
+		;オトコ
+		;IF LOCAL:1 && LOCAL == 7
+		;	IF !TALENT:ARG:童貞
+		;		CLEARBIT CFLAG:ARG:41, 7
+		;		CONTINUE
+		;	ELSE
+		;		SETBIT CFLAG:ARG:41, 7
+		;		CONTINUE
+		;	ENDIF
+		;オトコはふたなりは省く
+		;ELSEIF LOCAL:1 && LOCAL == 0
+		;	CONTINUE
+		;ELSEIF !LOCAL:1 && LOCAL == 5
+		;	IF !TALENT:ARG:処女
+		;		CLEARBIT CFLAG:ARG:41, 5
+		;		CONTINUE
+		;	ELSE
+		;		SETBIT CFLAG:ARG:41, 5
+		;		CONTINUE
+		;	ENDIF
+		;ENDIF
+		;
+		;IF !TALENT:ARG:(LOCALS:LOCAL) && GETBIT(CFLAG:ARG:41, LOCAL)
+		;	CLEARBIT CFLAG:ARG:41, LOCAL
+		;ELSE
+		;	SIF TALENT:ARG:(LOCALS:LOCAL) && !GETBIT(CFLAG:ARG:41, LOCAL)
+		;		SETBIT CFLAG:ARG:41, LOCAL
+		;ENDIF
+	NEXT
+ENDIF
+
+;素質消す
+FOR LOCAL, 0, 12
+	SIF TALENT:ARG:(LOCALS:LOCAL)
+		TALENT:ARG:(LOCALS:LOCAL) = 0
+NEXT
+
+;変化する特殊素質用
+
+
+IF LOCAL:1
+	;オトコの場合、女性になる
+	PRINTFORML %CALLNAME:ARG%は突然体全体が光に包まれるような感覚を感じた
+	PRINTW すると、意識がぼんやりとし、まるで光の海を漂うような浮遊感に包まれた……
+	PRINTL 少しして、体を包む光が消失したところで、体を確認すると、
+	PRINTFORML %CALLNAME:ARG%の体はすっかり女性になっていた……
+	PRINTW  
+	PRINTFORMW ＜%CALLNAME:ARG%は女性になった＞
+	IF CFLAG:ARG:TS管理
+		;以下の素質があれば消去し記録保存
+		FOR LOCAL, 0, 12
+			SELECTCASE LOCAL
+				CASE 7,11
+					CONTINUE
+				CASE 8
+					SIF TALENT:ARG:ふたなり && GETBIT(CFLAG:ARG:41, LOCAL)
+						TALENT:ARG:(LOCALS:LOCAL) = 1
+				CASEELSE
+					SIF GETBIT(CFLAG:ARG:41, LOCAL)
+						TALENT:ARG:(LOCALS:LOCAL) = 1
+			ENDSELECT
+		NEXT
+		SIF CFLAG:ARG:TS管理 == -1
+			CFLAG:ARG:TS管理 = 1
+		SIF CFLAG:ARG:TS管理 == 1
+			CFLAG:ARG:TS管理 = -1
+	;初TS
+	ELSE
+		TALENT:ARG:処女 = 1
+		CFLAG:ARG:TS管理 = -1
+	ENDIF
+ELSE
+	;女性の場合、オトコになる
+	PRINTFORML %CALLNAME:ARG%は突然体全体が光に包まれるような感覚を感じた
+	PRINTW すると、意識がぼんやりとし、まるで光の海を漂うような浮遊感に包まれた……
+	PRINTL 少しして、体を包む光が消失したところで、体を確認すると、
+	PRINTFORML %CALLNAME:ARG%の体はすっかり男性になっていた……
+	PRINTW  
+	PRINTFORMW ＜%CALLNAME:ARG%は男性になった＞
+	TALENT:ARG:122 = 1
+	IF CFLAG:ARG:TS管理
+		;以下の素質があれば消去し記録保存
+		FOR LOCAL, 0, 12
+			SELECTCASE LOCAL
+				CASE 7,8,11
+					SIF GETBIT(CFLAG:ARG:41, LOCAL)
+						TALENT:ARG:(LOCALS:LOCAL) = 1
+				CASEELSE
+
+			ENDSELECT
+		NEXT
+		
+		SIF CFLAG:ARG:TS管理 == -1
+			CFLAG:ARG:TS管理 = 1
+		SIF CFLAG:ARG:TS管理 == 1
+			CFLAG:ARG:TS管理 = -1
+	;初TS
+	ELSE
+		TALENT:ARG:童貞 = 1
+		CFLAG:ARG:TS管理 = -1
+	ENDIF
+ENDIF
+

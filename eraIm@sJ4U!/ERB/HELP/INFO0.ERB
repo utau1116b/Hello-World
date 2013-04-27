@@ -1,0 +1,223 @@
+
+;=============================================================================
+;各種ゲージ計算・表示処理
+;=============================================================================
+;-------------------------------------------------
+;主人・奴隷・助手の射精ゲージ計算処理
+;-------------------------------------------------
+;ふたなりは射精しにくいということで[オトコ]よりも高めに設置
+@CALC_GAUGE2_COMMON(ARG)
+#FUNCTION
+#LOCALSIZE 1
+LOCAL = (TALENT:ARG:120) ? 10000 # 20000
+IF TALENT:ARG:120 && TALENT:ARG:132
+	LOCAL /= 2
+ELSEIF TALENT:ARG:132
+	TIMES LOCAL , 0.75
+ELSEIF TALENT:ARG:133
+	LOCAL *= 2
+ENDIF
+SIF TALENT:ARG:171
+	LOCAL /= 2
+RETURNF MAX(LOCAL, 0)
+
+;-------------------------------------------------
+;主人・奴隷・助手の射精ゲージ表示処理
+;-------------------------------------------------
+@CALC_GAUGE2_CHARA, ARG
+MAXBASE:ARG:2 = CALC_GAUGE2_COMMON(ARG)
+SIF MAXBASE:ARG:2 <= 0
+	RETURN 0
+IF ARG == ASSI
+	LOCALS = （助手）
+ELSEIF ARG == MASTER
+	LOCALS = （主人）
+ELSE
+	LOCALS = 
+ENDIF
+PRINTFORML 射精%LOCALS%%BARSTR(BASE:ARG:2,MAXBASE:ARG:2,32)%({BASE:ARG:2, 5}/{MAXBASE:ARG:2, 5})
+
+;-------------------------------------------------
+;他者の射精ゲージ計算・表示処理
+;-------------------------------------------------
+@CALC_GAUGE2_OTHERS
+IF TEQUIP:90
+	;触手用
+	TFLAG:998 = 10000
+	PRINT 射精（触手）
+ELSEIF TEQUIP:55 == 1
+	;蟲風呂用
+	TFLAG:998 = 10000
+	PRINT 射精（淫蟲）
+ELSE
+	RETURN 0
+ENDIF
+SIF TFLAG:998 <= 0
+	RETURN 0
+PRINTFORML %BARSTR(TFLAG:997,TFLAG:998,32)%({TFLAG:997, 5}/{TFLAG:998, 5})
+
+;-------------------------------------------------
+;奴隷の噴乳ゲージ計算・表示処理
+;-------------------------------------------------
+;ARG …　誰の噴乳ゲージを計算・表示するのか？
+;ARG:1 …　立っているとゲージそのものは表示しない。
+@CALC_GAUGE3_SLAVE, ARG, ARG:1
+#LOCALSIZE 1
+LOCAL = 10000
+SIF TALENT:ARG:174
+	LOCAL /= 2
+MAXBASE:ARG:3 = MAX(LOCAL, 0)
+SIF MAXBASE:ARG:3 <= 0
+	RETURN 0
+SIF !ARG:1
+	PRINTFORML 母乳%BARSTR(BASE:ARG:3, MAXBASE:ARG:3, 32)%({BASE:ARG:3, 5}/{MAXBASE:ARG:3, 5})
+
+;-------------------------------------------------
+;奴隷の放尿ゲージ計算・表示処理
+;-------------------------------------------------
+;ARG …　誰の放尿ゲージを計算・表示するのか？
+;ARG:1 …　立っているとゲージそのものは表示しない。
+@CALC_GAUGE4_SLAVE, ARG, ARG:1
+;#LOCALSIZE 1
+;LOCAL = 20000
+;IF TALENT:ARG:132
+;	LOCAL /= 2
+;ELSEIF TALENT:ARG:133
+;	LOCAL *= 2
+;ENDIF
+;SIF TALENT:ARG:45
+;	LOCAL /= 2
+;SIF TALENT:ARG:175
+;	LOCAL /= 2
+;MAXBASE:ARG:HP = MAX(LOCAL, 0)
+;SIF MAXBASE:ARG:HP <= 0
+;	RETURN 0
+;SIF !ARG:1
+;	PRINTFORML 尿意%BARSTR(BASE:ARG:HP, MAXBASE:ARG:HP, 32)%({BASE:ARG:HP, 5}/{MAXBASE:ARG:HP, 5})
+
+;-------------------------------------------------
+;酔いゲージ計算処理
+;-------------------------------------------------
+;強いとその分だけゲージ増加
+;酔いのレベルが80％以上、120％未満で酩酊とする
+;ARG:1が0のとき酔いの深度を非表示、1の時は表示されるように
+@CALC_GAUGE8, ARG, ARG:1
+#LOCALSIZE 2
+;LOCAL:1 = 10000
+;IF TALENT:ARG:214
+;	LOCAL:1 *= 2
+;ELSEIF TALENT:ARG:210 || TALENT:ARG:215
+;	TIMES LOCAL:1 , 1.50
+;ELSEIF TALENT:ARG:221
+;	LOCAL:1 *= 2
+;ENDIF
+;MAXBASE:ARG:ボルテージ = LOCAL:1
+;IF ARG:1 == 1
+;	LOCAL = (BASE:ARG:ボルテージ *100) / LOCAL:1
+;	IF LOCAL == 0
+;		PRINT ＜素面＞
+;	ELSEIF LOCAL < 40
+;		PRINT ＜微酔＞
+;	ELSEIF LOCAL < 80
+;		PRINT ＜酩酊＞
+;	ELSEIF LOCAL < 120
+;		PRINT ＜泥酔＞
+;;	ELSEIF LOCAL < 160
+;		PRINT ＜狂酔＞
+;	ELSE
+;		PRINT ＜極酔＞
+;	ENDIF
+;	PRINTFORML (深度:Lv{LOCAL})
+;ENDIF
+
+;-------------------------------------------------
+;奴隷の精飲絶頂ゲージ表示処理
+;-------------------------------------------------
+@CALC_GAUGEX_SLAVE
+PRINTFORML 精飲%BARSTR(CFLAG:64,1000,32)% ({CFLAG:64, 4}/{1000, 4})
+
+;-------------------------------------------------
+;SHOP画面での奴隷及び助手の特殊装備表示処理
+;-------------------------------------------------
+@SHOW_SPECIAL_EQUIPMENT
+IF TARGET >= 0 && CFLAG:42
+	PRINTFORM 《%CALLNAME:TARGET%:
+	SIF CFLAG:42 & 1
+		PRINT クリトリスリング 
+	SIF CFLAG:42 & 2
+		PRINT 奴隷管理用貞操帯 
+	SIF CFLAG:42 & 4
+		PRINT ベリージュエル 
+	SIF CFLAG:42 & 8
+		PRINT ボンデージ 
+	SIF CFLAG:42 & 16
+		PRINT ラビアピアス 
+	SIF CFLAG:42 & 32
+		PRINT ニプルピアス 
+	PRINT 装着中》　
+ENDIF
+IF ASSI >= 0 && CFLAG:ASSI:42
+	PRINTFORM 《%CALLNAME:ASSI%:
+	SIF CFLAG:ASSI:42 & 1
+		PRINT クリトリスリング 
+	SIF CFLAG:ASSI:42 & 2
+		PRINT 奴隷管理用貞操帯 
+	SIF CFLAG:ASSI:42 & 4
+		PRINT ベリージュエル 
+	SIF CFLAG:ASSI:42 & 8
+		PRINT ボンデージ 
+	SIF CFLAG:ASSI:42 & 16
+		PRINT ラビアピアス 
+	SIF CFLAG:ASSI:42 & 32
+		PRINT ニプルピアス 
+	PRINTL 装着中》
+ELSE
+	PRINTL 
+ENDIF
+
+;-------------------------------------------------
+;使用する個別口上形式を表示
+;-------------------------------------------------
+@PRINT_MESSAGE_TYPE, ARG
+;弐型表示
+IF FLAG:12 & 2
+	PRINTL □ 使用する個別口上形式
+;壱型表示
+ELSE
+	PRINTL 使用する個別口上形式：
+ENDIF
+PRINTFORM 設定は「%SHOW_MESSAGE_TYPE(CFLAG:ARG:9)%」になっています
+IF CFLAG:ARG:9 == 4
+	TRYCCALLFORM TRY_{NO:ARG}
+		PRINTFORM (%CALLNAME:ARG%の専用口上は導入済みです)
+	CATCH
+		PRINTFORM (%CALLNAME:ARG%の専用口上が見つかりません)
+	ENDCATCH
+ENDIF
+PRINTL 
+PRINTFORML コンフィグの設定は「テキスト表示\@(FLAG:10 & 1) ? ON # OFF\@」になっています
+CALL NEW_DRAWLINE
+
+;………………………………………………
+;表示形式の表示
+;………………………………………………
+@SHOW_MESSAGE_TYPE(ARG)
+#FUNCTIONS
+SELECTCASE ARG
+	CASE 0
+		RETURNF "未設定"
+	CASE 1
+		RETURNF "使用しない"
+	CASE 2
+		RETURNF "地の文のみ"
+	CASE 4
+		RETURNF "汎用口上のみ"
+	CASE 6
+		RETURNF "汎用口上＋地の文"
+	CASE 8
+		RETURNF "専用口上のみ"
+	CASE 10
+		RETURNF "専用口上＋地の文"
+	CASEELSE
+		RETURNF "不明"
+ENDSELECT

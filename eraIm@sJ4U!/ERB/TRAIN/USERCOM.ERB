@@ -1,0 +1,982 @@
+;@CALLTRAINEND
+;TFLAG:CALLTRAIN = 0
+@SHOW_USERCOM
+CALL BGM("TRAIN", "メイン")
+;CALL RETURNLINE
+TFLAG:調教自動実行管理 = 0
+TFLAG:COMABLE管理 = !TFLAG:調教自動実行管理
+VARSET LOCAL
+;前ターンのMASTERが射精した相手をLOCAL:1へセット
+IF TCVAR:MASTER:直前のターンの射精した箇所 == 1
+	;V
+	LOCAL:4 = MASTER_POSE(6,1,1)
+ELSEIF TCVAR:MASTER:直前のターンの射精した箇所 == 2
+	;A
+	LOCAL:4 = MASTER_POSE(7,1,1)
+ENDIF
+;パートナーが[親愛]を持っている場合、異常経験が付くコマンドを表示するコンフィグがONの場合
+;パートナーが[親愛]を持っていたら異常経験フィルタを一時的にOFFにする
+IF TALENT:親愛 && GETBIT(FLAG:コマンドコンフィグ ,1)
+	LOCAL:2 = 0
+	;異常経験フィルタが元々OFFかLOCAL:2に記憶。コマンド表示後戻す
+	SIF !GETBIT(FLAG:コマンドコンフィグ ,0)
+		LOCAL:2 = 1
+	CLEARBIT FLAG:コマンドコンフィグ, 0
+ENDIF
+VARSET RESULT
+VARSET Q, -1
+VARSET C, 0
+LOCAL:1 = -1
+CALL NEWLINE_U(1)
+;コマンド表示
+FOR LOCAL,0,800
+	;弾幕ごっこ(非ウフフモード時の1番目のコマンド)の初期位置を変える処理
+	;デフォは100、コンフィグで設定している場合、0になる
+	IF LOCAL == 300 && !TFLAG:うふふ
+		IF GETBIT(FLAG:23, 23)
+			LOCAL:1 = -1
+		ELSE
+			LOCAL:1 = 99
+		ENDIF
+	ENDIF
+	
+	LOCAL:1 += 1
+	
+	;名前の長さが0の場合、ないものとみなす
+	SIF STRLENS(TRAINNAME:LOCAL) == 0
+		CONTINUE
+	;異常経験フィルタがONの時、異常経験をとるかどうか判定し、通ったら潰す
+	IF !GETBIT(FLAG:コマンドコンフィグ, 0)
+		SIF ABNOMALCOMABLE(LOCAL)
+			CONTINUE
+	ENDIF
+	;コマンドフィルタ
+	;共通設定フラグONの時
+	IF GET_COM_FILTERING(1001, TARGET)
+		SIF GET_COM_FILTERING(LOCAL, MASTER)
+			CONTINUE
+	ELSE
+		SIF GET_COM_FILTERING(LOCAL, TARGET)
+			CONTINUE
+	ENDIF
+	RESULT = 0
+	;現状で対象コマンドが使用可能かどうか判定
+	TRYCALLFORM COM_ABLE{LOCAL}
+	IF RESULT
+		IF (LOCAL == [[調教:クリキャップ]] && TEQUIP:クリキャップ) || (LOCAL == [[調教:オナホール]] && TEQUIP:オナホール) || (LOCAL == [[調教:バイブ]] && TEQUIP:バイブ) || (LOCAL == [[調教:アナルバイブ]] && TEQUIP:アナルバイブ) || (LOCAL == [[調教:アナルビーズ]] && TEQUIP:アナルビーズ) || (LOCAL == [[調教:搾乳機]] && TEQUIP:搾乳機)
+			LOCAL:3 = 0
+			SKIPDISP 1
+			CALL PRE_COMORDER, LOCAL
+			LOCAL:3 = RESULT
+			SKIPDISP 0
+			SIF LOCAL:3
+				SETCOLOR 105, 105, 105
+			;PRINTFORMC %TRAINNAME:LOCAL%解除[{LOCAL,3}]
+			CALL CUSTOM_COMMAND_NAME, LOCAL, LOCAL:1, 1
+			SIF LOCAL:3
+				RESETCOLOR
+			;ELSEIF LOCAL == [[調教:フェラチオ]] && LOCAL:4
+			;	PRINTFORMC お掃除フェラ[{LOCAL,3}]
+			;ELSEIF LOCAL == 60 && !BEDROOM(CFLAG:PLAYER:現在位置)
+			;	PRINTFORMC 対面立位[{LOCAL,3}]
+			;ELSEIF LOCAL == 61 && !BEDROOM(CFLAG:PLAYER:現在位置)
+			;	PRINTFORMC 背面立位[{LOCAL,3}]
+			;ELSEIF LOCAL == 62 && !BEDROOM(CFLAG:PLAYER:現在位置)
+			;	PRINTFORMC 対面立位アナル[{LOCAL,3}]
+			;ELSEIF LOCAL == 63 && !BEDROOM(CFLAG:PLAYER:現在位置)
+			;	PRINTFORMC 背面立位アナル[{LOCAL,3}]
+			;ELSEIF LOCAL == 350
+			;	;ベッドがない
+			;	IF INROOM(CFLAG:PLAYER:現在位置) != 1
+			;		LOCALS = 抱き寄せる
+			;	ELSE
+			;		LOCALS = 押し倒す
+			;	ENDIF
+		ELSEIF STRLENS(TRAINNAME:LOCAL)
+			;PRINTFORMC %TRAINNAME:LOCAL%[{LOCAL,3}]
+			;	;ウフフ独自コマンド
+			;IF LOCAL >= 280 && LOCAL <= 284
+			;	PRINTFORMC %CSTR:(LOCAL-200)%[{LOCAL,3}]
+			;純愛独自コマンド
+			;ELSEIF LOCAL >= 410 && LOCAL <= 414
+			;	PRINTFORMC %CSTR:(LOCAL-325)%[{LOCAL,3}]
+			;ELSE
+				;予め実行判定を調べ実行不可能ならばグレー表示にする
+				;例外＝口上独自コマンドおよび[316]髪を梳いて貰う
+			LOCAL:3 = 0
+			SKIPDISP 1
+			CALL PRE_COMORDER, LOCAL
+			LOCAL:3 = RESULT
+			SKIPDISP 0
+			SIF LOCAL:3
+				SETCOLOR 105, 105, 105
+			;PRINTFORMC %TRAINNAME:LOCAL%[{LOCAL,3}]
+			CALL CUSTOM_COMMAND_NAME, LOCAL, LOCAL:1
+			SIF LOCAL:3
+				RESETCOLOR
+		ENDIF
+		;改行処理
+		CALL NEWLINE_U
+	ENDIF
+NEXT
+
+;USERCOM表示の前に一度、改行する
+SIF !LINEISEMPTY()
+	PRINTL 
+
+;異常経験フィルタをコマンド表示後元の設定に戻す
+SIF LOCAL:2
+	FLAG:コマンドコンフィグ -= 1
+	
+CALL NEWLINE_U(1)
+PRINTC 履歴表示[800]
+CALL NEWLINE_U
+PRINTC 汚れ表示[801]
+CALL NEWLINE_U
+PRINTC 能力表示[802]
+CALL NEWLINE_U
+A = 0
+REPEAT 100		
+	SIF ITEM:(500 + COUNT)
+		A = 1
+REND
+IF A
+	PRINTC アイテム使用[810]
+	CALL NEWLINE_U
+ENDIF
+;服を脱がせる＝通称ウフフモード突入
+IF TFLAG:うふふ == 0 && !IS_友情(TARGET)
+	PRINTC 服を脱がせる[850]
+	CALL NEWLINE_U
+ENDIF
+;●ここまで
+IF TFLAG:うふふ == 0
+	
+ELSE
+	;コスプレ中は選べない
+	IF !TEQUIP:65
+		PRINTC 服の着脱[852]
+		CALL NEWLINE_U
+	ENDIF
+ENDIF
+IF FLAG:23 & 8
+	PRINTC 主導権を決める[851]
+	CALL NEWLINE_U
+ENDIF
+
+PRINTC コンフィグ[860]
+CALL NEWLINE_U
+	
+;口上独自USERCOM表示　CFLAGは利用設定フラグ
+IF CFLAG:TARGET:独自コマンド使用判定
+	FOR LOCAL, 10, 19
+		IF GETBIT(CFLAG:TARGET:独自コマンド使用判定, LOCAL)
+			PRINTFORMC %CSTR:TARGET:(80+LOCAL)%[{860 + LOCAL}]
+			CALL NEWLINE_U
+		ENDIF
+	NEXT
+ENDIF
+IF ASSI > 0
+	IF ASSIPLAY && TEQUIP:90 == 0 && TEQUIP:2 == 0 && (TFLAG:うふふ == 0 || TALENT:152)
+		PRINTC マスターと交代[900]
+	ELSEIF TEQUIP:90 == 0 && TEQUIP:2 == 0 && (TFLAG:うふふ == 0 || TALENT:152)
+		PRINTC 助手と交代[900]
+	ENDIF
+	;改行処理
+	CALL NEWLINE_U
+ENDIF
+
+IF ASSIPLAY 
+	PRINTC 能力表示(助手)[902]
+ELSE
+	PRINTC 能力表示(マスター)[902]
+ENDIF
+CALL NEWLINE_U
+PRINTC リセット[950]
+CALL NEWLINE_U
+IF TALENT:MASTER:998
+	PRINTC デバッグメニュー[998]
+	CALL NEWLINE_U
+ENDIF
+PRINTC 行動終了[999]
+IF PREVCOM >= 0
+	PRINTL 
+	PRINTFORM < 前回実行コマンド : %STR:0% 
+	SIF TFLAG:前回コマンド助手実行
+		PRINT (助手) 
+	PRINT >
+ENDIF
+;ENDIF
+;---------------------------------------------------------
+;USERCOM内の改行処理
+;---------------------------------------------------------
+@NEWLINE_U(ARG)
+#DIM CLINECOUNT, 1
+IF ARG
+	CLINECOUNT = 0
+	RETURN 0
+ENDIF
+CLINECOUNT += 1
+IF (CLINECOUNT % PRINTCPERLINE()) == 0
+	PRINTL 
+	CLINECOUNT = 0
+ENDIF
+
+;---------------------------------------------------------
+;実行判定を呼び出してコマンドごとにチェックする処理
+;TRYCCALLFORMを使うので式中関数にはできない
+;---------------------------------------------------------
+@PRE_COMORDER, ARG
+;[316]髪を梳いて貰うコマンドだけは途中でINPUTあるので処理しない。
+SIF ARG == 316
+	RETURN 0
+TRYCCALLFORM CAN_COM{ARG}(1)
+	;実行できない場合
+	IF A < V
+		RETURN 1
+	;実行できる場合
+	ELSE
+		RETURN 0
+	ENDIF
+CATCH
+	;元々実行判定のないコマンドの場合
+	RETURN 0
+ENDCATCH
+;---------------------------------------------------------------------------------------------
+;コマンド名変更処理
+;元はPRINTFORMC %TRAINNAME:LOCAL%[{LOCAL:1,3}]でTrain.csvのコマンド名通りに表示されていた処理
+;ARG 元処理のLOCAL(選択されているコマンド番号)
+;ARG:1 元処理のLOCAL:1(表示番号)
+;---------------------------------------------------------------------------------------------
+@CUSTOM_COMMAND_NAME, ARG, ARG:1, ARG:2
+VARSET LOCAL
+;LOCALSに元のコマンド名を設定
+;MASTERPOSE()が思ったように機能していないため、パートナー限定(COM_MASAGEも同様)
+IF ARG == [[調教:フェラチオ]]
+	;前ターンのMASTERが射精した相手をLOCAL:1へセット
+	IF TCVAR:MASTER:直前のターンの射精した箇所 == 1 && !ASSIPLAY
+		;V
+		;LOCAL = MASTER_POSE(6,1,1)
+		LOCAL = TARGET
+	ELSEIF TCVAR:MASTER:直前のターンの射精した箇所 == 2 && !ASSIPLAY
+		;A
+		;LOCAL = MASTER_POSE(7,1,1)
+		LOCAL = TARGET
+	ENDIF
+	;お掃除フェラ
+	IF LOCAL
+		LOCALS = お掃除フェラ[{ARG:1,3}]
+	ELSE
+		LOCALS = %TRAINNAME:ARG%[{ARG:1,3}]
+	ENDIF
+;パートナーに主導権がある時、パートナー側がプレイヤーへ行動するコマンドの名前変更
+;スパンキング
+ELSEIF ARG == 40 && TFLAG:主導権
+	LOCALS = スパンキングされる[{ARG:1,3}]
+;鞭
+ELSEIF ARG == 41 && TFLAG:主導権
+	LOCALS = 鞭で打たれる[{ARG:1,3}]
+;針
+ELSEIF ARG == 42 && TFLAG:主導権
+	LOCALS = 針で刺される[{ARG:1,3}]
+;言葉責め
+ELSEIF ARG == 75 && TFLAG:主導権
+	LOCALS = 言葉責めされる[{ARG:1,3}]
+;浣腸使用前
+ELSEIF ARG == 46 && TEQUIP:46 == 0
+	LOCALS = 浣腸[{ARG:1,3}]
+;浣腸・触手浣腸使用後
+ELSEIF (ARG == 46 || ARG == 107) && TEQUIP:46
+	LOCALS = 排泄[{ARG:1,3}]
+;------↑SIF
+ELSEIF ARG:2
+	;PRINTFORMC %TRAINNAME:ARG%解除[{ARG:1,3}]
+	LOCALS = %TRAINNAME:ARG%解除[{ARG:1,3}]
+ELSE
+	;元のコマンド名
+	LOCALS = %TRAINNAME:ARG%[{ARG:1,3}]
+ENDIF
+PRINTBUTTONC LOCALS, ARG:1
+@USERCOM
+DEBUGPRINTFORML SELECTCOM = {SELECTCOM} TFLAG:SELECTCOM保存 = {TFLAG:SELECTCOM保存}１
+;コマンド入力ミスフラグ初期化
+TFLAG:54 = 0
+A = 0
+REPEAT 100
+	SIF ITEM:(500 + COUNT)
+		A = 1
+REND
+
+IF RESULT >= 0 && RESULT < 800
+	IF !TFLAG:うふふ
+		IF GETBIT(FLAG:23, 23)
+			RESULT += 300
+		ELSE
+			RESULT += 200
+		ENDIF
+	ENDIF
+	;コマンド登録チェック
+	SIF TRAINNAME:RESULT == ""
+		RETURN 0
+	;SELECTCOMとTFLAG:3(SELECTCOM退避)に入力値セット
+	SELECTCOM = RESULT
+	TFLAG:SELECTCOM保存 = SELECTCOM
+	;コマンド使用可能判定
+	TRYCALLFORM COM_ABLE{SELECTCOM}
+	SIF RESULT == 0
+		RETURN 0
+	RESULT = 1
+	;実行制限(実行拒否等)チェック
+	TRYCALLFORM CAN_COM{SELECTCOM}(1)
+	IF RESULT == 0
+		;実行値表示のため再度CAN_COM
+		TRYCALLFORM CAN_COM{SELECTCOM}
+		RETURN 0
+	ENDIF
+	DEBUGPRINTFORML SELECTCOM = {SELECTCOM} TFLAG:SELECTCOM保存 = {TFLAG:SELECTCOM保存}２
+	;ダミーTRAIN
+	DOTRAIN 999
+ELSEIF RESULT == 800
+	CALL SHOW_EQUIP
+	RETURN 1
+ELSEIF RESULT == 801
+	CALL STAIN_INFO
+	RETURN 1
+ELSEIF RESULT == 802
+	;新型表示
+	DRAWLINE
+	PRINTFORM ■ 
+	CALL SET_COLOR(NO:TARGET)
+	PRINTFORM %NAME:TARGET%
+	RESETCOLOR
+	PRINTFORM (パートナー)のステータス 
+	
+	SIF ((FLAG:23 & 1p26) == 0) && FLAG:2 != 1
+		PRINTFORM (好感度:{CFLAG:2})
+	PRINTL 
+	CALL SHOW_INFO(NO:TARGET)
+	RETURN 1
+ELSEIF RESULT == 810 && A
+	;アイテム使用
+	CALL USE_TREASURE_ITEM
+ELSEIF RESULT == 850 && TFLAG:うふふ == 0 && !IS_友情(TARGET)
+	IF FLAG:23 & 2
+		PRINTFORML 服を脱がせて(Ｈな事をしようとして)もよろしいですか？
+		PRINTFORML [0] ダメ。手が滑った
+		PRINTFORML [1] ＯＫ。早く楽しませろ！
+
+		INPUT
+		IF (RESULT < 0 || RESULT > 1)
+			RESTART
+		ELSEIF RESULT == 0
+			RETURN 1
+		ENDIF
+	ENDIF
+
+	;[合意]持ちなら判定全スルー
+	IF TALENT:152
+		TFLAG:うふふ = 1
+		TFLAG:純愛口上 = 7
+		CALL KOJO_MESSAGE_SEND("JUN")
+		IF TFLAG:うふふ == 1
+			;映画館から追い出される
+			CALL GET_OUT_MOVIE
+			CALL DATUI_PROCESS
+			RETURN 1
+		ELSE
+			CALL DATUI_PROCESS
+			RETURN 0
+		ENDIF
+	;実行判定
+	ELSE
+		A = 0
+		S = 0
+		V = 70
+		W = 100
+		;Stage3クリア後は実行値スルー
+		SIF  FLAG:24 > 3 || TALENT:MASTER:202
+			V = -9999
+
+		;すべての命令に共通の要素を考慮
+		;(従順が高いと命令に従いやすいなど)
+		CALL COM_ORDER
+
+		;ABL:欲望
+		IF ABL:1
+			A += ABL:1 * 4
+		ENDIF
+		;ABL:奉仕精神
+		IF ABL:6
+			A += ABL:6 * 3
+		ENDIF
+		;男嫌い
+		IF TALENT:82 && TALENT:PLAYER:122
+			A -= 7
+		ENDIF
+
+
+		;恋慕
+		IF TALENT:85 && ASSIPLAY == 0
+			A += 10
+		ENDIF
+
+		;ムードボーナス
+		B = 0
+		IF TFLAG:37 < 10
+			B -= 20
+		ELSEIF TFLAG:37 < 30
+			B -= 5
+		ELSEIF TFLAG:37 < 50
+			B -= 1
+		ELSEIF TFLAG:37 < 100
+			B += TFLAG:37 / 10
+		ELSEIF TFLAG:37 < 300
+			B += TFLAG:37 / 7
+		ELSE
+			B += TFLAG:37 / 5
+		ENDIF
+		A += B
+		IF B < 0
+			B = B * -1
+		ELSE
+		ENDIF
+
+
+		;好感度
+		IF CFLAG:2 < 700
+			B = 0
+			IF CFLAG:2 < 50
+				B = 50
+			ELSEIF CFLAG:2 < 300
+				B = 20
+			ELSEIF CFLAG:2 < 500
+				B = 10
+			ELSE
+				B = 5
+			ENDIF
+			A -= B
+		ENDIF
+
+		;好感度
+		IF CFLAG:2 >= 700
+			B = 0
+			IF CFLAG:2 < 1000
+				B = 5
+			ELSE
+				B = CFLAG:2 / 100
+			ENDIF
+			A += B
+		ENDIF
+		;キス未経験
+		IF TALENT:151
+			A -= 20
+		ENDIF
+
+		;一線越えない
+		IF TALENT:27
+			A -= 15
+		ENDIF
+
+		;酔った勢い
+		IF TFLAG:47 >= 3
+			A += TFLAG:47 / 3
+		ENDIF
+
+		IF ((FLAG:23 & 1p27) == 0) && FLAG:2 != 1
+			;ABL:欲望
+			IF ABL:1
+				SIF S
+					PRINT  + 
+				PRINTS ABLNAME:1
+				PRINTV 'LV,ABL:1,'(,ABL:1 * 4,')
+				S = 1
+			ENDIF
+			;ABL:奉仕精神
+			IF ABL:6
+				SIF S
+					PRINT  + 
+				PRINTS ABLNAME:6
+				PRINTV 'LV,ABL:6,'(,ABL:6 * 3,')
+				S = 1
+			ENDIF
+			;男嫌い
+			IF TALENT:82 && TALENT:PLAYER:122
+				PRINT  - 
+				PRINTS TALENTNAME:82
+				PRINTV '(,7,')
+				S = 1
+			ENDIF
+
+
+			;恋慕
+			IF TALENT:85 && ASSIPLAY == 0
+				SIF S
+					PRINT  + 
+				PRINTS TALENTNAME:85
+				PRINTV '(,10,')
+				S = 1
+			ENDIF
+
+			;ムードボーナス
+			B = 0
+			IF TFLAG:37 < 10
+				B -= 20
+			ELSEIF TFLAG:37 < 30
+				B -= 5
+			ELSEIF TFLAG:37 < 50
+				B -= 1
+			ELSEIF TFLAG:37 < 100
+				B += TFLAG:37 / 10
+			ELSEIF TFLAG:37 < 300
+				B += TFLAG:37 / 7
+			ELSE
+				B += TFLAG:37 / 5
+			ENDIF
+			IF B < 0
+				B = B * -1
+				PRINT  - 
+				PRINT ムード悪い
+				PRINTV '(,B,')
+				S = 1
+			ELSE
+				PRINT  + 
+				PRINT ムード良い
+				PRINTV '(,B,')
+				S = 1
+			ENDIF
+
+
+			;好感度
+			IF CFLAG:2 < 700
+				B = 0
+				PRINT  - 
+				IF CFLAG:2 < 50
+					B = 50
+				ELSEIF CFLAG:2 < 300
+					B = 20
+				ELSEIF CFLAG:2 < 500
+					B = 10
+				ELSE
+					B = 5
+				ENDIF
+				PRINT 好感度不足
+				PRINTV '(,B,')
+				S = 1
+			ENDIF
+
+			;好感度
+			IF CFLAG:2 >= 700
+				B = 0
+				SIF S
+					PRINT  + 
+				IF CFLAG:2 < 1000
+					B = 5
+				ELSE
+					B = CFLAG:2 / 100
+				ENDIF
+				PRINT 好感度
+				PRINTV '(,B,')
+				S = 1
+			ENDIF
+			;キス未経験
+			IF TALENT:151
+				PRINT  - 
+				PRINTS TALENTNAME:151
+				PRINTV '(,20,')
+				S = 1
+			ENDIF
+
+			;一線越えない
+			IF TALENT:27
+				PRINT  - 
+				PRINTS TALENTNAME:27
+				PRINTV '(,15,')
+				S = 1
+			ENDIF
+
+			;酔った勢い
+			IF TFLAG:47 >= 3
+				PRINT  + 
+				PRINT 酔った勢い
+				PRINTV '(,TFLAG:47 / 3,')
+				S = 1
+			ENDIF
+
+			;合計を表示(70以上で実行、100以上で合意)
+			PRINT  = 
+			PRINTV A
+
+			IF A < V
+				PRINT  < 
+				PRINT 実行値
+				PRINTV V
+			ELSEIF A == V
+				PRINT  = 
+				PRINT 実行値
+				PRINTV V
+			ELSEIF A > V && A < W
+				PRINT  < 
+				PRINT 合意値
+				PRINTV W
+			ELSEIF A == W
+				PRINT  = 
+				PRINT 合意値
+				PRINTV W
+			ELSEIF A > W
+				PRINT  > 
+				PRINT 合意値
+				PRINTV W
+			ENDIF
+			WAIT
+		ENDIF
+
+		;実行できない場合
+		IF A < V
+			TFLAG:純愛口上 = 6
+			CALL KOJO_MESSAGE_SEND("JUN")
+			IF TALENT:85 == 0
+			CALL SET_COLOR(NO:TARGET)
+				PRINTFORM %CALLNAME:TARGET%
+				RESETCOLOR
+				PRINTFORMW の好感度が50下がりました
+				CFLAG:2 -= 50
+			ENDIF
+			RETURN 1
+		ELSEIF A < W
+			TFLAG:うふふ = 1
+			TFLAG:純愛口上 = 4
+			CALL KOJO_MESSAGE_SEND("JUN")
+			IF TFLAG:うふふ == 1
+				;映画館から追い出される
+				CALL GET_OUT_MOVIE
+				CALL DATUI_PROCESS
+				RETURN 1
+			ELSE
+				CALL DATUI_PROCESS
+				RETURN 0
+			ENDIF
+		ELSEIF A >= W
+			;酔ってるお陰で成功の場合
+			IF A < W + TFLAG:47 / 3
+				TFLAG:よっぱウフフ = 1
+			ELSE
+				TFLAG:よっぱウフフ = 0
+			ENDIF
+			TFLAG:純愛口上 = 5
+			TFLAG:うふふ = 1
+			CALL KOJO_MESSAGE_SEND("JUN")
+			IF TFLAG:うふふ == 1
+				IF ASSIPLAY == 0 && TFLAG:よっぱウフフ == 0
+					CALL SET_COLOR(NO:TARGET)
+					PRINTFORM %CALLNAME:TARGET%
+					RESETCOLOR
+					PRINTFORMW の【合意】を得た
+					TALENT:152 = 1
+				ENDIF
+				;映画館から追い出される
+				CALL GET_OUT_MOVIE
+				;既成事実２に相当
+				TFLAG:200 = 2
+				CALL MARK_GOT_CHECK
+				CALL DATUI_PROCESS
+				RETURN 1
+			ELSE
+				CALL DATUI_PROCESS
+				RETURN 0
+			ENDIF
+		ENDIF
+	ENDIF
+
+	RETURN 1
+ELSEIF RESULT == 851 && (FLAG:23 & 8)
+	PRINT どちらが主導権を握りますか？  現在は
+	SIF CFLAG:15 == 0
+		PRINTL 成り行きに任せています
+	SIF CFLAG:15 == 1
+		PRINTL 自分で握っています
+	SIF CFLAG:15 == 2
+		PRINTFORML %CALLNAME:TARGET%に握らせています
+	PRINTL [0] - 成り行きに任せる
+	SIF ABL:0 >= 3 || CFLAG:2 >= 300 || TALENT:13 || TALENT:14 || TALENT:17 || TALENT:153
+		PRINTL [1] - 自分で握る
+	SIF ABL:0 >= 3 || CFLAG:2 >= 300 || TALENT:83 || TALENT:153
+		PRINTFORML [2] - %CALLNAME:TARGET%に握らせる
+
+	INPUT
+	IF (RESULT < 0 || RESULT > 2)
+		RESTART
+	ELSEIF RESULT == 0
+		CFLAG:15 = 0
+	ELSEIF RESULT == 1 && (ABL:0 >= 3 || CFLAG:2 >= 300 || TALENT:13 || TALENT:14 || TALENT:17 || TALENT:153)
+		CFLAG:15 = 1
+		TFLAG:主導権 = 0
+	ELSEIF RESULT == 1
+		RESTART
+	ELSEIF RESULT == 2 && (ABL:0 >= 3 || CFLAG:2 >= 300 || TALENT:83 || TALENT:153)
+		CFLAG:15 = 2
+		TFLAG:主導権 = 1
+	ELSEIF RESULT == 2
+		RESTART
+	ENDIF
+
+	RETURN 1
+;服の着脱
+ELSEIF RESULT == 852 && TFLAG:うふふ
+	CALL CLOTH_CHANGE(TARGET)
+ELSEIF RESULT == 860
+	;コンフィグ
+	CALL START_CONFIGURE
+ELSEIF (RESULT >= 870 && RESULT < 880) && GETBIT(CFLAG:TARGET:独自コマンド使用判定, (RESULT-860))
+	TRYCALLFORM KOJO_USERCOM_{NO:TARGET}_{RESULT}
+ELSEIF RESULT == 900 && TEQUIP:90 == 0 && ASSI > 0 && TEQUIP:2 == 0 && (TFLAG:うふふ == 0 || TALENT:152)
+	CALL KOJO_MESSAGE_PLAYERCHANGE
+	IF ASSIPLAY
+		ASSIPLAY = 0
+		PLAYER = MASTER
+	ELSE
+		ASSIPLAY = 1
+		PLAYER = ASSI
+	ENDIF
+	RETURN 1
+ELSEIF RESULT == 902
+	;新型表示
+	W = PLAYER
+	DRAWLINE
+	IF ASSIPLAY
+		PRINTFORML ■ %NAME:PLAYER%(助手)のステータス
+	ELSE
+		PRINTFORML ■ %NAME:PLAYER%(マスター)のステータス
+	ENDIF
+	DRAWLINE
+	PRINTL □ 経験
+	CALL NEW_PRINT_EXP(NO:MASTER)
+	DRAWLINE
+	PRINTL □ 能力
+	CALL NEW_PRINT_ABL(NO:MASTER)
+	DRAWLINE
+	PRINTL □ 素質
+	CALL NEW_PRINT_TALENT(NO:MASTER)
+	WAIT
+	RETURN 1
+ELSEIF RESULT == 903
+	CALL UPCHECK_ANIME
+	WAIT
+ELSEIF RESULT == 998 && TALENT:MASTER:998
+	;デバッグモード用メニュー
+	PRINTL デバッグメニューを呼び出します
+	CALL DEBUG_MENU_TRAIN
+	RETURN 1
+ELSEIF RESULT == 999
+	;襲われ判定
+	IF ASSIPLAY == 0 && (ABL:1 >= 7 || PALAM:3 >= 3000 || PALAM:5 >= 3000 || CFLAG:2 >= 10000)
+		CALL PUSH_OVER
+		SIF RESULT
+			RETURN 1
+	ENDIF
+	BEGIN AFTERTRAIN
+	RETURN 1
+ELSEIF RESULT == 950
+	PRINTL リセットしますがよろしいですか？
+	PRINTL [0] はい
+	PRINTL [1] いいえ
+	PRINTL [2] オートセーブをロードする
+	INPUT
+	IF RESULT == 2
+		CHKDATA 99
+		IF RESULT == 0
+			PRINTFORMW ロードします
+			;ロード前に変数を破壊しておく
+			RESETDATA
+			;自動セーブは99のはずなんで99に
+			LOADDATA 99
+		ELSE
+			PRINTFORMW %RESULTS%
+			RETURN 1
+		ENDIF
+	ELSEIF RESULT
+		RETURN 1
+	ELSE
+		PRINTFORMW タイトル画面に戻ります
+		RESETDATA
+		BEGIN TITLE
+	ENDIF
+;無効な数字入力がなされた場合、フラグをたてる
+;誘うコマンドの、行動前処理が無効な入力によって何度も表示される不具合を回避します
+ELSE
+	TFLAG:54 = 1
+ENDIF
+RETURN 0
+@SHOW_EQUIP
+;新型表示
+W = TARGET
+DRAWLINE
+PRINTL □ 経験
+CALL NEW_PRINT_EXP
+PRINTL ･･･････････････････････････････････････････････････････････････････････････････
+PRINTL □ 珠
+CALL NEW_PRINT_JUEL
+IF PREVCOM >= 0
+	PRINT 前回実行コマンド : 
+	PRINTS STR:0
+	SIF TFLAG:50
+		PRINT (助手)
+	;PRINT (COMF:
+	;PRINTV PREVCOM
+	;PRINTL )
+	PRINTL  
+ENDIF
+;日常用
+SIF TEQUIP:7
+	PRINTL [炬燵使用中]
+SIF TEQUIP:36
+	PRINTL [ローター装着中]
+
+;ウフフ時用
+SIF TEQUIP:21
+	PRINTL [媚薬効果発揮中]
+SIF TEQUIP:22
+	PRINTL [利尿剤効果発揮中]
+SIF TEQUIP:74
+	PRINTL [鈴蘭の毒効果発揮中]
+SIF TEQUIP:75
+	PRINTL [昆虫採集セットの薬効果発揮中]
+
+SIF TEQUIP:53
+	PRINTFORML [ビデオ撮影中({TFLAG:70 - 1}/10)]
+SIF TEQUIP:54
+	PRINTL [野外プレイ中]
+SIF TEQUIP:57
+	PRINTL [羞恥プレイ中]
+SIF TEQUIP:58
+	PRINTL [お風呂場プレイ中]
+SIF TEQUIP:59
+	PRINTL [新妻プレイ中]
+SIF TEQUIP:60
+	PRINTL [スク水プレイ中]
+SIF TEQUIP:90
+	PRINTL [触手調教中]
+
+IF TEQUIP:11 && TEQUIP:90
+	PRINTL [触手挿入]
+ELSEIF TEQUIP:11
+	PRINTL [バイブ装備中]
+ENDIF
+
+IF TEQUIP:13 && TEQUIP:90
+	PRINTL [触手アナル挿入]
+ELSEIF TEQUIP:13
+	PRINTL [アナルバイブ装備中]
+ENDIF
+
+IF TEQUIP:14 && TEQUIP:90
+	PRINTL [触手クリ責め]
+ELSEIF TEQUIP:14
+	PRINTL [クリキャップ装着中]
+ENDIF
+
+IF TEQUIP:15 && TEQUIP:90
+	PRINTL [触手乳首責め]
+ELSEIF TEQUIP:15
+	PRINTL [二プルキャップ装着中]
+ENDIF
+
+IF TEQUIP:16 && TEQUIP:90
+	PRINTL [触手搾乳]
+ELSEIF TEQUIP:16
+	PRINTL [搾乳器装備中]
+ENDIF
+
+SIF TEQUIP:76
+	PRINTL [サラシ装着中]
+
+IF TEQUIP:17 && TEQUIP:90
+	PRINTL [触手ペニス責め]
+ELSEIF TEQUIP:17
+	PRINTL [オナホール装備中]
+ENDIF
+
+IF TEQUIP:18
+	PRINTL [シャワー使用中]
+ENDIF
+
+IF TEQUIP:44 && TEQUIP:90
+	PRINTL [触手緊縛]
+ELSEIF TEQUIP:44 && TEQUIP:72 == 0 && TEQUIP:73 == 0
+	PRINTL [縄で緊縛]
+ELSEIF TEQUIP:44 && TEQUIP:72 && TEQUIP:73 == 0
+	PRINTL [荊で緊縛]
+ELSEIF TEQUIP:44 && TEQUIP:73 && TEQUIP:72 == 0
+	PRINTL [蜘蛛の糸で緊縛]
+ENDIF
+
+IF TEQUIP:46 && TEQUIP:90
+	PRINTL [触手浣腸]
+ELSEIF TEQUIP:46
+	PRINTL [浣腸＋アナルプラグ装備中]
+ENDIF
+
+SIF TEQUIP:98
+	PRINTL [触手口辱中]
+
+SIF TEQUIP:43 && TEQUIP:73 == 0
+	PRINTL [アイマスク装備中]
+SIF TEQUIP:45
+	PRINTL [ボールギャグ装備中]
+SIF TEQUIP:19
+	PRINTL [アナルビーズ使用中]
+SIF TEQUIP:47
+	PRINTL [空気浣腸中]
+SIF TEQUIP:48
+	PRINTL [拡張バルーン挿入中]
+SIF TEQUIP:49
+	PRINTL [アナル電極挿入中]
+SIF TEQUIP:61
+	PRINTL [クスコ挿入中]
+SIF TEQUIP:62
+	PRINTL [お医者プレイ中]
+SIF TEQUIP:69
+	PRINTL [女体盛りプレイ中]
+SIF TEQUIP:71
+	PRINTL [焼芋挿入中]
+SIF TEQUIP:70
+	PRINTL [巨峰挿入中]
+SIF TEQUIP:PLAYER:43
+	PRINTFORML [アイマスク装備中(%CALLNAME:PLAYER%)]
+SIF TEQUIP:PLAYER:44
+	PRINTFORML [縄で緊縛(%CALLNAME:PLAYER%)]
+SIF TEQUIP:PLAYER:45
+	PRINTFORML [ボールギャグ装備中(%CALLNAME:PLAYER%)]
+SIF TEQUIP:25
+	PRINTFORML [%CALLNAME:PLAYER%押倒中]
+IF TEQUIP:79
+	SIF TEQUIP:79 == 1 || TEQUIP:79 == 2
+		PRINTL [氷柱挿入中]
+	SIF TEQUIP:79 == 3
+		PRINTL [極太氷柱挿入中]
+	SIF TEQUIP:79 >= 4
+		PRINTL [氷塊挿入中]
+ENDIF
+SIF TEQUIP:80
+	PRINTL [暗闇展開中]
+SIF TEQUIP:92
+	PRINTL [蟲風呂入浴中]
+SIF TEQUIP:78
+	PRINTL [鰻風呂入浴中]
+
+SIF EX:0
+	PRINTFORM C絶頂:{EX:0}回 
+SIF EX:1
+	PRINTFORM V絶頂:{EX:1}回 
+SIF EX:2
+	PRINTFORM A絶頂:{EX:2}回 
+SIF EX:3
+	PRINTFORM B絶頂:{EX:3}回 
+SIF EX:6
+	PRINTFORM M絶頂:{EX:6}回 
+SIF EX:4
+	PRINTFORM 噴乳:{EX:4}回 
+SIF EX:5
+	PRINTFORM 射精:{EX:5}回 
+SIF EX:0 || EX:1 || EX:2 || EX:3 || EX:4 || EX:5 || EX:6
+	PRINTL 
+WAIT

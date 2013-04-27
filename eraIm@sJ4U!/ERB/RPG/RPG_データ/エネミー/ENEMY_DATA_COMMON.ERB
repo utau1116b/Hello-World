@@ -1,0 +1,310 @@
+;敵の能力決定関連の共通関数
+;ARG:0	対象キャラ
+@SET_DEFAULT_ENEMY_STATUS(ARG:0)
+;能力値適正は全部100％
+ABL:(ARG:0):歌唱適性 = 100
+ABL:(ARG:0):被写適性 = 100
+ABL:(ARG:0):舞踊適性 = 100
+
+
+CALL SET_TARGET_ODDS(ARG:0)
+
+;性攻撃の確率は基本20%
+;CFLAG:(ARG:0):514 = 20
+
+;待機時間4割増し
+CFLAG:(ARG:0):通常行動速度補正 = 140
+
+;絶頂時間補正は基本100％
+;CFLAG:(ARG:0):527 = 100
+
+;1ランク差ごとに20%低減
+CFLAG:(ARG:0):ランク毎の獲得低減率 = 20
+
+;共通の耐性付与(低位)　主にちょっと強い敵用
+;ARG:0	対象キャラ
+@SET_DEFAULT_ENEMY_STATUS_L(ARG:0)
+BASE:(ARG:0):スリップ耐性 = 10
+BASE:(ARG:0):スロウ耐性 = 10
+BASE:(ARG:0):カース耐性 = 20
+BASE:(ARG:0):スリープ耐性 = 15
+BASE:(ARG:0):フィアー耐性 = 15
+BASE:(ARG:0):シール耐性 = 25
+BASE:(ARG:0):ブライン耐性 = 15
+
+;共通の耐性付与(中位)　主にEX用
+;ARG:0	対象キャラ
+@SET_DEFAULT_ENEMY_STATUS_M(ARG:0)
+BASE:(ARG:0):スリップ耐性 = 20
+BASE:(ARG:0):スロウ耐性 = 20
+BASE:(ARG:0):カース耐性 = 40
+BASE:(ARG:0):スリープ耐性 = 30
+BASE:(ARG:0):フィアー耐性 = 30
+BASE:(ARG:0):シール耐性 = 50
+BASE:(ARG:0):ブライン耐性 = 30
+
+
+;共通の耐性付与(高位) ボス用　ほとんど何も効かない　個別に弱点つけること
+;ARG:0	対象キャラ
+@SET_DEFAULT_ENEMY_STATUS_H(ARG:0)
+BASE:(ARG:0):スリップ耐性 = 70
+BASE:(ARG:0):スロウ耐性 = 70
+BASE:(ARG:0):カース耐性 = 85
+BASE:(ARG:0):スリープ耐性 = 80
+BASE:(ARG:0):フィアー耐性 = 80
+BASE:(ARG:0):シール耐性 = 90
+BASE:(ARG:0):ブライン耐性 = 80
+;狙う確率設定
+;ARG:0	対象キャラ
+;ARG:1	思考パターン ビット演算　0:通常　1:HP/EP低いの優先　2:確率前後反転　4:ダメージ強化系異常優先(他は通常　8:HP/EP高いの優先
+;ARG:2	攻撃種類　0:通常　1:性攻撃
+@SET_TARGET_ODDS(ARG:0, ARG:1, ARG:2)
+;LOCAL
+;0	LOOP
+;1	特殊ターゲット
+;2	TEMP
+
+LOCAL:1 = 0
+LOCAL:2 = 0
+
+;狙う比率は基本値として前から40/35/30/25/20
+CFLAG:(ARG:0):ターゲット決定基準値1 = 40
+CFLAG:(ARG:0):ターゲット決定基準値2 = 35
+CFLAG:(ARG:0):ターゲット決定基準値3 = 30
+CFLAG:(ARG:0):ターゲット決定基準値4 = 25
+CFLAG:(ARG:0):ターゲット決定基準値5 = 20
+IF ARG:1 & 2
+	;前後反転
+	;狙う比率は前から20/25/30/35/40
+	CFLAG:(ARG:0):ターゲット決定基準値1 = 20
+	CFLAG:(ARG:0):ターゲット決定基準値2 = 25
+	CFLAG:(ARG:0):ターゲット決定基準値3 = 30
+	CFLAG:(ARG:0):ターゲット決定基準値4 = 35
+	CFLAG:(ARG:0):ターゲット決定基準値5 = 40
+ENDIF
+
+
+
+
+IF ARG:1 & 1
+	;低★優先
+	
+	;最低SPキャラ取得
+	LOCAL:2 = -1
+	FOR LOCAL:0, 1080, 1085
+		IF FLAG:(LOCAL:0) > 0 && CFLAG:(FLAG:(LOCAL:0)):気絶状態 == 0
+			;最初の一発目か、より低いキャラを見つけたら更新
+			IF LOCAL:2 < 0
+				LOCAL:1 = LOCAL:0 - 1079
+				IF ARG:2 == 0
+					LOCAL:2 = BASE:(FLAG:(LOCAL:0)):HP
+				ELSE
+				ENDIF
+			ELSEIF ARG:2 == 0 && BASE:(FLAG:(LOCAL:0)):HP < LOCAL:2
+				LOCAL:1 = LOCAL:0 - 1079
+				LOCAL:2 = BASE:(FLAG:(LOCAL:0)):HP
+			ELSE
+			ENDIF
+		ENDIF
+	NEXT
+	;最低SPキャラに比率+100
+	IF LOCAL:1 > 0
+		CFLAG:(ARG:0):(1270 + LOCAL:1) += 100
+	ENDIF
+ENDIF
+IF ARG:1 & 4
+	;ダメージ強化状態異常優先　凍結が魔法攻撃集めるけど、テクニックとして面白そうなので放置
+	
+	;状態異常キャラに比率+100
+	FOR LOCAL:0, 1080, 1085
+		IF FLAG:(LOCAL:0) > 0 && CFLAG:(FLAG:(LOCAL:0)):気絶状態 == 0
+			IF ARG:2 == 0 && (CFLAG:(FLAG:(LOCAL:0)):スリープ状態)
+				CFLAG:(ARG:0):(191 + LOCAL:0) += 100
+			ELSE
+			ENDIF
+			IF CFLAG:(FLAG:(LOCAL:0)):1062
+				CFLAG:(ARG:0):(191 + LOCAL:0) += 50
+			ENDIF
+		ENDIF
+	NEXT
+ENDIF
+IF ARG:1 & 8
+	;高★優先
+	;最高★キャラ取得
+	LOCAL:2 = -1
+	FOR LOCAL:0, 1080, 1085
+		IF FLAG:(LOCAL:0) > 0 && CFLAG:(FLAG:(LOCAL:0)):気絶状態 == 0
+			;最初の一発目か、より高いキャラを見つけたら更新
+			IF LOCAL:2 < 0
+				LOCAL:1 = LOCAL:0 - 1079
+				IF ARG:2 == 0
+					LOCAL:2 = BASE:(FLAG:(LOCAL:0)):HP
+				ELSE
+					;LOCAL:2 = BASE:(FLAG:(LOCAL:0)):2
+				ENDIF
+			ELSEIF ARG:2 == 0 && BASE:(FLAG:(LOCAL:0)):HP > LOCAL:2
+				LOCAL:1 = LOCAL:0 - 1079
+				LOCAL:2 = BASE:(FLAG:(LOCAL:0)):HP
+			ELSE
+			
+			ENDIF
+		ENDIF
+	NEXT
+	
+	;最高★キャラに比率+100
+	IF LOCAL:1 > 0
+		CFLAG:(ARG:0):(1270 + LOCAL:1) += 100
+	ENDIF
+ENDIF
+
+
+
+
+
+;行動選択共通処理
+;ARG:0	登録番号
+@SELECT_ENEMY_ACTION_COMMON(ARG:0)
+;LOCAL
+;0	LOOP
+;1	予定行動
+;2	TEMP
+
+;AI反映
+CALL SET_TARGET_ODDS(ARG:0, CFLAG:(ARG:0):行動AI, 0)
+
+;RAND最大値取得
+LOCAL:2 = 0
+FOR LOCAL:0, 1296, 1306
+	IF CFLAG:(ARG:0):(LOCAL:0)
+		LOCAL:2 += 1
+	ENDIF
+NEXT
+IF LOCAL:2 == 0
+;PRINTFORMW 防御へ飛ぶ
+	;通常スキルが設定されていない場合、防御のみ
+	CALL SELECT_SKILL_TARGET_203(ARG:0)
+ELSE
+	;設定されているスキルの中からランダムで選択
+	LOCAL:1 = 1296 + RAND:(LOCAL:2)	
+	;PRINTFORML 使用予定スキル{LOCAL:1}
+	;使えるかどうかチェック
+	;PRINTFORMW 設定されてるスキルへ{CFLAG:(ARG:0):(LOCAL:1)}飛ぶ
+	TRYCCALLFORM COMABLE_{CFLAG:(ARG:0):(LOCAL:1)}(ARG:0)
+	CATCH
+	;PRINTFORMW COMABLE未設定
+		;COMABLE未設定時は防御のみ
+		CALL SELECT_SKILL_TARGET_203(ARG:0)
+		RETURN
+	ENDCATCH
+	IF RESULT == 1
+	;PRINTFORMW 利用できるのでスキルを使う
+		;利用可能ならそのまま使えばOK
+		CALLFORM SELECT_SKILL_TARGET_{CFLAG:(ARG:0):(LOCAL:1)}(ARG:0)
+	ELSE
+		;利用できない場合、頭の良さをチェック
+		IF CFLAG:(ARG:0):行動不能回避 == 0 || CFLAG:(ARG:0):行動不能回避 >= 2
+		;学習能力がある場合、学習度更新
+			IF CFLAG:(ARG:0):行動不能回避 >= 2
+				CFLAG:(ARG:0):行動不能回避 -= 1
+			ENDIF
+		;PRINTFORMW 利用できなかった
+			CALLFORM SELECT_SKILL_TARGET_{CFLAG:(ARG:0):(LOCAL:1)}(ARG:0)
+		ELSE
+			;PRINTFORMW 通常攻撃を行う
+			CALL SELECT_SKILL_TARGET_201(ARG:0)
+		ENDIF
+	ENDIF
+ENDIF
+
+;レベル差による経験値補正取得
+;ARG:0 敵のレベル
+@GET_LV_RATE(ARG:0)
+#FUNCTION
+#LOCALSIZE 5
+;LOCAL
+;0	LOOP
+;1	RETURN
+;2	TEMP
+;3	COUNTER
+;4	MAXLV
+
+LOCAL:1 = 100
+LOCAL:2 = 0
+LOCAL:3 = 0
+LOCAL:4 = 0
+
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		LOCAL:2 += BASE:(FLAG:(LOCAL:0)):戦闘レベル
+		LOCAL:3 += 1
+	ENDIF
+	IF FLAG:(LOCAL:0) > 0 && BASE:(FLAG:(LOCAL:0)):戦闘レベル > LOCAL:4
+		LOCAL:4 = BASE:(FLAG:(LOCAL:0)):戦闘レベル
+	ENDIF
+NEXT
+
+IF LOCAL:3
+	;PT平均レベル計算
+	LOCAL:2 /= LOCAL:3
+	;難易度MISSION以上は平均ではなく最大レベルから計算
+	IF FLAG:5 >= 2 || FLAG:5 != 9
+		LOCAL:2 = LOCAL:4
+	ENDIF
+	
+	;PT平均の方が高い場合、経験値補正
+	IF LOCAL:2 > ARG:0 + 7
+		LOCAL:1 = 30
+	ELSEIF LOCAL:2 > ARG:0 - 1
+		LOCAL:1 = 100 - (LOCAL:2 - ARG:0 - 1) * 10
+	ELSEIF LOCAL:2 < ARG:0 - 4
+		LOCAL:1 = 150
+	ELSEIF LOCAL:2 < ARG:0
+		LOCAL:1 = 100 + (ARG:0 - LOCAL:2) * 10
+	ENDIF
+ENDIF
+
+RETURNF LOCAL:1
+
+
+;ランク差による経験値補正取得
+;ARG:0 敵のランク
+;ARG:1 ランク補正
+;ARG:2 低減率
+@GET_RANK_RATE(ARG:0, ARG:1, ARG:2)
+#FUNCTION
+#LOCALSIZE 2
+;LOCAL
+;0	LOOP
+;1	RETURN
+
+LOCAL:1 = 100
+
+;本来のランクよりも敵のランクが低い場合
+IF (FLAG:敵レベル / 2 + 1) > ARG:0
+	IF ((FLAG:敵レベル / 2 + 1) - ARG:0) == 1
+		LOCAL:1 -= ARG:2
+	ELSEIF ((FLAG:敵レベル / 2 + 1) - ARG:0) == 2
+		LOCAL:1 -= ARG:2 * 5 / 2
+	ELSEIF ((FLAG:敵レベル / 2 + 1) - ARG:0) == 3
+		LOCAL:1 -= ARG:2 * 4
+	ELSE
+		LOCAL:1 -= ((FLAG:敵レベル / 2 + 1) - ARG:0 + 2) * ARG:2
+	ENDIF
+	;ランク補正が入っている場合を考慮
+	IF ARG:1 > ARG:0
+		LOCAL:1 += (ARG:1 - ARG:0) * ARG:2 / 3
+	ENDIF
+	;10%以下にはならない
+	SIF LOCAL:1 < 10
+		LOCAL:1 = 10
+;本来のランクより高い場合のボーナス
+ELSEIF (FLAG:敵レベル / 2 + 1) < ARG:0
+	LOCAL:1 += (ARG:0 - (FLAG:敵レベル / 2 + 1)) * ARG:2
+	;200%は超えない
+	SIF LOCAL:1 > 200
+		LOCAL:1 = 200
+ENDIF
+
+RETURNF LOCAL:1
+
+

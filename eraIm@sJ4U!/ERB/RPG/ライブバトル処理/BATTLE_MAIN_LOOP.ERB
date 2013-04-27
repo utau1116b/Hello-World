@@ -1,0 +1,323 @@
+;戦闘メインループ
+;ARG:0	イベント戦フラグ(0:通常雑魚　1:EXエネミー　2:スキマ　3:固定敵　4:～ボス戦)
+@BATTLE_MAIN_LOOP(ARG:0)
+;LOCAL
+;0	ループカウンタ1
+;1	ループカウンタ2
+;2	経過させる時間
+;3	生存フラグ
+;4	TE51
+;5	TEMP2
+
+;エラートラップ
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(BATTLE_MAIN_LOOP START)
+ENDIF
+
+;戦闘終了チェック
+LOCAL:3 = 0
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		IF CFLAG:(FLAG:(LOCAL:0)):気絶状態 == 0
+			;気絶していないキャラが居れば生存フラグを立てる
+			LOCAL:3 = 1
+		ENDIF
+	ENDIF
+NEXT
+
+
+IF LOCAL:3 == 0
+	;敗北
+	RETURN 1
+ENDIF
+
+IF TFLAG:逃走成功 == 1
+	;逃走
+	IF ARG:0 == 2
+		PRINTFORMW しかし出口が消えてしまっており、逃げられない！
+		TFLAG:逃走成功 = 0
+	ELSE
+		RETURN 2
+	ENDIF
+ENDIF
+
+LOCAL:3 = 0
+FOR LOCAL:0, 1, 11
+	IF TFLAG:(LOCAL:0 + 1000) > 0
+		IF CFLAG:(LOCAL:0):気絶状態 == 0
+			;気絶していないキャラが居れば生存フラグを立てる
+			LOCAL:3 = 1
+		ENDIF
+	ENDIF
+NEXT
+IF LOCAL:3 == 0
+	;勝利
+	RETURN 0
+ENDIF
+
+;集中継続チェック
+FOR LOCAL:0, 1, 11
+	IF CFLAG:(LOCAL:0):集中フラグ && (CFLAG:(LOCAL:0):スリープ状態 || CFLAG:(LOCAL:0):気絶状態 || (CFLAG:(LOCAL:0):現在状態 == -1))
+		;集中している間に停止以外の行動不能系状態異常になると、集中が切れる
+		;集中中断用口上
+		FLAG:フェス中口上 = 31
+		CALL KOJO(LOCAL:0, CFLAG:7130)
+		PRINTFORML %CALLNAME:(LOCAL:0)%の集中が途切れた！
+		CALL BMSG_WAIT(1)
+		CFLAG:(LOCAL:0):集中フラグ = 0
+		IF CFLAG:(LOCAL:0):変身準備状態
+			;変身準備中だった場合、変身中断
+			CFLAG:(LOCAL:0):変身準備状態 = 0
+			CALL SHOW_CURE_STATE_MESSAGE(LOCAL:0, 117)
+		ENDIF
+		CALL SET_DEFAULT_WAIT(LOCAL:0)
+	ENDIF
+NEXT
+
+FOR LOCAL:0, 1080, 1085
+	IF (FLAG:(LOCAL:0) > 0)
+		IF CFLAG:(FLAG:(LOCAL:0)):集中フラグ && (CFLAG:(FLAG:(LOCAL:0)):スリープ状態 || CFLAG:(FLAG:(LOCAL:0)):気絶状態 || (CFLAG:(FLAG:(LOCAL:0)):現在状態 == -1))
+			;集中している間に停止以外の行動不能系状態異常になると、集中が切れる
+			PRINTFORML %CALLNAME:(FLAG:(LOCAL:0))%の集中が途切れた！
+			CALL BMSG_WAIT(1)
+			CFLAG:(FLAG:(LOCAL:0)):集中フラグ = 0
+			IF CFLAG:(FLAG:(LOCAL:0)):変身準備状態
+				;変身準備中だった場合、変身中断
+				CFLAG:(FLAG:(LOCAL:0)):変身準備状態 = 0
+				CALL SHOW_CURE_STATE_MESSAGE(FLAG:(LOCAL:0), 117)
+			ENDIF
+			CALL SET_DEFAULT_WAIT(FLAG:(LOCAL:0))
+		ENDIF
+	ENDIF
+NEXT
+
+;エラートラップ
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(BATTLE_MAIN_LOOP GET_MIN_COUNTER直前)
+ENDIF
+
+;カウンタ最小値を取得
+CALL GET_MIN_COUNTER
+LOCAL:2 = RESULT
+
+;エラートラップ
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(BATTLE_MAIN_LOOP GET_MIN_COUNTER直後)
+ENDIF
+
+;時間を経過
+TFLAG:カウントタイマー -= LOCAL:2
+
+;エラートラップ
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(BATTLE_MAIN_LOOP 時間経過後)
+ENDIF
+
+;t
+FOR LOCAL:0, 1, 11
+	IF CFLAG:(LOCAL:0):ストップ状態 || CFLAG:(LOCAL:0):スリープ状態 || CFLAG:(LOCAL:0):気絶状態 || CFLAG:(FLAG:(LOCAL:0)):カウンター状態 || (CFLAG:(LOCAL:0):現在状態 == -1)
+		;行動不能系状態異常の間は、待機時間は減らない
+	ELSE
+		CFLAG:(LOCAL:0):残り待機時間 -= LOCAL:2
+	ENDIF
+NEXT
+;m
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		IF CFLAG:(FLAG:(LOCAL:0)):ストップ状態 || CFLAG:(FLAG:(LOCAL:0)):スリープ状態 || CFLAG:(FLAG:(LOCAL:0)):気絶状態 || CFLAG:(FLAG:(LOCAL:0)):カウンター状態 || (CFLAG:(FLAG:(LOCAL:0)):現在状態 == -1)
+		;行動不能系状態異常の間は、待機時間は減らない
+		ELSE
+			CFLAG:(FLAG:(LOCAL:0)):残り待機時間 -= LOCAL:2
+			;時の祝福状態なら更に時間が進む1.5倍
+			IF CFLAG:(FLAG:(LOCAL:0)):時の祝福状態
+				IF TFLAG:ループカウント % 2 == 0
+					CFLAG:(FLAG:(LOCAL:0)):残り待機時間 -= LOCAL:2
+					IF CFLAG:(FLAG:(LOCAL:0)):残り待機時間 < 0
+						CFLAG:(FLAG:(LOCAL:0)):残り待機時間 = 0
+					ENDIF
+				ENDIF
+			ENDIF
+			;時の石版状態なら時間の進みが遅くなる1/2
+			IF CFLAG:(FLAG:(LOCAL:0)):時の石版状態
+				IF TFLAG:ループカウント % 2 == 0
+					CFLAG:(FLAG:(LOCAL:0)):残り待機時間 += LOCAL:2
+				ENDIF
+			ENDIF
+		ENDIF
+	ENDIF
+NEXT
+VARSET A
+;乙女よ大志を抱け！のタイムカードを進める
+;参考はRENEW_STATE_TIME_PASSAGE
+FOR LOCAL:0, 1256, 1259
+	IF TFLAG:(LOCAL:0) >= 10
+		TFLAG:(LOCAL:0) -= 10
+		IF TFLAG:(LOCAL:0) < 10
+			TFLAG:(LOCAL:0) = 1
+		ENDIF
+	ELSE
+	
+	ENDIF
+NEXT
+;舞分身の時間を進める
+FOR LOCAL:0, 1263, 1266
+	IF TFLAG:(LOCAL:0) >= 10
+		TFLAG:(LOCAL:0) -= 10
+		IF TFLAG:(LOCAL:0) < 10
+			TFLAG:(LOCAL:0) = 1
+		ENDIF
+	ELSE
+	
+	ENDIF
+NEXT
+;舞が気絶していたら分身を消す
+IF CFLAG:28:気絶状態
+	FOR LOCAL:0, 1263, 1266
+		IF TFLAG:(LOCAL:0)
+			TFLAG:(LOCAL:0) = 0 
+		ENDIF
+	NEXT
+ENDIF
+;タイムカード存在チェック
+;A1A2A3
+LOCAL:4 = 0
+FOR LOCAL:0, 1256, 1259
+	IF TFLAG:(LOCAL:0) > 0
+		A:(LOCAL:4 + 1) = LOCAL:0
+		LOCAL:4 += 1
+	ENDIF
+NEXT
+
+;エラートラップ
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(BATTLE_MAIN_LOOP メインタイマーチェック直前)
+ENDIF
+
+;メインタイマーチェック
+IF TFLAG:カウントタイマー == 0
+	TFLAG:ループカウント += 1
+	TFLAG:カウントタイマー = 10
+	CALL RENEW_STATE_TIME_PASSAGE
+ENDIF
+
+;エラートラップ
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(BATTLE_MAIN_LOOP メインタイマーチェック直後)
+ENDIF
+
+;能力値更新
+CALL STATUS_RENEW(1)
+CALL STATUS_RENEW(2)
+
+
+IF TFLAG:ループカウント == 10
+	TFLAG:ループカウント = 0
+	;スリップ計算
+	CALL CHECK_SLIP_DAMAGE
+ENDIF
+
+;エラートラップ
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(BATTLE_MAIN_LOOP ループカウントリセット後)
+ENDIF
+
+;HP/EP0チェック
+CALL CHECK_HPEP_0(0)
+
+
+
+FOR LOCAL:0, 1, 11
+	IF CFLAG:(LOCAL:0):ストップ状態 || CFLAG:(LOCAL:0):スリープ状態 || CFLAG:(LOCAL:0):1061 || CFLAG:(LOCAL:0):気絶状態 || CFLAG:(LOCAL:0):カウンター状態 ||  (CFLAG:(LOCAL:0):現在状態 == -1)
+		;行動不能系状態異常の時はなにもしない
+		CONTINUE
+	ELSEIF TFLAG:(LOCAL:0 + 1000) > 0 && CFLAG:(LOCAL:0):残り待機時間 == 0
+		IF CFLAG:(LOCAL:0):現在状態 == 0
+			CALL ENEMY_TURN(LOCAL:0, TFLAG:(LOCAL:0 + 1000))
+		ENDIF
+			PRINTL
+		IF FLAG:1704 == 1 || FLAG:1704 == 2
+			;高速モードなら行動後に一旦停止
+			WAIT
+		ENDIF
+		;行動を起こした後は、全滅チェックなどを行うために一旦ループを回しなおす
+		GOTO LOOP_FINISH
+	ELSE
+	ENDIF
+NEXT
+
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		IF CFLAG:(FLAG:(LOCAL:0)):ストップ状態 || CFLAG:(FLAG:(LOCAL:0)):スリープ状態 || CFLAG:(FLAG:(LOCAL:0)):気絶状態 || CFLAG:(FLAG:(LOCAL:0)):カウンター状態 || (CFLAG:(FLAG:(LOCAL:0)):現在状態 == -1)
+			;行動不能系状態異常の時はなにもしない
+			CONTINUE
+		ELSEIF CFLAG:(FLAG:(LOCAL:0)):残り待機時間 == 0
+
+			IF CFLAG:(FLAG:(LOCAL:0)):現在状態 == 0
+				;サバイバー反映
+				IF ABL:(FLAG:(LOCAL:0)):サバイバー
+					;王者の威圧チェック
+					CALL GET_MAX_ABL_PT(237)
+					IF RESULT == 0
+						A = MAXBASE:(FLAG:(LOCAL:0)):MP / 100 * 5
+						SIF A < 0
+							A = 1
+						BASE:(FLAG:(LOCAL:0)):MP += A
+					ENDIF
+				ENDIF
+				CALL NAKAMA_TURN(FLAG:(LOCAL:0))
+			ENDIF
+			PRINTL 
+			IF FLAG:1704 == 1 || FLAG:1704 == 2
+				;高速モードなら行動後に一旦停止
+				WAIT
+			ENDIF
+			;行動を起こした後は、全滅チェックなどを行うために一旦ループを回しなおす
+			GOTO LOOP_FINISH
+		ELSE
+		ENDIF
+	ENDIF
+NEXT
+
+;タイムカード発動
+FOR LOCAL:0, 1256, 1259
+	IF TFLAG:(LOCAL:0) == 1 && (LOCAL:0 == A:1 || LOCAL:0 == A:2 || LOCAL:0 == A:3)
+		CALL TIME_CARD(LOCAL:0)
+		TFLAG:(LOCAL:0) = 0
+		GOTO LOOP_FINISH
+	ENDIF
+NEXT
+;舞分身発動
+FOR LOCAL:0, 1263, 1266
+	IF TFLAG:(LOCAL:0) == 1
+		TFLAG:(LOCAL) = 999
+		;待機時間
+		TFLAG:汎用1 = CFLAG:28:残り待機時間
+		;現在状態 
+		TFLAG:汎用2 = CFLAG:28:現在状態
+		
+		CFLAG:28:残り待機時間 = 0
+		CFLAG:28:現在状態 = 0
+		CALL NAKAMA_TURN(28)
+		GOTO LOOP_FINISH
+	ENDIF
+NEXT
+
+;エラートラップ
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(BATTLE_MAIN_LOOP $LOOP_FINISH直前)
+ENDIF
+
+$LOOP_FINISH
+;HP/EP0チェック
+CALL CHECK_HPEP_0(0)
+
+;能力値更新
+CALL STATUS_RENEW(1)
+CALL STATUS_RENEW(2)
+
+;エラートラップ
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(BATTLE_MAIN_LOOP $LOOP_FINISH)
+ENDIF
+;ループ
+RESTART

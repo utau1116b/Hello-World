@@ -1,0 +1,221 @@
+;-------------------------------------------------
+;櫛で梳かす
+;日常系コマンド　レベル1
+;-------------------------------------------------
+@COM307
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+
+CALL COM300_SUCCESS(95, 9)
+
+;-------------------------------------------------
+;特殊分岐
+;-------------------------------------------------
+;CALL COM_ORDER_COMMON
+;判定値がバカみたいに高いとランダムで髪梳きに派生
+;IF 200 < A && RAND:3 == 0
+;	;主導権で分岐
+;	IF TFLAG:45
+;		PRINTFORMW %CALLNAME:TARGET%に持っていた櫛を取り上げられてしまった…
+;	ELSE
+;		PRINTFORMW %CALLNAME:TARGET%は何か言いたそうに%CALLNAME:PLAYER%を見つめている…
+;	ENDIF
+;	PRINTL  
+;	PRINTL 髪梳き
+;	CALL COM306B
+;	RETURN 1
+;実行できない場合
+;ELSEIF RESULT == 0
+;	PRINTW 髪に触ろうとした手を払われてしまった…
+;	RETURN 0
+;実行できる場合
+;ELSE
+;	CALL COM307B
+;	RETURN 1
+;ENDIF
+
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:体力 += 0
+DOWNBASE:気力 += 60
+
+SOURCE:歓楽 = 100
+SOURCE:接触 = 200
+SOURCE:恭順 = 200
+SOURCE:受動 = 100
+SOURCE:征服 = 800
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+
+SOURCE:恭順 *= ((ABL:PLAYER:技巧 + 3) * 10 + 100)
+
+IF TFLAG:SELECTCOM分岐 == -1
+	TIMES SOURCE:歓楽 , 0.10
+	TIMES SOURCE:恭順 , 0.10
+	TIMES SOURCE:征服 , 0.50
+	TIMES SOURCE:受動 , 0.50
+ELSEIF TFLAG:SELECTCOM分岐 == 0
+
+ELSE
+	TIMES SOURCE:歓楽 , 2.00
+	TIMES SOURCE:恭順 , 2.00
+	TIMES SOURCE:征服 , 2.00
+	TIMES SOURCE:受動 , 2.00
+ENDIF
+
+;-------------------------------------------------
+;汚れの処理
+;-------------------------------------------------
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+;同性愛　レズなら戻り値1ゲイなら戻り値2
+;IF HETEROSEX(TARGET,PLAYER)
+;	EXP:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;ENDIF
+IF TFLAG:成功判定 == 1
+	;愛情経験追加
+	IF TALENT:恋慕 || TALENT:恋人
+		EXP:愛情経験 += 3
+	ELSE
+		EXP:愛情経験 += 1
+	ENDIF
+ELSEIF TFLAG:成功判定 == 0
+	;恋慕または恋人ありで愛情経験追加
+	IF TALENT:恋慕 || TALENT:恋人
+		EXP:愛情経験 += 1
+	ENDIF
+ENDIF
+
+RETURN 1
+
+@CAN_COM307(ARG)
+;-------------------------------------------------
+;実行判定処理
+;-------------------------------------------------
+SKIPDISP ARG
+PRINTL 櫛で梳かす
+A = 0
+S = 0
+V = 20
+;すべての命令に共通の要素を考慮
+;(従順が高いと命令に従いやすいなど)
+CALL COM_ORDER
+
+	;男嫌い
+	IF TALENT:82 && TALENT:PLAYER:122
+		PRINT  - 
+		PRINTS TALENTNAME:82
+		PRINTV '(,7,')
+		S = 1
+		A -= 7
+	ENDIF
+
+	;恋慕
+	IF TALENT:85 && ASSIPLAY == 0
+		SIF S
+			PRINT  + 
+		PRINTS TALENTNAME:85
+		PRINTV '(,5,')
+		S = 5
+		A += 5
+	ENDIF
+
+	;デート中
+	IF TEQUIP:2
+		PRINT  + 
+		PRINT デート中
+		PRINTV '(,3,')
+		S = 1
+		A += 3
+	ENDIF
+
+	;ムードボーナス
+	B = 0
+	IF TFLAG:37 < 10
+		B -= 10
+	ELSEIF TFLAG:37 < 30
+		B -= 1
+	ELSEIF TFLAG:37 < 50
+		B += 1
+	ELSEIF TFLAG:37 < 100
+		B += TFLAG:37 / 10
+	ELSEIF TFLAG:37 < 300
+		B += TFLAG:37 / 5
+	ELSE
+		B += TFLAG:37 / 4
+	ENDIF
+	IF B < 0
+		B = B * -1
+		PRINT  - 
+		PRINT ムード悪い
+		PRINTV '(,B,')
+		S = 1
+		A -= B
+	ELSE
+		PRINT  + 
+		PRINT ムード良い
+		PRINTV '(,B,')
+		S = 1
+		A += B
+	ENDIF
+
+	;好感度
+	IF CFLAG:2 < 300
+		B = 0
+		PRINT  - 
+		IF CFLAG:2 < 0
+			B = 20
+		ELSEIF CFLAG:2 < 100
+			B = 10
+		ELSE
+			B = 5
+		ENDIF
+		PRINT 好感度不足
+		PRINTV '(,B,')
+		S = 1
+		A -= B
+	ENDIF
+
+	;好感度
+	IF CFLAG:2 >= 400
+		B = 0
+		SIF S
+			PRINT  + 
+		B = CFLAG:2 / 30
+		PRINT 好感度
+		PRINTV '(,B,')
+		S = 1
+		A += B
+	ENDIF
+
+	;合計を表示(20以上で実行)
+	PRINT  = 
+	PRINTV A
+
+	V = 20
+	SIF A < V
+		PRINT  < 
+	SIF A == V
+		PRINT  = 
+	SIF A > V
+		PRINT  > 
+	PRINT 実行値
+	PRINTV V
+
+	WAIT
+
+	SKIPDISP 0
+	;実行できない
+	SIF A < V
+		RETURN 0
+RETURN 1
+

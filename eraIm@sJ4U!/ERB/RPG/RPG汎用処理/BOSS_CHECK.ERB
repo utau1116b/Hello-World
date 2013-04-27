@@ -1,0 +1,79 @@
+;ボス戦チェック
+;RETURN 0:問題なし(出現しないか、勝利) 1:進行中断(逃げたか、負けた)
+@BOSS_CHECK
+;LOCAL
+;0	LOOP
+;1	ボス戦ID
+;2	LV補正
+
+
+LOCAL:1 = 0
+
+VARSET A, 0
+VARSET D, 0
+VARSET B, 0
+;特殊ボス分岐
+;最終戦は閣下固定
+;ボスがまだ決まってなければボスを決める
+IF FLAG:ボスID保存場所 == 0 || FLAG:ボスID保存場所 == 100
+	FOR LOCAL:0, 11, (11 + FLAG:キャラ数)
+		IF CFLAG:(LOCAL:0):勧誘状況 == 0
+			A:D = LOCAL:0
+			D += 1
+		ENDIF
+	NEXT
+ENDIF
+IF D >= 1
+	B = A:(RAND:D)
+	;ボスを保存
+	FLAG:ボスID保存場所 = B
+ENDIF
+VARSET A, 0
+VARSET D, 0
+VARSET B, 0
+PRINTFORML 準備はいいですか？
+PRINTFORML [0] 準備OK
+PRINTFORML [1] 一旦引き返す
+
+$INPUT_LOOP
+INPUT
+IF RESULT == 0
+	CALL CHECK_ENEMY_RANK
+	;Lv補正は、Stage1から順に、0,1,0,1, 0,1,2,0,1, 0,1,2,0,1, 0,1,2…
+	;ランク補正は、Stage3,5,8,10,13,15…で1つ増える
+	LOCAL:2 = (FLAG:現在フロア * 2 % 5) / 2
+	LOCAL:3 = FLAG:現在フロア * 2 / 5
+	;ボス戦開始
+	CALL BATTLE_START(FLAG:ボスID保存場所, LOCAL:2, (FLAG:敵レベル + LOCAL:3))
+	IF RESULT == 0
+		;勝利
+		RETURN 0
+	ELSE
+		;敗北か逃走
+		RETURN 1
+	ENDIF
+ELSEIF RESULT == 1
+	RETURN 1
+ELSE
+	REUSELASTLINE 入力値が不正です。再入力してください
+	GOTO INPUT_LOOP
+ENDIF
+
+;ボス戦終了時の共通処理(遭遇フラグと、発狂ボーナス)
+@BOSS_END
+PRINTFORM 正気を取り戻した
+SELECTCASE TFLAG:イベント戦
+	;閣下撃破
+	;今のところ仲間にはならない
+	CASE 100
+		FLAG:現在フロア += 1
+	;ボスは非加入
+	CASE 1000 TO 1006
+	;それ以外はメンバーに加入
+		FLAG:現在フロア += 1
+	CASEELSE
+		CALL NEWCHARA_INIT(TFLAG:イベント戦)
+		PRINTFORMW %CALLNAME:(TFLAG:イベント戦)%が仲間に加わった！
+		FLAG:現在フロア += 1
+ENDSELECT
+

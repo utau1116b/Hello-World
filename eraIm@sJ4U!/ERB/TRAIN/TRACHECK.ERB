@@ -1,0 +1,1292 @@
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;好感度チェック
+;CALL		USER
+;ARG		0:キャラNO, 1:ソースNO
+;RETURN		好感度ボーナス係数
+;COMMENT	
+;-----------------------------------------------------------
+@MASTER_FAVOR_CHECK(ARG,ARG:1)
+#FUNCTION
+SIF ASSIPLAY
+	RETURNF 100
+SELECTCASE ARG:1
+	CASE 0 TO 2, 17, 24
+		RETURNF GET_REVISION(CFLAG:ARG:好感度, 200 , 20000) + 100
+	CASE 3
+		RETURNF GET_REVISION(CFLAG:ARG:好感度, 200 , 15000) + 100
+	CASE 8 ,14, 15, 22, 23
+		RETURNF MAX(50,100 - CFLAG:ARG:好感度 / 200)
+	CASEELSE
+		RETURNF 100
+ENDSELECT
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;技巧のチェック
+;CALL		USER
+;ARG		0:キャラNO, 1:ソースNO
+;RETURN		技巧ボーナス係数
+;COMMENT	
+;-----------------------------------------------------------
+@TECHNIQUE_CHECK(ARG,ARG:1)
+#FUNCTION
+SIF TCVAR:ARG:116 < 0
+	RETURNF 100
+SELECTCASE ARG:1
+	CASE 0 TO 2, 17, 24
+		RETURNF GET_REVISION(ABL:(TCVAR:ARG:116):技巧 + 2, 500, 10)
+	CASEELSE
+		RETURNF 100
+ENDSELECT
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;ムードチェック
+;CALL		USER
+;ARG		0:キャラNO, 1:ソースNO
+;RETURN		ムードボーナス値
+;COMMENT	
+;-----------------------------------------------------------
+@MOOD_CHECK(ARG,ARG:1)
+#FUNCTION
+SELECTCASE ARG:1
+	CASE 3,5,11,16,13,18,20,21
+		RETURNF GET_REVISION(BASE:ARG:ムード, 50 , 500) + 100
+	CASE 8 ,14, 15, 22, 23
+		RETURNF 200 - BASE:ARG:ムード / 100
+	CASEELSE
+		RETURNF 100
+ENDSELECT
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;PLAYER能力の処理
+;CALL		USER
+;ARG		0:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@PLAYER_SKILL_CHECK(ARG)
+;調教者のTALENT:解放をみる
+IF TALENT:PLAYER:解放
+	TIMES SOURCE:ARG:快Ｃ , 1.20
+	TIMES SOURCE:ARG:快Ｖ , 1.20
+	TIMES SOURCE:ARG:快Ａ , 1.20
+	TIMES SOURCE:ARG:快Ｂ , 1.20
+	TIMES SOURCE:ARG:快Ｍ , 1.20
+	TIMES SOURCE:ARG:情愛 , 1.20
+ENDIF
+;調教者のTALENT:両刀をみる
+IF TALENT:PLAYER:両刀 && HETEROSEX(PLAYER,ARG)
+	TIMES SOURCE:ARG:情愛 , 1.20
+	TIMES SOURCE:ARG:性行動 , 1.20
+	TIMES SOURCE:ARG:達成 , 1.20
+ENDIF
+;調教者のTALENT:サドをみる
+SIF TALENT:PLAYER:サド
+	TIMES SOURCE:ARG:痛み , 1.50
+;調教者のTALENT:小悪魔をみる
+SIF TALENT:PLAYER:小悪魔
+	TIMES SOURCE:ARG:露出 , 1.50
+;調教者のTALENT:魅惑をみる
+IF TALENT:PLAYER:魅惑
+	TIMES SOURCE:ARG:不潔 , 0.50
+	TIMES SOURCE:ARG:逸脱 , 0.50
+
+	TIMES SOURCE:ARG:快Ｃ , 1.20
+	TIMES SOURCE:ARG:快Ｖ , 1.20
+	TIMES SOURCE:ARG:快Ａ , 1.20
+	TIMES SOURCE:ARG:快Ｂ , 1.20
+	TIMES SOURCE:ARG:快Ｍ , 1.20
+	TIMES SOURCE:ARG:性行動 , 1.20
+ENDIF
+;調教者のTALENT:謎の魅力をみる
+IF TALENT:PLAYER:謎の魅力
+	TIMES SOURCE:ARG:不潔 , 0.50
+	TIMES SOURCE:ARG:逸脱 , 0.50
+
+	TIMES SOURCE:ARG:快Ｃ , 1.20
+	TIMES SOURCE:ARG:快Ｖ , 1.20
+	TIMES SOURCE:ARG:快Ａ , 1.20
+	TIMES SOURCE:ARG:快Ｂ , 1.20
+	TIMES SOURCE:ARG:快Ｍ , 1.20
+	TIMES SOURCE:ARG:性行動 , 1.20
+	TIMES SOURCE:ARG:達成 , 1.50
+ENDIF
+
+;調教者のサドっ気・マゾっ気・主導権基準値を考慮
+;調教者がサドいと、受動と苦痛が増える
+IF ABL:PLAYER:サドっ気 > 10
+	SOURCE:ARG:痛み = SOURCE:ARG:痛み * (ABL:PLAYER:サドっ気 * 5 + 100) / 100
+	SOURCE:ARG:受動 = SOURCE:ARG:受動 * (ABL:PLAYER:サドっ気 * 5 + 100) / 100
+ELSEIF ABL:PLAYER:サドっ気 > 5
+	TIMES SOURCE:ARG:痛み , 1.50
+	TIMES SOURCE:ARG:受動 , 1.50
+ELSEIF ABL:PLAYER:サドっ気 > 0
+	TIMES SOURCE:ARG:痛み , 1.20
+	TIMES SOURCE:ARG:受動 , 1.20
+ENDIF
+;調教者がマゾいと、征服が増える
+IF ABL:PLAYER:マゾっ気 > 10
+	SOURCE:ARG:征服 = SOURCE:ARG:征服 * (ABL:PLAYER:マゾっ気 * 5 + 100) / 100
+ELSEIF ABL:PLAYER:マゾっ気 > 5
+	TIMES SOURCE:ARG:征服 , 1.50
+ELSEIF ABL:PLAYER:マゾっ気 > 0
+	TIMES SOURCE:ARG:征服 , 1.20
+ENDIF
+
+T = PLAYER
+CALL GET_INITIATIVE_RATE
+IF R > 0
+	SOURCE:ARG:痛み = SOURCE:ARG:痛み * (R * 1 + 100) / 100
+	SOURCE:ARG:受動 = SOURCE:ARG:受動 * (R * 1 + 100) / 100
+ENDIF
+IF R < 0
+	R *= -1
+	SOURCE:ARG:征服 = SOURCE:ARG:征服 * (R * 1 + 100) / 100
+ENDIF
+
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;好感度による処理
+;CALL		USER
+;ARG		0:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@MASTER_SKILL_CHECK(ARG)
+
+SIF ASSIPLAY > 0 || ARG == MASTER
+	RETURN 0
+
+;主人による調教経験
+IF ASSIPLAY == 0
+	IF CFLAG:ARG:好感度 >= 500
+		TIMES SOURCE:ARG:不潔 , 0.70
+		TIMES SOURCE:ARG:逸脱 , 0.70
+
+		TIMES SOURCE:ARG:快Ｃ , 1.20
+		TIMES SOURCE:ARG:快Ｖ , 1.20
+		TIMES SOURCE:ARG:快Ａ , 1.20
+		TIMES SOURCE:ARG:情愛 , 1.30
+		TIMES SOURCE:ARG:快Ｂ , 1.20
+		TIMES SOURCE:ARG:歓楽 , 1.40
+		TIMES SOURCE:ARG:快Ｍ , 1.20
+	ELSEIF CFLAG:ARG:好感度 >= 300
+		TIMES SOURCE:ARG:不潔 , 0.80
+		TIMES SOURCE:ARG:逸脱 , 0.80
+
+		TIMES SOURCE:ARG:快Ｃ , 1.10
+		TIMES SOURCE:ARG:快Ｖ , 1.10
+		TIMES SOURCE:ARG:快Ａ , 1.10
+		TIMES SOURCE:ARG:情愛 , 1.20
+		TIMES SOURCE:ARG:快Ｂ , 1.10
+		TIMES SOURCE:ARG:歓楽 , 1.20
+		TIMES SOURCE:ARG:快Ｍ , 1.10
+	ELSEIF CFLAG:ARG:好感度 >= 100
+		TIMES SOURCE:ARG:不潔 , 0.90
+		TIMES SOURCE:ARG:逸脱 , 0.90
+		TIMES SOURCE:ARG:情愛 , 1.10
+	ENDIF
+ENDIF
+
+;淫乱
+;主人経験との重複前提で計算
+IF TALENT:ARG:淫乱
+	TIMES SOURCE:ARG:快Ｃ , 1.80
+	TIMES SOURCE:ARG:快Ｖ , 1.80
+	TIMES SOURCE:ARG:快Ａ , 1.80
+	TIMES SOURCE:ARG:快Ｂ , 1.80
+	TIMES SOURCE:ARG:快Ｍ , 1.80
+ENDIF
+
+;恋慕
+;主人経験との重複前提で計算
+IF TALENT:ARG:恋慕
+	TIMES SOURCE:ARG:快Ｃ , 1.30
+	TIMES SOURCE:ARG:快Ｖ , 1.30
+	TIMES SOURCE:ARG:快Ａ , 1.30
+	TIMES SOURCE:ARG:情愛 , 1.80
+	TIMES SOURCE:ARG:快Ｂ , 1.30
+	TIMES SOURCE:ARG:歓楽 , 1.50
+	TIMES SOURCE:ARG:快Ｍ , 1.30
+ENDIF
+
+;親愛
+;主人経験との重複前提で計算
+IF TALENT:ARG:親愛
+	TIMES SOURCE:ARG:快Ｃ , 1.50
+	TIMES SOURCE:ARG:快Ｖ , 1.50
+	TIMES SOURCE:ARG:快Ａ , 1.50
+	TIMES SOURCE:ARG:情愛 , 2.00
+	TIMES SOURCE:ARG:性行動 , 1.50
+	TIMES SOURCE:ARG:達成 , 1.50
+	TIMES SOURCE:ARG:中毒 , 1.20
+	TIMES SOURCE:ARG:快Ｂ , 1.50
+	TIMES SOURCE:ARG:歓楽 , 2.00
+	TIMES SOURCE:ARG:快Ｍ , 1.50
+ENDIF
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;同性の場合のチェック
+;CALL		USER
+;ARG		0:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@SOURCE_SEX_CHECK(ARG)
+SIF !HETEROSEX(ARG,PLAYER)
+	RETURN 0
+;同性愛
+;ABL:レズホモっ気をみる
+SELECTCASE ABL:ARG:(16 + HETEROSEX(ARG,PLAYER))
+	CASE 0
+		TIMES SOURCE:ARG:屈従 , 1.20
+		TIMES SOURCE:ARG:逸脱 , 1.20
+	CASE 1
+		TIMES SOURCE:ARG:達成 , 1.10
+		TIMES SOURCE:ARG:中毒 , 1.10
+		TIMES SOURCE:ARG:接触 , 1.10
+	CASE 2
+		TIMES SOURCE:ARG:達成 , 1.20
+		TIMES SOURCE:ARG:中毒 , 1.20
+		TIMES SOURCE:ARG:接触 , 1.20
+		TIMES SOURCE:ARG:屈従 , 0.90
+		TIMES SOURCE:ARG:逸脱 , 0.90
+	CASE 3
+		TIMES SOURCE:ARG:達成 , 1.30
+		TIMES SOURCE:ARG:中毒 , 1.30
+		TIMES SOURCE:ARG:接触 , 1.30
+		TIMES SOURCE:ARG:屈従 , 0.80
+		TIMES SOURCE:ARG:逸脱 , 0.80
+	CASE 4
+		TIMES SOURCE:ARG:達成 , 1.40
+		TIMES SOURCE:ARG:中毒 , 1.40
+		TIMES SOURCE:ARG:接触 , 1.40
+		TIMES SOURCE:ARG:屈従 , 0.70
+		TIMES SOURCE:ARG:逸脱 , 0.70
+	CASE 5
+		TIMES SOURCE:ARG:達成 , 1.50
+		TIMES SOURCE:ARG:中毒 , 1.50
+		TIMES SOURCE:ARG:接触 , 1.50
+		;TIMES SOURCE:ARG:挑発 , 1.50
+		TIMES SOURCE:ARG:屈従 , 0.60
+		TIMES SOURCE:ARG:逸脱 , 0.60
+	CASE 6
+		TIMES SOURCE:ARG:達成 , 1.60
+		TIMES SOURCE:ARG:中毒 , 1.60
+		TIMES SOURCE:ARG:接触 , 1.60
+		TIMES SOURCE:ARG:屈従 , 0.50
+		TIMES SOURCE:ARG:逸脱 , 0.50
+	CASE 7
+		TIMES SOURCE:ARG:達成 , 1.70
+		;TIMES SOURCE:ARG:誘惑 , 1.70
+		;TIMES SOURCE:ARG:辱め , 1.70
+		;TIMES SOURCE:ARG:挑発 , 1.70
+		TIMES SOURCE:ARG:屈従 , 0.40
+		TIMES SOURCE:ARG:逸脱 , 0.40
+	CASE 8
+		TIMES SOURCE:ARG:達成 , 1.80
+		TIMES SOURCE:ARG:中毒 , 1.80
+		TIMES SOURCE:ARG:接触 , 1.80
+		TIMES SOURCE:ARG:屈従 , 0.30
+		TIMES SOURCE:ARG:逸脱 , 0.30
+	CASE 9
+		TIMES SOURCE:ARG:達成 , 1.90
+		TIMES SOURCE:ARG:中毒 , 1.90
+		TIMES SOURCE:ARG:接触 , 1.90
+		TIMES SOURCE:ARG:屈従 , 0.20
+		TIMES SOURCE:ARG:逸脱 , 0.20
+	CASEELSE
+		TIMES SOURCE:ARG:達成 , 2.00
+		TIMES SOURCE:ARG:中毒 , 2.00
+		TIMES SOURCE:ARG:接触 , 2.00
+		TIMES SOURCE:ARG:屈従 , 0.10
+		TIMES SOURCE:ARG:逸脱 , 0.10
+ENDSELECT
+
+;ABL:中毒をみる
+SELECTCASE ABL:ARG:(31 + HETEROSEX(ARG,PLAYER))
+	CASE 1
+		TIMES SOURCE:ARG:快Ｃ , 1.10
+		TIMES SOURCE:ARG:快Ｖ , 1.10
+		TIMES SOURCE:ARG:快Ａ , 1.10
+		TIMES SOURCE:ARG:快Ｂ , 1.10
+		TIMES SOURCE:ARG:快Ｍ , 1.10
+		;TIMES SOURCE:ARG:与快Ｃ , 1.10
+		;TIMES SOURCE:ARG:与快Ｖ , 1.10
+		;TIMES SOURCE:ARG:与快Ａ , 1.10
+		;TIMES SOURCE:ARG:与快Ｂ , 1.10
+		TIMES SOURCE:ARG:達成 , 1.10
+		TIMES SOURCE:ARG:屈従 , 0.90
+		TIMES SOURCE:ARG:不潔 , 0.90
+		TIMES SOURCE:ARG:逸脱 , 0.90
+	CASE 2
+		TIMES SOURCE:ARG:快Ｃ , 1.20
+		TIMES SOURCE:ARG:快Ｖ , 1.20
+		TIMES SOURCE:ARG:快Ａ , 1.20
+		TIMES SOURCE:ARG:快Ｂ , 1.20
+		TIMES SOURCE:ARG:快Ｍ , 1.20
+		;TIMES SOURCE:ARG:与快Ｃ , 1.20
+		;TIMES SOURCE:ARG:与快Ｖ , 1.20
+		;TIMES SOURCE:ARG:与快Ａ , 1.20
+		;TIMES SOURCE:ARG:与快Ｂ , 1.20
+		TIMES SOURCE:ARG:達成 , 1.20
+		TIMES SOURCE:ARG:屈従 , 0.80
+		TIMES SOURCE:ARG:不潔 , 0.80
+		TIMES SOURCE:ARG:逸脱 , 0.80
+	CASE 3
+		TIMES SOURCE:ARG:快Ｃ , 1.30
+		TIMES SOURCE:ARG:快Ｖ , 1.30
+		TIMES SOURCE:ARG:快Ａ , 1.30
+		TIMES SOURCE:ARG:快Ｂ , 1.30
+		TIMES SOURCE:ARG:快Ｍ , 1.30
+		;TIMES SOURCE:ARG:与快Ｃ , 1.30
+		;TIMES SOURCE:ARG:与快Ｖ , 1.30
+		;TIMES SOURCE:ARG:与快Ａ , 1.30
+		;TIMES SOURCE:ARG:与快Ｂ , 1.30
+		TIMES SOURCE:ARG:達成 , 1.30
+		TIMES SOURCE:ARG:屈従 , 0.70
+		TIMES SOURCE:ARG:不潔 , 0.70
+		TIMES SOURCE:ARG:逸脱 , 0.70
+	CASE 4
+		TIMES SOURCE:ARG:快Ｃ , 1.40
+		TIMES SOURCE:ARG:快Ｖ , 1.40
+		TIMES SOURCE:ARG:快Ａ , 1.40
+		TIMES SOURCE:ARG:快Ｂ , 1.40
+		TIMES SOURCE:ARG:快Ｍ , 1.40
+		;TIMES SOURCE:ARG:与快Ｃ , 1.40
+		;TIMES SOURCE:ARG:与快Ｖ , 1.40
+		;TIMES SOURCE:ARG:与快Ａ , 1.40
+		;TIMES SOURCE:ARG:与快Ｂ , 1.40
+		TIMES SOURCE:ARG:達成 , 1.40
+		TIMES SOURCE:ARG:屈従 , 0.60
+		TIMES SOURCE:ARG:不潔 , 0.60
+		TIMES SOURCE:ARG:逸脱 , 0.60
+	CASE 5
+		TIMES SOURCE:ARG:快Ｃ , 1.40
+		TIMES SOURCE:ARG:快Ｖ , 1.40
+		TIMES SOURCE:ARG:快Ａ , 1.40
+		TIMES SOURCE:ARG:快Ｂ , 1.40
+		TIMES SOURCE:ARG:快Ｍ , 1.40
+		;TIMES SOURCE:ARG:与快Ｃ , 1.40
+		;TIMES SOURCE:ARG:与快Ｖ , 1.40
+		;TIMES SOURCE:ARG:与快Ａ , 1.40
+		;TIMES SOURCE:ARG:与快Ｂ , 1.40
+		TIMES SOURCE:ARG:達成 , 1.40
+		TIMES SOURCE:ARG:屈従 , 0.60
+		TIMES SOURCE:ARG:不潔 , 0.60
+		TIMES SOURCE:ARG:逸脱 , 0.60
+	CASE 6
+		TIMES SOURCE:ARG:快Ｃ , 1.50
+		TIMES SOURCE:ARG:快Ｖ , 1.50
+		TIMES SOURCE:ARG:快Ａ , 1.50
+		TIMES SOURCE:ARG:快Ｂ , 1.50
+		TIMES SOURCE:ARG:快Ｍ , 1.50
+		;TIMES SOURCE:ARG:与快Ｃ , 1.50
+		;TIMES SOURCE:ARG:与快Ｖ , 1.50
+		;TIMES SOURCE:ARG:与快Ａ , 1.50
+		;TIMES SOURCE:ARG:与快Ｂ , 1.50
+		TIMES SOURCE:ARG:達成 , 1.50
+		TIMES SOURCE:ARG:屈従 , 0.50
+		TIMES SOURCE:ARG:不潔 , 0.50
+		TIMES SOURCE:ARG:逸脱 , 0.50
+	CASE 7
+		TIMES SOURCE:ARG:快Ｃ , 1.60
+		TIMES SOURCE:ARG:快Ｖ , 1.60
+		TIMES SOURCE:ARG:快Ａ , 1.60
+		TIMES SOURCE:ARG:快Ｂ , 1.60
+		TIMES SOURCE:ARG:快Ｍ , 1.60
+		;TIMES SOURCE:ARG:与快Ｃ , 1.60
+		;TIMES SOURCE:ARG:与快Ｖ , 1.60
+		;TIMES SOURCE:ARG:与快Ａ , 1.60
+		;TIMES SOURCE:ARG:与快Ｂ , 1.60
+		TIMES SOURCE:ARG:達成 , 1.60
+		TIMES SOURCE:ARG:屈従 , 0.40
+		TIMES SOURCE:ARG:不潔 , 0.40
+		TIMES SOURCE:ARG:逸脱 , 0.40
+	CASE 8
+		TIMES SOURCE:ARG:快Ｃ , 1.70
+		TIMES SOURCE:ARG:快Ｖ , 1.70
+		TIMES SOURCE:ARG:快Ａ , 1.70
+		TIMES SOURCE:ARG:快Ｂ , 1.70
+		TIMES SOURCE:ARG:快Ｍ , 1.70
+		;TIMES SOURCE:ARG:与快Ｃ , 1.70
+		;TIMES SOURCE:ARG:与快Ｖ , 1.70
+		;TIMES SOURCE:ARG:与快Ａ , 1.70
+		;TIMES SOURCE:ARG:与快Ｂ , 1.70
+		TIMES SOURCE:ARG:達成 , 1.70
+		TIMES SOURCE:ARG:屈従 , 0.30
+		TIMES SOURCE:ARG:不潔 , 0.30
+		TIMES SOURCE:ARG:逸脱 , 0.30
+	CASE 9
+		TIMES SOURCE:ARG:快Ｃ , 1.80
+		TIMES SOURCE:ARG:快Ｖ , 1.80
+		TIMES SOURCE:ARG:快Ａ , 1.80
+		TIMES SOURCE:ARG:快Ｂ , 1.80
+		TIMES SOURCE:ARG:快Ｍ , 1.80
+		;TIMES SOURCE:ARG:与快Ｃ , 1.80
+		;TIMES SOURCE:ARG:与快Ｖ , 1.80
+		;TIMES SOURCE:ARG:与快Ａ , 1.80
+		;TIMES SOURCE:ARG:与快Ｂ , 1.80
+		TIMES SOURCE:ARG:達成 , 1.80
+		TIMES SOURCE:ARG:屈従 , 0.20
+		TIMES SOURCE:ARG:不潔 , 0.20
+		TIMES SOURCE:ARG:逸脱 , 0.20
+	CASE IS > 9
+		TIMES SOURCE:ARG:快Ｃ , 1.90
+		TIMES SOURCE:ARG:快Ｖ , 1.90
+		TIMES SOURCE:ARG:快Ａ , 1.90
+		TIMES SOURCE:ARG:快Ｂ , 1.90
+		TIMES SOURCE:ARG:快Ｍ , 1.90
+		;TIMES SOURCE:ARG:与快Ｃ , 1.90
+		;TIMES SOURCE:ARG:与快Ｖ , 1.90
+		;TIMES SOURCE:ARG:与快Ａ , 1.90
+		;TIMES SOURCE:ARG:与快Ｂ , 1.90
+		TIMES SOURCE:ARG:達成 , 1.90
+		TIMES SOURCE:ARG:屈従 , 0.10
+		TIMES SOURCE:ARG:不潔 , 0.10
+		TIMES SOURCE:ARG:逸脱 , 0.10
+ENDSELECT
+	;調教者のABL:レズホモっ気
+SELECTCASE ABL:PLAYER:(16 + HETEROSEX(ARG,PLAYER))
+	CASE 0
+		TIMES SOURCE:ARG:情愛 , 0.50
+		TIMES SOURCE:ARG:達成 , 0.50
+	CASE 1
+		TIMES SOURCE:ARG:情愛 , 0.70
+		TIMES SOURCE:ARG:達成 , 0.70
+	CASE 2
+		TIMES SOURCE:ARG:情愛 , 0.90
+		TIMES SOURCE:ARG:達成 , 0.90
+	CASE 3
+		TIMES SOURCE:ARG:情愛 , 1.10
+		TIMES SOURCE:ARG:達成 , 1.10
+	CASE 4
+		TIMES SOURCE:ARG:情愛 , 1.20
+		TIMES SOURCE:ARG:達成 , 1.20
+	CASE 5
+		TIMES SOURCE:ARG:情愛 , 1.30
+		TIMES SOURCE:ARG:達成 , 1.30
+	CASE 6
+		TIMES SOURCE:ARG:情愛 , 1.40
+		TIMES SOURCE:ARG:達成 , 1.40
+	CASE 7
+		TIMES SOURCE:ARG:情愛 , 1.50
+		TIMES SOURCE:ARG:達成 , 1.50
+	CASE 8
+		TIMES SOURCE:ARG:情愛 , 1.60
+		TIMES SOURCE:ARG:達成 , 1.60
+	CASE 9
+		TIMES SOURCE:ARG:情愛 , 1.80
+		TIMES SOURCE:ARG:達成 , 1.80
+	CASEELSE
+		TIMES SOURCE:ARG:情愛 , 2.00
+		TIMES SOURCE:ARG:達成 , 2.00
+ENDSELECT
+;調教者のABL:中毒
+SELECTCASE ABL:PLAYER:(31 + HETEROSEX(ARG,PLAYER))
+	CASE 1
+		TIMES SOURCE:ARG:情愛 , 1.10
+		TIMES SOURCE:ARG:性行動 , 1.10
+		TIMES SOURCE:ARG:達成 , 1.10
+	CASE 2
+		TIMES SOURCE:ARG:情愛 , 1.20
+		TIMES SOURCE:ARG:性行動 , 1.20
+		TIMES SOURCE:ARG:達成 , 1.20
+	CASE 3
+		TIMES SOURCE:ARG:情愛 , 1.30
+		TIMES SOURCE:ARG:性行動 , 1.30
+		TIMES SOURCE:ARG:達成 , 1.30
+	CASE 4
+		TIMES SOURCE:ARG:情愛 , 1.40
+		TIMES SOURCE:ARG:性行動 , 1.40
+		TIMES SOURCE:ARG:達成 , 1.40
+	CASE 5
+		TIMES SOURCE:ARG:情愛 , 1.50
+		TIMES SOURCE:ARG:性行動 , 1.50
+		TIMES SOURCE:ARG:達成 , 1.50
+	CASE 6
+		TIMES SOURCE:ARG:情愛 , 1.60
+		TIMES SOURCE:ARG:性行動 , 1.60
+		TIMES SOURCE:ARG:達成 , 1.60
+	CASE 7
+		TIMES SOURCE:ARG:情愛 , 1.70
+		TIMES SOURCE:ARG:性行動 , 1.70
+		TIMES SOURCE:ARG:達成 , 1.70
+	CASE 8
+		TIMES SOURCE:ARG:情愛 , 1.80
+		TIMES SOURCE:ARG:性行動 , 1.80
+		TIMES SOURCE:ARG:達成 , 1.80
+	CASE 9
+		TIMES SOURCE:ARG:情愛 , 1.90
+		TIMES SOURCE:ARG:性行動 , 1.90
+		TIMES SOURCE:ARG:達成 , 1.90
+	CASEELSE
+		TIMES SOURCE:ARG:情愛 , 2.00
+		TIMES SOURCE:ARG:性行動 , 2.00
+		TIMES SOURCE:ARG:達成 , 2.00
+ENDSELECT
+;調教者の自制心
+IF TALENT:PLAYER:自制心
+	TIMES SOURCE:ARG:性行動 , 0.50
+	TIMES SOURCE:ARG:達成 , 0.50
+ENDIF
+
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;生理中の場合のチェック
+;CALL		USER
+;ARG		0:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@EVENT_MENSTRUAL_PAIN(ARG)
+
+;生理中でなく、妊娠パッチがONでなければRETURN
+SIF !(TALENT:ARG:生理 && (FLAG:62 & 1))
+	RETURN 0
+
+;痛みのソースが0だが接触がある場合苦痛のソースに40～60を代入
+SIF SOURCE:ARG:痛み == 0 && (SOURCE:ARG:快Ｃ || SOURCE:ARG:快Ｖ || SOURCE:ARG:快Ａ || SOURCE:ARG:快Ｂ || SOURCE:ARG:接触)
+	SOURCE:ARG:痛み = 40 + RAND:21
+
+;Cに刺激がある場合
+IF SOURCE:ARG:快Ｃ
+	IF TALENT:ARG:Ｃ鈍感
+		TIMES SOURCE:ARG:痛み , 1.20
+	ELSEIF TALENT:ARG:Ｃ敏感
+		TIMES SOURCE:ARG:痛み , 1.50
+	ELSE
+		TIMES SOURCE:ARG:痛み , 1.30
+	ENDIF
+ENDIF
+
+;Vに刺激がある場合
+IF SOURCE:ARG:快Ｖ
+	IF TALENT:ARG:Ｖ鈍感
+		TIMES SOURCE:ARG:痛み , 1.20
+	ELSEIF TALENT:ARG:Ｖ敏感
+		TIMES SOURCE:ARG:痛み , 1.50
+	ELSE
+		TIMES SOURCE:ARG:痛み , 1.30
+	ENDIF
+ENDIF
+
+;Aに刺激がある場合
+IF SOURCE:ARG:快Ａ
+	IF TALENT:ARG:Ａ鈍感
+		TIMES SOURCE:ARG:痛み , 1.20
+	ELSEIF TALENT:ARG:Ａ敏感
+		TIMES SOURCE:ARG:痛み , 1.40
+	ELSE
+		TIMES SOURCE:ARG:痛み , 1.30
+	ENDIF
+ENDIF
+
+;Bに刺激がある場合
+IF SOURCE:ARG:快Ｂ
+	IF TALENT:ARG:Ｂ鈍感
+		TIMES SOURCE:ARG:痛み , 1.20
+	ELSEIF TALENT:ARG:Ｂ敏感
+		TIMES SOURCE:ARG:痛み , 1.40
+	ELSE
+		TIMES SOURCE:ARG:痛み , 1.30
+	ENDIF
+ENDIF
+
+;接触がある場合
+SIF SOURCE:ARG:接触
+	TIMES SOURCE:ARG:痛み , 1.10
+
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;処女喪失時の処理
+;CALL		USER
+;ARG		0:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@LOST_VIRGIN(ARG)
+;-------------------------------------------------
+;処女喪失のチェック
+;-------------------------------------------------
+IF TALENT:ARG:処女 == 1 && EXP_UP(0,ARG) && !TFLAG:破瓜抑制
+	PRINTW 処女喪失
+	;処女喪失フラグ(今回のコマンド)
+	TCVAR:ARG:破瓜 = 1
+	TFLAG:処女喪失 = 1
+	;処女喪失フラグ（今回の調教）
+	TFLAG:地の文用処女喪失フラグ = 1
+	;ビデオ撮影
+	IF TEQUIP:ARG:ビデオ撮影
+		;性交
+		IF TEQUIP:ARG:性交中
+			LOCALS = LV1/
+		ELSEIF TEQUIP:バイブ
+			LOCALS = LV3/
+		;その他
+		ELSE
+			LOCALS = LV4/
+		ENDIF
+		VSTR:1 += LOCALS
+		;処女喪失フラグ（ビデオ撮影）
+		TFLAG:ビデオ撮影用処女喪失フラグ |= 1
+	ENDIF
+	;貞操観念
+	IF TALENT:ARG:貞操観念
+		IF !TALENT:ARG:恋慕
+			TIMES SOURCE:ARG:情愛 , 0.60
+			TIMES SOURCE:ARG:反感 , 10.00
+		ELSEIF !ASSIPLAY
+			TIMES SOURCE:ARG:情愛 , 1.20
+			TIMES SOURCE:ARG:反感 , 0.50
+		ENDIF
+	;貞操無頓着
+	ELSEIF TALENT:ARG:貞操無頓着
+		TIMES SOURCE:ARG:情愛 , 0.60
+		TIMES SOURCE:ARG:反感 , 0.50
+	ENDIF
+	;陥落素質による処理
+	;MASTERがTARGETの膣に挿入している
+	IF TEQUIP:ARG:50 == MASTER
+		;親愛かつ相手が主人
+		IF TALENT:ARG:恋慕 > 1
+			PRINTFORML %CALLNAME:ARG%は%CALLNAME:MASTER%が初めての相手である事にこの上ない幸せを感じているようだ……
+			TFLAG:友好処女奪還 = 1
+			TIMES SOURCE:ARG:情愛 , 2.00
+			TIMES SOURCE:ARG:反感 , 0.10
+		;恋慕かつ相手が主人
+		ELSEIF TALENT:ARG:恋慕
+			PRINTFORML %CALLNAME:ARG%は%CALLNAME:MASTER%に処女を捧げられた事に幸福を感じているようだ……
+			TFLAG:友好処女奪還 = 1
+			TIMES SOURCE:ARG:情愛 , 2.00
+			TIMES SOURCE:ARG:反感 , 0.30
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;再生処女喪失のチェック
+;-------------------------------------------------
+;IF TALENT:ARG:処女 == 2 && EXP_UP(1,ARG)
+;	TCVAR:ARG:破瓜 = 2
+;	;ビデオ撮影
+;	IF TEQUIP:28
+;		;性交
+;		IF TEQUIP:ARG:50
+;			LOCALS = LV1/
+;		ELSEIF TEQUIP:ARG:13
+;			LOCALS = LV3/
+;		;その他
+;		ELSE
+;			LOCALS = LV4/
+;		ENDIF
+;		TSTR:1 += LOCALS
+;	ENDIF
+;	PRINTW 再生処女喪失
+;ENDIF
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.01
+;苦痛快楽経験、奉仕快楽経験のチェック
+;CALL		USER
+;ARG		0:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@EXP_GOT_CHECK(ARG)
+;奉仕系である、奉仕快楽のチェック
+LOCAL = CUP:ARG:快Ｃ + CUP:ARG:快Ｖ + CUP:ARG:快Ａ + CUP:ARG:快Ｂ + CUP:ARG:快Ｍ + CUP:ARG:恭順
+LOCAL:1 = 0
+
+IF CUP:ARG:欲情 < 100
+	LOCAL = 0
+ELSEIF CUP:ARG:欲情 < 300
+	LOCAL *= 2
+ELSEIF CUP:ARG:欲情 < 700
+	LOCAL *= 3
+ELSEIF CUP:ARG:欲情 < 1500
+	LOCAL *= 4
+ELSE
+	LOCAL *= 5
+ENDIF
+
+IF TFLAG:奉仕快楽
+	IF LOCAL >= 12000
+		LOCAL:1 = 16
+		TIMES CUP:ARG:恐怖 , 0.65
+		TIMES CUP:ARG:反感 , 0.30
+	ELSEIF LOCAL >= 8000
+		LOCAL:1 = 12
+		TIMES CUP:ARG:恐怖 , 0.70
+		TIMES CUP:ARG:反感 , 0.40
+	ELSEIF LOCAL >= 5000
+		LOCAL:1 = 8
+		TIMES CUP:ARG:恐怖 , 0.75
+		TIMES CUP:ARG:反感 , 0.50
+	ELSEIF LOCAL >= 3000
+		LOCAL:1 = 4
+		TIMES CUP:ARG:恐怖 , 0.80
+		TIMES CUP:ARG:反感 , 0.60
+	ELSEIF LOCAL >= 2000
+		LOCAL:1 = 2
+		TIMES CUP:ARG:恐怖 , 0.85
+		TIMES CUP:ARG:反感 , 0.70
+	ELSEIF LOCAL >= 1000
+		LOCAL:1 = 1
+		TIMES CUP:ARG:恐怖 , 0.90
+		TIMES CUP:ARG:反感 , 0.80
+	ENDIF
+	EXP:ARG:奉仕快楽経験 += LOCAL:1
+ENDIF
+
+;苦痛快楽のチェック
+LOCAL = 0
+IF CUP:ARG:欲情 >= 3000 && CUP:ARG:苦痛 >= 2000
+	LOCAL = 16
+	TIMES CUP:ARG:恐怖 , 0.65
+ELSEIF CUP:ARG:欲情 >= 2500 && CUP:ARG:苦痛 >= 1500
+	LOCAL = 12
+	TIMES CUP:ARG:恐怖 , 0.70
+ELSEIF CUP:ARG:欲情 >= 1500 && CUP:ARG:苦痛 >= 1000
+	LOCAL = 8
+	TIMES CUP:ARG:恐怖 , 0.75
+ELSEIF CUP:ARG:欲情 >= 1000 && CUP:ARG:苦痛 >= 500
+	LOCAL = 4
+	TIMES CUP:ARG:恐怖 , 0.80
+ELSEIF CUP:ARG:欲情 >= 600 && CUP:ARG:苦痛 >= 300
+	LOCAL = 2
+	TIMES CUP:ARG:恐怖 , 0.85
+ELSEIF CUP:ARG:欲情 >= 300 && CUP:ARG:苦痛 >= 100
+	LOCAL = 1
+	TIMES CUP:ARG:恐怖 , 0.90
+ENDIF
+
+IF LOCAL > 0 && ARG > 0
+	EXP:ARG:苦痛快楽経験 += LOCAL
+
+ENDIF
+
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.01
+;刻印取得のチェック
+;CALL		USER
+;ARG		0:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@MARK_GOT_CHECK(ARG)
+VARSET LOCAL
+;-------------------------------------------------
+;苦痛依存
+;-------------------------------------------------
+IF CUP:ARG:苦痛 >= 2000 && CUP:ARG:苦痛 < 4000 && MARK:ARG:苦痛依存 <= 0
+	MARK:ARG:苦痛依存 = 1
+	TFLAG:苦痛依存 = 1
+	LOCAL = 1
+ELSEIF CUP:ARG:苦痛 >= 4000 && CUP:ARG:苦痛 < 8000 && MARK:ARG:苦痛依存 <= 1
+	MARK:ARG:苦痛依存 = 2
+	TFLAG:苦痛依存 = 2
+
+	LOCAL = 3
+ELSEIF CUP:ARG:苦痛 >= 8000 && MARK:ARG:苦痛依存 <= 2
+	MARK:ARG:苦痛依存 = 3
+	TFLAG:苦痛依存 = 3
+
+	LOCAL = 5
+	IF TALENT:PLAYER:サド
+		EXP:ARG:異常経験 += 2
+	ELSEIF TALENT:PLAYER:針さばき && SELECTCOM == 103
+		EXP:ARG:異常経験 += 2
+	ELSE
+		EXP:ARG:異常経験 += 1
+	ENDIF
+ENDIF
+IF LOCAL
+	;マゾっ気LVが取得する苦痛依存LV以上かつ、気丈・感情乏しいがなく、反発感情がない場合は親密アップ
+	IF ABL:ARG:親密 < LOCAL && ABL:ARG:マゾっ気 >= TFLAG:苦痛依存 && !TALENT:ARG:気丈 && !TALENT:ARG:感情乏しい && !MARK:ARG:反発感情
+		ABL:ARG:親密 = LOCAL
+		TFLAG:刻印取得時の親密の変化 = 1
+	ENDIF
+ENDIF
+;-------------------------------------------------
+;快楽依存
+;-------------------------------------------------
+VARSET LOCAL
+A = CUP:ARG:0 + CUP:ARG:1 + CUP:ARG:2 + CUP:ARG:14 + CUP:ARG:18
+IF A >= 500 && A < 1500 && MARK:ARG:快楽依存 <= 0
+	MARK:ARG:快楽依存 = 1
+	TFLAG:快楽依存 = 1
+	LOCAL = 1
+ELSEIF A >= 1500 && A < 3000 && MARK:ARG:快楽依存 <= 1
+	MARK:ARG:快楽依存 = 2
+	TFLAG:快楽依存 = 2
+	LOCAL = 3
+ELSEIF A >= 3000 && MARK:ARG:快楽依存 <= 2
+	MARK:ARG:快楽依存 = 3
+	TFLAG:快楽依存 = 3
+	LOCAL = 5
+	;自制心・感情乏しいの場合は快楽依存による親密アップはなし
+	;IF !ABL:ARG:親密 && !TALENT:ARG:自制心 && !TALENT:ARG:感情乏しい
+	;	ABL:ARG:親密 = 1
+	;	TFLAG:刻印取得時の親密の変化 = 1
+	;ENDIF
+ENDIF
+IF LOCAL
+	;自制心・感情乏しいがなく、反発感情がない場合は親密アップ
+	IF ABL:ARG:親密 < LOCAL  && !TALENT:ARG:感情乏しい && !TALENT:ARG:自制心 && !MARK:ARG:反発感情
+		ABL:ARG:親密 = LOCAL
+		TFLAG:刻印取得時の親密の変化 = 1
+	ENDIF
+ENDIF
+;-------------------------------------------------
+;既成事実
+;-------------------------------------------------
+VARSET LOCAL, 0
+IF TFLAG:200 == 1 && MARK:ARG:2 <= 0
+	MARK:ARG:既成事実 = 1
+	TFLAG:既成事実 = 1
+	LOCAL = 3
+ELSEIF TFLAG:200 == 2 && MARK:ARG:2 <= 1
+	MARK:ARG:既成事実 = 2
+	TFLAG:既成事実 = 2
+	LOCAL = 5
+ELSEIF TFLAG:200 == 3 && MARK:ARG:2 <= 2
+	MARK:ARG:既成事実 = 3
+	TFLAG:既成事実 = 3
+	LOCAL = 8
+ENDIF
+IF LOCAL
+	;感情乏しいがなく、反発感情がない場合は親密アップ
+	IF ABL:ARG:親密 < LOCAL  && !TALENT:ARG:感情乏しい && !MARK:ARG:反発感情
+		ABL:ARG:親密 = LOCAL
+		TFLAG:刻印取得時の親密の変化 = 1
+	ENDIF
+ENDIF
+;-------------------------------------------------
+;反発感情
+;------------------------------------------------- 
+;MASTERは除外
+SIF ARG == MASTER
+	RETURN 0
+A = CUP:ARG:反感+CUP:ARG:不快
+IF A >= 500 && A < 1000 && TFLAG:前回のASSIPLAYの履歴 == 0 && MARK:ARG:4 <= 0
+	MARK:ARG:反発感情 = 1
+	SIF MARK:ARG:4 < 1
+		MARK:ARG:4 = 1
+	TFLAG:反発感情 = 1
+	
+ELSEIF A >= 1000 && A < 2000 && TFLAG:前回のASSIPLAYの履歴 == 0 && MARK:ARG:4 <= 1
+	MARK:ARG:反発感情 = 2
+	TFLAG:反発感情 = 2
+	IF MARK:ARG:4 < 2
+		;感情乏しいの場合は反発感情による親密ダウンはなし
+		IF ABL:ARG:親密 == 1 && !TALENT:ARG:感情乏しい
+			ABL:ARG:親密 -= 2
+			TFLAG:刻印取得時の親密の変化 = 1
+		ELSEIF ABL:ARG:親密 == 2 && !TALENT:ARG:感情乏しい
+			ABL:ARG:親密 -= 1
+			TFLAG:刻印取得時の親密の変化 = 2
+		ENDIF
+	ENDIF
+	MARK:ARG:4 = 2
+ELSEIF A >= 2000 && TFLAG:前回のASSIPLAYの履歴 == 0 && MARK:ARG:4 <= 2
+	MARK:ARG:反発感情 = 3
+	TFLAG:反発感情 = 3
+	IF MARK:ARG:4 < 3
+		;感情乏しいの場合は反発感情による親密ダウンはなし
+		IF ABL:ARG:親密 > 0 && ABL:ARG:親密 <= 2 && !TALENT:ARG:感情乏しい
+			ABL:親密 -= 4
+			TFLAG:刻印取得時の親密の変化 = 1
+		ELSEIF ABL:ARG:親密 == 3 && !TALENT:ARG:感情乏しい
+			ABL:ARG:親密 -= 2
+			TFLAG:刻印取得時の親密の変化 = 2
+		ENDIF
+	ENDIF
+	MARK:ARG:4 = 3
+ENDIF
+;恋慕有+その他の条件を満たして友好的に処女を奪ったフラグ
+;1の時は反発感情を取得しない。この段階で初期化する
+TFLAG:150 = 0
+TFLAG:前回のASSIPLAYの履歴 = 0
+;反発感情取得時は反発感情取得口上のみ表示
+IF TFLAG:反発感情
+	TFLAG:快楽依存 = 0
+	TFLAG:苦痛依存 = 0
+	TFLAG:既成事実 = 0
+ENDIF
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;親密の上昇による[抵抗]の消滅をチェック
+;CALL		USER
+;ARG		VOID
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@JUJUN_UP_CHECK
+FOR LOCAL,0,CHARANUM
+	;関係ない人は省く
+	SIF LOCAL != MASTER && LOCAL != TARGET && LOCAL != ASSI
+		CONTINUE
+	IF ABL:LOCAL:親密 >= 3 && TALENT:LOCAL:抵抗
+		PRINTFORM %NAME:LOCAL%は[抵抗]を失った
+		TALENT:LOCAL:抵抗 = 0
+		PRINTL 否定の珠が半分になった
+		JUEL:LOCAL:100 /= 2
+	ENDIF
+NEXT
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;欲望の上昇による[抑圧]の消滅をチェック
+;CALL		USER
+;ARG		VOID
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@YOKUBO_UP_CHECK
+FOR LOCAL,0,CHARANUM
+	;関係ない人は省く
+	SIF LOCAL != MASTER && LOCAL != TARGET && LOCAL != ASSI
+		CONTINUE
+	IF ABL:LOCAL:欲望 >= 3 && (TALENT:LOCAL:抑圧 || TALENT:LOCAL:抵抗)
+		TFLAG:13 = 36
+		TFLAG:25 = 1
+		LOCAL:1 = TARGET
+		TARGET = LOCAL
+		CALL SELF_KOJO
+		TARGET = LOCAL:1
+		PRINTFORM %NAME:LOCAL%は
+		SIF TALENT:LOCAL:抑圧
+			PRINTFORM [抑圧]
+		SIF TALENT:LOCAL:抵抗
+			PRINTFORM [抵抗]
+		PRINTFORML を失った
+		TALENT:LOCAL:抵抗 = 0
+		TALENT:LOCAL:抑圧 = 0
+		PRINTL 否定の珠が半分になった
+		JUEL:LOCAL:100 /= 2
+	ENDIF
+NEXT
+
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.01
+;好感度上昇計算処理
+;CALL		USER
+;ARG		0:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@FAVOR_CALC(ARG)
+;COMABLE範囲外抑止
+;SIF !TFLAG:COMABLE管理
+;	RETURN 0
+;対象がMASTER以外の時起動
+SIF !ARG
+	RETURN 0
+SIF ASSIPLAY 
+	RETURN 0
+;主人(あなた)と対象の能力を計算
+;ABL:親密をみる
+;TFLAG:獲得好感度 += 
+;(ABL:ARG:親密 + ABL:ARG:親密) / 2
+
+;ウフフ時でない
+IF SELECTCOM > 300
+	TFLAG:獲得好感度 += (RAND:6 - 1)
+	IF TFLAG:18 == -1
+		TFLAG:獲得好感度 -= 10
+		TFLAG:ムード -= 5
+	ELSEIF TFLAG:18 == 0
+		TFLAG:ムード += (RAND:6 - 1)
+	ELSE
+		TFLAG:獲得好感度 += 2
+		TFLAG:ムード += (5 + (RAND:6 - 1))
+	ENDIF
+ELSE
+	TFLAG:獲得好感度 += (RAND:10 + 5)
+	SIF !TALENT:合意 && !TFLAG:48
+		TFLAG:獲得好感度 -= 8
+	TFLAG:ムード += (TFLAG:獲得好感度 / 2)
+ENDIF
+;主人と対象が同性
+IF HETEROSEX(TARGET,PLAYER)
+	;男ならホモっ気、女ならレズっ気を見る
+	IF ABL:ARG:(HETEROSEX(TARGET,PLAYER) + 16) == 0
+		TFLAG:獲得好感度 -= 1
+	ELSEIF ABL:ARG:(HETEROSEX(TARGET,PLAYER) + 16) < 3
+		TFLAG:獲得好感度 += 0
+	ELSEIF ABL:ARG:(HETEROSEX(TARGET,PLAYER) + 16) < 5
+		TFLAG:獲得好感度 += 1
+	ELSE
+		TFLAG:獲得好感度 += 2
+	ENDIF
+	;男ならＢＬ中毒、女ならレズ中毒を見る
+	IF ABL:ARG:(HETEROSEX(TARGET,PLAYER) + 31) > 4
+		TFLAG:獲得好感度 += 2
+	ELSEIF ABL:ARG:(HETEROSEX(TARGET,PLAYER) + 31) > 2
+		TFLAG:獲得好感度 += 1
+	ENDIF
+	;両刀
+	SIF TALENT:ARG:両刀
+		TFLAG:獲得好感度 += 1
+ENDIF
+;素質による増減
+;反抗的
+SIF TALENT:ARG:反抗的
+	TFLAG:獲得好感度 -= 1
+;素直
+SIF TALENT:ARG:素直 && TFLAG:獲得好感度 > 0
+	TFLAG:獲得好感度 += 1
+;自制心
+SIF TALENT:ARG:自制心
+	TFLAG:獲得好感度 -= 1
+;感情乏しい
+SIF TALENT:ARG:感情乏しい
+	TFLAG:獲得好感度 -= 1
+;抵抗
+SIF TALENT:ARG:抵抗
+	TFLAG:獲得好感度 -= 1
+;献身的
+SIF TALENT:ARG:献身的 && TFLAG:獲得好感度 > 0
+	TFLAG:獲得好感度 += 1
+;快感に素直
+IF TALENT:ARG:快感に素直 > 0
+	TFLAG:獲得好感度 += 1
+;快感の否定
+ELSEIF TALENT:ARG:快感の否定
+	TFLAG:獲得好感度 -= 1
+ENDIF
+;男嫌い
+IF TALENT:ARG:男嫌い && TALENT:MASTER:オトコ
+	TFLAG:獲得好感度 -= 1
+;女嫌い
+;ELSEIF TALENT:ARG:性別嗜好 & 2 && TALENT:MASTER:2 & 1
+;	TFLAG:獲得好感度 -= 1
+ENDIF
+;恋慕
+SIF TALENT:ARG:恋慕
+	TFLAG:獲得好感度 += 2
+;親愛
+SIF TALENT:88
+	TFLAG:獲得好感度 += 3
+;恋人
+SIF TALENT:153
+	TFLAG:獲得好感度 += 2
+	;服従
+;主人の魅力
+SIF TALENT:MASTER:魅力
+	TFLAG:獲得好感度 += 1
+;主人の魅惑
+SIF TALENT:MASTER:魅惑
+	TFLAG:獲得好感度 += 1
+;主人の謎の魅力
+SIF TALENT:MASTER:謎の魅力
+	TFLAG:獲得好感度 += 1
+;主人の人気
+SIF TALENT:MASTER:人気
+	TFLAG:獲得好感度 += 1
+
+
+LOCAL = 0
+LOCAL:1 = 0
+;各種快感
+;50上限、25000と+500 この数値が大きければSOURCE:ARGの増加に対して鈍感になる
+LOCAL += (100 - 25000 / (SOURCE:ARG:快Ｃ + SOURCE:ARG:快Ｖ + SOURCE:ARG:快Ａ + SOURCE:ARG:快Ｂ + SOURCE:ARG:快Ｍ + 250)) * (1 + TALENT_LV(ARG, "快感応答"))
+;情愛
+LOCAL += (100 - 200000 / (SOURCE:ARG:情愛 + 2000))
+;達成感
+LOCAL += (30 - 30000 / (SOURCE:ARG:達成 + 1000))
+;欲情
+LOCAL += (20 - 20000 / (SOURCE:ARG:欲情 + 1000))
+;恭順
+LOCAL += (20 - 20000 / (SOURCE:ARG:恭順 + 1000))
+;屈服
+LOCAL += (20 - 20000 / (SOURCE:ARG:屈従 + 1000))
+;露出
+LOCAL += (30 - 30000 / (SOURCE:ARG:露出 + 1000)) * (ABL:ARG:露出癖 - 3) / 3
+;恐怖
+;LOCAL += (50 - 20000 / (SOURCE:ARG:不安 + 400)) * (ABL:ARG:親密 - 3) / 3
+;苦痛
+LOCAL += (50 - 20000 / (SOURCE:ARG:痛み + 400)) * (ABL:ARG:マゾっ気 - 3) / 3
+;歓楽
+LOCAL += (50 - 100000 / (SOURCE:ARG:歓楽 + 2000))
+;征服
+LOCAL += (30 - 90000 / (SOURCE:ARG:征服 + 3000))
+;受動
+LOCAL += (30 - 90000 / (SOURCE:ARG:受動 + 3000))
+LOCAL:1 += LOCAL
+;不潔
+LOCAL -= (50 - 25000 / (SOURCE:ARG:不潔 + 500)) * (2 - TALENT_LV(ARG, "汚臭耐性")) / 2
+;反感
+;LOCAL -= (50 - 15000 / (SOURCE:ARG:反感 + 300))
+;逸脱
+LOCAL -= (50 - 25000 / (SOURCE:ARG:逸脱 + 500))
+;反発
+LOCAL -= (50 - 10000 / (SOURCE:ARG:反感 + 200))
+
+;好感度上昇分に計算値追加
+TFLAG:獲得好感度 += LOCAL / 8
+
+;日常時ON
+IF TFLAG:COMABLE管理 != 2
+	;ムードに好感度上昇分追加
+	;BASE:ARG:ムード +=  MIN(ABL:ARG:親密 + 1,10) * LOCAL / 2
+	;BASE:ARG:ムード = MIN(BASE:ARG:ムード , MAXBASE:ARG:ムード )
+ENDIF
+
+SELECTCASE FLAG:難易度
+	CASE 0
+		LOCAL:1 = 0
+	CASE 1
+		LOCAL:1 = 1
+	CASE 2
+		LOCAL:1 = 3
+	CASE 3
+		LOCAL:1 = 5
+	CASEELSE
+		LOCAL:1 = 1
+ENDSELECT
+
+;反発感情補正
+TFLAG:獲得好感度 -= (LOCAL:1 + 1) * MARK:反発感情
+
+;結果が一定数未満の場合
+;IF MARK:反発感情 >= 3 && TFLAG:獲得好感度 < -3
+;	TFLAG:獲得好感度 = -3
+;ELSEIF MARK:反発感情 == 2 && TFLAG:獲得好感度 < -2
+;	TFLAG:獲得好感度 = -2
+;ELSEIF MARK:反発感情 == 1 && TFLAG:獲得好感度 < -1
+;	TFLAG:獲得好感度 = -1
+;ELSEIF TFLAG:獲得好感度 < 0
+;	TFLAG:獲得好感度 = 0
+;ENDIF
+
+	;相性による修正
+	SIF RELATION:ARG:(NO:MASTER) != 0
+		TFLAG:獲得好感度 *= (RELATION:ARG:(NO:MASTER) / 100)
+	;パートナー補正
+	SIF TALENT:ARG:150
+		TIMES R , 1.20
+
+;無関心の場合、恋慕がないと好感度が上がりにくい
+IF TALENT:ARG:無関心 && !TALENT:ARG:恋慕
+	IF TFLAG:獲得好感度 > 1
+		TFLAG:獲得好感度 /= 2
+	ELSEIF TFLAG:獲得好感度 > 0
+		TFLAG:獲得好感度 = 1
+	ENDIF
+	SIF ABL:ARG:サドっ気 >= 4
+		TFLAG:獲得好感度 += 1
+ENDIF
+
+;何もしないを使用した場合は上限を0にする
+SIF TFLAG:獲得好感度 > 0 && SELECTCOM == 21
+	TFLAG:獲得好感度 = 0
+;助手調教中
+SIF ASSIPLAY == 1
+	TFLAG:獲得好感度 = 0
+SIF SELECTCOM == [[調教:何もしない]]
+	TFLAG:獲得好感度 = 0
+;好感度に上昇値を加算
+CFLAG:ARG:好感度 += TFLAG:獲得好感度
+
+;好感度は0以下にも100万以上にもならない
+;CFLAG:ARG:好感度 = LIMIT(CFLAG:2, 0, 999999)
+
+LOCAL:1 = 0
+FOR LOCAL,0,100
+	SIF SOURCE:ARG:LOCAL
+		LOCAL:1 ++
+NEXT
+SIF !LOCAL:1
+	TFLAG:獲得好感度 = 0
+
+;好感度表示
+SIF TFLAG:獲得好感度
+	PRINTFORML \@(TFLAG:獲得好感度 >= 0) ? 好感度上昇：{TFLAG:獲得好感度} # 好感度上昇：-{-TFLAG:獲得好感度}\@
+SIF ((FLAG:23 & 1p26) == 0) && FLAG:2 != 1
+	PRINTFORML 好感度合計:{CFLAG:ARG:2}
+TFLAG:獲得好感度 = 0
+
+;好感度上昇値合算
+;FLAG:好感度上昇のキャラ累積値 += TFLAG:獲得好感度
+
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;V調教の苦痛、反発補正(フィストなど激しいものは別処理)
+;CALL		USER
+;ARG		0:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@PAIN_CHECK_V(ARG)
+;EXP:Ｖ経験をみる（処女の反感は別途処理済みなので省略）
+IF EXP:ARG:Ｖ経験 < EXPLV:1
+	TIMES SOURCE:ARG:痛み , 2.50
+ELSEIF EXP:ARG:Ｖ経験 < EXPLV:2
+	TIMES SOURCE:ARG:痛み , 0.80
+	TIMES SOURCE:ARG:反感 , 1.20
+ELSEIF EXP:ARG:Ｖ経験 < EXPLV:3
+	TIMES SOURCE:ARG:痛み , 0.40
+ELSEIF EXP:ARG:Ｖ経験 < EXPLV:4
+	TIMES SOURCE:ARG:痛み , 0.10
+ELSEIF EXP:ARG:Ｖ経験 < EXPLV:5
+	TIMES SOURCE:ARG:痛み , 0.00
+ELSEIF EXP:ARG:Ｖ経験 >= EXPLV:5
+	TIMES SOURCE:ARG:痛み , 0.00
+ENDIF
+
+;PALAM:潤滑をみる
+IF PALAM:ARG:潤滑 < PALAMLV:1
+	TIMES SOURCE:ARG:痛み , 1.20
+	TIMES SOURCE:ARG:反感 , 1.50
+ELSEIF PALAM:ARG:潤滑 < PALAMLV:2
+	TIMES SOURCE:ARG:痛み , 0.70
+	TIMES SOURCE:ARG:反感 , 1.20
+ELSEIF PALAM:ARG:潤滑 < PALAMLV:3
+	TIMES SOURCE:ARG:痛み , 0.40
+ELSEIF PALAM:ARG:潤滑 < PALAMLV:4
+	TIMES SOURCE:ARG:痛み , 0.10
+ELSEIF PALAM:ARG:潤滑 >= PALAMLV:4
+	TIMES SOURCE:ARG:痛み , 0.10
+ENDIF
+
+;FileName_TRACHECK.ERB ----------------------------- Rev1.00
+;アナル調教の苦痛、反発補正
+;CALL		USER
+;ARG		0:キャラNO
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@PAIN_CHECK_A(ARG)
+;EXP:Ａ経験をみる
+IF EXP:ARG:Ａ経験 < EXPLV:1
+	TIMES SOURCE:ARG:痛み , 3.00
+	TIMES SOURCE:ARG:反感 , 3.00
+ELSEIF EXP:ARG:Ａ経験 < EXPLV:2
+	TIMES SOURCE:ARG:痛み , 1.20
+	TIMES SOURCE:ARG:反感 , 2.00
+ELSEIF EXP:ARG:Ａ経験 < EXPLV:3
+	TIMES SOURCE:ARG:痛み , 0.80
+	TIMES SOURCE:ARG:反感 , 1.50
+ELSEIF EXP:ARG:Ａ経験 < EXPLV:4
+	TIMES SOURCE:ARG:痛み , 0.60
+	TIMES SOURCE:ARG:反感 , 1.20
+ELSEIF EXP:ARG:Ａ経験 < EXPLV:5
+	TIMES SOURCE:ARG:痛み , 0.40
+ELSEIF EXP:ARG:Ａ経験 >= EXPLV:5
+	TIMES SOURCE:ARG:痛み , 0.20
+ENDIF
+
+;PALAM:潤滑をみる
+IF PALAM:ARG:潤滑 < PALAMLV:1
+	TIMES SOURCE:ARG:痛み , 1.20
+	TIMES SOURCE:ARG:反感 , 2.00
+ELSEIF PALAM:ARG:潤滑 < PALAMLV:2
+	TIMES SOURCE:ARG:痛み , 1.00
+	TIMES SOURCE:ARG:反感 , 1.50
+ELSEIF PALAM:ARG:潤滑 < PALAMLV:3
+	TIMES SOURCE:ARG:痛み , 0.60
+ELSEIF PALAM:ARG:潤滑 < PALAMLV:4
+	TIMES SOURCE:ARG:痛み , 0.30
+ELSEIF PALAM:ARG:潤滑 >= PALAMLV:4
+	TIMES SOURCE:ARG:痛み , 0.20
+ENDIF

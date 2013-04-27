@@ -1,0 +1,118 @@
+;-------------------------------------------------
+;搾乳器
+;道具使用コマンド、レベル3
+;-------------------------------------------------
+@COM110
+;着脱の処理
+TEQUIP:クスコ = !TEQUIP:クスコ
+
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+TFLAG:200 = 2
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:体力 += 50
+DOWNBASE:気力 += 100
+
+SOURCE:快Ｖ = 300
+	SOURCE:7 += 150
+	SOURCE:10 += 150
+	SOURCE:12 += 500
+	SOURCE:13 += 500
+	SOURCE:14 += 200
+SOURCE:反感 = 100
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+
+;ビデオカメラ
+SIF TEQUIP:53
+	TIMES SOURCE:12 , 1.20
+;羞恥プレイ
+SIF TEQUIP:57
+	TIMES SOURCE:12 , 1.20
+;貞操観念
+SIF TALENT:30
+	TIMES SOURCE:14 , 4.00
+;倒錯的
+SIF TALENT:80
+	TIMES SOURCE:12 , 1.50
+	TIMES SOURCE:14 , 1.20
+;小柄体型
+SIF TALENT:100
+	TIMES SOURCE:6 , 2.50
+;調合知識、治療、針さばきがあれば痛覚半減
+;調合知識、治療があれば痛覚減
+IF TEQUIP:90 == 0
+	IF TALENT:PLAYER:55 && TALENT:PLAYER:117 && TALENT:PLAYER:53
+		TIMES SOURCE:6 , 0.50
+	ELSEIF TALENT:PLAYER:55 && TALENT:PLAYER:117
+		TIMES SOURCE:6 , 0.70
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+;同性愛　レズなら戻り値1ゲイなら戻り値2
+IF HETEROSEX(TARGET,PLAYER)
+	EXP:(39 + HETEROSEX(TARGET,PLAYER)) += 1
+	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 1
+ENDIF
+
+;EXP:PLAYER:道具使用経験 ++
+
+RETURN 1
+;-------------------------------------------------
+;装着継続の処理
+;-------------------------------------------------
+@EQUIP_COMクスコ(ARG)
+;搾乳器装備中
+PRINTL ＜クスコ挿入中＞
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+DOWNBASE:ARG:体力 += 10
+DOWNBASE:ARG:気力 += 50
+
+	SOURCE:10 += 150
+	SOURCE:12 += 500
+	SOURCE:13 += 500
+	SOURCE:14 += 500
+SOURCE:快Ｖ += 50
+SOURCE:痛み += 20
+;プライド高い
+SIF TALENT:15
+	TIMES SOURCE:14 , 1.20
+
+;無関心
+IF TALENT:21
+	TIMES SOURCE:12 , 0.80
+	TIMES SOURCE:14 , 0.80
+ENDIF
+;倒錯的
+IF TALENT:80
+	TIMES SOURCE:12 , 1.50
+	TIMES SOURCE:14 , 1.20
+ENDIF
+
+;貞操観念
+SIF TALENT:30
+	TIMES SOURCE:14 , 2.00
+
+;ビデオカメラ
+SIF TEQUIP:53
+	TIMES SOURCE:12 , 1.20
+;羞恥プレイ
+SIF TEQUIP:57
+	TIMES SOURCE:12 , 1.20
+
+EXP:Ｖ経験 += 2
+	
+RETURN 1

@@ -1,0 +1,48 @@
+;213	ピンチに弱い
+
+;スキル説明を表示
+;ARG:0	スキルレベル
+;RETURN	0:レベルアップ不可能　1:レベルアップ可能
+@SHOW_SKILL_EXPLAIN_213(ARG:0)
+DRAWLINE
+PRINTFORML ピンチに弱い
+PRINTL こんなダメダメな私は穴掘って埋まってます～っっ！！
+DRAWLINE
+PRINTL ※未実装
+PRINTL ピンチになると戦闘から離脱する（パッシブスキル）
+
+
+PRINTL 
+SELECTCASE ABL:(ARG:0):ピンチに弱い
+	CASE 3
+		CALL SET_COLOR(19)
+		PRINTFORML M@STER
+	CASEELSE
+		PRINTL NEXT:
+ENDSELECT
+DRAWLINE
+
+
+IF ABL:(ARG:0):ピンチに弱い >= 5
+	RETURN 0
+ELSE
+	RETURN 1
+ENDIF
+
+
+;使用可能チェック
+;ARG:0	対象キャラ登録番号
+@COMABLE_213(ARG:0)
+
+
+RETURN 0
+
+;スキル効果を設定
+;ARG:0	使用キャラ登録番号
+@SELECT_SKILL_TARGET_213(ARG:0)
+
+RETURN 0
+;スキル発動
+;ARG:0	使用キャラ
+;ARG:1	対象
+@USE_SKILL_213(ARG:0, ARG:1)

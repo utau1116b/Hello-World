@@ -1,0 +1,635 @@
+;-------------------------------------------------
+;奴隷の評価額算出
+;-------------------------------------------------
+;乗算型の補正額に0～9や100～109といった額を設定すると、
+;SELL_CHARA.ERBの@SALE_CHARAでの表示で、
+;1/10の位が省略されるという不具合があります。
+;@SALE_CHARAに回避処理を追加するとスクリプトが煩雑になるので、
+;「助手による値上げ交渉」以外の項目では回避処理を行っていません。
+;補正額の追加や変更を行う場合は、上の点に気を付けてください。
+;-------------------------------------------------
+;基本スコア
+;A:10 = ABL:従順加算
+;A:11 = ABL:欲望加算
+;A:12 = ABL:技巧加算
+;A:13 = ABL:奉仕技術加算
+;A:14 = ABL:性交技術加算
+;A:15 = ABL:話術加算
+;A:30 = ABL:性交中毒加算
+;A:31 = ABL:自慰中毒加算
+;A:32 = ABL:精液中毒加算
+;A:33 = ABL:レズ中毒加算
+;A:37 = ABL:売春中毒減算（マイナス評価）
+;A:39 = ABL:獣姦中毒加算
+;A:71 = ABL:ボーカル技能加算
+;A:73 = ABL:料理技能加算
+;
+;補正スコア
+;A:0 = ABL:Ｃ感覚補正
+;A:1 = ABL:Ｂ感覚補正
+;A:2 = ABL:Ｖ感覚補正
+;A:3 = ABL:Ａ感覚補正
+;A:16 = ABL:奉仕精神補正
+;A:17 = ABL:露出癖補正
+;A:20 = ABL:サドっ気補正
+;A:21 = ABL:マゾっ気補正
+;A:22 = ABL:レズっ気補正
+;A:23 = ABL:ホモっ気補正
+;
+;E:74 = EXP:売春経験補正（マイナス評価）
+;E:60 = EXP:出産経験補正（マイナス評価）
+;
+;T:0 = TALEN;T:処女補正
+;T:12 = TALEN;T:気丈補正
+;T:15 = TALEN;T:自尊心補正
+;T:20 = TALEN;T:自制心補正
+;T:21 = TALEN;T:無関心補正
+;T:22 = TALEN;T:感情乏しい補正
+;T:24 = TALEN;T:保守的補正
+;T:27 = TALEN;T:一線越えない補正
+;T:33 = TALEN;T:解放補正
+;T:42 = TALEN;T:濡れやすい補正
+;T:46 = TALEN;T:薬物中毒補正
+;T:63 = TALEN;T:献身的補正
+;T:70 = TALEN;T:快感に素直補正
+;T:71 = TALEN;T:快感の否定補正
+;T:73 = TALEN;T:即落ち補正
+;T:74 = TALEN;T:自慰狂い補正
+;T:75 = TALEN;T:セックス狂補正
+;T:76 = TALEN;T:淫乱補正
+;T:77 = TALEN;T:尻穴狂い補正
+;T:78 = TALEN;T:淫乳補正
+;T:80 = TALEN;T:倒錯的補正
+;T:91 = TALEN;T:魅惑補正
+;T:92 = TALEN;T:謎の魅力補正
+;T:100 = TALEN;T:威圧感補正
+;T:101 = TALEN;T:Ｃ鈍感補正
+;T:102 = TALEN;T:Ｃ敏感補正
+;T:103 = TALEN;T:Ｖ鈍感補正
+;T:104 = TALEN;T:Ｖ敏感補正
+;T:105 = TALEN;T:Ａ鈍感補正
+;T:106 = TALEN;T:Ａ敏感補正
+;T:107 = TALEN;T:Ｂ鈍感補正
+;T:108 = TALEN;T:Ｂ敏感補正
+;T:109 = TALEN;T:貧乳補正
+;T:110 = TALEN;T:巨乳補正
+;T:111 = TALEN;T:回復早い補正
+;T:124 = TALEN;T:動物耳補正
+;T:113 = TALEN;T:魅力補正
+;T:114 = TALEN;T:爆乳補正
+;T:115 = TALEN;T:肥満補正
+;T:116 = TALEN;T:絶壁補正
+;T:121 = TALEN;T:ふたなり補正
+;T:122 = TALEN;T:オトコ補正
+;T:126 = TALEN;T:人気者補正
+;T:130 = TALEN;T:母乳体質補正
+;T:135 = TALEN;T:未熟補正
+;
+;T:180 = TALEN;T:娼婦補正
+;T:181 = TALEN;T:傾城補正
+;T:182 = TALEN;T:饒舌補正
+;T:185 = TALEN;T:歌姫補正
+;T:186 = TALEN;T:舞姫補正
+;T:187 = TALEN;T:美姫補正
+;
+;T:203 = TALEN;T:アイドル補正
+;T:310 = TALEN;T:ガイノイド補正
+;T:311 = TALEN;T:ヒーロー補正
+;T:313 = TALEN;T:サイボーグ補正
+;T:315 = TALEN;T:精霊補正
+;T:316 = TALEN;T:幽霊補正
+;
+;T:9 = TALEN;T:崩壊補正
+;T:123 = TALEN;T:狂気補正
+;T:153 = TALEN;T:妊娠補正
+;
+;O:0 = 助手補正
+;O:1 = 商売人補正
+;-------------------------------------------------
+;売却額の計算
+;-------------------------------------------------
+@ESTIMATE_CHARA(ARG:0)
+;変数の初期化
+;総計
+S = 0
+
+I = COUNT
+REPEAT 400
+	T:COUNT = 100
+REND
+COUNT = I
+
+;-------------------------------------------------
+;加算型ボーナス
+;-------------------------------------------------
+;ABL:従順をみる
+IF ABL:(ARG:0):0 == 0
+	A:10 = 0
+ELSEIF ABL:(ARG:0):0 == 1
+	A:10 = 200
+ELSEIF ABL:(ARG:0):0 == 2
+	A:10 = 500
+ELSEIF ABL:(ARG:0):0 == 3
+	A:10 = 850
+ELSEIF ABL:(ARG:0):0 == 4
+	A:10 = 1500
+ELSEIF ABL:(ARG:0):0 == 5
+	A:10 = 2000
+ELSEIF ABL:(ARG:0):0 == 6
+	A:10 = 2300
+ELSEIF ABL:(ARG:0):0 == 7
+	A:10 = 2600
+ELSEIF ABL:(ARG:0):0 == 8
+	A:10 = 3000
+ELSEIF ABL:(ARG:0):0 == 9
+	A:10 = 3200
+ELSEIF ABL:(ARG:0):0 >= 10
+	A:10 = 3500
+ENDIF
+S += A:10
+
+;ABL:欲望をみる
+IF ABL:(ARG:0):1 == 0
+	A:11 = 10
+ELSEIF ABL:(ARG:0):1 == 1
+	A:11 = 100
+ELSEIF ABL:(ARG:0):1 == 2
+	A:11 = 300
+ELSEIF ABL:(ARG:0):1 == 3
+	A:11 = 700
+ELSEIF ABL:(ARG:0):1 == 4
+	A:11 = 1200
+ELSEIF ABL:(ARG:0):1 == 5
+	A:11 = 2000
+ELSEIF ABL:(ARG:0):1 == 6
+	A:11 = 2300
+ELSEIF ABL:(ARG:0):1 == 7
+	A:11 = 2600
+ELSEIF ABL:(ARG:0):1 == 8
+	A:11 = 3000
+ELSEIF ABL:(ARG:0):1 == 9
+	A:11 = 3200
+ELSEIF ABL:(ARG:0):1 >= 10
+	A:11 = 3500
+ENDIF
+S += A:11
+
+;ABL:技巧をみる
+IF ABL:(ARG:0):2 == 0
+	A:12 = 0
+ELSEIF ABL:(ARG:0):2 == 1
+	A:12 = 100
+ELSEIF ABL:(ARG:0):2 == 2
+	A:12 = 200
+ELSEIF ABL:(ARG:0):2 == 3
+	A:12 = 400
+ELSEIF ABL:(ARG:0):2 == 4
+	A:12 = 700
+ELSEIF ABL:(ARG:0):2 == 5
+	A:12 = 1200
+ELSEIF ABL:(ARG:0):2 == 6
+	A:12 = 1500
+ELSEIF ABL:(ARG:0):2 == 7
+	A:12 = 1800
+ELSEIF ABL:(ARG:0):2 == 8
+	A:12 = 2200
+ELSEIF ABL:(ARG:0):2 == 9
+	A:12 = 2600
+ELSEIF ABL:(ARG:0):2 >= 10
+	A:12 = 3000
+ENDIF
+S += A:12
+
+;ABL:話術をみる
+IF ABL:(ARG:0):163 == 0
+	A:15 = 0
+ELSEIF ABL:(ARG:0):163 == 1
+	A:15 = 50
+ELSEIF ABL:(ARG:0):163 == 2
+	A:15 = 120
+ELSEIF ABL:(ARG:0):163 == 3
+	A:15 = 200
+ELSEIF ABL:(ARG:0):163 == 4
+	A:15 = 300
+ELSEIF ABL:(ARG:0):163 == 5
+	A:15 = 450
+ELSEIF ABL:(ARG:0):163 == 6
+	A:15 = 1000
+ELSEIF ABL:(ARG:0):163 == 7
+	A:15 = 1400
+ELSEIF ABL:(ARG:0):163 == 8
+	A:15 = 2100
+ELSEIF ABL:(ARG:0):163 == 9
+	A:15 = 2800
+ELSEIF ABL:(ARG:0):163 >= 10
+	A:15 = 3500
+ENDIF
+S += A:15
+
+
+;ABL:自慰中毒をみる
+IF ABL:(ARG:0):10 == 0
+	A:31 = 0
+ELSEIF ABL:(ARG:0):10 == 1
+	A:31 = 250
+ELSEIF ABL:(ARG:0):10 == 2
+	A:31 = 500
+ELSEIF ABL:(ARG:0):10 == 3
+	A:31 = 750
+ELSEIF ABL:(ARG:0):10 == 4
+	A:31 = 1000
+ELSEIF ABL:(ARG:0):10 >= 5
+	A:31 = 1300
+ENDIF
+S += A:31
+
+;ABL:精液中毒をみる
+IF ABL:(ARG:0):11 == 0
+	A:32 = 0
+ELSEIF ABL:(ARG:0):11 == 1
+	A:32 = 300
+ELSEIF ABL:(ARG:0):11 == 2
+	A:32 = 600
+ELSEIF ABL:(ARG:0):11 == 3
+	A:32 = 900
+ELSEIF ABL:(ARG:0):11 == 4
+	A:32 = 1300
+ELSEIF ABL:(ARG:0):11 >= 5
+	A:32 = 1700
+ENDIF
+S += A:32
+
+;ABL:レズ中毒をみる
+IF ABL:(ARG:0):12 == 0
+	A:33 = 0
+ELSEIF ABL:(ARG:0):12 == 1
+	A:33 = 250
+ELSEIF ABL:(ARG:0):12 == 2
+	A:33 = 500
+ELSEIF ABL:(ARG:0):12 == 3
+	A:33 = 750
+ELSEIF ABL:(ARG:0):12 == 4
+	A:33 = 1000
+ELSEIF ABL:(ARG:0):12 >= 5
+	A:33 = 1300
+ENDIF
+S += A:33
+
+
+
+;-------------------------------------------------
+;乗算型ボーナスの計算
+;-------------------------------------------------
+;ABL:Ｃ感覚をみる
+IF ABL:(ARG:0):3 <= 3
+	A:0 = 100
+ELSEIF ABL:(ARG:0):3 == 4
+	A:0 = 110
+ELSEIF ABL:(ARG:0):3 == 5
+	A:0 = 120
+ELSEIF ABL:(ARG:0):3 == 6
+	A:0 = 130
+ELSEIF ABL:(ARG:0):3 == 7
+	A:0 = 140
+ELSEIF ABL:(ARG:0):3 == 8
+	A:0 = 150
+ELSEIF ABL:(ARG:0):3 == 9
+	A:0 = 170
+ELSEIF ABL:(ARG:0):3 >= 10
+	A:0 = 200
+ENDIF
+S *= A:0
+S /= 100
+
+;ABL:Ｂ感覚をみる
+IF ABL:(ARG:0):14 <= 2
+	A:1 = 100
+ELSEIF ABL:(ARG:0):14 == 3
+	A:1 = 110
+ELSEIF ABL:(ARG:0):14 == 4
+	A:1 = 120
+ELSEIF ABL:(ARG:0):14 == 5
+	A:1 = 130
+ELSEIF ABL:(ARG:0):14 == 6
+	A:1 = 140
+ELSEIF ABL:(ARG:0):14 == 7
+	A:1 = 150
+ELSEIF ABL:(ARG:0):14 == 8
+	A:1 = 160
+ELSEIF ABL:(ARG:0):14 == 9
+	A:1 = 180
+ELSEIF ABL:(ARG:0):14 >= 10
+	A:1 = 200
+ENDIF
+S *= A:1
+S /= 100
+
+;ABL:Ｖ感覚をみる
+IF ABL:(ARG:0):4 <= 2
+	A:2 = 100
+ELSEIF ABL:(ARG:0):4 == 3
+	A:2 = 110
+ELSEIF ABL:(ARG:0):4 == 4
+	A:2 = 120
+ELSEIF ABL:(ARG:0):4 == 5
+	A:2 = 140
+ELSEIF ABL:(ARG:0):4 == 6
+	A:2 = 150
+ELSEIF ABL:(ARG:0):4 == 7
+	A:2 = 160
+ELSEIF ABL:(ARG:0):4 == 8
+	A:2 = 170
+ELSEIF ABL:(ARG:0):4 == 9
+	A:2 = 190
+ELSEIF ABL:(ARG:0):4 >= 10
+	A:2 = 200
+ENDIF
+S *= A:2
+S /= 100
+
+;ABL:Ａ感覚をみる
+IF ABL:(ARG:0):5 <= 1
+	A:3 = 100
+ELSEIF ABL:(ARG:0):5 == 2
+	A:3 = 110
+ELSEIF ABL:(ARG:0):5 == 3
+	A:3 = 120
+ELSEIF ABL:(ARG:0):5 == 4
+	A:3 = 140
+ELSEIF ABL:(ARG:0):5 == 5
+	A:3 = 160
+ELSEIF ABL:(ARG:0):5 == 6
+	A:3 = 180
+ELSEIF ABL:(ARG:0):5 == 7
+	A:3 = 190
+ELSEIF ABL:(ARG:0):5 == 8
+	A:3 = 200
+ELSEIF ABL:(ARG:0):5 == 9
+	A:3 = 230
+ELSEIF ABL:(ARG:0):5 >= 10
+	A:3 = 250
+ENDIF
+S *= A:3
+S /= 100
+
+;ABL:奉仕精神をみる
+IF ABL:(ARG:0):6 <= 2
+	A:16 = 100
+ELSEIF ABL:(ARG:0):6 == 3
+	A:16 = 110
+ELSEIF ABL:(ARG:0):6 == 4
+	A:16 = 130
+ELSEIF ABL:(ARG:0):6 <= 7
+	A:16 = 150
+ELSEIF ABL:(ARG:0):6 >= 8
+	A:16 = 180
+ENDIF
+S *= A:16
+S /= 100
+
+;ABL:露出癖をみる
+IF ABL:(ARG:0):7 <= 2
+	A:17 = 100
+ELSEIF ABL:(ARG:0):7 == 3
+	A:17 = 110
+ELSEIF ABL:(ARG:0):7 == 4
+	A:17 = 130
+ELSEIF ABL:(ARG:0):7 <= 7
+	A:17 = 150
+ELSEIF ABL:(ARG:0):7 >= 8
+	A:17 = 180
+ENDIF
+S *= A:17
+S /= 100
+
+;ABL:サドっ気をみる
+IF ABL:(ARG:0):15 <= 2
+	A:20 = 100
+ELSEIF ABL:(ARG:0):15 == 3
+	A:20 = 130
+ELSEIF ABL:(ARG:0):15 == 4
+	A:20 = 140
+ELSEIF ABL:(ARG:0):15 == 5
+	A:20 = 150
+ELSEIF ABL:(ARG:0):15 <= 7
+	A:20 = 200
+ELSEIF ABL:(ARG:0):15 <= 9
+	A:20 = 250
+ELSEIF ABL:(ARG:0):15 >= 10
+	A:20 = 300
+ENDIF
+S *= A:20
+S /= 100
+
+;ABL:マゾっ気をみる
+IF ABL:(ARG:0):8 <= 2
+	A:21 = 100
+ELSEIF ABL:(ARG:0):8 == 3
+	A:21 = 130
+ELSEIF ABL:(ARG:0):8 == 4
+	A:21 = 140
+ELSEIF ABL:(ARG:0):8 == 5
+	A:21 = 150
+ELSEIF ABL:(ARG:0):8 <= 7
+	A:21 = 200
+ELSEIF ABL:(ARG:0):8 <= 9
+	A:21 = 250
+ELSEIF ABL:(ARG:0):8 >= 10
+	A:21 = 300
+ENDIF
+S *= A:21
+S /= 100
+
+;ABL:レズっ気をみる
+IF ABL:(ARG:0):9 <= 2
+	A:22 = 100
+ELSEIF ABL:(ARG:0):9 == 3
+	A:22 = 110
+ELSEIF ABL:(ARG:0):9 == 4
+	A:22 = 130
+ELSEIF ABL:(ARG:0):9 <= 7
+	A:22 = 150
+ELSEIF ABL:(ARG:0):9 >= 8
+	A:22 = 180
+ENDIF
+S *= A:22
+S /= 100
+
+;ABL:ホモっ気をみる
+IF ABL:(ARG:0):13 <= 2
+	A:23 = 100
+ELSEIF ABL:(ARG:0):13 == 3
+	A:23 = 110
+ELSEIF ABL:(ARG:0):13 == 4
+	A:23 = 130
+ELSEIF ABL:(ARG:0):13 <= 7
+	A:23 = 150
+ELSEIF ABL:(ARG:0):13 >= 8
+	A:23 = 180
+ENDIF
+S *= A:23
+S /= 100
+
+
+
+;EXP:出産経験をみる（マイナス評価）
+IF EXP:(ARG:0):61 == 0
+	E:60 = 100
+ELSEIF EXP:(ARG:0):61 == 1
+	E:60 = 50
+ELSEIF EXP:(ARG:0):61 == 2
+	E:60 = 20
+ELSEIF EXP:(ARG:0):61 >= 3
+	E:60 = 10
+ENDIF
+S *= E:60
+S /= 100
+
+;TALENT:処女をみる
+;(処女の方が評価高くなると、Ｊだと逆に損だよね？)
+;IF TALENT:(ARG:0):0
+	;IF CFLAG:71 == 0
+		T:0 = 200
+	;ELSE
+	;	T:0 = 150
+	;ENDIF
+;ENDIF
+;TALENT:気丈をみる
+SIF TALENT:(ARG:0):12 && ABL:0 >= 3
+	T:12 = 120
+;TALENT:自尊心をみる
+SIF TALENT:(ARG:0):15 && ABL:0 >= 3
+	T:15 = 120
+;TALENT:自制心をみる
+SIF TALENT:(ARG:0):20 && ABL:1 <= 3
+	T:20 = 80
+;TALENT:無関心をみる
+SIF TALENT:(ARG:0):21 && ABL:1 <= 3
+	T:21 = 80
+;TALENT:感情乏しいをみる
+SIF TALENT:(ARG:0):22 && ABL:1 <= 3
+	T:22 = 80
+;TALENT:保守的をみる
+SIF TALENT:(ARG:0):24 && ABL:1 <= 3
+	T:24 = 80
+;TALENT:一線越えないをみる
+SIF TALENT:(ARG:0):27 && ABL:0 <= 3
+	T:27 = 80
+;TALENT:解放をみる
+SIF TALENT:(ARG:0):33
+	T:33 = 120
+;TALENT:濡れやすいをみる
+SIF TALENT:(ARG:0):42
+	T:42 = 120
+;TALENT:薬物中毒をみる
+SIF TALENT:(ARG:0):46
+	T:46 = 20
+;TALENT:献身的をみる
+SIF TALENT:(ARG:0):63
+	T:63 = 120
+;TALENT:快感に素直をみる
+SIF TALENT:(ARG:0):70 && ABL:1 >= 3
+	T:70 = 120
+;TALENT:快感の否定をみる
+SIF TALENT:(ARG:0):71 && ABL:1 <= 3
+	T:71 = 60
+;TALENT:即落ちをみる
+SIF TALENT:(ARG:0):73
+	T:73 = 20
+;TALENT:淫乱をみる
+SIF TALENT:(ARG:0):76
+	T:76 = 150
+;TALENT:魅惑をみる
+SIF TALENT:(ARG:0):91
+	T:91 = 150
+;TALENT:謎の魅力をみる
+SIF TALENT:(ARG:0):92
+	T:92 = 400
+;TALENT:貧乳をみる
+;TALENT:小柄体型・TALENT:幼稚・TALENT:未熟があれば大丈夫
+SIF TALENT:(ARG:0):109 && TALENT:(ARG:0):100 == 0 && TALENT:(ARG:0):132 == 0
+	T:109 = 90
+;TALENT:巨乳をみる
+SIF TALENT:(ARG:0):110
+	T:110 = 150
+;TALENT:魅力をみる
+SIF TALENT:(ARG:0):113
+	T:113 = 150
+;TALENT:爆乳をみる
+SIF TALENT:(ARG:0):141
+	T:114 = 160
+;TALENT:絶壁をみる
+;TALENT:幼稚かTALENT:未熟があれば大丈夫
+SIF TALENT:(ARG:0):116 && TALENT:(ARG:0):132 == 0
+	T:116 = 50
+;TALENT:ふたなりをみる
+SIF TALENT:(ARG:0):121
+	T:121 = 200
+;TALENT:オトコをみる
+;TALENT:オトコだとABL:従順・ABL:欲望が共に高く、ある程度のホモっ気がないとかなり下がる
+;TALENT:魅力・TALENT:幼稚・TALENT:未熟があれば大丈夫
+IF TALENT:(ARG:0):122 && TALENT:(ARG:0):113 == 0 && TALENT:(ARG:0):132 == 0
+	IF ABL:(ARG:0):0 <= 3 || ABL:(ARG:0):1 <= 3 || ABL:(ARG:0):23 <= 2
+		T:122 = 20
+	ELSEIF ABL:(ARG:0):0 <= 4 || ABL:(ARG:0):1 <= 4 || ABL:(ARG:0):23 <= 3
+		T:122 = 40
+	ELSEIF ABL:(ARG:0):0 <= 5 || ABL:(ARG:0):1 <= 5 || ABL:(ARG:0):23 <= 4
+		T:122 = 70
+	ENDIF
+ENDIF
+;TALENT:動物耳をみる
+SIF TALENT:(ARG:0):124
+	T:124 = 120
+;TALENT:人気者をみる
+SIF TALENT:(ARG:0):126
+	T:126 = 150
+;TALENT:母乳体質をみる
+SIF TALENT:(ARG:0):130
+	T:130 = 140
+;崩壊,狂気,妊娠は売却額をかなり低くする（従順によって50％まで回復）
+IF TALENT:(ARG:0):134 || TALENT:(ARG:0):123
+	IF TALENT:(ARG:0):134
+		T:9 = ABL:(ARG:0):0 * 5
+	ELSEIF TALENT:(ARG:0):123
+		T:123 = ABL:(ARG:0):0 * 5
+	ENDIF
+ENDIF
+
+I = COUNT
+REPEAT 400
+	IF T:COUNT != 100
+		S *= T:COUNT
+		S /= 100
+	ENDIF
+REND
+COUNT = I
+
+;助手を売る
+O:0 = 100
+SIF ISASSI:TARGET == 1
+	O:0 = 50
+S *= O:0
+S /= 100
+
+;主人・助手の中の商売人をチェック（本人が売却対象の場合は外す）
+;O:1 = 100
+;M = 0
+;I = COUNT
+;REPEAT CHARANUM
+;	IF TALENT:COUNT:211 && ISASSI:COUNT && ABL:COUNT:15 && COUNT != TARGET
+;		SIF ABL:COUNT:15 > ABL:M:15
+;			M = COUNT
+;	ENDIF
+;REND
+;COUNT = I
+;SIF M
+;	O:1 = 100 + ABL:M:15 * 2
+;S *= O:1
+;S /= 100
+
+;売却不可フラグ
+SIF TALENT:199
+	S = -1
+;
+;
+;

@@ -1,0 +1,125 @@
+;00301	カブラうさぎ
+
+;ARG:0	Lv補正
+;ARG:1	登録場所
+
+@SET_ENEMY_STATUS_301(ARG:0, ARG:1, ARG:2)
+;LOCAL
+;1	実レベル
+;0	LOOP
+;2	一時記憶用
+;3	ベースランク
+
+CALLNAME:(ARG:1) = オリディ・モデル
+
+;ドロップアイテム
+CFLAG:(ARG:1):ドロップアイテム1 = 0
+CFLAG:(ARG:1):ドロップ確率1 = 0
+CFLAG:(ARG:1):ドロップアイテム2 = 0
+CFLAG:(ARG:1):ドロップ確率2 = 0
+CFLAG:(ARG:1):ドロップアイテム3 = 0
+CFLAG:(ARG:1):ドロップ確率3 = 0
+
+;基礎レベル取得
+LOCAL:1 = 1 + ARG:0
+
+IF LOCAL:1 < 1
+	LOCAL:1 = 1
+ENDIF
+
+;CALL SET_DEFAULT_ENEMY_STATUS(ARG:1)
+
+;レベル設定
+BASE:(ARG:1):戦闘レベル = LOCAL:1
+
+
+;耐性
+;VOCAL耐性
+BASE:(ARG:1):VO耐性 = 0
+;DANCE耐性
+BASE:(ARG:1):VI耐性 = 0
+;VISUAL耐性
+BASE:(ARG:1):DA耐性 = 0
+;EXTEND耐性
+BASE:(ARG:1):EX耐性 = 0
+;スリップ耐性
+BASE:(ARG:1):スリップ耐性 = 0
+
+;スロウ耐性
+BASE:(ARG:1):スロウ耐性 = 0
+
+;カース耐性
+BASE:(ARG:1):カース耐性 = 0
+;ストップ耐性
+BASE:(ARG:1):ストップ耐性 = 0
+
+;スリープ耐性
+BASE:(ARG:1):スリープ耐性 = 0
+
+;フィアー耐性
+BASE:(ARG:1):フィアー耐性 = 0
+;シール耐性
+BASE:(ARG:1):シール耐性 = 0
+;ブライン耐性
+BASE:(ARG:1):ブライン耐性 = 0
+;気絶耐性
+BASE:(ARG:1):気絶耐性 = 0
+
+;ボスフラグ。スリップダメージ軽減など
+CFLAG:(ARG:1):ボスフラグ = 0
+;行動不能回避
+CFLAG:(ARG:1):行動不能回避 = 1
+;行動AI
+CFLAG:(ARG:1):行動AI = 0
+
+;ベース能力
+;攻撃力
+BASE:(ARG:1):ベースPOW = 14 + (LOCAL:1 * 0)
+;防御力
+BASE:(ARG:1):ベースGUA = 6 + (LOCAL:1 * 0)
+;技術
+BASE:(ARG:1):ベースDEX = 1 + (LOCAL:1 * 0)
+;命中率
+BASE:(ARG:1):ベースHIT = 1 + (LOCAL:1 * 0)
+;素早さ
+BASE:(ARG:1):ベースSPD = 14 + (LOCAL:1 * 0)
+;運
+BASE:(ARG:1):ベースLUC = 1 + (LOCAL:1 * 0)
+;スコア
+CFLAG:(ARG:1):敵★ = 59 + (LOCAL:1 * 0)
+;テンション
+CFLAG:(ARG:1):敵ハート = 1 + (LOCAL:1 * 0)
+;ボルテージ
+CFLAG:(ARG:1):敵V = 100
+
+;経験値
+CFLAG:(ARG:1):獲得経験値 = 16 + (LOCAL:1 * 0)
+;お金
+CFLAG:(ARG:1):獲得金額 = 31 + (LOCAL:1 * 0)
+
+
+;行動決定
+;ARG:0	登録番号
+@SELECT_ENEMY_ACTION_301(ARG:0)
+;LOCAL
+;0	LOOP
+;1	予定行動
+;2	TEMP
+
+LOCAL:1 = 0
+
+;行動テーブル決定
+;一旦初期化
+FOR LOCAL:0, 1296, 1306
+	CFLAG:(ARG:0):(LOCAL:0) = 0
+NEXT
+
+;通常テーブル
+CFLAG:(ARG:0):通常行動1 = 201
+CFLAG:(ARG:0):通常行動2 = 201
+CFLAG:(ARG:0):通常行動3 = 201
+CFLAG:(ARG:0):通常行動4 = 201
+
+;実際の行動決定
+CALL SELECT_ENEMY_ACTION_COMMON(ARG:0)
+

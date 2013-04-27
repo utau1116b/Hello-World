@@ -1,0 +1,109 @@
+;ARG:0	地方 0首都 1北東 2中央 3上方 4西 5南
+;イベントを選択できるのはスケジュール選択時だけなので
+@PRINT_SUB_EVENT(ARG:0)
+;まず最初にTSTRになにもない時のーーーを代入しておく
+CALL PRINT_SUB_EVENT2
+RETURN
+;上記で仕事番号とそれにかかるコストを取得する
+;そしたらそれを下の関数で書きだしてリターン
+;ARG:0 仕事番号
+@PRINT_SUB_EVENT2
+;この関数で、仕事番号によって、コスト、名前をプリント
+FLAG:イベント判定 = 1
+;SIF V == 0
+	CALL SEARCH_EVENT_ABLE(TARGET)
+IF (FLAG:午前の予定 == 140|| FLAG:午後の予定 == 140 || FLAG:午前の予定2 == 140|| FLAG:午後の予定2 == 140)
+		SETCOLOR COLOR("light-gray")
+		TRYCALLFORM SUB_EVENT_NAME_{SUBEVENT}
+		PRINTFORM [Ｅ]
+		PRINTFORM %TSTR,24,LEFT%
+		RESETCOLOR
+		PRINTFORM  
+		CALL PRINT_COST_TIME(0,3)
+		PRINTFORM  
+		CALL GET_COST_MONEY(0)
+		PRINTFORM {RESULT,7,LEFT}
+ELSE
+	IF SUBEVENT <= 0
+		SETCOLOR COLOR("light-gray")
+		PRINTFORM [？]
+		TSTR = EMPTY
+		PRINTFORM %TSTR,24,LEFT%
+		PRINTFORM  
+		RESETCOLOR
+		CALL PRINT_COST_TIME(0,3)
+		PRINTFORM  
+		CALL GET_COST_MONEY(0)
+		PRINTFORM {RESULT,7,LEFT}
+	ELSEIF SUBEVENT > 0 && FLAG:24 != 0
+		TRYCALLFORM SUB_EVENT_NAME_{SUBEVENT}
+		LOCALS = [Ｅ]%TSTR,24,LEFT%
+		PRINTBUTTON LOCALS, 140
+		;PRINTFORM %TSTR,24,LEFT%
+		PRINTFORM  
+		CALL PRINT_COST_TIME(0,3)
+		PRINTFORM  
+		CALL GET_COST_MONEY(0)
+		PRINTFORM {RESULT,7,LEFT}
+	ELSE
+		SETCOLOR COLOR("light-gray")
+		PRINTFORM [？]
+		TSTR = EMPTY
+		PRINTFORM %TSTR,24,LEFT%
+		PRINTFORM  
+		RESETCOLOR
+		CALL PRINT_COST_TIME(0,3)
+		PRINTFORM  
+		CALL GET_COST_MONEY(0)
+		PRINTFORM {RESULT,7,LEFT}
+	ENDIF
+ENDIF
+
+;コンフィグで色々調整する部分
+@EVENT_ABLE_COMMON(ARG)
+
+
+;実行できるスキットを検索
+;更新はSHOPが呼び出される瞬間
+@SEARCH_EVENT_ABLE(ARG)
+
+VARSET LOCAL:1
+VARSET SUBEVENT
+FOR LOCAL, 0, 1000
+	TRYCALLFORM EVENT_ABLE_{LOCAL}
+	IF RESULT
+		;PRINTFORML V:{V:(LOCAL:1)} = {LOCAL:0}
+		SUBEVENT:(LOCAL:1) = LOCAL:0
+		LOCAL:1 += 1
+		RESULT = 0
+	ENDIF
+NEXT
+
+;サブイベントの実行
+@SUB_EVENT
+IF FIRSTSUBEVENT(SUBEVENT)
+	CALLFORM EVENT_SETUP_{SUBEVENT}
+	SIF RESULT:1
+		FLAG:口上文字色使用 = 1
+	SIF FLAG:口上文字色使用 == 1
+		CALL SET_COLOR(FLAG:イベント用ターゲット一時保存)
+	CALLFORM EVENT_K{SUBEVENT}
+	RESETCOLOR
+	ARRAYSHIFT SUBEVENT, -1, 0
+	FLAG:口上文字色使用 = 0
+ENDIF
+
+;-------------------------------------------------
+;初回EVENT判定関数@FIRSTEVENT
+;式中で使用する関数です。理論上無限にイベントを登録できます。
+;EVENTと派生ごとに保存される初回判定用関数です。
+;TFLAG:イベント番号（TFLAG:10）を自動で参照するので、現在発生しいるEVENTごとに番号が独立して保存されます。
+;なお、他のイベントの初回判定を参照する場合は、ARG:3にイベント番号を入れることで一応可能です。
+;ARGはイベント番号、ARG:1はキャラ登録番号（省略するとTARGET）、ARG:2が真だと初回判定を更新しない（参照のみ）
+;CSTR:0で管理します
+;-------------------------------------------------
+@FIRSTSUBEVENT(ARG, ARG:1 = -2, ARG:2, ARG:3 = -2)
+#FUNCTION
+ARG:1 = ARG:1 == -2 ? MASTER # ARG:1
+ARG:3 = ARG:3 == -2 ? TFLAG:イベント番号 # ARG:3
+RETURNF FIRSTPROCESS(ARG:1, @"EVENT%TOSTR(ARG:3)%_%TOSTR(ARG)%", ARG:2)

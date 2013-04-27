@@ -1,0 +1,46 @@
+;自分のターンの処理
+@NAKAMA_TURN_LAF(ARG:0)
+;ARG:0 行動対象
+CALL PRINT_LAF_MAIN
+CALL PRINT_PT_STATUS_LAF(ARG:0)
+CUSTOMDRAWLINE =
+PRINTFORM ＡＰＰＥＡＬ：
+CALL SET_COLOR(ARG:0)
+PRINTFORML %CALLNAME:(ARG:0), 8, LEFT%
+;↑残り思い出数も表示するように
+RESETCOLOR
+$INPUT_LOOP
+TFLAG:アピール種別 = 0
+CALL PRINT_LIVE_COMMAND_LAF(ARG)
+ALIGNMENT LEFT
+;TFLAG:アピール種別 = 0ノーアピール 1ボーカル 2ビジュアル 3ダンス 4思い出 5バーストアピール
+IF RESULT == 1
+	;Voアピール
+	TFLAG:アピール種別 = 1
+	CLEARLINE 4
+ELSEIF RESULT == 8
+	;Viアピール
+	TFLAG:アピール種別 = 2
+	CLEARLINE 4
+ELSEIF RESULT == 9
+	;Daアピール
+	TFLAG:アピール種別 = 3
+	CLEARLINE 4
+	;思い出
+ELSEIF RESULT == 2 && TFLAG:味方思い出 > 0
+	TFLAG:アピール種別 = 4
+	CLEARLINE 6
+	;バーストアピール
+ELSEIF RESULT == 101 && BASE:0:ボルテージ >= 10000
+	TFLAG:アピール種別 = 5
+ELSEIF RESULT == 3
+	;ノーアピール
+	TFLAG:アピール種別 = 0
+ELSE
+	;不可能なコマンドを入力したらノーアピール扱い
+	TFLAG:アピール種別 = 0
+	TFLAG:アピール成功 = 0
+ENDIF
+RESETCOLOR
+CALL アピール処理(ARG)
+;

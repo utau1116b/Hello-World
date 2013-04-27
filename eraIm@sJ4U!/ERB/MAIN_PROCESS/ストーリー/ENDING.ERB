@@ -1,0 +1,346 @@
+@EVENTTURNEND
+#LATER
+CALL ENDING_CHECK
+RETURN 0
+
+@SYSTEM_GET_LIMITDAY
+
+STR:5 = 
+;残り日数の取得　STR:5で表示も取得
+IF FLAG:5 != 9 && FLAG:5 != 10 && FLAG:24 <= 5
+	A = FLAG:24
+	SIF FLAG:5 == 0
+		A *= 15
+	SIF FLAG:5 == 1
+		A *= 10
+	SIF FLAG:5 == 2
+		A *= 10
+	SIF FLAG:5 == 3 || FLAG:5 == 4
+		A *= 10
+	;ステージ0は期限3日
+	A += 3
+	IF DAY > A
+		LOCAL = DAY - A
+		STR:5 = {LOCAL}日オーバー
+	ENDIF
+	IF DAY <= A
+		LOCAL = A - (DAY + 1)
+		IF TIME && A == 0
+			;もっとうまい言い回しは無いだろうか
+			STR:5 = Border of life!
+		ELSE
+			STR:5 = 昇格期限まで残り{LOCAL}日
+		ENDIF
+	ENDIF
+ELSE
+
+ENDIF
+
+
+
+;エンディングチェック
+@ENDING_CHECK
+IF FLAG:5 != 9 && FLAG:5 != 10 && FLAG:24 <= 5
+	;期日を計算
+	CALL SYSTEM_GET_LIMITDAY
+	IF DAY >= A
+		;さあ、楽しい楽しい約束の日がやってきました
+		;ふんふんふ～ん♪鼻歌を歌いながら閣下はどの道具を使おうかと考えているようだ
+		;バイブ取り出す
+		;ちょっ！それ男に使うものじゃない
+		;穴ならあるじゃない、
+		;次のプロデューサーを見つけるからあなたは玩具
+		;アッーーーー！！
+		PRINTFORMW 閣下との約束の期日が来た……
+		PRINTFORMW しかし、%CALLNAME:TARGET%達%CSTR:0:22%は国民的アイドルになることはできなかった……
+		PRINTFORMW 「約束の日が来たわよ。結果は……自分たちが一番よく分かっているわね？」
+		PRINTFORMW どこからか閣下が現れる
+		PRINTFORMW 「ふふふ……私がここまで協力してあげたのにまさか誰一人国民的アイドルにできなかったなんて……」
+		PRINTFORMW 「少しお仕置きが必要ね……」
+		PRINTFORMW 引きつった笑顔で閣下がそう言うと、次第にあなたの意識は朦朧としていき……やがて気を失った
+		PRINTL 
+		PRINTFORMW ……………
+		PRINTL 
+		PRINTFORMW ………
+		PRINTL 
+		PRINTFORMW …
+		PRINTL 
+		PRINTFORMW あなたが目を覚ますと、まず自分の手足が縄で縛られ、石畳の上に放置されているのに気付いた
+		PRINTFORMW 窓のない小さな部屋には、三角木馬、アイアンメイデン、鞭……
+		PRINTFORMW 何に使うのか考えたくもない器具が完備されていた
+		PRINTFORMW 「ようやくお目覚めかしら、王子様？」
+		PRINTFORMW 鉄製の重い扉を開けて閣下が部屋に入ってきた
+		PRINTFORMW 「言ったはずよね？期限までに誰一人国民的アイドルを育てられなかったらその時は……って」
+		PRINTFORMW 重い扉が再び閉じいく……
+		PRINTFORMW 「ふふふ……さて、無能で、だらしない、役立たずのダメデューサーには……」
+		PRINTFORMW 扉の閉まる時に立てる、ガシャンという重い音に……
+		PRINTFORMW 「……少し躾が必要ね」
+		;足を喜んで舐めるレベルまで調教される
+		PRINTFORMW %CALLNAME:MASTER%は自分はもう逃げられないということを悟った……
+		PRINTFORMW そうして、閣下は壁から一本の鞭を取り出すと、それを大きく振り上げて……
+		PRINTL 
+		PRINTFORMW ……………
+		PRINTL 
+		PRINTFORMW ………
+		PRINTL 
+		PRINTFORMW …
+		PRINTL 
+		PRINTFORMW あなたの断末魔は、いつまでも止むことは無かった……
+		PRINTL
+		PRINTFORMW  　　　　　　　　BAD END ～むしろご褒美です～ No.1
+		PRINTFORMW 
+		PRINTFORMW 今の状態を引き継いで、最初からやり直せます。どうしますか？
+		PRINTFORML [0] こんな事はなかった事に！
+		PRINTFORML [1] 周回プレイ反対！俺は１周でクリアしてみせるぜ！！
+		$INPUT_LOOP
+		INPUT
+		IF RESULT != 0 && RESULT != 1
+			PRINTFORML 正しい値を入力してください
+			GOTO INPUT_LOOP
+		ELSEIF RESULT == 0
+			PRINTFORMW それでは1日目、Stage1に戻ります。次は頑張って下さい
+			REPEAT CHARANUM
+				SIF TALENT:COUNT:134 || MARK:COUNT:90
+					CFLAG:COUNT:110 -= DAY
+			REND
+			DAY = 0
+			TIME = 0
+			FLAG:24 = 1
+			FLAG:25 = 0
+			FLAG:26 += 1
+			FLAG:27 = 0
+			FLAG:仕事難易度 = 0
+			FLAG:クリア済みステージ数 = 0
+			FLAG:敵レベル = 0
+			FLAG:現在の戦闘回数 = 0
+			FLAG:ボスID保存場所 = 0
+		ELSEIF RESULT == 1
+			PRINTFORMW その心意気、ご立派です。次は頑張って下さい
+			PRINTFORMW お疲れ様でした。ゲームを終了します
+			QUIT
+		ENDIF
+		RETURN 1
+	ENDIF
+ENDIF
+
+
+@GAME_CONTINUE
+;常に継続させるように変更。難易度変更もしない
+;後日談っぽい物はここで表示する
+
+TFLAG:600 = 29
+CALL KOJO_MESSAGE_SEND("JUN")
+
+RETURN 1
+
+;STORY.ERBからENDING関係を移動
+@ENDING_STORY
+PRINTFORML きゃあっ、と可愛らしい悲鳴を上げ、閣下はその場へ倒れこんだ
+PRINTFORML 「うぅ……イタタ……。　割と本気だったんだけどなぁ？」
+PRINTFORML 「うん、まいった。　%CSTR:0:22%は文句なしの合格。　これで%CALLNAME:TARGET%達はＡランクアイドルよ！」
+PRINTFORML 会場が一際大きな歓声に包まれる。　今や会場中が国民的アイドルの誕生を祝福していた
+PRINTFORMW 歓びを抑えられない%CALLNAME:TARGET%達が%CALLNAME:MASTER%の元へ駆け寄ってきた
+CALL MMPLAY(17)
+PRINTL 
+PRINTFORML %CALLNAME:TARGET%は%CALLNAME:MASTER%にアイドル活動を手伝ってもらった事への礼を告げた
+PRINTFORMW 何を今更、と恥ずかしがる%CALLNAME:MASTER%だったが、満更でも無かった
+PRINTL 
+PRINTFORML ともかく、当初の閣下との約束を果たし、%CALLNAME:MASTER%は国民的アイドルをプロデュースした
+PRINTFORMW これでようやく普通の生活に戻ることが出来る……%CALLNAME:MASTER%はどこか寂しさを感じながらも、そう思った
+PRINTL 
+PRINTFORMW ・・・・・
+PRINTL 
+PRINTFORMW ・・・
+PRINTL 
+PRINTFORMW ・
+PRINTL 
+IF TALENT:恋人
+	PRINTFORML きゅっ
+	PRINTL 
+	PRINTFORML どこか様子がおかしいと察したのか、%CALLNAME:MASTER%の袖を恋人の%CALLNAME:TARGET%が握る
+	PRINTFORMW それはどこにも行かないで、と言ってるようで……
+	PRINTL 
+	PRINTFORML ……最初は嫌々始めたプロデュース活動だった。だが、%CALLNAME:TARGET%達がステージの上で輝く姿を見ている内に
+	PRINTFORML プロデュース活動も悪くない。そう思い始めている自分がいることに気付いていた。
+	PRINTFORMW 何より恋人である%CALLNAME:TARGET%を他の男にプロデュースなどさせられるか！
+	PRINTL 
+	PRINTFORML %CALLNAME:MASTER%は、何があっても、自分はずっと%CALLNAME:TARGET%の側にいる、といい頭を撫でた
+	PRINTFORML それで%CALLNAME:TARGET%は安心したようで、一足先にステージに戻った他のメンバーの後を追い
+	PRINTFORMW 自分を呼ぶファンの声援に応えるために、再びステージに戻って行った
+	PRINTL 
+	PRINTFORML きっかけは兎も角として恋人となった二人
+	PRINTFORML もしかしたら、%CALLNAME:TARGET%のファンを裏切っているかもしれない。%CALLNAME:MASTER%はプロデューサー失格かもしれない
+	PRINTFORML 悩みの種は多いが、%CALLNAME:TARGET%となら、きっと乗り越えていけるだろう
+	PRINTFORML そう考えながら、今はただ、ステージの上で輝く彼女達を見守っていた……
+	PRINTFORML 
+	PRINTFORML  
+	PRINTFORMW 　　　　　　　　―― Good Ending　～これからも一緒に～ No.2
+ELSE
+	PRINTFORML 
+	PRINTFORML 
+	PRINTFORML 
+	PRINTL 
+	PRINTFORML 
+	PRINTFORML 思いついたら書きます
+	PRINTFORML 
+	PRINTFORML 
+	PRINTFORML 
+	PRINTFORML 
+	PRINTFORMW 　　　　　　　　―― Normal Ending　～未完成でごめんね～ No.3
+ENDIF
+
+
+PRINTL  
+PRINTL  
+A = 0
+;恋慕キャラカウント
+REPEAT CHARANUM
+	SIF TALENT:COUNT:85
+		A += 1
+REND
+
+;エンゲージリング渡したキャラが居る
+IF FLAG:29 > 0 && (FLAG:46 & 1) == 0
+	CALL ADDITIONAL_ENDING_1
+;エンゲージリングを渡してなくて、恋慕10人以上でハーレムエンド
+ELSEIF A >= 10 && (FLAG:46 & 4) == 0
+	CALL ADDITIONAL_ENDING_3
+ENDIF
+
+;PRINTFORML クリアおめでとうございます
+;PRINTFORML エンディングがでなかった方、ごめんなさい。まだ作れてないです
+;PRINTFORML とりあえずストーリーはここまでです
+;PRINTFORML クリア後の要素もいずれ用意すると思います
+;PRINTFORML あとは、延々とアイドル達とイチャイチャして下さい
+;PRINTFORMW TH@NK YOU FOR YOUR PL@YNG !!
+
+RETURN 1
+
+
+;********************************************************
+;案としてあるもの()
+;７６５END
+;８７６END
+;竜宮小町END
+;大人組END(小鳥、舞、まなみ、尾崎、藪下、千種くらい？)
+;新幹少女END
+;ロリ組END
+;高槻家END
+;如月家END?
+;魔王エンジェルEND
+;シンデレラガールズ1END
+;シンデレラガールズ2END
+;シンデレラガールズロリ組END
+;シンデレラガールズ大人組END
+;ニュージェネレーションEND
+;太陽組END
+;月組END
+;星組END
+;妖精組END
+;ハニーサウンドEND
+;グル―ヴィーチューンEND
+;ファンキーノートEND
+;(ジュピターEND？)
+;主人公'ＳEND
+;********************************************************
+@ADDITIONAL_ENDING_1
+;予定
+;約束は国民的アイドルをプロデュースするまでだったけど
+;恋人とかいると、もう少しこのままでいいかな的にプロデュースを続けるエンド
+T = FLAG:29
+N = 1
+CALL GET_CHARA_NAME
+PRINTFORMW %CALLNAME:MASTER%達がトップアイドルとなってから数日後……
+PRINTL  
+PRINTFORML そこには、神社で結婚式を挙げている%CALLNAME:MASTER%と%STR:1%の姿があった
+PRINTFORML その式では駆けつけた、多くの%STR:1%のファンたちが祝福の涙を流している
+PRINTFORML 数多くの参列者達に冷やかされて恥ずかしそうにしている%STR:1%だったが、
+PRINTFORMW その顔には、本当に幸せそうな笑みが浮かべられていた……
+PRINTL  
+PRINTFORMW  
+PRINTFORMW 　　　　　　　　―― Additional Ending No.1 ～人生のプロデュース～
+PRINTL  
+PRINTL  
+FLAG:46 |= 1
+
+;結婚記念日フラグ
+TIME:9 = DAY:1
+TIME:10 = DAY:2
+IF DAY:5 == 6
+	TIME:9 += 7
+ELSE
+	TIME:9 += 6 - DAY:5
+ENDIF
+IF TIME:9 > 31
+	TIME:9 -= 31
+	TIME:10 += 1
+ENDIF
+SIF TIME:10 == 4
+	TIME:10 = 0
+
+RETURN 1
+
+
+@ADDITIONAL_ENDING_2
+;既に全キャラ収集していたらRETURN
+SIF (FLAG:46 & 2)
+	RETURN 0
+;全キャラ収集チェック
+LOCAL = 0
+REPEAT 200
+	;CSVの有無でキャラ数を把握する（存在すればRESULT = 1）
+	EXISTCSV COUNT,0
+	SIF RESULT == 1
+		LOCAL += 1
+REND
+;CSVの有無で把握したキャラ数とCHARANUMが同数なら全キャラ収集。違うならRETURN
+SIF LOCAL != CHARANUM
+	RETURN 0
+
+PRINTFORMW ……%CALLNAME:MASTER%達はついに幻想郷の少女全員を救い出す事に成功した
+PRINTL  
+PRINTFORML 霧が収まったわけではないので、少女達はまだ全員あなたと共に暮らしている
+PRINTFORML 全員がそれなりに良い環境を与えられているため、仮に霧が収まったとしても
+PRINTFORMW このまま一緒に暮らした方が楽だと思う少女も少なくないだろう
+PRINTL  
+PRINTFORML %CALLNAME:MASTER%は異変を解決し、幻想郷の少女達を救った功績を称えられ
+PRINTFORML 翌日の文々。新聞の一面を飾ったが、そんな事よりも増え続ける生活費の方が
+PRINTFORMW %CALLNAME:MASTER%にとっては重大な問題となっていた……
+PRINTL  
+PRINTFORMW  
+PRINTFORMW 　　　　　　　　―― Additional Ending No.2 ～幻想郷の救世主？～
+PRINTL  
+PRINTL  
+FLAG:46 |= 2
+
+RETURN 1
+
+
+@ADDITIONAL_ENDING_3
+
+A = 0
+
+PRINTFORMW %CALLNAME:MASTER%達が異変の元凶を退治してから数日後……
+PRINTL  
+PRINTFORML %CALLNAME:MASTER%の家の前では、今日も少女達が%CALLNAME:MASTER%と一緒に過ごす時間を賭けて弾幕ごっこを繰り広げていた
+PRINTFORML これだけ多くの少女達に好かれていると言うのは確かに嬉しい物ではあるのだが、
+PRINTFORMW 流石にこう毎日引っ張りだこにされていては体力が持たない
+PRINTL  
+PRINTFORML たまには自分も休ませてくれ……そう%CALLNAME:MASTER%が言おうとすると、
+PRINTFORM 弾幕ごっこを制した
+REPEAT CHARANUM
+	IF A == 0 && TALENT:COUNT:85
+		A = COUNT
+		PRINTFORM %CALLNAME:A%
+	ENDIF
+REND
+PRINTFORML が、満面の笑顔で%CALLNAME:MASTER%に抱きついてきた
+PRINTFORMW ……その笑顔を見た%CALLNAME:MASTER%は結局何も言えなくなってしまい、今日も%CALLNAME:A%と、ヘトヘトになるまで一緒に過ごすのだった
+PRINTL  
+PRINTFORMW  
+PRINTFORMW 　　　　　　　　―― Additional Ending No.3 ～秘密の花園～
+PRINTL  
+PRINTL  
+FLAG:46 |= 4
+
+RETURN 1

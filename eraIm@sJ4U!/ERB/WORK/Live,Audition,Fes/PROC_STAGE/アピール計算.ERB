@@ -1,0 +1,293 @@
+;ARG	使用者
+;ARG:1	アピール種別
+@アピール成功判定(ARG, ARG:1)
+#FUNCTION
+#LOCALSIZE 4
+VARSET LOCAL
+IF ARG < 11
+	LOCAL:1 += JUDGE_APPEALHIT(ARG, ARG:1)
+	IF RAND:100 < LOCAL:1
+		LOCAL:2 += JUDGE_PERFECTAPPEAL(ARG, ARG:1)
+		IF RAND:100 < LOCAL:2
+			LOCAL:3 = 2
+		ELSE
+			LOCAL:3 = 1
+		ENDIF
+	ELSE
+		LOCAL:3 = 0
+	ENDIF
+ELSE
+	;パーフェクトならチェイン数加算
+	LOCAL:3 = TFLAG:アピール成功
+	IF LOCAL:3 == 2
+		TFLAG:チェイン数 ++
+	ELSE
+		TFLAG:チェイン数 = 0
+	ENDIF
+ENDIF
+RETURNF LOCAL:3
+
+;ARG	対象
+;ARG:1	アピール種別
+@JUDGE_APPEALHIT(ARG, ARG:1)
+;LOCAL		TEMP
+;LOCAL:1	命中率
+;LOCAL:2	パフェアピ率
+#FUNCTION
+#LOCALSIZE 2
+;命中率、パフェ率を計算
+;一回のアピールの度にこの関数を通す
+
+	;アピールミス判定
+VARSET LOCAL
+;技能10でほぼ100%成功
+IF ARG:1 == 1
+	LOCAL = 30
+	LOCAL -= (2 * ABL:ARG:Ｖｏ技能 + 10)
+ELSEIF ARG:1 == 2
+	LOCAL = 30
+	LOCAL -= (2 * ABL:ARG:Ｖｉ技能 + 10)
+ELSEIF ARG:1 == 3
+	LOCAL = 30
+	LOCAL -= (2 * ABL:ARG:Ｄａ技能 + 10)
+ENDIF
+	
+	;更に難易度を適用し計算
+	
+	;念のため下がり過ぎてたら0に調整
+	
+SIF LOCAL < 0
+	LOCAL = 0
+		
+	;ここで成功(命中)率を出す
+	
+LOCAL:1 = 100 - LOCAL
+
+	;念のためキャップをかける
+SIF LOCAL:1 > 100
+	LOCAL:1 = 100
+SIF LOCAL:1 < 0
+	LOCAL:1 = 0
+	
+	;かしましなら*1.5(というかユニット状態判定？)
+	
+	SIF FLAG:ユニット状態 == 1
+		TIMES LOCAL:1 , 1.5
+
+	RETURNF LOCAL:1
+;ARG	対象
+;ARG:1	アピール種別
+@JUDGE_PERFECTAPPEAL(ARG, ARG:1)
+#FUNCTION
+#LOCALSIZE 3
+VARSET LOCAL
+	;以下パフェアピ判定
+IF ARG:1 == 1
+
+	;基本確率(50)
+	LOCAL:2 = ABL:ARG:Ｖｏ技能 * 3 + 5
+	
+	;装備補正(30)
+	
+	
+ELSEIF ARG:1 == 2
+
+	;基本確率(50)
+	LOCAL:2 = ABL:ARG:Ｖｉ技能 * 3 + 5
+	
+	;装備補正(30)
+	
+	
+ELSEIF ARG:1 == 3
+
+	;基本確率(50)
+	LOCAL:2 = ABL:ARG:Ｄａ技能 * 3 + 5
+	
+	;装備補正(30)
+	
+	
+ELSE
+
+ENDIF
+
+	;団結補正(50)
+LOCAL:2 += SUM_団結値() / 10
+	
+	;ラック補正(10)
+	
+	;かしましなら*1.5(というかユニット状態判定？)
+	
+SIF FLAG:ユニット状態 == 1
+	TIMES LOCAL:2, 1.5
+	
+	;更に素質を適用
+
+	RETURNF LOCAL:2
+
+;誰に対しても同じ処理（好感度でちょっち変える）
+;パフェアピ率をどう処理するか
+;ARG	対象
+;ARG:1	パフェ、グッド、ミス
+;ARG:2	種類
+@APPEAL_CALCLATE(ARG, ARG:1, ARG:2)
+;LOCAL
+VARSET LOCAL
+
+IF ARG:2 == 1
+	;
+	LOCAL += SUM_VO(ARG)
+	SIF ARG >= 11
+		LOCAL *= TFLAG:VOレート
+	SIF ARG < 11
+		LOCAL *= 10000
+ELSEIF ARG:2 == 2
+
+	LOCAL += SUM_VI(ARG)
+	SIF ARG >= 11
+		LOCAL *= TFLAG:VIレート
+	SIF ARG < 11
+		LOCAL *= 10000
+ELSE
+
+	LOCAL += SUM_DA(ARG)
+	SIF ARG >= 11
+		LOCAL *= TFLAG:DAレート
+	SIF ARG < 11
+		LOCAL *= 10000
+	
+ENDIF
+
+LOCAL *= 2
+
+;まずパフェッた時の数字をベースにする
+TIMES LOCAL, 1.20
+
+;パフェ以下の時
+SIF ARG:1 < 2
+	TIMES LOCAL, 0.60
+
+;バッド時
+SIF ARG:1 < 1
+	LOCAL = LOCAL * (-1) / 3
+	
+;ユニット状態適用
+SIF FLAG:ユニット状態 == 1
+	TIMES LOCAL , 1.50
+	
+;現在未完成なのでリップサービス
+	;TIMES LOCAL , 1.50
+	
+	TIMES LOCAL , 1.70
+	
+	LOCAL /= 10000
+	
+	;条件無視で親密ボーナス(アピールしたキャラのみ)
+	SIF ARG >= 11
+		LOCAL += (ABL:ARG:親密 * 3)
+	
+RETURN LOCAL
+
+;じっさいは、倦怠期とか有頂天とかもあるので、個人個人で分けた方がいいかな？
+
+@バースト計算(ARG, ARG:1)
+;LOCAL		
+;LOCAL:1	合計得点
+;LOCAL:2	
+;LOCAL:3	アピール成功判定
+#FUNCTION
+#LOCALSIZE 4
+VARSET LOCAL
+LOCAL:3 = アピール成功判定(ARG, ARG:1)
+SELECTCASE ARG:1
+
+CASE 1
+	LOCAL:1 = SUM_団結値() * 2 * TFLAG:VOレート / 10000
+CASE 2
+	LOCAL:1 = SUM_団結値() * 2 * TFLAG:VIレート / 10000
+CASE 3
+	LOCAL:1 = SUM_団結値() * 2 * TFLAG:DAレート / 10000
+CASEELSE
+
+ENDSELECT
+
+LOCAL:1 *= 10000
+TIMES LOCAL:1, 1.70
+LOCAL:1 /= 10000
+
+
+RETURNF LOCAL:1
+;	ARG	 対象
+;	ARG:1アピール種別
+@待機時間セット_LAF(ARG, ARG:1)
+VARSET LOCAL
+;バーストアピール
+IF ARG:1 == 5
+
+	;全員遅延
+	FOR LOCAL, 1080, 1085
+		IF FLAG:LOCAL > 0
+			LOCAL:1 = 100 * 17 * 100
+			;TIMES LOCAL:1, 0.5866
+			LOCAL:1 = ADD_RAND(LOCAL:1)
+			LOCAL:1 /= 100
+			CFLAG:(FLAG:LOCAL):残り待機時間 = LOCAL:1
+			;PRINTFORMW 味方{FLAG:LOCAL} = {CFLAG:(FLAG:LOCAL):残り待機時間}
+		ENDIF
+	NEXT
+	LOCAL:1 = 100 * 17 * 100
+	;TIMES LOCAL:1, 0.5866
+	LOCAL:1 = ADD_RAND(LOCAL:1)
+	LOCAL:1 /= 100
+	CFLAG:1:残り待機時間 = LOCAL:1
+
+	;PRINTFORMW 敵{CFLAG:1:残り待機時間}
+;思い出アピール
+ELSEIF ARG:1 == 4
+
+	IF ARG >= 11
+		FOR LOCAL, 1080, 1085
+			IF FLAG:LOCAL > 0
+				LOCAL:1 = 100 * 6 * 100
+				;TIMES LOCAL:1, 0.5866
+				LOCAL:1 = ADD_RAND(LOCAL:1)
+				LOCAL:1 /= 100
+				CFLAG:(FLAG:LOCAL):残り待機時間 = LOCAL:1
+			ENDIF
+		NEXT
+	ELSE
+		LOCAL:1 = 100 * 6 * 100
+		;TIMES LOCAL:1, 0.5866
+		LOCAL:1 = ADD_RAND(LOCAL:1)
+		LOCAL:1 /= 100
+		CFLAG:1:残り待機時間 = LOCAL:1
+	ENDIF
+	
+;デフォルトは100
+ELSE
+	IF ARG >= 11
+		LOCAL = メンバー数()
+		SELECTCASE LOCAL
+			CASE 1
+				;100%
+				LOCAL:1 = 108;107.52688172043…
+			CASE 2
+				;95%
+				LOCAL:1 = 204
+			CASE 3
+				;93%
+				LOCAL:1 = 300;元280
+			CASE 4
+				;90%
+				LOCAL:1 = 387
+			CASE 5
+				;87%
+				LOCAL:1 = 468
+			CASEELSE
+				PRINTFORMW エラー！不明な数値{LOCAL}が選ばれました(アピール処理<待機時間設定>)
+		ENDSELECT
+		CFLAG:ARG:残り待機時間 = ADD_RAND(LOCAL:1)
+	ELSE
+		CFLAG:ARG:残り待機時間 = ADD_RAND(110)
+	ENDIF
+	;SPDで待機時間減少は…やめた方がいいかな
+ENDIF

@@ -1,0 +1,1608 @@
+;≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+;東方調教典
+;≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+;SHOPメニューより呼び出される。用語辞典っぽいものに。
+;記述はまとめwikiの物を一部参考・借用しています。
+;コマンド説明パッチよりコマンドの説明も追加。
+;--------------------------------------------------------------------------------------------
+;このファイル内ではメニュー処理と能力・刻印・経験・
+;珠・ソース・その他特殊なキャラ変数についての記述と、キャラクター解説のメニュー処理があります。
+;--------------------------------------------------------------------------------------------
+;=============================================================================
+;東方調教典メニュー
+;=============================================================================
+;--------------------------------------------------
+;東方調教典メニュー
+;--------------------------------------------------
+@DICTIONARY_MENU
+DRAWLINE
+PRINTL どの項目について調べますか？
+PRINTLC [ 1] 能力
+PRINTLC [ 2] 刻印
+PRINTLC [ 3] 素質
+PRINTLC [ 4] 経験
+PRINTLC [ 5] 珠
+PRINTLC [ 6] ソース
+PRINTLC [ 7] その他数値
+;キャラマニュアルより参照できるように
+;PRINTLC [ 8] キャラクター
+PRINTLC [ 9] アイテム
+;PRINTLC [10] 体質変化薬
+;PRINTLC [11] 施設
+;PRINTLC [12] 触手の特殊能力
+;PRINTLC [13] 特殊な風呂
+;PRINTLC [14] SHOPコマンド説明
+PRINTLC [15] 調教コマンド説明
+;PRINTLC [16] CONFIG説明
+;PRINTLC [17] ゲームモード説明
+;PRINTLC [18] エンディング条件
+PRINTLC [97] 素質サーチシステム
+PRINTLC [98] ネタばれＱ＆Ａ
+PRINTLC [99] 偶像調教典とは
+PRINTL 
+PRINTL [100]やめる
+DRAWLINE
+$INPUT_LOOP
+INPUT
+IF RESULT == 100
+	RETURN 0
+ELSEIF RESULT == 1
+	;能力
+	CALL DICTIONARY_ABL_MAIN
+ELSEIF RESULT == 2
+	;刻印
+	CALL DICTIONARY_MARK_MAIN
+ELSEIF RESULT == 3
+	;素質
+	CALL DICTIONARY_TALENT_MAIN
+ELSEIF RESULT == 4
+	;経験
+	CALL DICTIONARY_EXP_MAIN
+ELSEIF RESULT == 5
+	;珠
+	CALL DICTIONARY_JUEL_MAIN
+ELSEIF RESULT == 6
+	;ソース
+	CALL DICTIONARY_SOURCE_MAIN
+ELSEIF RESULT == 7
+	;その他数値
+	CALL DICTIONARY_OTHER_MAIN
+ELSEIF RESULT == 8
+	;キャラクター
+	CALL DICTIONARY_CHARA_MAIN
+ELSEIF RESULT == 9
+	;アイテム
+	CALL DICTIONARY_ITEM_MAIN
+ELSEIF RESULT == 11
+	;施設
+	;CALL DICTIONARY_EXITEM_MAIN
+	PRINTFORMW 未実装です
+ELSEIF RESULT == 14
+	;SHOPコマンド説明
+	CALL DICTIONARY_SHOP_COMMAND
+ELSEIF RESULT == 15
+	;調教コマンド説明
+	CALL DICTIONARY_TRAIN_COMMAND
+ELSEIF RESULT == 16
+	;CONFIG説明
+	CALL DICTIONARY_CONFIG_MAIN_J
+ELSEIF RESULT == 17
+	;ゲームモード説明
+	;CALL DICTIONARY_GAMEMODE_MAIN
+	PRINTFORMW 未実装です
+ELSEIF RESULT == 18
+	;エンディング条件
+	CALL DICTIONARY_ENDING_MAIN
+ELSEIF RESULT == 97
+	;素質サーチシステム
+	CALL DICTIONARY_SEARCH_TALENT
+ELSEIF RESULT == 98
+	;ネタばれＱ＆Ａ
+	CALL DICTIONARY_NETABARE_QA
+ELSEIF RESULT == 99
+	;東方調教典とは
+	CALL DICTIONARY_ABOUT
+ELSE
+	GOTO INPUT_LOOP
+ENDIF
+RESTART
+
+;=============================================================================
+;用語辞典――東方調教典とは
+;=============================================================================
+;という名のデタラメ
+@DICTIONARY_ABOUT
+PRINTL 説明しよう！
+PRINTL 東方調教典とは、万人食いの伝説を打ち立てた調教師である鳥越 九朗が
+PRINTL 調教に関する事柄をまとめた書物『調教全典～愚息の巻』を元に、
+PRINTW ＳＭ調教名人である真敗 勝が編纂し、自費出版(淫冥書房)したものなのだ！
+PRINTL なお、東方調教典は当出版社が王妊の乱の最中に妬き討ちにされたため、
+PRINTW 残念ながら絶版となっている。
+PRINTW …………と黒髪の素兎さんが言ってたウサ。
+
+;=============================================================================
+;用語辞典――能力
+;=============================================================================
+;--------------------------------------------------
+;能力解説メインページ
+;--------------------------------------------------
+@DICTIONARY_ABL_MAIN
+DRAWLINE
+PRINTFORML 「能力」に関する大まかな説明です。
+DRAWLINE
+;各表示
+FOR LOCAL, 0, 110
+	;素質系は表示させない
+	SELECTCASE LOCAL
+		CASE 101 TO 110
+		CASE 20 TO 27
+		CASEELSE
+			SIF STRLENS(ABLNAME:LOCAL) > 0
+				PRINTFORMLC [{LOCAL, 2}] %ABLNAME:LOCAL%
+	ENDSELECT
+NEXT
+PRINTL 
+PRINTL [100]戻る
+DRAWLINE
+$INPUT_LOOP
+INPUT
+IF RESULT == 100
+	RETURN 0
+ELSEIF RESULT < 0 || RESULT > 110 || STRLENS(ABLNAME:RESULT) == 0
+	GOTO INPUT_LOOP
+ELSE
+	PRINTFORML 【%ABLNAME:RESULT%】
+	TRYCALLFORM DICTIONARY_ABL_{RESULT}
+	RESTART
+ENDIF
+
+;--------------------------------------------------
+;能力解説
+;--------------------------------------------------
+
+;従順
+@DICTIONARY_ABL_0
+PRINTL 主人に対してどれだけ従おうと考えているのかの尺度を表します。
+PRINTL 従順が低いとどんな命令にも反発しますし、
+PRINTL 逆に高いと主人の言うことを聞くようになっていきます。
+PRINTW 助手にしたり性奴隷として売却するなど調教を行ううえでは必須の能力となっています。
+
+;欲望
+@DICTIONARY_ABL_1
+PRINTL そのキャラがどれだけ情事に溺れているかを表しています。
+PRINTL 高いとあらゆる性戯に対して欲情を催すようになります。
+PRINTL 強い快楽を感じさせたり媚薬を与えるなどで上昇させることができます。
+PRINTW 性奴隷に必須な能力と言えるでしょう。
+
+;技巧
+@DICTIONARY_ABL_2
+PRINTL どれだけ性に関連するテクニックを持っているかを示しています。
+PRINTL また、小手先周りの器用さもこれで示すことがあります。
+PRINTL 基本的に高ければ高いほど調教の効果が強化されるため、
+PRINTW 主人助手問わず調教者として必須な能力と言えるでしょう。
+;Ｃ感覚
+@DICTIONARY_ABL_3
+PRINTL クリトリス(またはペニス)でどれだけ感じるかの指数です。
+PRINTW ローターやクンニ(フェラする)等で上昇させることができます。
+;Ｖ感覚
+@DICTIONARY_ABL_4
+PRINTL ヴァギナでどれだけ感じるかの指数です。
+PRINTL バイブやセックス系調教(正常位等)をこなすことによって上昇させることができます。
+PRINTW 当然ながら[オトコ]持ちのキャラは上昇させることができません。
+
+;Ａ感覚
+@DICTIONARY_ABL_5
+PRINTL アナルでどれだけ感じるかの指数です。
+PRINTL お尻の穴を弄り続けることによって上昇させていきます。
+PRINTW ただしお尻の穴で性行為に及ぶのは一般的にアブノーマルなものという認識が強いです。
+;奉仕精神
+@DICTIONARY_ABL_6
+PRINTL 他人に尽くすことに悦びを感じるかを表します。
+PRINTL 高いと調教からより多くをものを学びとろうとしたり、
+PRINTL 命令を与えずとも自ら進んでご奉仕するようになります。
+PRINTW フェラチオやパイズリなどを繰り返せば上昇させることができます。
+;露出癖
+@DICTIONARY_ABL_7
+PRINTL 恥ずかしい姿を見られて興奮するかどうかを表します。
+PRINTL 高いと自慰など恥情が上がる調教をしたときに欲情がかなり上がるようになります。
+PRINTL 同時に恥じらう気持ちが薄くなるため、誰かに見られる恐怖等は感じにくくなります。
+PRINTW 野外プレイや自慰等で馴らしていくことで上昇させることができます。
+
+;マゾっ気
+@DICTIONARY_ABL_8
+PRINTL 苦痛を受けることにどれだけ欲情するかの指標になります。
+PRINTL 高いと、痛みを感じたときに欲情が上がり、反感があがりにくくなる他、
+PRINTL 体力や気力の消耗を抑えることができるようになります。
+PRINTL SM系の調教をメインに行う場合は必須といえる程の能力ですが、
+PRINTW 同時に高くなればなるほどサドっ気を上昇させにくくなります。
+;レズっ気
+@DICTIONARY_ABL_9
+PRINTL 女性同士との性愛をどの程度受け入れているかを示します。
+PRINTL 高いと同性の性愛調教をされたときに感じる反感などが下がり、快感が上がります。
+PRINTW 調教終了時にレズプレイを行うための前提条件であるレズ中毒の取得に必要です。
+
+;自慰中毒
+@DICTIONARY_ABL_10
+PRINTL 自慰行為の習慣がどれだけあるかです。
+PRINTL 高いと調教終了後に自慰をしやすくなる上、自慰回数も増えるようになります。
+PRINTW 上昇させるには自慰経験か調教自慰経験を多く必要です。
+
+;精液中毒
+@DICTIONARY_ABL_11
+PRINTL 精液の味や匂いに興奮するかの指数です。
+PRINTL 高いと精液で欲情が上がる他、イベント等で珠を多く入手できるようになります。
+PRINTL ただし、上昇させるために「屈服の珠」を非常に多く必要とします。
+PRINTL 慣れている(＝精液経験が高い)と必要な球が減少しますので、
+PRINTW 上げるなら精液経験を多く稼いでからのほうがよいでしょう。
+
+;レズ中毒
+@DICTIONARY_ABL_12
+PRINTL 女性同士との性愛にどれだけ夢中になっているかを示します。
+PRINTL 高いと同性の性愛調教をされたときに感じる反感などが下がり、快感が上がります。
+PRINTL また奴隷、助手双方が♀でレズ中毒を取得していると
+PRINTL 調教終了時にレズプレイをしてしまいます。
+PRINTW この時一定条件を満たすとさらに６９を行うようになります。
+;ＢＬっ気
+@DICTIONARY_ABL_13
+PRINTL 男性同士との性愛をどの程度受け入れているかを示します。
+PRINTL 高いと同性の性愛調教をされたときに感じる反感などが下がり、快感が上がります。
+PRINTW 調教終了時にＢＬプレイを行うための前提条件であるＢＬ中毒の取得に必要です。
+
+;Ｂ感覚
+@DICTIONARY_ABL_14
+PRINTL 胸でどれだけ感じるかです。[オトコ]持ちのキャラは上げにくくなっています。
+PRINTL 胸愛撫やパイズリ等胸の開発に勤しめれば強化させることができます。
+PRINTL ただし胸の大きさによって上げやすかったりコマンドができなかったりします。
+PRINTL 胸が小さい場合は感じやすい一方、胸を使った性技を実行しにくくなり、
+PRINTW 大きい場合は刺激を感じにくくなる代わり胸を使った調教がしやすくなる傾向にあります。
+
+;サドっ気
+@DICTIONARY_ABL_15
+PRINTL 苦痛を与えることにどれだけ欲情するかの指標になります。
+PRINTL SM系の調教の際、高いとより相手に多くの苦痛を与えるようになる他、
+PRINTL 助手の場合は一定レベルに達していないと実行出来ないコマンドも存在しています。
+PRINTL 助手にして別の奴隷に苦痛を与えさせていけばそのうち新たな性癖に
+PRINTL 目覚めることになるでしょう。
+PRINTW ただし高くなればなるほどマゾっ気を上昇させにくくなります。
+
+;ＢＬ中毒
+@DICTIONARY_ABL_16
+PRINTL 男性同士との性愛にどれだけ夢中になっているかを示します。
+PRINTL 高いと同性の性愛調教をされたときに感じる反感などが下がり、快感が上がります。
+PRINTL また奴隷、助手双方が♂でＢＬ中毒を取得していると
+PRINTL 調教終了時にＢＬプレイを行いやすくなります。
+PRINTW この時一定条件を満たすとレズプレイ同様、さらに６９を行うようになります。
+;Ｍ感覚
+@DICTIONARY_ABL_17
+PRINTW 未実装です
+;金銭感覚
+@DICTIONARY_ABL_89
+PRINTL 料理の技術の高さの尺度を表します。
+PRINTL 高いとその分作った料理の見た目や味が良くなり、周りから高評価を得やすくなります。
+PRINTL 料理を作って食べたり売ったりする人はこの技能を伸ばすことをお勧めします。
+PRINTL またNORMAL以上の難易度では料理技能は体力・気力の回復に影響を与えます。
+PRINTW 特に主人の料理技能は早めにあげておいたほうがいいかもしれません。
+;料理技能
+@DICTIONARY_ABL_90
+PRINTL 料理の技術の高さの尺度を表します。
+PRINTL 高いとその分作った料理の見た目や味が良くなり、周りから高評価を得やすくなります。
+PRINTL 料理を作って食べたり売ったりする人はこの技能を伸ばすことをお勧めします。
+PRINTL またNORMAL以上の難易度では料理技能は体力・気力の回復に影響を与えます。
+PRINTW 特に主人の料理技能は早めにあげておいたほうがいいかもしれません。
+
+;撮影技能
+@DICTIONARY_ABL_91
+PRINTL ビデオや写真撮影に関する技術の高さを示します。
+PRINTL 高いとそれだけ良い動画や映える写真を撮ることができるようになります。
+PRINTL それなりの経験を積む必要がありますが、写真やビデオの価格に大きく影響するするため、
+PRINTW これらを主な収入にする場合は早い段階で上げることをお勧めします。
+
+;浪費癖
+@DICTIONARY_ABL_97
+PRINTL ビデオや写真撮影に関する技術の高さを示します。
+PRINTL 高いとそれだけ良い動画や映える写真を撮ることができるようになります。
+PRINTL それなりの経験を積む必要がありますが、写真やビデオの価格に大きく影響するするため、
+PRINTW これらを主な収入にする場合は早い段階で上げることをお勧めします。
+;Ｖｏ技能
+@DICTIONARY_ABL_105
+PRINTL どれくらい歌を巧く歌えるかの尺度を示します。
+PRINTL 高いとコンサートを開いた際、より多くの収入が見込めるようになります。
+PRINTW ただしある程度経験(歌唱経験)を積まない限り技能を伸ばすことはできません。
+;Ｖｉ技能
+@DICTIONARY_ABL_106
+PRINTL 他人に尽くすことに悦びを感じるかを表します。
+PRINTL 高いと調教からより多くをものを学びとろうとしたり、
+PRINTL 命令を与えずとも自ら進んでご奉仕するようになります。
+PRINTW フェラチオやパイズリなどを繰り返せば上昇させることができます。
+;Ｄａ技能
+@DICTIONARY_ABL_107
+PRINTL 恥ずかしい姿を見られて興奮するかどうかを表します。
+PRINTL 高いと自慰など恥情が上がる調教をしたときに欲情がかなり上がるようになります。
+PRINTL 同時に恥じらう気持ちが薄くなるため、誰かに見られる恐怖等は感じにくくなります。
+PRINTW 野外プレイや自慰等で馴らしていくことで上昇させることができます。
+
+;話術
+@DICTIONARY_ABL_108
+PRINTL 苦痛を受けることにどれだけ欲情するかの指標になります。
+PRINTL 高いと、痛みを感じたときに欲情が上がり、反感があがりにくくなる他、
+PRINTL 体力や気力の消耗を抑えることができるようになります。
+PRINTL SM系の調教をメインに行う場合は必須といえる程の能力ですが、
+PRINTW 同時に高くなればなるほどサドっ気を上昇させにくくなります。
+;事務
+@DICTIONARY_ABL_109
+PRINTL 女性同士との性愛をどの程度受け入れているかを示します。
+PRINTL 高いと同性の性愛調教をされたときに感じる反感などが下がり、快感が上がります。
+PRINTW 調教終了時にレズプレイを行うための前提条件であるレズ中毒の取得に必要です。
+
+;表示したいけど、番号の関係で保留
+;プロデューサーLv
+;@DICTIONARY_ABL_99
+;PRINTL 調教師の能力としてどの程度のものかを示します。
+;PRINTL 高いとより効率よく調教を進められるようになります。
+;PRINTL また調教師の名声もこれに含まれるため、奴隷を売却する際は
+;PRINTL より上質の奴隷であるということでプレミアが付くようになります。
+;PRINTL ただし多くの奴隷を売却したり調教によって虜にしないと上昇させることはできません。
+;PRINTL 条件は特殊ですが可能な限り早い段階で上昇させると良いでしょう。
+;PRINTW これも原則的に主人専用の能力です。
+
+;=============================================================================
+;用語辞典――刻印
+;=============================================================================
+;--------------------------------------------------
+;刻印解説メインページ
+;--------------------------------------------------
+@DICTIONARY_MARK_MAIN
+DRAWLINE
+PRINTFORML 「刻印」に関する大まかな説明です。
+DRAWLINE
+;各表示
+FOR LOCAL, 0, 11
+	SIF STRLENS(MARKNAME:LOCAL) > 0
+		PRINTFORMLC [{LOCAL, 2}] %MARKNAME:LOCAL%
+NEXT
+PRINTL 
+PRINTL [100]戻る
+DRAWLINE
+$INPUT_LOOP
+INPUT
+IF RESULT == 100
+	RETURN 0
+ELSEIF RESULT < 0 || RESULT > 100 || STRLENS(MARKNAME:RESULT) == 0
+	GOTO INPUT_LOOP
+ELSE
+	PRINTFORML 【%MARKNAME:RESULT%】
+	TRYCALLFORM DICTIONARY_MARK_{RESULT}
+ENDIF
+RESTART
+
+;--------------------------------------------------
+;刻印解説
+;--------------------------------------------------
+;苦痛依存
+@DICTIONARY_MARK_0
+PRINTL 身体に染みついて忘れられない程身体に強い苦痛を受けたことを示します。
+PRINTL 刻印のレベルが高いほど一度に強い苦痛を受けていることを示しており、
+PRINTL それ以上の苦痛を受けることは避けたいとする心理が働くことで、
+PRINTL より調教の命令を受け入れやすくなります。
+PRINTL 
+PRINTL 調教においては、そのターンの苦痛パラメータ上昇が以下のとおりならば
+PRINTL 苦痛依存を取得する。
+PRINTL 
+PRINTL 苦痛依存Lv1 苦痛依存Lv0以下の時に、 500以上1500未満上昇
+PRINTL 苦痛依存Lv2 苦痛依存Lv1以下の時に、1500以上3000未満上昇
+PRINTW 苦痛依存Lv3 苦痛依存Lv2以下の時に、3000以上上昇
+
+;快楽依存
+@DICTIONARY_MARK_1
+PRINTL 身体に染みついて忘れられない程強い快感を受けたことを示します。
+PRINTL 刻印のレベルが高いほど一度に強い快楽を受けていることを示しており、
+PRINTL さらなる快楽を得たいとする心理が働くことで、
+PRINTL より調教の命令を受け入れやすくなります。
+PRINTL 
+PRINTL 調教においては、そのターンの快Ｃと快Ｖと快Ａと快Ｂのパラメータ
+PRINTL 上昇の総合計が以下の通りならば、快楽依存を取得する。
+PRINTL 
+PRINTL 快楽依存Lv1 快楽依存Lv0以下の時に、1000以上3000未満上昇
+PRINTL 快楽依存Lv2 快楽依存Lv1以下の時に、3000以上6000未満上昇
+PRINTW 快楽依存Lv3 快楽依存Lv2以下の時に、6000以上上昇
+
+;既成事実
+@DICTIONARY_MARK_2
+PRINTL 心が折れ、主人に屈したことを示します。
+PRINTL 刻印のレベルが高いほどより強い従属心が生まれていることを示しており、
+PRINTL 主人の命令に逆らう気持ちが小さくなっていきます。
+PRINTL 
+PRINTL 調教においては、そのターンの屈服と恥情の1/20と苦痛の1/20と
+PRINTL 恐怖の1/5のパラメータ上昇の総合計が以下の通りならば、
+PRINTL 屈服刻印を取得する。
+PRINTL 
+PRINTL 屈服刻印Lv1 屈服刻印Lv0以下の時に、1000以上2500未満上昇
+PRINTL 屈服刻印Lv2 屈服刻印Lv1以下の時に、2500以上5000未満上昇
+PRINTW 屈服刻印Lv3 屈服刻印Lv2以下の時に、5000以上上昇
+
+;反発感情
+@DICTIONARY_MARK_3
+PRINTL 主人に対して強い反感を持っていることを示します。
+PRINTL 刻印のレベルが高いほど主人に対する反感が強いため、
+PRINTL 主人の命令に逆らう気持ちが強くなっていきます。
+PRINTL が、強い反発心を持ったまま負荷をかけ続けると心を壊すことも可能です。
+PRINTL とは言え、通常は調教の邪魔にしかならないので早い段階で消した方が賢明です。
+PRINTL 反発感情は、能力上昇の時に珠を消費して低下させることができます。
+PRINTL 
+PRINTL 調教においては、そのターンの反感と不快のパラメータ上昇の
+PRINTL 総合計が以下のとおりならば、反発感情を取得する。
+PRINTL 
+PRINTL 反発感情Lv1 反発感情Lv0以下の時に、 500以上2000未満上昇
+PRINTL 反発感情Lv2 反発感情Lv1以下の時に、2000以上4000未満上昇
+PRINTL 反発感情Lv3 反発感情Lv2以下の時に、4000以上上昇
+PRINTL 
+PRINTL ただし、反発感情は過去にどのレベルまで取得したのかがキャラごとに、
+PRINTL 記録されており、一旦取得したレベルの反発感情は原則として
+PRINTL 再取得はされない。
+PRINTL 例外も結構あるが、たとえば難易度HARD以上においては、そのターンの
+PRINTL 反感と不快のパラメータ上昇の総合計が4千万以上の場合には、
+PRINTW 反発感情履歴の状況に関わらず、反発感情Lv3を取得することになる
+
+;=============================================================================
+;用語辞典――経験
+;=============================================================================
+;--------------------------------------------------
+;経験解説メインページ
+;--------------------------------------------------
+@DICTIONARY_EXP_MAIN
+DRAWLINE
+PRINTFORML 「経験」に関する大まかな説明です。
+DRAWLINE
+;各表示
+FOR LOCAL, 0, 104
+	SIF STRLENS(EXPNAME:LOCAL) > 0
+		PRINTFORMLC [{LOCAL, 2}] %EXPNAME:LOCAL%
+NEXT
+PRINTL 
+PRINTL [100]戻る
+DRAWLINE
+$INPUT_LOOP
+INPUT
+IF RESULT == 100
+	RETURN 0
+ELSEIF RESULT < 0 || RESULT > 110 || STRLENS(EXPNAME:RESULT) == 0
+	GOTO INPUT_LOOP
+ELSE
+	PRINTFORML 【%EXPNAME:RESULT%】
+	TRYCALLFORM DICTIONARY_EXP_{RESULT}
+	RESTART
+ENDIF
+
+;--------------------------------------------------
+;経験解説
+;--------------------------------------------------
+;Ｖ経験
+@DICTIONARY_EXP_0
+PRINTL 調教等でヴァギナをどれくらい弄られたかを示します。
+PRINTL それだけ多くの回数膣へ挿入されたことになるので、
+PRINTL 高いとＶ系調教実行時の消耗が軽減されます。
+PRINTL また能力「Ｖ感覚」を上昇させるのに必要です。
+PRINTW 当然ながら、通常[オトコ]が経験することはあり得ません。
+
+;Ａ経験
+@DICTIONARY_EXP_1
+PRINTL 調教等でアナルをどれくらい弄られたかを示します。
+PRINTL それだけ多くの回数肛門へ挿入されたことになるので、
+PRINTL 高いとＡ系調教実行時の消耗が軽減されます。
+PRINTW また能力「Ａ感覚」を上昇させるのに必要です。
+
+;絶頂経験
+@DICTIONARY_EXP_2
+PRINTL オーガズムを何回体験したかを示します。
+PRINTL クリトリスやヴァギナへ刺激を与え、性的興奮を体験させると増加します。
+PRINTW ドライオーガズムに達した場合もカウントされます。
+
+;射精経験
+@DICTIONARY_EXP_3
+PRINTL 性的な刺激を受けて何回射精したかを示します。
+PRINTL 1度の射精に大量の精液を出した場合は、射精を2回分以上行ったとみなされ、
+PRINTW 2以上の数値がカウントされることもあります。
+
+;自慰経験
+@DICTIONARY_EXP_10
+PRINTL 自慰を何回行ったのかを示します。
+PRINTL 調教中の「自慰」コマンド以外にも調教後のイベントなどでも上昇することがあります。
+PRINTW 能力「自慰中毒」を上昇させるのに必須です。
+
+;強制自慰経験
+@DICTIONARY_EXP_11
+PRINTL 調教中、本人の意図しない自慰を何回行ったのかを示します。
+PRINTL 自慰経験に似ていますがその定義はより狭く、調教によるもの限定です。
+PRINTL 原則的に調教中の「自慰」やそれに関連するコマンドのみでしか上昇させられません。
+PRINTW 能力「自慰中毒」を上昇させるのに必須です。
+
+
+;精液経験
+@DICTIONARY_EXP_20
+PRINTL 調教中などで精液が身体にかかった回数を示します。
+PRINTL 1度に大量の精液を浴びた場合は2以上カウントされることもありますが、
+PRINTL 1量やかけた部位があまり影響が無い場合はカウントされないこともあります。
+PRINTW 能力「精液中毒」を上昇させるのに必須です。
+
+;奉仕快楽経験
+@DICTIONARY_EXP_21
+PRINTL 主人に性的な奉仕することに快楽を感じた経験を示します。
+PRINTL 奉仕系のコマンド実行中に性的な快楽を与えると上昇しやすい傾向にあります。
+PRINTW 能力「奉仕精神」を上昇させたり、一部の素質を取得させるのに必須です。
+
+;フェラ経験
+@DICTIONARY_EXP_22
+PRINTL 口に主人や助手の物を咥えて奉仕する「フェラチオ」をどれだけ行ったかを示します。
+PRINTL その名の通り、「フェラチオ」や関連するコマンドで上昇する他、
+PRINTL 朝のイベント等でも上昇することがあります。
+PRINTW 一部の素質を取得させるのに必須です。
+
+;愛情経験
+@DICTIONARY_EXP_23
+PRINTL どれくらい主人から強い愛情を与えられ、自身も愛情を感じたかを示します。
+PRINTL 滅多なことでは上昇しませんが、愛情系のルートにいく場合は非常に重要です。
+PRINTW 一部の素質を取得させるのに必須です。
+
+;膣射経験
+@DICTIONARY_EXP_24
+PRINTL 尿道を通常ではありえない程の大きさまで無理矢理広げられたことを示します。
+PRINTL 上昇させる手段もＶ拡張経験やＡ拡張経験以上に限定されており、
+PRINTL 滅多に見ることはないでしょう。
+PRINTL Ｖ拡張経験やＡ拡張経験同様、身体に非常に負担のかかるプレイで付きますが、
+PRINTL 初めてこれを経験した場合は間違いなく『異常経験』が付くこととなるでしょう。
+PRINTL 能力の上昇に関して全く影響を与えませんが、
+PRINTL よりハードな尿道調教を施す場合は有る程度の慣れを要求されることが多いです。
+PRINTW また、ある素質を取得させるのに必須です。
+;苦痛快楽経験
+@DICTIONARY_EXP_30
+PRINTL 身体的苦痛を受けることに快楽を感じた経験を示します。
+PRINTL 苦痛系のコマンド実行中に性的な快楽を与えると上昇しやすい傾向にあります。
+PRINTW 能力「マゾっ気」を上昇させたり、一部の素質を取得させるのに必須です。
+
+;放尿経験
+@DICTIONARY_EXP_31
+PRINTL 尿道等への刺激で尿をどのくらい出したのかを示します。
+PRINTL 尿意が上がった状態でＣに刺激を与えたり、
+PRINTL コマンド「放尿」を使うことで上昇します。
+PRINTL 1度の放尿で大量の尿を漏らした場合は、放尿を2回分以上行ったとみなされ、
+PRINTL 2以上の数値がカウントされることもあります。
+PRINTW 通常、[おもらし癖]や利尿剤を使わない限り尿意が上昇することは有りません。
+
+;Ａ快楽経験
+@DICTIONARY_EXP_32
+PRINTL どれだけアナルを弄られることに快楽を感じたかを示します。
+PRINTL 快Ａを強く感じれば感じるほど、より大きな数字で上昇します。
+PRINTW ある素質を取得させるのに必須です。
+
+;レズ経験
+@DICTIONARY_EXP_40
+PRINTL 女性同士の性的なプレイ、レズプレイをどれくらい行ったかを示します。
+PRINTL 同性キャラでの調教や調教終了後のイベントなどで上昇します。
+PRINTL 能力「レズっ気」や「レズ中毒」を上昇させるのに必須です。
+PRINTW ただし高すぎると異性に対してなびきにくくなることもあり得ます
+
+;ＢＬ経験
+@DICTIONARY_EXP_41
+PRINTL 男性同士の性的なプレイ、ＢＬプレイをどれくらい行ったかを示します。
+PRINTL 同性キャラでの調教や調教終了後のイベントなどで上昇します。
+PRINTL 能力「ＢＬっ気」や「ＢＬ中毒」を上昇させるのに必須です。
+PRINTW ただし高すぎると異性に対してなびきにくくなることもあり得ます。
+
+;異常経験
+@DICTIONARY_EXP_50
+PRINTL トラウマにもなる程の強烈な経験をどれだけ受けたかを示します。
+PRINTL 原則的に非常にハードな調教や非常識な行動を取らせることで上昇します。
+PRINTL ハードな調教に慣れることで体力や気力の伸びが良くなる他、
+PRINTL 能力「従順」や「欲望」等を一線を越えるレベルまで引き上げるのに必要です。
+PRINTL 奴隷の心を壊す方針をとる場合も多くの数字をとって上昇させる必要があります。
+PRINTL ただし取得するとその周回中において
+PRINTL 一部の素質が取得できなくなるといったデメリットもあります。
+PRINTL また、異常経験フィルタを有効にした場合は調教中、
+PRINTL 異常経験が入る可能性のある調教コマンドが選択できなくなります。
+PRINTL 調教中の事故防止として活用するとよいでしょう。
+PRINTL ただしイベントで付く分は回避できないこともありますのでご注意を。
+PRINTW 異常経験を付けるか付けないかの判断はプレイヤー次第です。
+
+;緊縛経験
+@DICTIONARY_EXP_51
+PRINTL その名の通り緊縛された経験を示します。
+PRINTL 主に縄で縛ったり、触手を用いることで上昇させることが出来ます。
+PRINTL これを上昇させたところで特定の能力の上昇に必須ということは有りませんが、
+PRINTW 経験を積むと慣れによって緊縛されたときの消耗が軽減されます。
+
+
+;Ｖ拡張経験
+@DICTIONARY_EXP_52
+PRINTL ヴァギナを通常ではありえない程の大きさまで無理矢理広げられたことを示します。
+PRINTL 上昇させる手段も多少限定されており、通常のプレイで見る機会は少ないでしょう。
+PRINTL フィストファックや産卵など身体に非常に負担のかかるプレイで付きますが、
+PRINTL 初めてこれを経験した場合は間違いなく『異常経験』が付くこととなるでしょう。
+PRINTL 能力の上昇に関して全く影響を与えませんが、
+PRINTW よりハードなＶ調教を施す場合は有る程度の慣れを要求されることが多いです。
+
+;Ａ拡張経験
+@DICTIONARY_EXP_53
+PRINTL アナルを通常ではありえない程の大きさまで無理矢理広げられたことを示します。
+PRINTL 上昇させる手段も多少限定されており、通常のプレイで見る機会は少ないでしょう。
+PRINTL アナルフィストやアナル産卵など身体に非常に負担のかかるプレイで付きますが、
+PRINTL 初めてこれを経験した場合は間違いなく『異常経験』が付くこととなるでしょう。
+PRINTL 能力の上昇に関して全く影響を与えませんが、
+PRINTW よりハードなＡ調教を施す場合は有る程度の慣れを要求されることが多いです。
+
+;噴乳経験
+@DICTIONARY_EXP_54
+PRINTL 胸への刺激で母乳がどれくらい噴き出たのかを示します。
+PRINTL [母乳体質]を持っていない限り上昇することは有りません。
+PRINTL 1度の噴乳に大量の母乳を出した場合は、噴乳を2回分以上行ったとみなされ、
+PRINTL 2以上の数値がカウントされることもあります。
+PRINTW 能力「噴乳中毒」を上昇させるのに必須です。
+
+;触手経験
+@DICTIONARY_EXP_55
+PRINTL どれほど触手による調教を受けたかを示します。
+PRINTL 基本的に触手系のコマンドやイベントを得ることで増加します。
+PRINTL 触手が苦手なキャラでも経験を詰むと慣れて消耗が少なくなります。
+PRINTL 能力「触手中毒」の上昇に必須です。
+PRINTL また、触手に関連するものに対して広い範囲で影響を及ぼします。
+PRINTW フェチの傾向が強く、触手嫌いな方には無縁の経験でしょう。
+
+;吸血経験
+@DICTIONARY_EXP_56
+PRINTL その名の通り、何回血を吸われたかを示します。
+PRINTL 特殊なコマンド「吸血」や「触手吸血」によって上昇させることが出来ます。
+PRINTW 経験が多いとこれら吸血系のコマンドの効果が上昇します。
+
+;被吸血経験
+@DICTIONARY_EXP_57
+PRINTL その名の通り、何回血を吸われたかを示します。
+PRINTL 特殊なコマンド「吸血」や「触手吸血」によって上昇させることが出来ます。
+PRINTW 経験が多いとこれら吸血系のコマンドの効果が上昇します。
+
+;;産卵経験
+@DICTIONARY_EXP_60
+PRINTL 卵を産んだり、子宮に産みつけられた卵を排出したかを示します。
+PRINTL 基本的に触手系の調教か[卵生][産卵体質]持ちしか増加しません。
+PRINTW 産卵経験が高いと卵の排出に慣れたことになり、産卵の消耗が減少します。
+
+;出産経験
+@DICTIONARY_EXP_61
+PRINTL 子供を何人産んだかを示します。
+PRINTL 原則的に妊娠出産機能を有効にしない限り増加することは有りません。
+PRINTW 能力の上昇にあまり影響を与えない、いわばフェチ用の経験とも言えるでしょう。
+
+;家事経験
+@DICTIONARY_EXP_90
+PRINTL その名の通り料理を作成した回数を示します。
+PRINTL SHOPコマンドで料理を作らせる(or主人が自分で作る)ことで上昇します。
+PRINTL 調理経験が多いとその分料理することに慣れていることになるため、
+PRINTL 作成した料理を売った時の売値が上昇します。
+PRINTW また、能力「料理技能」を上昇させるのに必要になります。
+
+;撮影経験
+@DICTIONARY_EXP_91
+PRINTL ビデオカメラ、またはカメラで調教風景を撮影した回数を示します。
+PRINTL 「ビデオカメラ」や「カメラ」を使用することで調教者側の経験が上昇します。
+PRINTW 能力「撮影技能」を上昇させるのに必要になります。
+
+
+;被写経験
+@DICTIONARY_EXP_92
+PRINTL ビデオカメラ、またはカメラで調教風景を撮影された回数を示します。
+PRINTL 「ビデオカメラ」や「カメラ」を使用することで被調教側の経験が上昇します。
+PRINTW 有る程度経験を積むとビデオ等で人気が出るようになります。
+
+
+;歌唱経験
+@DICTIONARY_EXP_93
+PRINTL 歌を歌った回数を示します。
+PRINTL SHOPコマンドの「野外ライブを開く」等で上昇します。
+PRINTL 高いと歌うことに慣れたことになり、ライブの成功率が上昇する他、
+PRINTL 野外ライブの収入も上昇するようになります。
+PRINTW また、能力「歌唱技能」を上昇させるのに必要になります
+
+;デート経験
+@DICTIONARY_EXP_94
+PRINTL 歌を歌った回数を示します。
+PRINTL SHOPコマンドの「野外ライブを開く」等で上昇します。
+PRINTL 高いと歌うことに慣れたことになり、ライブの成功率が上昇する他、
+PRINTL 野外ライブの収入も上昇するようになります。
+PRINTW また、能力「歌唱技能」を上昇させるのに必要になります
+;キス経験
+@DICTIONARY_EXP_96
+PRINTL その名の通り、何回キスをしたかを示します。
+PRINTL 調教中の「キス」や「口移し」の他、イベントなどでも上昇することがあります。
+PRINTW 一部の素質を取得させるのに必須です。
+
+;主導経験
+@DICTIONARY_EXP_97
+PRINTL 主人による調教をどれだけ受けたかを示します。
+PRINTL 基本的に主人調教中ならばどのコマンドを実行しても上昇します。
+PRINTL 特定の素質の取得に必要な他、キャラ引き継ぎにも重要な役割を果たします。
+PRINTL 奴隷を奴隷として認識させるつもりであれば
+PRINTW 積極的に主人による調教を実行すると良いでしょう。
+
+;記憶消去経験
+@DICTIONARY_EXP_98
+PRINTL 主人による調教をどれだけ受けたかを示します。
+PRINTL 基本的に主人調教中ならばどのコマンドを実行しても上昇します。
+PRINTL 特定の素質の取得に必要な他、キャラ引き継ぎにも重要な役割を果たします。
+PRINTL 奴隷を奴隷として認識させるつもりであれば
+PRINTW 積極的に主人による調教を実行すると良いでしょう。
+;舞踊経験
+@DICTIONARY_EXP_103
+;=============================================================================
+;用語辞典――珠
+;=============================================================================
+;--------------------------------------------------
+;珠解説メインページ
+;--------------------------------------------------
+@DICTIONARY_JUEL_MAIN
+DRAWLINE
+PRINTFORML 「珠」に関する大まかな説明です。
+PRINTFORML 《》で括られたものはその技能を上げるのにその珠しか手段がないことを示します。
+DRAWLINE
+;各表示
+FOR LOCAL, 0, 199
+	IF STRLENS(PALAMNAME:LOCAL) > 0
+		IF LOCAL >= 100
+			PRINTFORMLC [{LOCAL}]%PALAMNAME:LOCAL%の珠
+		ELSE
+			PRINTFORMLC [{LOCAL, 2}] %PALAMNAME:LOCAL%の珠
+		ENDIF
+	ENDIF
+NEXT
+PRINTL 
+PRINTL [200]戻る
+DRAWLINE
+$INPUT_LOOP
+INPUT
+IF RESULT == 200
+	RETURN 0
+ELSEIF RESULT < 0 || RESULT > 200 || STRLENS(PALAMNAME:RESULT) == 0
+	GOTO INPUT_LOOP
+ELSE
+	PRINTFORML 【%PALAMNAME:RESULT%】
+	TRYCALLFORM DICTIONARY_JUEL_{RESULT}
+	RESTART
+ENDIF
+
+;--------------------------------------------------
+;珠解説
+;--------------------------------------------------
+;快Ｃ
+@DICTIONARY_JUEL_0
+PRINTL クリトリスやペニスなどへの快感を受けて溜まる珠です。
+PRINTL 《Ｃ感覚》・レズっ気・ＢＬっ気・自慰中毒・レズ中毒・
+PRINTL ＢＬ中毒・射精中毒の上昇に必要になります。
+PRINTW 調教においては快Ｃのソースから変換されます。
+
+;快Ｖ
+@DICTIONARY_JUEL_1
+PRINTL ヴァギナへの快感を受けて溜まる珠で女性専用です。
+PRINTL 《Ｖ感覚》の上昇に必要になります。
+PRINTW 調教においては快Ｖのソースから変換されます。
+
+;快Ａ
+@DICTIONARY_JUEL_2
+PRINTL アヌスへの快感を受けて溜まる珠です。
+PRINTL 《Ａ感覚》・自慰中毒・排泄中毒の上昇に必要になります。
+PRINTW 調教においては快Ａのソースから変換されます。
+
+
+;潤滑
+@DICTIONARY_JUEL_3
+PRINTL どのくらい濡れたかを表す珠ですが、実際に珠として溜まることはありません。
+PRINTL 濡れたことに関するものは各種調教でのやりやすさやパラメータ獲得の時に
+PRINTL 考慮されています。
+PRINTW 調教においては快Ｃ・快Ｖ・液体追加のソースから変換されます。
+
+
+;恭順
+@DICTIONARY_JUEL_4
+PRINTL 主人に対して恭しく従うという心理を感じることによる溜まる珠です。
+PRINTL 従順・奉仕精神の上昇に必要になります。
+PRINTL 調教においては快Ｖ・接触・情愛・達成感・恭順追加・中毒充足・
+PRINTW 鬼殺し・媚薬浸潤のソースから変換されます。
+;欲情
+@DICTIONARY_JUEL_5
+PRINTL 性的に欲情してしまった場合に溜まる珠です。
+PRINTL 欲望・従順・サドっ気・マゾっ気・レズっ気・ＢＬっ気・自慰中毒・
+PRINTL 精液中毒・レズ中毒・ＢＬ中毒・噴乳中毒・触手中毒・排泄中毒・
+PRINTL 射精中毒・薬物刻印の上昇に必要になります。
+PRINTL 調教においては快Ｃ・快Ｖ・快Ａ・快Ｂ・接触・情愛・露出・主導権・欲情追加・痛み・
+PRINTW 痒み・支配・中毒充足・薬物浸潤・酒酔い・鬼殺し・媚薬浸潤のソースから変換されます。
+;屈服
+@DICTIONARY_JUEL_6
+PRINTL 主人に対して抵抗する心が折れてしまった心理を感じることにより溜まる珠です。
+PRINTL 従順・奉仕精神・マゾっ気・レズっ気・ＢＬっ気・精液中毒・レズ中毒・
+PRINTL ＢＬ中毒・噴乳中毒・排泄中毒・射精中毒の上昇に必要になります。
+PRINTL また、《恐怖刻印》・《反発感情》を下げるのにも必要になります。
+PRINTL 調教においては快Ａ・痒み・屈従・支配・トラウマ・触手汚染・羞恥扇動・
+PRINTW 性技学習・媚薬湿潤のソースから変換されます。
+;習得
+@DICTIONARY_JUEL_7
+PRINTL 性調教にせよ、他の生活的なことにせよ、何らかに習熟した場合に
+PRINTL 溜まる珠です。つまり、弁当やライブでも溜まります。
+PRINTL 技巧・奉仕精神・サドっ気・《料理》・《撮影》・《歌唱》の上昇に必要になります。
+PRINTW 調教においては主導権・性行動・性技学習のソースから変換されます。
+
+;恥情
+@DICTIONARY_JUEL_8
+PRINTL なんらかの恥ずかしいと思った心理を感じることにより溜まる珠です。
+PRINTL 《露出癖》・自慰中毒・排泄中毒の上昇に必要になります。
+PRINTW 調教においては快Ｖ・露出・羞恥扇動のソースから変換されます。
+;苦痛
+@DICTIONARY_JUEL_9
+PRINTL なんらかの苦しみや痛みを感じることにより溜まる珠です。
+PRINTL マゾっ気の上昇に必要になります。
+PRINTW 調教においては痛み・痒みのソースから変換されます
+;恐怖
+@DICTIONARY_JUEL_10
+PRINTL なんらかの恐怖を感じることにより溜まる珠です。
+PRINTL 従順・触手中毒の上昇に必要になります。
+PRINTW 調教においては快Ａ・痛み・支配・トラウマのソースから変換されます。
+;反感
+@DICTIONARY_JUEL_11
+PRINTL 主人に対してなんらかの反感を感じることにより溜まる珠ですが、
+PRINTL この珠はすぐに否定の珠に変換されてしまいます。
+PRINTL 調教においては接触・露出・痛み・痒み・支配・不潔・逸脱・
+PRINTW 反感追加のソースから変換されます。
+
+;不快
+@DICTIONARY_JUEL_12
+PRINTL なんらかの不快さを感じることにより溜まる珠ですが、
+PRINTL この珠はすぐに否定の珠に変換されてしまいます。
+PRINTL 調教においては快Ａ・接触・痒み・トラウマ・薬物浸潤・羞恥扇動・
+PRINTW 触手汚染・不潔・酒酔い・鬼殺しのソースから変換されます。
+
+;抑鬱
+@DICTIONARY_JUEL_13
+PRINTL 自分にかんして自己嫌悪を感じたり鬱な気持ちを感じたりすることに
+PRINTL より溜まる珠ですが、この珠はすぐに否定の珠に変換されてしまいます。
+PRINTL 調教においては快Ｃ・快Ｖ・快Ａ・快Ｂ・性行動・屈従・支配・痒み
+PRINTW のソースから変換されます。
+;快Ｂ
+@DICTIONARY_JUEL_14
+PRINTL 乳房への快感を受けて溜まる珠で、男性ではほとんど溜まらないでしょう。
+PRINTL 《Ｂ感覚》・噴乳中毒の上昇に必要になります。
+PRINTW 調教においては快Ｂのソースから変換されます。
+;好意
+@DICTIONARY_JUEL_15
+;生活
+@DICTIONARY_JUEL_16
+;優越
+@DICTIONARY_JUEL_17
+PRINTL 自ら進んで何かをしようとしたりすると溜まる珠です。
+PRINTL 欲望・技巧・サドっ気の上昇に必要となります。
+PRINTW 調教においては主導権のソースから変換されます。
+;快Ｍ
+@DICTIONARY_JUEL_18
+PRINTL 自ら進んで何かをしようとしたりすると溜まる珠です。
+PRINTL 欲望・技巧・サドっ気の上昇に必要となります。
+PRINTW 調教においては主導権のソースから変換されます。
+;酒気
+@DICTIONARY_JUEL_19
+PRINTL 自ら進んで何かをしようとしたりすると溜まる珠です。
+PRINTL 欲望・技巧・サドっ気の上昇に必要となります。
+PRINTW 調教においては主導権のソースから変換されます。
+;情感
+@DICTIONARY_JUEL_20
+PRINTL 触手に触れたりすることにより溜まる珠です。
+PRINTL 触手中毒の上昇に必要になります。
+PRINTW 調教においては触手汚染のソースから変換されます。
+;否定
+@DICTIONARY_JUEL_100
+PRINTL 何らかの否定的なことがあれば溜まる珠です。また、反感・不快・抑鬱
+PRINTL の珠からもこの珠に変換されて溜まります。
+PRINTL 技能上昇のときに恭順・欲情・屈服・恥情・苦痛・恐怖の珠を相殺する
+PRINTL ことにより技能上昇の妨げとなります。
+PRINTW 調教においては反感・不快・抑鬱の各珠の解説を参照してください。
+
+;歌唱
+@DICTIONARY_JUEL_105
+PRINTL 自ら進んで何かをしようとしたりすると溜まる珠です。
+PRINTL 欲望・技巧・サドっ気の上昇に必要となります。
+PRINTW 調教においては主導権のソースから変換されます。
+;被写
+@DICTIONARY_JUEL_106
+PRINTL 自ら進んで何かをしようとしたりすると溜まる珠です。
+PRINTL 欲望・技巧・サドっ気の上昇に必要となります。
+PRINTW 調教においては主導権のソースから変換されます。
+;舞踊
+@DICTIONARY_JUEL_107
+PRINTL 触手に触れたりすることにより溜まる珠です。
+PRINTL 触手中毒の上昇に必要になります。
+PRINTW 調教においては触手汚染のソースから変換されます。
+;=============================================================================
+;用語辞典――ソース
+;=============================================================================
+;--------------------------------------------------
+;ソース解説メインページ
+;--------------------------------------------------
+@DICTIONARY_SOURCE_MAIN
+DRAWLINE
+PRINTL 「ソース」に関する大まかな説明です。
+PRINTL ソースは一般的に、調教において調教対象が獲得するもので、
+PRINTL 主人や助手は獲得はしません（その場合直接パラメータが上下するか、珠として得られる）
+PRINTL 獲得されたソースはそのターンのうちに、パラメータを上昇させます。
+PRINTL 以下の各ソース解説において()で括られたパラメータは
+PRINTL 素質や状況により上昇されないこともありえるものを示します。
+DRAWLINE
+;各表示
+FOR LOCAL, 0, 110
+	SIF STRLENS(SOURCENAME:LOCAL) > 0
+		PRINTFORMLC [{LOCAL}]%SOURCENAME:LOCAL%
+NEXT
+PRINTL 
+PRINTL [100]戻る
+DRAWLINE
+$INPUT_LOOP
+INPUT
+IF RESULT == 100
+	RETURN 0
+ELSEIF RESULT < 0 || RESULT > 107 || STRLENS(SOURCENAME:RESULT) == 0
+	GOTO INPUT_LOOP
+ELSE
+	TRYCALLFORM DICTIONARY_SOURCE_{RESULT}
+	RESTART
+ENDIF
+
+;--------------------------------------------------
+;ソース解説
+;--------------------------------------------------
+;快Ｃ
+@DICTIONARY_SOURCE_0
+PRINTL 【快Ｃのソース】
+PRINTL 快楽系ソースで、一番最初に処理されます。
+PRINTL ソースNo.は0番です。
+PRINTL 快Ｃ・欲情・抑鬱・(潤滑)・(習得)のパラ上昇に関わります。
+PRINTL 潤滑と習得のパラは[淫核／淫茎]持ちのみ上昇します。
+PRINTW 欲望Lvや既に獲得してある欲情パラメータによる修整を受けます。
+
+;快Ｖ
+@DICTIONARY_SOURCE_1
+PRINTL 【快Ｖのソース】
+PRINTL 快楽系ソースで、2番目に処理されます。
+PRINTL ソースNo.は1番です。
+PRINTL 快Ｖ・恭順・欲情・抑鬱・(潤滑)・(恥情)のパラ上昇に関わります。
+PRINTL 潤滑のパラは[淫壷]持ちのみ上昇します。
+PRINTL 恥情のパラは[小人体型]持ちのみ上昇します。
+PRINTW 欲望Lvや既に獲得してある欲情パラメータによる修整を受けます。
+
+;快Ａ
+@DICTIONARY_SOURCE_2
+PRINTL 【快Ａのソース】
+PRINTL 快楽系ソースで、3番目に処理されます。
+PRINTL ソースNo.は2番です。
+PRINTL 快Ａ・欲情・屈服・抑鬱・(恐怖)・(不快)のパラ上昇に関わります。
+PRINTL 恐怖と不快のパラは[小人体型]持ちのみ上昇します。
+PRINTW 欲望Lvや既に獲得してある欲情パラメータによる修整を受けます。
+
+;情愛
+@DICTIONARY_SOURCE_3
+PRINTL 【情愛のソース】
+PRINTL ポジティブソースで、6番目に処理されます。
+PRINTL ソースNo.は11番です。
+PRINTL 恭順・欲情のパラ上昇に関わります。
+PRINTW 従順Lv・欲望Lvによる修整を受けます。
+;性行動
+@DICTIONARY_SOURCE_4
+PRINTL 【性行動のソース】
+PRINTL ポジティブソースで、10番目に処理されます。
+PRINTL ソースNo.は15番です。
+PRINTL 習得・(抑鬱)のパラ上昇に関わります。
+PRINTL 抑鬱のパラは[抑圧]か[抵抗]持ちのみ上昇します。
+PRINTW 奉仕精神Lvによる修整を受けます。
+;達成感
+@DICTIONARY_SOURCE_5
+PRINTL 【達成感のソース】
+PRINTL ポジティブソースで、11番目に処理されます。
+PRINTL ソースNo.は16番です。
+PRINTL 恭順のパラ上昇に関わります。
+PRINTW 従順Lv・奉仕精神Lvによる修整を受けます。
+
+;痛み
+@DICTIONARY_SOURCE_6
+PRINTL 【痛みのソース】
+PRINTL ポジティブソースで、14番目に処理されます。
+PRINTL ソースNo.は20番です。
+PRINTL 苦痛・恐怖・反感・(欲情)のパラ上昇に関わります。
+PRINTL 欲情のパラはマゾっ気Lv1以上の対象のみ上昇します。
+PRINTW 従順Lv・マゾっ気Lv・調教者のサドっ気Lvによる修整を受けます。
+
+;中毒充足
+@DICTIONARY_SOURCE_7
+PRINTL 【中毒充足のソース】
+PRINTL ポジティブソースで、18番目に処理されます。
+PRINTL ソースNo.は24番です。
+PRINTL 恭順・欲情のパラ上昇に関わります。
+PRINTW 欲望Lvによる修整を受けます。
+;不潔
+@DICTIONARY_SOURCE_8
+PRINTL 【不潔のソース】
+PRINTL ネガティブソースで、24番目に処理されます。
+PRINTL ソースNo.は30番です。
+PRINTL (反感)・(不快)のパラ上昇に関わります。
+PRINTL 反感のパラは排泄中毒Lv4未満の対象のみ上昇します。
+PRINTL 不快のパラは排泄中毒Lv5未満の対象のみ上昇します。
+PRINTW 従順Lv・排泄中毒Lvによる修整を受けます。
+;接触
+@DICTIONARY_SOURCE_9
+PRINTL 【接触のソース】
+PRINTL ポジティブソースで、5番目に処理されますが、
+PRINTL 快楽系ソース処理との間に様々な処理が割り込んでいます。
+PRINTL ソースNo.は10番です。
+PRINTL 恭順・欲情・反感・不快のパラ上昇に関わります。
+PRINTW 従順Lv・欲望Lv・レズ(ＢＬ)っ気Lvや相性による修整を受けます。
+;液体追加
+@DICTIONARY_SOURCE_10
+PRINTL 【液体追加のソース】
+PRINTL ポジティブソースで、7番目に処理されます。
+PRINTL ソースNo.は19番です。
+PRINTW 潤滑のパラ上昇に関わります。
+
+
+;欲情追加
+@DICTIONARY_SOURCE_11
+PRINTL 【欲情追加のソース】
+PRINTL ポジティブソースで、13番目に処理されます。
+PRINTL ソースNo.は18番です。
+PRINTW 欲情のパラ上昇に関わります。
+
+;露出
+@DICTIONARY_SOURCE_12
+PRINTL 【露出のソース】
+PRINTL ポジティブソースで、8番目に処理されます。
+PRINTL ソースNo.は12番です。
+PRINTL 欲情・恥情・反感のパラ上昇に関わります。
+PRINTL 従順Lv・露出癖Lv・潤滑パラ上昇＆液体追加ソース・
+PRINTW 既に獲得してある恥情パラメータによる修整を受けます。
+
+;屈従
+@DICTIONARY_SOURCE_13
+PRINTL 【屈従のソース】
+PRINTL ポジティブソースで、16番目に処理されますが、
+PRINTL その直前に目覚め判定があります。　ソースNo.は22番です。
+PRINTL 屈服・(抑鬱)のパラ上昇に関わります。
+PRINTL 抑鬱のパラは従順Lv3以下の対象のみ上昇します。
+PRINTW 従順Lv・サドっ気Lvによる修整を受けます。
+
+
+;逸脱
+@DICTIONARY_SOURCE_14
+PRINTL 【逸脱のソース】
+PRINTL ネガティブソースで、25番目に処理されます。
+PRINTL ソースNo.は31番です。
+PRINTL (反感)のパラ上昇に関わります。
+PRINTL 反感のパラは従順Lvと欲望Lvが両方とも5未満の対象のみ上昇します。
+PRINTW 従順Lv・欲望Lvによる修整を受けます。
+
+;反感追加
+@DICTIONARY_SOURCE_15
+PRINTL 【反感追加のソース】
+PRINTL ネガティブソースで、26番目に処理されます。
+PRINTL ソースNo.は32番です。
+PRINTW 反感のパラ上昇に関わります。
+;恭順追加
+@DICTIONARY_SOURCE_16
+PRINTL 【恭順追加のソース】
+PRINTL ポジティブソースで、12番目に処理されます。
+PRINTL ソースNo.は17番です。
+PRINTW 恭順のパラ上昇に関わります。
+;快Ｂ
+@DICTIONARY_SOURCE_17
+PRINTL 【快Ｂのソース】
+PRINTL 快楽系ソースで、4番目に処理されます。
+PRINTL ソースNo.は3番です。
+PRINTL 快Ｂ・欲情・抑鬱・(恭順)のパラ上昇に関わります。
+PRINTL 恭順のパラは[小人体型]持ちのみ上昇します。
+PRINTW 欲望Lvや既に獲得してある欲情パラメータによる修整を受けます。
+
+;歓楽
+@DICTIONARY_SOURCE_18
+
+;家務
+@DICTIONARY_SOURCE_19
+
+;征服
+@DICTIONARY_SOURCE_20
+PRINTL 【支配のソース】
+PRINTL ポジティブソースで、17番目に処理されます。
+PRINTL ソースNo.は23番です。
+PRINTL 屈服・恐怖・反感・抑鬱・(欲情)のパラ上昇に関わります。
+PRINTL 欲情のパラはマゾっ気Lv1以上の対象のみ上昇します。
+PRINTL 従順Lv・サドっ気Lv・マゾっ気Lv・
+PRINTW 調教者のサドっ気Lvによる修整を受けます。
+
+;受動
+@DICTIONARY_SOURCE_21
+PRINTL 【支配のソース】
+PRINTL ポジティブソースで、17番目に処理されます。
+PRINTL ソースNo.は23番です。
+PRINTL 屈服・恐怖・反感・抑鬱・(欲情)のパラ上昇に関わります。
+PRINTL 欲情のパラはマゾっ気Lv1以上の対象のみ上昇します。
+PRINTL 従順Lv・サドっ気Lv・マゾっ気Lv・
+PRINTW 調教者のサドっ気Lvによる修整を受けます。
+
+;懐疑
+@DICTIONARY_SOURCE_22
+PRINTL 【支配のソース】
+PRINTL ポジティブソースで、17番目に処理されます。
+PRINTL ソースNo.は23番です。
+PRINTL 屈服・恐怖・反感・抑鬱・(欲情)のパラ上昇に関わります。
+PRINTL 欲情のパラはマゾっ気Lv1以上の対象のみ上昇します。
+PRINTL 従順Lv・サドっ気Lv・マゾっ気Lv・
+PRINTW 調教者のサドっ気Lvによる修整を受けます。
+
+;不安
+@DICTIONARY_SOURCE_23
+PRINTL 【トラウマのソース】
+PRINTL ポジティブソースで、19番目に処理されます。
+PRINTL ソースNo.は25番です。
+PRINTL 屈服・恐怖・不快のパラ上昇に関わります。
+PRINTW 恐怖刻印による修整を受けます。
+
+;快Ｍ
+@DICTIONARY_SOURCE_24
+PRINTL 【薬物浸潤のソース】
+PRINTL ポジティブソースで、20番目に処理されます。
+PRINTL ソースNo.は26番です。
+PRINTL 欲情・不快・薬毒のパラ上昇に関わります。
+PRINTW 従順Lv・各種中毒Lv・反発感情・薬物刻印による修整を受けます。
+;歌唱
+@DICTIONARY_SOURCE_105
+PRINTL 【達成感のソース】
+PRINTL ポジティブソースで、11番目に処理されます。
+PRINTL ソースNo.は16番です。
+PRINTL 恭順のパラ上昇に関わります。
+PRINTW 従順Lv・奉仕精神Lvによる修整を受けます。
+
+;被写
+@DICTIONARY_SOURCE_106
+PRINTL 【痛みのソース】
+PRINTL ポジティブソースで、14番目に処理されます。
+PRINTL ソースNo.は20番です。
+PRINTL 苦痛・恐怖・反感・(欲情)のパラ上昇に関わります。
+PRINTL 欲情のパラはマゾっ気Lv1以上の対象のみ上昇します。
+PRINTW 従順Lv・マゾっ気Lv・調教者のサドっ気Lvによる修整を受けます。
+
+;舞踊
+@DICTIONARY_SOURCE_107
+PRINTL 【中毒充足のソース】
+PRINTL ポジティブソースで、18番目に処理されます。
+PRINTL ソースNo.は24番です。
+PRINTL 恭順・欲情のパラ上昇に関わります。
+PRINTW 欲望Lvによる修整を受けます。
+
+;=============================================================================
+;用語辞典――その他数値
+;=============================================================================
+;--------------------------------------------------
+;その他数値解説メインページ
+;--------------------------------------------------
+@DICTIONARY_OTHER_MAIN
+LOCAL = 0
+$PRINT_LIST
+DRAWLINE
+PRINTFORML 能力や刻印や経験や珠以外の数値に関する大まかな説明です。
+PRINTFORML 内容を知りたい項目の番号を入力してください。 ＜page.{LOCAL+1}/2＞
+DRAWLINE
+IF LOCAL == 0
+	PRINTL [ 0] 体力
+	PRINTL [ 1] 気力
+	PRINTL [ 2] 射精ゲージ
+	PRINTL [ 3] 母乳ゲージ
+	PRINTL [ 4] 尿意ゲージ
+	PRINTL [ 5] 陰毛の成長具合
+	;PRINTL [ 6] 調教ソース
+	;PRINTL [ 7] パラメータ
+	;PRINTL [ 8] 陰核の成長具合
+	PRINTL [ 9] 酔い
+	PRINTL [10] 好感度
+	PRINTL [11] ストレス
+ELSEIF LOCAL == 1
+	PRINTL [12] 日付
+	PRINTL [13] 資金
+	;PRINTL [14] 嫉妬ポイント
+	;PRINTL [15] 精飲絶頂ゲージ
+	;PRINTL [16] キャラクター固有番号
+	;PRINTL [17] 奴隷売却による収入の累計
+	;PRINTL [18] 高級奴隷売却による収入の累計
+	;PRINTL [19] 奴隷売却で稼いだ最高金額
+	;PRINTL [20] 媚薬中毒レベル
+	PRINTL [21] 調教ソース
+	PRINTL [22] パラメータ
+ENDIF
+DRAWLINE
+PRINTFORMLC \@(LOCAL <= 0) ? %" " * 18% # [1001]前のページ\@
+PRINTLC [1000]戻る
+PRINTFORMLC \@(LOCAL >= 1) ? %" " * 18% # [1009]後ろのページ\@
+PRINTL 
+$INPUT_LOOP
+INPUT
+IF RESULT == 1000
+	RETURN 0
+ELSEIF RESULT == 1001 && LOCAL > 0
+	LOCAL -= 1
+ELSEIF RESULT == 1009 && LOCAL < 1
+	LOCAL += 1
+ELSE
+	TRYCCALLFORM DICTIONARY_OTHER_{RESULT}
+	CATCH
+		GOTO INPUT_LOOP
+	ENDCATCH
+ENDIF
+GOTO PRINT_LIST
+
+;--------------------------------------------------
+;その他数値解説
+;--------------------------------------------------
+;体力
+@DICTIONARY_OTHER_0
+PRINTL 〔体力〕
+PRINTL そのキャラクターの体力を表します。
+PRINTL これが0になると復活手段がなければ死亡します。
+PRINTL 主人および助手および調教奴隷が死亡すれば通常はバッドエンドになります。
+PRINTL 設定やゲームモードやイベントなどで最大体力そのものが増加することがあります。
+PRINTW また、休憩などで体力は回復していきます。
+
+;気力
+@DICTIONARY_OTHER_1
+PRINTL 〔気力〕
+PRINTL そのキャラクターの気力を表します。
+PRINTL これが0になっても死亡はしませんが、調教やイベントなどで様々な悪影響があるでしょう。
+PRINTL 設定やゲームモードやイベントなどで最大気力そのものが増加することがあります。
+PRINTW また、休憩などで気力は回復していきます。
+
+;射精ゲージ
+@DICTIONARY_OTHER_2
+PRINTL 〔射精ゲージ〕
+PRINTL そのキャラクターがあとどれくらいで射精するかを表します。
+PRINTL ゲージが最大に達すると何らかの理由で止められていない限りは射精することになります。
+PRINTL つまり、このゲージの上限が少ないほど射精しやすいことになります。
+PRINTL 当然、射精できるペニスを保有しているかそれに代わるものがないキャラには無縁のゲージです。
+PRINTW LUNATIC以上の難易度の場合、射精には体力消費が伴うことにも注意してください。
+
+;母乳ゲージ
+@DICTIONARY_OTHER_3
+PRINTL 〔母乳ゲージ〕
+PRINTL そのキャラクターがあとどれくらいで噴乳するかを表します。
+PRINTL ゲージが最大に達すると何らかの理由で止められていない限りは噴乳することになります。
+PRINTL つまり、このゲージの上限が少ないほど噴乳しやすいことになります。
+PRINTL 当然、母乳体質である女性以外のキャラには無縁のゲージです。
+PRINTW また、噴乳には体力消費が伴うことにも注意してください。
+
+;尿意ゲージ
+@DICTIONARY_OTHER_4
+PRINTL 〔尿意ゲージ〕
+PRINTL そのキャラクターがあとどれくらいで放尿するかを表します。
+PRINTL ゲージが最大に達すると何らかの理由で止められていない限りは放尿することになります。
+PRINTL つまり、このゲージの上限が少ないほど放尿しやすいことになります。
+PRINTL なんらかの理由で尿意をそそられることによりこのゲージが表面化します。
+PRINTW そうでなければ基本的には表示されることもなく気にする必要はありません。
+
+;陰毛の成長具合
+@DICTIONARY_OTHER_5
+PRINTL 〔陰毛の成長具合〕
+PRINTL そのキャラクターの陰毛の現在の成長度合いを示しますが、そのものの数字は表示されません。
+PRINTL 基本的にはこれが著しく低いかない場合には素質〔パイパン〕が表示されることになります。
+PRINTL 基本的に小柄体型や小人体型の場合は通常は陰毛は生えていません。
+PRINTL 陰毛の有無はそれにより恥情のソースなどに修整が入るなどの違いがあります。
+PRINTL また蒐集品としても陰毛が存在します。
+PRINTL なお、陰毛に対する処理によっては陰毛が生えることがなくなる場合があります。
+PRINTW 陰毛が生えるかどうかを見る手段はゲーム中では存在しないことに注意してください。
+
+;触手寄生LV
+@DICTIONARY_OTHER_6
+;触手エネルギー
+@DICTIONARY_OTHER_7
+;陰核の成長具合
+@DICTIONARY_OTHER_8
+
+;酔い
+@DICTIONARY_OTHER_9
+PRINTL 〔酔い〕
+PRINTL そのキャラクターがどれだけお酒に酔っているかを表します。
+PRINTL お酒を飲めば酔いますが、各個の種族や体質により酔い方は異なります。
+PRINTL 酔うことにより様々な影響が出てきますが、酔いそのものは時間とともに醒めていきます。
+PRINTL なお、いわゆる薬物酔いに関してはYMでは別個に扱ってます。たとえば、薬物経験であるとか、
+PRINTW 媚薬中毒であるとかそういった扱いです。また乗り物酔いは現状ではありません。
+
+;好感度
+@DICTIONARY_OTHER_10
+PRINTL 〔好感度〕
+PRINTL そのキャラクターがどれだけ主人に好感しているかを表します。
+PRINTL これを上げることは調教の基本のひとつとなるでしょう。
+PRINTL なお、好感度は0以下にはならず、100万以上にもなりません。
+PRINTL 
+PRINTL 好感度は調教においては、主人調教でなおかつ
+PRINTL 対象が失神や睡眠中でなく、触手および獣姦以外の調教を行うことで
+PRINTL 上げていくのが基本になりますが、対象の素質や能力や刻印によっては
+PRINTW いくら調教しても上がらない場合がありますので注意すべきでしょう。
+
+;ストレス
+@DICTIONARY_OTHER_11
+PRINTL 〔ストレス〕
+PRINTL そのキャラクターがどれだけ精神的に追い詰められているかを表します。
+PRINTL 助手である間もストレスは増加していきますので注意してください。
+PRINTL ストレスを溜め込んだキャラクターには様々な悪影響があります。
+PRINTL ただし、崩壊形素質を付加したい場合などには意図的にストレスを与えなければ
+PRINTL ならない場合もあるでしょう。
+PRINTW なお、ストレスは0以下にはならず、100万以上にもなりません。
+
+;日付
+@DICTIONARY_OTHER_12
+PRINTL 〔日付〕
+PRINTL 今日の日付を表します。新暦ですので閏月とかはありません。
+PRINTW 単に雰囲気的なもので、日付による影響はほとんどゲームにはありません。
+
+;資金
+@DICTIONARY_OTHER_13
+PRINTL 〔資金〕
+PRINTL あなたが現在使用できる資金を表します。
+PRINTL これを目標以上にすることがゲームの目的のひとつでしょう。
+PRINTL また、資金を消費することにより買い物をしたりサービスを受けたりできます。
+PRINTL なお、0になっても通常はゲームオーバーにはなりませんが、モードや難易度によっては
+PRINTW 維持費が掛かり、それが払えなくなるとゲームオーバーになるものもあります。
+
+;嫉妬ポイント
+@DICTIONARY_OTHER_14
+;精飲絶頂ゲージ
+@DICTIONARY_OTHER_15
+;キャラクター固有番号
+@DICTIONARY_OTHER_16
+;奴隷売却による収入の累計
+@DICTIONARY_OTHER_17
+;高級奴隷売却による収入の累計
+@DICTIONARY_OTHER_18
+;奴隷売却で稼いだ最高金額
+@DICTIONARY_OTHER_19
+;媚薬中毒レベル
+@DICTIONARY_OTHER_20
+
+;調教ソース
+@DICTIONARY_OTHER_21
+PRINTL 〔調教ソース〕
+PRINTL 調教中に対象奴隷がその調教内容に応じて加算される数値で、
+PRINTL たくさんの種類に分けられています。
+PRINTL 詳しくは別項のソース解説を見てください。
+PRINTL 
+PRINTL YMにおける調教とは、対象に有用なソースを与えるような
+PRINTL コマンドを行い、そのソースがパラメータに変換され、
+PRINTL 調教終了後に、そのパラメータの量に応じて各種の珠に変換され、
+PRINTL その珠を消費することにより、対象の能力を上昇させたり、
+PRINTL 刻印を上昇下降させたりするために行います。
+PRINTL 
+PRINTL どの調教ソースがどのパラメータにどれだけの割合で転換される
+PRINTW のかも決まっています。
+
+;パラメータ
+@DICTIONARY_OTHER_22
+PRINTL 〔パラメータ〕
+PRINTL 調教中に各キャラクターがどれだけの状態になったのかを、
+PRINTL 数値で表したもので、調教対象だけでなく主人や助手にも
+PRINTL 設定されています。しかし、通常は調教対象のパラメータが
+PRINTL 一番重要であるため、調教ターンにおけるコマンド入力時には、
+PRINTL 必ず、調教対象の現在のパラメータがゲージと共に表示されています。
+PRINTL 
+PRINTL 調教対象のパラメータは調教終了時に対応する珠に変換されます。
+PRINTL その珠を溜めていき、一定以上になればそれを消費することにより、
+PRINTL 対象の各種能力の上昇や、各種刻印の上昇および下降ができるように
+PRINTW なります。
+
+;=============================================================================
+;用語辞典――キャラクター
+;=============================================================================
+;--------------------------------------------------
+;キャラクター解説メインページ
+;--------------------------------------------------
+@DICTIONARY_CHARA_MAIN
+;変数のリセット
+CALLF CLEAR_LIST
+VARSET LOCAL, 0
+
+TFLAG:206 = 0
+
+REPEAT 500
+	SIF STRLENS(ITEMNAME:(COUNT + 100)) <= 0
+		CONTINUE
+	;YASAIモードかデバッグモードかIRCキャラ解禁でないとIRCキャラは表示されない
+	SIF COUNT > 299 && NO:MASTER != 400 && TALENT:MASTER:831 == 0 && TALENT:MASTER:834 == 0 && TALENT:MASTER:998 == 0
+		CONTINUE
+	CALLF SET_LIST, COUNT, 1
+	LOCAL:3 += 1
+	SIF (LOCAL:3%60) == 1 && LOCAL:3 > 60
+		LOCAL:1 += 1
+REND
+SIF LOCAL:1 < 0
+	LOCAL:1 = 0
+
+;ページをめくったときなどはここから
+$PRINT_LIST_PAGE
+DRAWLINE
+PRINTFORML 「キャラクター」に関する大まかな説明です。 ＜page.{LOCAL+1}/{LOCAL:1+1}＞
+DRAWLINE
+LOCAL:2 = 0
+REPEAT 500
+	;(表示可否)が0の場合は除外
+	SIF GET_LIST(COUNT) == 0
+		CONTINUE
+	;どこからどこまでを陳列するか
+	LOCAL:2 += 1
+	SIF LOCAL:2 > (LOCAL * 60) && LOCAL:2 <= ((LOCAL + 1) * 60)
+		PRINTFORMLC [{COUNT,3}]%ITEMNAME:(COUNT+100)%
+REND
+PRINTL 
+DRAWLINE
+PRINTFORMLC \@(LOCAL <= 0) ? %" " * 16% # [1001]前のページ\@
+PRINTLC [1000]戻る
+PRINTFORMLC \@(LOCAL >= LOCAL:1) ? %" " * 16% # [1009]次のページ\@
+PRINTL 
+$INPUT_LOOP
+INPUT
+IF RESULT == 1000
+	RETURN 0
+ELSEIF RESULT == 1001 && LOCAL > 0
+	LOCAL -= 1
+ELSEIF RESULT == 1009 && LOCAL < LOCAL:1
+	LOCAL += 1
+ELSEIF RESULT < 0 || RESULT > 500 || GET_LIST(RESULT) == 0
+	GOTO INPUT_LOOP
+ELSE
+	CALL DICTIONARY_CHARA_PAGE, RESULT
+ENDIF
+GOTO PRINT_LIST_PAGE
+
+;--------------------------------------------------
+;キャラ図鑑能力表示部
+;--------------------------------------------------
+@DICTIONARY_CHARA_PAGE, ARG
+$PRINT_PAGE
+;存在しないキャラの場合、戻る
+SIF EXISTCSV(ARG , 0) <= 0
+	RETURN 0
+
+;前後のキャラを表示できるか判定
+LOCAL:1 = -1
+LOCAL:2 = -1
+FOR LOCAL, 0, 500
+	SIF EXISTCSV(LOCAL , 0) <= 0 || LOCAL == ARG
+		CONTINUE
+	IF LOCAL < ARG
+		LOCAL:1 = LOCAL
+	ELSE
+		LOCAL:2 = LOCAL
+		BREAK
+	ENDIF
+NEXT
+
+DRAWLINE
+DRAWLINE
+PRINTFORM キャラ番号：%TOSTR(ARG, "000")%　
+TFLAG:201 = ARG
+TFLAG:206 = 1
+;キャラ解説本体の関数へ
+;CALL CHARA_PROFILE
+TFLAG:206 = 0
+PRINTFORML 体力：{CSVBASE(ARG, 0, 0), 4}　気力：{CSVBASE(ARG, 1, 0), 4}　性別：\@(CSVTALENT(ARG, 120, 0)) ? ♂ # ♀\@　\@(STRLENS(CSVNICKNAME(ARG, 0)) > 0) ? 称号：%CSVNICKNAME(ARG, 0)% # \@
+DRAWLINE
+;初期能力
+CALL DICTIONARY_CHARA_ABL, ARG
+;初期経験
+CALL DICTIONARY_CHARA_EXP, ARG
+;初期素質
+CALL DICTIONARY_CHARA_TALENT, ARG
+;初期相性
+CALL DICTIONARY_CHARA_RELATION, ARG
+PRINTFORMLC \@(LOCAL:1 >= 0) ? [1001]前のキャラ # %" " * 16%\@
+PRINTFORMLC [1000]リストに戻る
+PRINTFORMLC \@(LOCAL:2 >= 0) ? [1009]次のキャラ # %" " * 16%\@
+PRINTL 
+$INPUT_LOOP
+INPUT
+IF RESULT == 1000
+	RETURN 0
+ELSEIF RESULT == 1001 && LOCAL:1 >= 0
+	ARG = LOCAL:1
+ELSEIF RESULT == 1009 && LOCAL:2 >= 0
+	ARG = LOCAL:2
+ELSE
+	GOTO INPUT_LOOP
+ENDIF
+GOTO PRINT_PAGE
+
+;………………………………………………
+;初期能力
+;………………………………………………
+@DICTIONARY_CHARA_ABL, ARG
+#LOCALSIZE 1
+PRINTL □ 初期能力
+LOCAL = 0
+REPEAT 100
+	SIF STRLENS(ABLNAME:COUNT) <= 0
+		CONTINUE
+	SIF CSVABL(ARG, COUNT, 0) <= 0
+		CONTINUE
+
+	PRINTFORM %ABLNAME:COUNT, 8, LEFT%：LV{CSVABL(ARG, COUNT, 0)}　
+	;改行or表示位置あけ
+	LOCAL += 1
+	SIF LOCAL%5 == 0
+		PRINTL 
+REND
+
+IF LOCAL == 0
+	PRINTL 能力なし
+;最後のループで改行してなかったら、ここで改行しておく
+ELSEIF LOCAL%5 != 0
+	PRINTL 
+ENDIF
+DRAWLINE
+
+;………………………………………………
+;初期経験
+;………………………………………………
+@DICTIONARY_CHARA_EXP, ARG
+#LOCALSIZE 1
+PRINTL □ 初期経験
+LOCAL = 0
+REPEAT 100
+	SIF STRLENS(EXPNAME:COUNT) <= 0
+		CONTINUE
+	SIF CSVEXP(ARG, COUNT, 0) <= 0
+		CONTINUE
+	PRINTFORM %EXPNAME:COUNT,12, LEFT%：{MIN(CSVEXP(ARG, COUNT, 0), 99999999), 8}　
+
+	;改行or表示位置あけ
+	LOCAL += 1
+	SIF LOCAL%3 == 0
+		PRINTL 
+REND
+
+IF LOCAL == 0
+	PRINTL 経験なし
+;最後のループで改行してなかったら、ここで改行しておく
+ELSEIF LOCAL%3 != 0
+	PRINTL 
+ENDIF
+DRAWLINE
+
+;………………………………………………
+;初期素質
+;………………………………………………
+@DICTIONARY_CHARA_TALENT, ARG
+#LOCALSIZE 1
+PRINTL □ 初期素質
+FOR LOCAL, 0, 1000
+	SIF STRLENS(TALENTNAME:LOCAL) <= 0
+		CONTINUE
+
+	SIF CSVTALENT(ARG, LOCAL, 0)
+		PRINTFORM [%TALENTNAME:LOCAL%] 
+NEXT
+PRINTL 
+DRAWLINE
+
+;………………………………………………
+;初期相性
+;………………………………………………
+@DICTIONARY_CHARA_RELATION, ARG
+#LOCALSIZE 1
+PRINTL □ 初期相性
+LOCAL = 0
+REPEAT 500
+	SIF CSVRELATION(ARG, COUNT, 0) <= 0 || CSVRELATION(ARG, COUNT, 0) == 100
+		CONTINUE
+	PRINTFORM %ITEMNAME:(COUNT+100), 18, LEFT%×{MIN(CSVRELATION(ARG, COUNT, 0), 999), 3}％　
+
+	;改行or表示位置あけ
+	LOCAL += 1
+	SIF LOCAL%3 == 0
+		PRINTL 
+REND
+IF LOCAL == 0
+	PRINTL 特になし
+ELSEIF LOCAL%3 != 0
+	PRINTL 
+ENDIF
+DRAWLINE

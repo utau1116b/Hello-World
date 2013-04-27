@@ -1,0 +1,321 @@
+;抱き合う
+@COM370
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+;TCVAR:2 射精箇所フラグ（-1=コンドーム 1=膣内 2=アナル 3=手淫 4=口淫 5=パイズリ 6=素股 7=足コキ 8=体表 9=アナル奉仕 10=道具 11=触手）
+
+LOCALS = {TARGET}/
+CSTR:PLAYER:10 += LOCALS
+TCVAR:PLAYER:2 = 8
+;強度
+TCVAR:PLAYER:4 = 600
+CALL COM300_SUCCESS(90, 9)
+LOCAL = 0
+;(ムード25以上or酔い17以上)且つデート中ではない
+SIF (TFLAG:37 >= 25 || TFLAG:47 >= 17) && !TEQUIP:2
+	LOCAL = 1
+;(ムード35以上or酔い27以上)且つ温泉以外のデートスポットかつ(恥薄い、快感に素直、淫乱、倒錯的)
+SIF (TFLAG:37 >= 35 || TFLAG:47 >= 27) && (TEQUIP:2 > 0 && (TEQUIP:2 != 6)) && (TALENT:36 || TALENT:70 || TALENT:76 || TALENT:80)
+	LOCAL = 1
+
+;好感度3500より大きい、欲望Lv8、恋慕、上二つのどっちか
+SIF CFLAG:2 > 3500 && ABL:1 >= 8 && TALENT:85 && LOCAL
+	LOCAL = 2
+	
+;TFLAG:17でおおまかな状況を見られるように
+TFLAG:17 = LOCAL
+TFLAG:200 = 1
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:体力 += 20
+DOWNBASE:気力 += 180
+SIF LOCAL == 2
+	DOWNBASE:気力 -= 100
+
+;固定で獲得するソース
+SOURCE:18 = 50
+SOURCE:9 = 1100
+SOURCE:12 = 500
+SIF TEQUIP:2
+	SOURCE:12 += 1500
+SIF LOCAL == 2
+	SOURCE:12 += 1000
+SOURCE:受動 = 300
+SOURCE:征服 = 600
+;信頼
+;TFLAG:98 = -7
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+IF LOCAL == 2
+	SOURCE:0 = 25
+	SOURCE:3 = 40
+	SOURCE:17 = 25
+	SIF TEQUIP:2 > 0
+		TIMES SOURCE:12 , 0.80
+ENDIF
+
+;TALENT:恋慕をみる
+SIF TALENT:85
+	TIMES SOURCE:3 , 1.50
+;TALENT:恋人をみる
+SIF TALENT:153
+	TIMES SOURCE:3 , 1.50
+;TALENT:親愛をみる
+SIF TALENT:88
+	TIMES SOURCE:3 , 2.00
+	
+;着衣補正
+IF TEQUIP:2 != 6
+	TIMES SOURCE:3 , 0.80
+	TIMES SOURCE:0 , 0.60
+	TIMES SOURCE:17 , 0.60
+	TIMES SOURCE:12 , 0.50
+ENDIF
+
+;成功度合いボーナス
+IF TFLAG:18 == -1
+	TIMES SOURCE:18 , 0.10
+	TIMES SOURCE:9 , 0.50
+	TIMES SOURCE:20 , 0.50
+	TIMES SOURCE:21 , 0.50
+ELSEIF TFLAG:18 == 0
+
+	;恋慕または恋人ありで愛情経験追加
+	SIF TALENT:85 || TALENT:153
+		EXP:23 += 2
+ELSE
+	TIMES SOURCE:18 , 2.00
+	TIMES SOURCE:9 , 2.00
+	TIMES SOURCE:20 , 2.00
+	TIMES SOURCE:21 , 2.00
+	;愛情経験追加
+	SIF TALENT:85 || TALENT:153
+		EXP:23 += 4
+	EXP:23 += 2
+ENDIF
+
+;-------------------------------------------------
+;汚れの処理
+;-------------------------------------------------
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+IF HETEROSEX(TARGET,PLAYER)
+	EXP:レズ経験 += 4
+	EXP:MASTER:レズ経験 += 4
+ENDIF
+
+RETURN 1
+
+@CAN_COM370(ARG)
+;-------------------------------------------------
+;実行判定処理
+;-------------------------------------------------
+SKIPDISP ARG
+PRINTL 抱き合う
+A = 0
+S = 0
+V = 65
+;すべての命令に共通の要素を考慮
+;(従順が高いと命令に従いやすいなど)
+CALL COM_ORDER
+
+	;男嫌い
+	IF TALENT:82 && TALENT:PLAYER:122
+		PRINT  - 
+		PRINTS TALENTNAME:82
+		PRINTV '(,7,')
+		S = 1
+		A-=7
+	ENDIF
+
+	;ABL:欲望
+	IF ABL:1
+		SIF S
+			PRINT  + 
+		PRINTS ABLNAME:1
+		PRINTV 'LV,ABL:1,'(,ABL:1 * 1,')
+		S = 1
+		A+=ABL:1
+	ENDIF
+	;ABL:奉仕精神
+	IF ABL:6
+		SIF S
+			PRINT  + 
+		PRINTS ABLNAME:6
+		PRINTV 'LV,ABL:6,'(,ABL:6 * 2,')
+		S = 1
+		A+=ABL:6*2
+	ENDIF
+	;PALAM:欲情
+	IF PALAM:5 < PALAMLV:1
+		L = 0
+	ELSEIF PALAM:5 < PALAMLV:2
+		L = 1
+	ELSEIF PALAM:5 < PALAMLV:3
+		L = 2
+	ELSEIF PALAM:5 < PALAMLV:4
+		L = 3
+	ELSEIF PALAM:5 < PALAMLV:5
+		L = 4
+	ELSE
+		L = 5
+	ENDIF
+	IF L
+		SIF S
+			PRINT  + 
+		PRINTS PALAMNAME:5
+		PRINTV 'LV,L,'(,L * 1,')
+		S = 1
+		A+=L
+	ENDIF
+
+	;恥じらい'
+	IF TALENT:35
+		PRINT  - 
+		PRINTS TALENTNAME:35
+		PRINTV '(,5,')
+		S = 1
+		A-=5
+	ENDIF
+	;献身的
+	IF TALENT:63
+		SIF S
+			PRINT  + 
+		PRINTS TALENTNAME:63
+		PRINTV '(,6,')
+		S = 1
+		A+=6
+	ENDIF
+	;快感の否定
+	IF TALENT:71
+		PRINT  - 
+		PRINTS TALENTNAME:71
+		PRINTV '(,1,')
+		S = 1
+		A-=1
+	ENDIF
+	;恋慕
+	IF TALENT:85 && ASSIPLAY == 0
+		SIF S
+			PRINT  + 
+		PRINTS TALENTNAME:85
+		PRINTV '(,5,')
+		S = 5
+		A+=5
+	ENDIF
+
+	;キス未経験
+	IF TALENT:151
+		PRINT  - 
+		PRINTS TALENTNAME:151
+		PRINTV '(,20,')
+		S = 1
+		A-=20
+	ENDIF
+
+	;合意
+	IF TALENT:152
+		SIF S
+			PRINT  + 
+		PRINTS TALENTNAME:152
+		PRINTV '(,20,')
+		S = 5
+		A+=20
+	ENDIF
+
+	;一線越えない（合意が無い時のみ）
+	IF TALENT:152 == 0 && TALENT:27
+		PRINT  - 
+		PRINTS TALENTNAME:27
+		PRINTV '(,15,')
+		S = 1
+		A-=15
+	ENDIF
+
+	;ムードボーナス
+	B = 0
+	IF TFLAG:37 < 10
+		B -= 10
+	ELSEIF TFLAG:37 < 30
+		B -= 1
+	ELSEIF TFLAG:37 < 50
+		B += 1
+	ELSEIF TFLAG:37 < 100
+		B += TFLAG:37 / 10
+	ELSEIF TFLAG:37 < 300
+		B += TFLAG:37 / 5
+	ELSE
+		B += TFLAG:37 / 4
+	ENDIF
+	IF B < 0
+		B = B * -1
+		PRINT  - 
+		PRINT ムード悪い
+		PRINTV '(,B,')
+		S = 1
+		A-=B
+	ELSE
+		PRINT  + 
+		PRINT ムード良い
+		PRINTV '(,B,')
+		S = 1
+		A+=B
+	ENDIF
+
+
+	;好感度
+	IF CFLAG:2 < 500
+		B = 0
+		PRINT  - 
+		IF CFLAG:2 < 100
+			B = 20
+		ELSEIF CFLAG:2 < 300
+			B = 10
+		ELSE
+			B = 5
+		ENDIF
+		PRINT 好感度不足
+		PRINTV '(,B,')
+		S = 1
+		A-=B
+	ENDIF
+
+	;好感度
+	IF CFLAG:2 >= 700
+		B = 0
+		SIF S
+			PRINT  + 
+		B = CFLAG:2 / 80
+		PRINT 好感度
+		PRINTV '(,B,')
+		S = 1
+		A+=B
+	ENDIF
+
+	;合計を表示(120以上で実行)
+	PRINT  = 
+	PRINTV A
+
+	SIF A < V
+		PRINT  < 
+	SIF A == V
+		PRINT  = 
+	SIF A > V
+		PRINT  > 
+	PRINT 実行値
+	PRINTV V
+
+	SKIPDISP 0
+	;実行できない
+	SIF A < V
+		RETURN 0
+RETURN 1

@@ -1,0 +1,131 @@
+;FLAG:記者 1,安宅純 2,有明仁 3,小柴徹 4,金丸大蔵 5,山原太郎 6,善永 7,悪徳又一
+;90%で記者が付く
+;レベルが高い程、記者は付きにくくなる
+;付く確率はレベル13までで90％だったのがレベル１4以上だと30％以下に低下してました。自分で取ったデータだけなんでレベルが原因なのか団結力なのか売上枚数なのか他が原因なのかまでは断定できませんが…
+;難易度を上げるために仕様変更している可能性は高いですね。序盤でも付きにくいと言う方も居ますのでランクやレベルは関係なく、確率は変動しないようにされたのかもしれません。
+;1 20%
+;2 20%
+;3 20%
+;4 20%
+;5 20%
+;芸能記者
+;(-表記がついていたら悪徳、そうでなければ敏腕) 
+@GET_記者
+VARSET LOCAL
+;もし記者が付いている時に別の記者が付くなら、重複を避け、前の記者を外す
+
+;現時点では合格してないと記者付かない
+SIF !TFLAG:合格フラグ
+	RETURN
+;記者判定なしだとダメ
+SIF !TFLAG:記者判定
+	RETURN
+;今のところ記者が付いていたらダメ
+SIF FLAG:記者
+	RETURN
+	
+IF RAND(100) < 10
+
+ELSE
+	LOCAL = RAND:100
+	SELECTCASE LOCAL
+		CASE 0 TO 19
+			FLAG:記者 = 1
+		CASE 20 TO 39
+			FLAG:記者 = 2
+		CASE 40 TO 59
+			FLAG:記者 = 3
+		CASE 60 TO 79
+			FLAG:記者 = 4
+		CASE 80 TO 99
+			FLAG:記者 = 5
+		CASEELSE
+		
+	ENDSELECT
+	SELECTCASE FLAG:記者
+		CASE 1
+			LOCALS = 安宅
+			LOCALS:1 = 純
+		CASE 2
+			LOCALS = 有明
+			LOCALS:1 = 仁
+		CASE 3
+			LOCALS = 小柴
+			LOCALS:1 = 徹
+		CASE 4
+			LOCALS = 金丸
+			LOCALS:1 = 大蔵
+		CASE 5
+			LOCALS = 山原
+			LOCALS:1 = 太郎
+		CASEELSE
+	ENDSELECT
+	PRINTL 
+	PRINTFORMW ……………
+	PRINTL 
+	PRINTFORMW ………
+	PRINTL 
+	PRINTFORMW …
+	PRINTL 
+	IF TFLAG:合格フラグ == 1
+		PRINTFORMW 仕事を無事にこなした%CALLNAME:TARGET%達に、向こうから近づいてくる者がいた
+		PRINTFORMW 『どうも、私芸能記者をやっております、%LOCALS% %LOCALS:1%と申します』
+		PRINTFORMW 『さっきのステージを見て%CSTR:0:22%に俄然興味が沸いてしまいました!!』
+		PRINTFORMW 『%CSTR:0:22%の記事を書きたいので、是非密着取材をさせて下さい』
+		PRINTL 
+		SELECTCASE FLAG:記者
+			CASE 1
+				PRINTFORMW %LOCALS%さんは情熱的な記事を書くことを得意とする記者だったはずだ
+				PRINTFORMW この人が記事を書いてくれれば、%CSTR:0:22%のステージが一層盛り上がるかもしれない
+			CASE 2
+				PRINTFORMW %LOCALS%さんは宣伝を得意とする記者だったはずだ
+				PRINTFORMW この人が記事を書いてくれれば、より多くのファンを得られるかもしれない
+			CASE 3
+				PRINTFORMW %LOCALS%さんは運動に詳しい記者だったはずだ
+				PRINTFORMW この人が記事を書いてくれれば、レッスンの効果が上昇するかもしれない
+			CASE 4
+				PRINTFORMW %LOCALS%さんは経済に詳しい記者だったはずだ
+				PRINTFORMW この人が記事を書いてくれれば、仕事の報酬が増えるかもしれない
+			CASE 5
+				PRINTFORMW %LOCALS%さんは超が付く程の敏腕記者だったはずだ
+				PRINTFORMW この人が記事を書いてくれれば、%CSTR:0:22%は向かう所敵なしだ!!
+			CASEELSE
+		ENDSELECT
+		FLAG:記者 = 120 + FLAG:記者
+	ENDIF
+ENDIF
+@LEV_記者
+;記者が付いてなければ処理しない
+SIF FLAG:記者 <= 0
+	RETURN
+;日数を減らす
+IF FLAG:記者 > 10
+	FLAG:記者 -= 10
+ENDIF
+;タイムアウトで記者が離れる
+IF FLAG:記者 < 10
+	FLAG:記者 = 0
+	PRINTFORMW 『それではいい記事が書けましたので、私はこれで失礼します』
+	PRINTFORMW そう言い残し、%CSTR:0:22%を取材中の記者は去って行った・・・
+ENDIF
+
+
+
+;ARG	0でフルネーム,1で苗字
+@記者名(ARG)
+#FUNCTIONS
+SELECTCASE FLAG:記者 % 10
+	CASE 1
+		RETURNF \@ ARG ? 安宅 # 安宅純 \@
+	CASE 2
+		RETURNF \@ ARG ? 有明 # 有明仁 \@
+	CASE 3
+		RETURNF \@ ARG ? 小柴 # 小柴徹 \@
+	CASE 4
+		RETURNF \@ ARG ? 金丸 # 金丸大蔵 \@
+	CASE 5
+		RETURNF \@ ARG ? 山原 # 山原太郎 \@
+	CASEELSE
+		RETURNF "エラー"
+ENDSELECT
+

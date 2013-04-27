@@ -1,0 +1,107 @@
+;“G‚É‘Î‚µ‚Ä”ÍˆÍUŒ‚‚ð‚µ‚½Žž‚Ì”{—¦‚ð“ü‚ê‚Ä•Ô‚·
+;ARG	‘ÎÛ
+;ARG:1	”ÍˆÍ(3,4‚ðcˆê—ñA‰¡ˆê—ñ‚É)
+;ARG:2	Œ¸Š—L
+@UŒ‚”ÍˆÍ‘I‘ð(ARG,ARGS,ARG:1)
+VARSET LOCAL
+TFLAG:(1210+ARG)=100
+;ˆê—ñ–Ú
+IF ARG < 16
+	SELECTCASE ARGS
+		CASE "¬”ÍˆÍ"
+			IF ARG:1
+				LOCAL = 50
+			ELSE
+				LOCAL = 100
+			ENDIF
+			;ID’á‚¢•û‚ÉŒ¸Š
+			IF ARG > 11
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,-1,0,LOCAL)
+			ENDIF
+			;ID‚‚¢•û‚ÉŒ¸Š
+			IF ARG < 15
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,1,0,LOCAL)
+			ENDIF
+		;‘å”ÍˆÍ
+		CASE "‘å”ÍˆÍ"
+			IF ARG:1
+				LOCAL = 80
+				LOCAL:1 = 60
+			ELSE
+				LOCAL = 100
+				LOCAL:1 = 100
+			ENDIF
+			CALL ˆÐ—Í”{—¦‚w‚x(ARG,0,1,LOCAL)
+			;ID’á‚¢•û‚ÉŒ¸Š
+			IF ARG > 11
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,-1,0,LOCAL)
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,-1,1,LOCAL:1)
+			ENDIF
+			;ID‚‚¢•û‚ÉŒ¸Š
+			IF ARG < 15
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,1,0,LOCAL)
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,-1,1,LOCAL:1)
+			ENDIF
+	ENDSELECT
+;“ñ—ñ–Ú
+ELSE
+	SELECTCASE ARGS
+		CASE "¬”ÍˆÍ"
+			IF ARG:1
+				LOCAL = 50
+			ELSE
+				LOCAL = 100
+			ENDIF
+			;ID’á‚¢•û‚ÉŒ¸Š
+			IF ARG > 16
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,-1,0,LOCAL)
+			ENDIF
+			;ID‚‚¢•û‚ÉŒ¸Š
+			IF ARG < 20
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,1,0,LOCAL)
+			ENDIF
+		;‘å”ÍˆÍ
+		CASE "‘å”ÍˆÍ"
+			IF ARG:1
+				LOCAL = 80
+				LOCAL:1 = 60
+			ELSE
+				LOCAL = 100
+				LOCAL:1 = 100
+			ENDIF
+			CALL ˆÐ—Í”{—¦‚w‚x(ARG,0,1,LOCAL)
+			;ID’á‚¢•û‚ÉŒ¸Š
+			IF ARG > 16
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,-1,0,LOCAL)
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,-1,-1,LOCAL:1)
+			ENDIF
+			;ID‚‚¢•û‚ÉŒ¸Š
+			IF ARG < 20
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,1,0,LOCAL)
+				CALL ˆÐ—Í”{—¦‚w‚x(ARG,-1,-1,LOCAL:1)
+			ENDIF
+	ENDSELECT
+ENDIF
+
+;ARG	‘ÎÛƒLƒƒƒ‰
+;ARG:1	‘Š‘Îƒ|ƒWƒVƒ‡ƒ“X
+;ARG:2	"			Y
+;ARG:3	”{—¦
+@ˆÐ—Í”{—¦‚w‚x(ARG,ARG:1,ARG:2,ARG:3)
+;ˆÊ’u‚ð‡‚í‚¹‚é
+ARG -= 10
+LOCAL:1 = CFLAG:ARG:XÀ•W
+LOCAL:2 = CFLAG:ARG:YÀ•W
+TFLAG:(1220 + CHARA_POS(LOCAL:1+ARG:1,LOCAL:2+ARG:2)) = ARG:3
+SIF !CHARA_POS(LOCAL:1+ARG:1,LOCAL:2+ARG:2)
+	PRINTFORMW ƒGƒ‰[IÀ•W‚w{LOCAL:1},‚x{LOCAL:2}‚Ì“G‚É‘Î‚µ‚Ä•s–¾‚È‘Š‘ÎÀ•W‚w{ARG:1},‚x{ARG:2}‚ª‘I‘ð‚³‚ê‚Ü‚µ‚½
+
+;ARG	XÀ•W
+;ARG:1	YÀ•W
+@CHARA_POS(ARG,ARG:1)
+#FUNCTION
+SIF !Y
+	RETURNF X
+SIF Y
+	RETURNF X+5
+RETURNF 0

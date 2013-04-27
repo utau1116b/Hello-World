@@ -1,0 +1,101 @@
+;======================================================
+;装備品のデータ
+;======================================================
+
+@装備タイプ_816
+;1 = FLORAL 2 = LUXURY 3 = STARRY 4 = EXTRA
+RETURN 3
+
+;1 = 衣装 2 = HEAD 3 = BODY 4 = HAND 5 = LEG 6 = お守り
+@装備箇所_816
+RETURN 1
+
+@装備レベル_816
+RETURN 0
+
+@装備シリーズ_816
+RETURN 0
+
+@購入条件_816
+SIF MONEY < 1000
+	RETURN 0
+RETURN 1
+
+@装備解説_816
+PRINTL 
+
+@装備条件_816,ARG
+RETURN 1
+
+@装備条件説明_816
+PRINTL 装備条件：
+
+;合成可能か
+@合成条件_816
+;SIF
+;	RETURN 0
+RETURN 1
+
+;合成素材(変数に素材、個数を入れる)
+@合成素材_816
+RETURN 1
+
+@VO_816
+RETURN 3 * 5 * 100
+
+@VI_816
+RETURN 6 * 5 * 100
+
+@DA_816
+RETURN 4 * 5 * 100
+
+@HP_816
+RETURN 0
+
+@MP_816
+RETURN 0
+
+@POW_816
+RETURN 0
+
+@GUA_816
+RETURN 0
+
+@DEX_816
+RETURN 0
+
+@SPD_816
+RETURN 0
+
+@LUC_816
+RETURN 0
+
+@VO耐性_816
+RETURN 0
+
+@VI耐性_816
+RETURN 0
+
+@DA耐性_816
+RETURN 0
+
+@攻撃回数_816
+RETURN 1
+
+@攻撃範囲_816
+RETURN 0
+
+@スキル1_816
+RETURN 0
+
+@スキル2_816
+RETURN 0
+
+@スキル3_816
+RETURN 0
+
+@スキル4_816
+RETURN 0
+
+@スキル5_816
+RETURN 0

@@ -1,0 +1,285 @@
+;アイドルのファン人数によってアイドルランクアップ
+;ARG:0 対象のキャラ登録番号
+@アイドルランク変化(ARG:0)
+;LOCAL:0	対象のファン数
+;LOCAL:1	対象のアイドルランク
+;アイドルランク	0=ランク外	1=Fランク,2=Eランク,3=Dランク,4=Cランク,5=Bランク
+;,6=A,7=S,8=SS,9=SSS,10=トップアイドル,11=アイドルマスター
+#DIM PREアイドルランク
+PREアイドルランク = ABL:ARG:アイドルランク
+FOR LOCAL:2, 0, 11
+	IF FLAG:24 < 5
+		;Stage5までは昇格試験に合格していないとリターン
+		;PRINTFORML あ{LOCAL:2}
+		IF LOCAL:2 < FLAG:24
+			IF 全国ファン数(ARG) >= 昇格条件_ファン数(LOCAL:2)
+			
+				ABL:(ARG:0):アイドルランク = LOCAL:2 + 1
+				
+			ENDIF
+			
+		ELSE
+		
+			CONTINUE
+		
+		ENDIF
+	ELSE
+	;クリア後は制限なし
+		IF 全国ファン数(ARG) >= 昇格条件_ファン数(LOCAL:2)
+		
+			ABL:(ARG:0):アイドルランク = LOCAL:2 + 1
+		ENDIF
+		
+	ENDIF
+NEXT
+IF ABL:ARG:アイドルランク > PREアイドルランク
+	CUSTOMDRAWLINE =
+	PRINTL 
+	CALL PRINTCOLOR(SET_COLOR_FUNC(ARG), @"%CALLNAME:ARG%")
+	PRINTFORML のアイドルランクが上がった！
+	CALL PRINTCOLOR(SET_COLOR_FUNC(ARG), @"%CALLNAME:ARG%")
+	PRINTFORM は
+	CALL PRINT_IDOL_RANK(ABL:ARG:アイドルランク)
+	PRINTL になった！
+	PRINTL
+	;DRAWLINE
+ELSEIF ABL:ARG:アイドルランク < PREアイドルランク
+	PRINTFORML %CALLNAME:ARG%のアイドルランクが下がった……
+	PRINTFORM %CALLNAME:ARG%は
+	CALL PRINT_IDOL_RANK(ABL:ARG:アイドルランク)
+	PRINTL になった
+ENDIF
+;----------------------------------------------
+;昇格試験受けられるかどうか
+;受けられるなら1、そうでなければ0を返す
+;----------------------------------------------
+;@@@アイドルランクアップとか、昇格試験出現条件とかの関係をどうしよう？
+@CHECK_RANKUP_TERMS
+;LOCAL:0 ループ用
+;LOCAL:1 TEMP
+LOCAL:1 = 0
+;FOR LOCAL:0, 1080, 1085
+;	IF FLAG:(LOCAL:0) > 0
+;		IF 全国ファン数(FLAG:(LOCAL)) > LOCAL:1
+;			LOCAL:1 = 全国ファン数(FLAG:(LOCAL))
+;		ENDIF
+;	ENDIF
+;NEXT
+LOCAL:1 = SUM_ファン数()
+;LOCAL:1にユニットメンバー中で最大のファン数を格納
+IF FLAG:24 == 0
+	RETURN 1
+ELSEIF FLAG:24 == 1
+	IF LOCAL:1 >= 昇格条件_ファン数("E")
+		RETURN 1
+	ELSE
+		RETURN 0
+	ENDIF
+ELSEIF FLAG:24 == 2
+	IF LOCAL:1 >= 昇格条件_ファン数("D")
+		RETURN 1
+	ELSE
+		RETURN 0
+	ENDIF
+ELSEIF FLAG:24 == 3
+	IF LOCAL:1 >= 昇格条件_ファン数("C")
+		RETURN 1
+	ELSE
+		RETURN 0
+	ENDIF
+ELSEIF FLAG:24 == 4
+	IF LOCAL:1 >= 昇格条件_ファン数("B")
+		RETURN 1
+	ELSE
+		RETURN 0
+	ENDIF
+ELSEIF FLAG:24 == 5
+	IF LOCAL:1 >= 昇格条件_ファン数("A")
+		RETURN 1
+	ELSE
+		RETURN 0
+	ENDIF
+ELSEIF FLAG:24 == 6
+	IF LOCAL:1 >= 昇格条件_ファン数("S")
+		RETURN 1
+	ELSE
+		RETURN 0
+	ENDIF
+ELSEIF FLAG:24 == 7
+	IF LOCAL:1 >= 昇格条件_ファン数("SS")
+		RETURN 1
+	ELSE
+		RETURN 0
+	ENDIF
+ELSEIF FLAG:24 == 8
+	IF LOCAL:1 >= 昇格条件_ファン数("SSS")
+		RETURN 1
+	ELSE
+		RETURN 0
+	ENDIF
+ELSEIF FLAG:24 == 9
+	IF LOCAL:1 >= 昇格条件_ファン数("トップアイドル")
+		RETURN 1
+	ELSE
+		RETURN 0
+	ENDIF
+ELSEIF FLAG:24 == 10
+	IF LOCAL:1 >= 昇格条件_ファン数("アイドルマスター")
+		RETURN 1
+	ELSE
+		RETURN 0
+	ENDIF
+ELSE
+	RETURN 0
+ENDIF
+;ARG:0	対象
+@NEXT_IDOL_RANK(ARG:0)
+IF ABL:(ARG:0):アイドルランク == 0
+	LOCAL = 昇格条件_ファン数("F")- 全国ファン数(ARG)
+ELSEIF ABL:(ARG:0):アイドルランク == 1
+	LOCAL = 昇格条件_ファン数("E")- 全国ファン数(ARG)
+ELSEIF ABL:(ARG:0):アイドルランク == 2
+	LOCAL = 昇格条件_ファン数("D")- 全国ファン数(ARG)
+ELSEIF ABL:(ARG:0):アイドルランク == 3
+	LOCAL = 昇格条件_ファン数("C")- 全国ファン数(ARG)
+ELSEIF ABL:(ARG:0):アイドルランク == 4
+	LOCAL = 昇格条件_ファン数("B")- 全国ファン数(ARG)
+ELSEIF ABL:(ARG:0):アイドルランク == 5
+	LOCAL = 昇格条件_ファン数("A")- 全国ファン数(ARG)
+ELSEIF ABL:(ARG:0):アイドルランク == 6
+	LOCAL = 昇格条件_ファン数("S")- 全国ファン数(ARG)
+ELSEIF ABL:(ARG:0):アイドルランク == 7
+	LOCAL = 昇格条件_ファン数("SS")- 全国ファン数(ARG)
+ELSEIF ABL:(ARG:0):アイドルランク == 8
+	LOCAL = 昇格条件_ファン数("SSS")- 全国ファン数(ARG)
+ELSEIF ABL:(ARG:0):アイドルランク == 9
+	LOCAL = 昇格条件_ファン数("トップアイドル")- 全国ファン数(ARG)
+ELSEIF ABL:(ARG:0):アイドルランク == 10
+	LOCAL = 昇格条件_ファン数("アイドルマスター")- 全国ファン数(ARG)
+ELSE
+	LOCAL = 7658761054
+ENDIF
+
+SIF LOCAL < 0
+	LOCAL = 0
+
+PRINTFORM {LOCAL}
+
+;次のステージ出現条件取得
+@GET_NEXT_STAGE
+IF FLAG:24 == 0
+	LOCAL:1= (昇格条件_ファン数("F") - SUM_ファン数())
+ELSEIF FLAG:24 == 1
+	LOCAL:1 = (昇格条件_ファン数("E") - SUM_ファン数())
+ELSEIF FLAG:24 == 2
+	LOCAL:1 = (昇格条件_ファン数("D") - SUM_ファン数())
+ELSEIF FLAG:24 == 3
+	LOCAL:1 = (昇格条件_ファン数("C") - SUM_ファン数())
+ELSEIF FLAG:24 == 4
+	LOCAL:1 = (昇格条件_ファン数("B") - SUM_ファン数())
+ELSEIF FLAG:24 == 5
+	LOCAL:1 = (昇格条件_ファン数("A") - SUM_ファン数())
+ELSEIF FLAG:24 == 6
+	LOCAL:1 = (昇格条件_ファン数("S") - SUM_ファン数())
+ELSEIF FLAG:24 == 7
+	LOCAL:1 = (昇格条件_ファン数("SS") - SUM_ファン数())
+ELSEIF FLAG:24 == 8
+	LOCAL:1 = (昇格条件_ファン数("SSS") - SUM_ファン数())
+ELSEIF FLAG:24 == 9
+	LOCAL:1 = (昇格条件_ファン数("トップアイドル") - SUM_ファン数())
+ELSEIF FLAG:24 == 10
+	LOCAL:1 = (昇格条件_ファン数("アイドルマスター") - SUM_ファン数())
+ELSE
+	PRINTFORM その他
+ENDIF
+RETURN LOCAL:1
+;ARG:0	対象
+@GET_NEXT_IDOL_RANK(ARG:0)
+IF ABL:(ARG:0):アイドルランク == 0
+	LOCAL:1= (昇格条件_ファン数("F") - 全国ファン数(ARG))
+ELSEIF ABL:(ARG:0):アイドルランク == 1
+	LOCAL:1 = (昇格条件_ファン数("E") - 全国ファン数(ARG))
+ELSEIF ABL:(ARG:0):アイドルランク == 2
+	LOCAL:1 = (昇格条件_ファン数("D") - 全国ファン数(ARG))
+ELSEIF ABL:(ARG:0):アイドルランク == 3
+	LOCAL:1 = (昇格条件_ファン数("C") - 全国ファン数(ARG))
+ELSEIF ABL:(ARG:0):アイドルランク == 4
+	LOCAL:1 = (昇格条件_ファン数("B") - 全国ファン数(ARG))
+ELSEIF ABL:(ARG:0):アイドルランク == 5
+	LOCAL:1 = (昇格条件_ファン数("A") - 全国ファン数(ARG))
+ELSEIF ABL:(ARG:0):アイドルランク == 6
+	LOCAL:1 = (昇格条件_ファン数("S") - 全国ファン数(ARG))
+ELSEIF ABL:(ARG:0):アイドルランク == 7
+	LOCAL:1 = (昇格条件_ファン数("SS") - 全国ファン数(ARG))
+ELSEIF ABL:(ARG:0):アイドルランク == 8
+	LOCAL:1 = (昇格条件_ファン数("SSS") - 全国ファン数(ARG))
+ELSEIF ABL:(ARG:0):アイドルランク == 9
+	LOCAL:1 = (昇格条件_ファン数("トップアイドル") - 全国ファン数(ARG))
+ELSEIF ABL:(ARG:0):アイドルランク == 10
+	LOCAL:1 = (昇格条件_ファン数("アイドルマスター") - 全国ファン数(ARG))
+ELSE
+	PRINTFORM その他
+ENDIF
+RETURN LOCAL:1
+;ARG:0 アイドルランク
+@PRINT_IDOL_RANK(ARG:0)
+IF ARG:0 == 0
+	;インフラレッド
+	CALL PRINTCOLOR(SET_COLOR_FUNC("真") , "アイドルランク外")
+ELSEIF ARG:0 == 1
+	CALL PRINTCOLOR(SET_COLOR_FUNC("雪歩") , "Fランクアイドル")
+ELSEIF ARG:0 == 2
+	CALL PRINTCOLOR(SET_COLOR_FUNC("美希") , "Eランクアイドル")
+ELSEIF ARG:0 == 3
+	CALL PRINTCOLOR(SET_COLOR_FUNC("律子") , "Dランクアイドル")
+ELSEIF ARG:0 == 4
+	CALL PRINTCOLOR(SET_COLOR_FUNC("響") , "Cランクアイドル")
+ELSEIF ARG:0 == 5
+	CALL PRINTCOLOR(SET_COLOR_FUNC("千早") , "Bランクアイドル")
+ELSEIF ARG:0 == 6
+	CALL PRINTCOLOR(SET_COLOR_FUNC("伊織") , "Aランクアイドル")
+ELSEIF ARG:0 == 7
+	CALL PRINTCOLOR(SET_COLOR_FUNC("亜美") , "Sランクアイドル")
+ELSEIF ARG:0 == 8
+	CALL PRINTCOLOR(SET_COLOR_FUNC("やよい") , "SSランクアイドル")
+ELSEIF ARG:0 == 9
+	CALL PRINTCOLOR(SET_COLOR_FUNC("春香") , "SSSランクアイドル")
+ELSEIF ARG:0 == 10
+	CALL PRINTCOLOR(SET_COLOR_FUNC("貴音") , "トップアイドル")
+ELSEIF ARG:0 == 11
+	CALL PRINTCOLOR(SET_COLOR_FUNC("あずさ") , "アイドルマスター")
+ELSE
+	PRINT エラー
+ENDIF
+
+@昇格条件_ファン数(ARGS)
+#FUNCTION
+#LOCALSIZE 1
+VARSET LOCAL
+SELECTCASE ARGS
+	CASE "0", "F"
+		LOCAL = 0
+	CASE "1", "E"
+		LOCAL = 10000
+	CASE "2", "D"
+		LOCAL = 30000
+	CASE "3", "C"
+		LOCAL = 70000
+	CASE "4", "B"
+		LOCAL = 120000
+	CASE "5", "A"
+		LOCAL = 200000
+	CASE "6", "S"
+		LOCAL = 300000
+	CASE "7", "SS"
+		LOCAL = 500000
+	CASE "8", "SSS"
+		LOCAL = 1000000
+	CASE "9", "トップアイドル"
+		LOCAL = 4000000
+	CASE "10", "アイドルマスター"
+		LOCAL = 10000000
+	CASEELSE
+		LOCAL = 99999999
+ENDSELECT
+RETURNF LOCAL

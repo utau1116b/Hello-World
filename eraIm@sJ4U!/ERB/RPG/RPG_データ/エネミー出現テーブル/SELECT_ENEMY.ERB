@@ -1,0 +1,33 @@
+;出現する敵の種類を決定
+;ARG:0	イベント戦フラグ(0:通常雑魚　1:EXエネミー　2:スキマ　3:固定敵　4:～ボス戦)
+;ARG:1	ランク(1～60)
+@SELECT_ENEMY(ARG:0, ARG:1)
+;LOCAL
+;0	LOOP
+;1	PTID
+
+;出現敵初期化
+FOR LOCAL:0, 1001, 1011
+	TFLAG:(LOCAL:0) = 0
+NEXT
+LOCAL:1 = 0
+
+;PTID取得
+TRYCCALLFORM SELECT_ENEMY_PT_{FLAG:現在挑戦中仕事}(ARG:0, ARG:1)
+CATCH
+	PRINTFORMW エラー！出現敵一覧が設定されていないマップ(ID:{FLAG:現在挑戦中仕事})の敵を決定しようとしました
+	PRINTFORMW テストバトル用のアイドルを呼び出します
+	LOCAL:1 = RAND:5 + 1
+	IF RAND:5 == 0
+		LOCAL:1 += RAND:6
+	ENDIF
+
+	FOR LOCAL:0, 0, LOCAL:1
+		TFLAG:(LOCAL:0 + 1001) = 1
+	NEXT
+	RETURN
+ENDCATCH
+
+
+
+

@@ -1,0 +1,97 @@
+;敵のユニット名を決める
+;雪　月　花　みたいに三つ区切りでもいいかも
+;空文字列もありで
+@RAND_NAME()
+#FUNCTIONS
+#LOCALSIZE 5
+VARSET LOCALS
+;候補1
+SELECTCASE RAND(100)
+	CASE 0 TO 4
+		LOCALS = フェニックス
+	CASE 5 TO 9
+		LOCALS = オーシャン
+	CASE 10 TO 14
+		LOCALS = スノー
+	CASE 15 TO 19
+		LOCALS = ブラック
+	CASE 20 TO 24
+		LOCALS = フォレスト
+	CASE 25 TO 29
+		LOCALS = サンライズ
+	CASE 30 TO 34
+		LOCALS = ドラゴン
+	CASE 35 TO 39
+		LOCALS = ディープ
+	CASE 40 TO 44
+		LOCALS = シチリア
+	CASE 45 TO 49
+		LOCALS = クリア
+	CASE 50 TO 54
+		LOCALS = 無敵
+	CASE 55 TO 59
+		LOCALS = プロジェクト
+	CASE 60 TO 64
+		LOCALS = ディアリー
+	CASE 65 TO 69
+		LOCALS = パーフェクト
+	CASE 70 TO 74
+		LOCALS = ワンダリング
+	CASE 75 TO 79
+		LOCALS = ミッシング
+	CASE 80 TO 84
+		LOCALS = ブレッド
+	CASE 85 TO 89
+		LOCALS = フラット
+	CASE 90 TO 94
+		LOCALS = クラッシュ
+	CASEELSE
+		LOCALS = 魔王
+ENDSELECT
+;候補2
+SELECTCASE RAND(100)
+	CASE 0 TO 4
+		LOCALS:1 = レッド
+	CASE 5 TO 9
+		LOCALS:1 = ブルー
+	CASE 10 TO 14
+		LOCALS:1 = ホワイト
+	CASE 15 TO 19
+		LOCALS:1 = パール
+	CASE 20 TO 24
+		LOCALS:1 = グリーン
+	CASE 25 TO 29
+		LOCALS:1 = イエロー
+	CASE 30 TO 34
+		LOCALS:1 = ドラゴン
+	CASE 35 TO 39
+		LOCALS:1 = パープル
+	CASE 40 TO 44
+		LOCALS:1 = オレンジ
+	CASE 45 TO 49
+		LOCALS:1 = アサヒ
+	CASE 50 TO 54
+		LOCALS:1 = 艦隊
+	CASE 55 TO 59
+		LOCALS:1 = フェアリー
+	CASE 60 TO 64
+		LOCALS:1 = スターズ
+	CASE 65 TO 69
+		LOCALS:1 = サン
+	CASE 70 TO 74
+		LOCALS:1 = スター
+	CASE 75 TO 79
+		LOCALS:1 = ムーン
+	CASE 80 TO 84
+		LOCALS:1 = ハート
+	CASE 85 TO 89
+		LOCALS:1 = 3
+	CASE 90 TO 94
+		LOCALS:1 = デビルス
+	CASEELSE
+		LOCALS:1 = エンジェル
+ENDSELECT
+
+LOCALS:2 = %LOCALS%%LOCALS:1%
+RETURNF LOCALS:2
+

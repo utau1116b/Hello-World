@@ -1,0 +1,201 @@
+;-------------------------------------------------
+;キャラ能力表示(種族他)
+;-------------------------------------------------
+;能力を見る選択のとき、各キャラの横で種族、体力、気力が表示されます。
+;一応完成。(Im@sJでは未実装)
+@SHOW_RACE, ARG
+;一言口上呼び出し
+IF ARG != MASTER
+	CALL DISPLAY_KOJO_MESSAGE_IMPRESSION_MAIN, ARG
+ENDIF
+;--------------------------------------------------
+;一言口上関係
+;--------------------------------------------------
+;ステータス画面を見る時に出力されます
+@DISPLAY_KOJO_MESSAGE_IMPRESSION_MAIN, ARG
+
+	TRYCALL KOJO_X_MESSAGE_IMPRESSION(ARG:0)
+
+;≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+;汎用口上用一言口上処理
+;≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+;=============================================================================
+;イベント口上
+;=============================================================================
+@KOJO_X_MESSAGE_IMPRESSION(ARG:0)
+;「人格設定」
+CALL DEFINE_JINKAKU_SELECT, (ARG:0)
+
+	CALL KOJO_X_MESSAGE_IMPRESSION_OTHER(ARG:0)
+
+;=============================================================================
+;汎用口上、汎用逆口上ジェネレーター人格決定の処理
+;=============================================================================
+;--------------------------------------------------
+;汎用口上か汎用逆口上の判別
+;--------------------------------------------------
+@DEFINE_JINKAKU_SELECT, ARG
+
+CALL DEFINE_JINKAKU_NORMAL, ARG
+
+;--------------------------------------------------
+;汎用口上の人格の決定処理
+;--------------------------------------------------
+@DEFINE_JINKAKU_NORMAL, ARG
+;………………………………………………
+;一人称(CSTR:11)を決定
+;………………………………………………
+;性転換でオトコになった存在の場合元の性別の人格を見る、あと元々オトコの場合は性転換してもオトコ扱い
+IF (TALENT:ARG:122)
+	;僕(キャラ由来)
+	IF NO:ARG == 26
+		CSTR:ARG:11 = 僕
+	;僕(キャラ由来)
+	ELSEIF NO:ARG == 69
+		CSTR:ARG:11 = 僕
+	;俺([反抗的]、[生意気])
+	ELSEIF TALENT:ARG:11 || TALENT:ARG:15
+		CSTR:ARG:11 = 俺
+	;我輩([プライド高い]、[吸血鬼])
+	ELSEIF TALENT:ARG:16 || TALENT:ARG:205
+		CSTR:ARG:11 = 我輩
+	;わし([保守的]、[貞操観念]、[鬼]、[天狗])
+	ELSEIF TALENT:ARG:24 || TALENT:ARG:30 || TALENT:ARG:214 || TALENT:ARG:215
+		CSTR:ARG:11 = わし
+	;僕([臆病]、[大人しい]、[幼児]、[幼児退行]、[河童])
+	ELSEIF TALENT:ARG:10 || TALENT:ARG:14 || TALENT:ARG:130 || TALENT:ARG:159 || TALENT:ARG:210
+		CSTR:ARG:11 = 僕
+	;私
+	ELSE
+		CSTR:ARG:11 = 私
+	ENDIF
+ELSE
+	;僕
+	IF NO:ARG == 17
+		CSTR:ARG:11 = 僕
+	;亜美真美美希
+	ELSEIF NO:ARG == 19 || NO:ARG == 20 || NO:ARG == 21 
+		CSTR:ARG:11 = %CALLNAME:(ARG)%
+	;僕
+	ELSEIF NO:ARG == 26
+		CSTR:ARG:11 = 僕
+	;あたし
+	ELSEIF NO:ARG == 25
+		CSTR:ARG:11 = あたし
+	;私
+	ELSE
+		CSTR:ARG:11 = 私
+	ENDIF
+ENDIF
+
+;………………………………………………
+;二人称(CSTR:12)と人格(BASE:(ARG:0):ベースGUA)を決定
+;………………………………………………
+CFLAG:ARG:汎用口上用人格 = 0
+IF (TALENT:ARG:120)
+; && CFLAG:ARG:4995 != 2) || CFLAG:ARG:4995 == 1
+	;貴様(キャラ由来)
+	IF NO:ARG == 14 || NO:ARG == 18
+		CSTR:ARG:12 = プロデューサーさん
+		CFLAG:ARG:汎用口上用人格 = 11
+	;お主(キャラ由来)
+	ELSEIF NO:ARG == 21
+		CSTR:ARG:12 = ハニー
+		CFLAG:ARG:汎用口上用人格 = 11
+	;あなた
+	ELSE
+		CSTR:ARG:12 = プロデューサー
+		CFLAG:ARG:汎用口上用人格 = 14
+	ENDIF
+
+ELSE
+	;あんた
+	IF TALENT:ARG:プライド高い && TALENT:ARG:中毒しやすい
+		CSTR:ARG:12 = あんた
+		CFLAG:ARG:汎用口上用人格 = 1
+	;お前
+	ELSEIF (TALENT:ARG:プライド高い && (TALENT:ARG:楽観的 || TALENT:ARG:反抗的 || TALENT:ARG:動物耳) && TALENT:ARG:サド == 0) || (TALENT:ARG:自制心 && TALENT:ARG:保守的) || NO:ARG == 2
+		CSTR:ARG:12 = お前
+		CFLAG:ARG:汎用口上用人格 = 2
+	;貴方
+	ELSEIF TALENT:ARG:プライド高い
+	; && NO:ARG != 37
+		CSTR:ARG:12 = 貴方
+		CFLAG:ARG:汎用口上用人格 = 3
+	;お兄さん・お姉さん
+	ELSEIF TALENT:ARG:幼稚 && TALENT:ARG:生意気 == 0 && TALENT:ARG:反抗的 == 0 && NO:ARG != 45
+		CSTR:ARG:12 = \@(TALENT:MASTER:120) ? お兄さん # お姉さん\@
+		CFLAG:ARG:汎用口上用人格 = 4
+	;あなた
+	ELSEIF TALENT:ARG:幼稚 == 0 && TALENT:ARG:抵抗 == 0 && TALENT:ARG:生意気 == 0 && TALENT:ARG:反抗的 == 0 && TALENT:ARG:無関心 == 0 && TALENT:ARG:抑圧 == 0 && (TALENT:ARG:解放 || TALENT:ARG:快感に素直 || TALENT:ARG:鼓舞)
+		CSTR:ARG:12 = あなた
+		CFLAG:ARG:汎用口上用人格 = 6
+	;あなた([臆病]、[大人しい]、[恥じらい]、[献身的]、[小悪魔])
+	ELSEIF TALENT:ARG:10 || TALENT:ARG:14 || TALENT:ARG:35 || TALENT:ARG:63 || TALENT:ARG:87
+		CSTR:ARG:12 = あなた
+		CFLAG:ARG:汎用口上用人格 = 5
+	;あんた
+	ELSE
+		CSTR:ARG:12 = あんた
+		CFLAG:ARG:汎用口上用人格 = 1
+	ENDIF
+
+	;恋慕後
+	;◎◎ちゃん(キャラ由来)＋恋慕＋主人が「あなた」ではない
+
+	;亜美・真美限定
+	IF NO:ARG == 27 || NO:ARG == 62
+		CSTR:ARG:12 = \@(TALENT:MASTER:122) ? 兄ちゃん # 姉ちゃん\@
+
+	ENDIF
+
+ENDIF
+
+;………………………………………………
+;特殊語尾(CSTR:13、CSTR:14)を決定
+;………………………………………………
+;だぜ
+IF NO:ARG == 21
+	CSTR:ARG:13 = なの
+	CSTR:ARG:14 = なの
+
+;よ
+ELSEIF CFLAG:ARG:汎用口上用人格 == 2
+	CSTR:ARG:13 = よね
+	CSTR:ARG:14 = よ
+;わ
+ELSEIF CFLAG:ARG:汎用口上用人格 < 10
+	CSTR:ARG:13 = ね
+	CSTR:ARG:14 = わ
+ENDIF
+
+;ENDIF
+;-------------------------------------------------
+;通常の一言口上処理
+;-------------------------------------------------
+@KOJO_X_MESSAGE_IMPRESSION_OTHER(ARG:0)
+;剃毛された＋陰毛が生えかけ＋[恥薄い]ではない＋1/2の確率
+IF CFLAG:(ARG:0):毛の成長判定 == 2 && BASE:(ARG:0):9 > 50 && BASE:(ARG:0):9 < 251 && TALENT:(ARG:0):36 == 0 && RAND:2 == 0
+	IF CFLAG:(ARG:0):汎用口上用人格 == 1
+		PRINTSINGLEFORM 　　　「早く生え揃ってくれないと恥ずかしいのよね」
+	ELSEIF CFLAG:(ARG:0):汎用口上用人格 == 2
+		PRINTSINGLEFORM 　　　「下の毛が薄いことがこれほど恥ずかしいとは…」
+	ELSEIF CFLAG:(ARG:0):汎用口上用人格 == 3
+		PRINTSINGLEFORM 　　　「下がまだ涼しいわね…、恥ずかしいわ…」
+	ELSEIF CFLAG:(ARG:0):汎用口上用人格 == 4
+		PRINTSINGLEFORM 　　　「だんだん毛が生えてきたよ」
+	ELSEIF CFLAG:(ARG:0):汎用口上用人格 == 5
+		PRINTSINGLEFORM 　　　「うう、丸見えなのは恥ずかしいです…」
+	ELSEIF CFLAG:(ARG:0):汎用口上用人格 == 6
+		PRINTSINGLEFORM 　　　「あらまあ、これでは大事なものが丸見えですわ…　恥ずかしいです♪」
+	ELSEIF CFLAG:(ARG:0):汎用口上用人格 == 11
+		PRINTSINGLEFORM 　　　「下がむずむずして恥ずかしいのぉ」
+	ELSEIF CFLAG:(ARG:0):汎用口上用人格 == 12
+		PRINTSINGLEFORM 　　　「毛がないと、なんか収まりがつかないよな…」
+	ELSEIF CFLAG:(ARG:0):汎用口上用人格 == 13
+		PRINTSINGLEFORM 　　　「困りましたね、生え揃ってくれないと恥ずかしくなってしまいます」
+	ELSEIF CFLAG:(ARG:0):汎用口上用人格 == 14
+		PRINTSINGLEFORM 　　　「その、あんまり下ばかり見られると恥ずかしいですよ…」
+	ENDIF
+ENDIF
+

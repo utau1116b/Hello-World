@@ -1,0 +1,92 @@
+;経験値獲得
+;ARG:0	獲得量
+@GET_EXP(ARG:0)
+;LOCAL
+;0	LOOP
+;1	実際の獲得量
+;2	戦闘メンバー獲得量
+;3	控えメンバー獲得量
+;4	戦闘メンバー人数
+;5	TEMP
+
+;量が0の場合(味方を倒した場合など)はスキップ
+IF ARG:0 == 0
+	RETURN
+ENDIF
+
+;スキルなどの補正
+LOCAL:1 = ARG:0
+
+;ハピネスシング(気絶していないPT全員のLV総計*5%増加(最大25*5＝125%増))
+LOCAL:5 = 0
+FOR LOCAL:0, 80, 85
+	IF FLAG:(LOCAL:0 + 1000) >= 0 && CFLAG:(FLAG:(LOCAL:0 + 1000)):気絶状態 == 0
+		LOCAL:5 += ABL:(FLAG:(LOCAL:0)):ハピネスシング
+	ENDIF
+NEXT
+LOCAL:1 = LOCAL:1 * (100 + LOCAL:5 * 5) / 100
+
+
+;最序盤ボーナス
+IF FLAG:現在の戦闘回数 < 10
+	LOCAL:1 = LOCAL:1 * 7 / 3
+ELSEIF FLAG:現在の戦闘回数 < 20
+	LOCAL:1 = LOCAL:1 * 6 / 3
+ELSEIF FLAG:現在の戦闘回数 < 30
+	LOCAL:1 = LOCAL:1 * 5 / 3
+ELSEIF FLAG:現在の戦闘回数 < 40
+	LOCAL:1 = LOCAL:1 * 4 / 3
+ENDIF
+
+
+
+;レッスン場
+;トレーニングルーム
+;トレーニングマシーン増設
+IF FLAG:レッスン場 == 1 && FLAG:トレーニングルーム == 1 && FLAG:トレーニングマシーン増設 == 1
+	LOCAL:1 = LOCAL:1 * (100 + 50) / 100
+ELSEIF FLAG:レッスン場 == 1 && FLAG:トレーニングルーム == 1
+	LOCAL:1 = LOCAL:1 * (100 + 25) / 100
+ELSEIF FLAG:レッスン場 == 1
+	LOCAL:1 = LOCAL:1 * (100 + 10) / 100
+ENDIF
+
+;難易度補正
+IF FLAG:5 == 0
+	LOCAL:1 = LOCAL:1 * 3 / 2
+ELSEIF FLAG:5 == 2
+	LOCAL:1 = LOCAL:1 * 4 / 5
+ELSEIF FLAG:5 == 3
+	LOCAL:1 = LOCAL:1 * 3 / 4
+ENDIF
+
+;戦闘メンバー人数計算
+LOCAL:4 = 0
+;どうせ全員に経験値を割り振るので、人数によって獲得経験値は変えない
+LOCAL:2 = LOCAL:1
+
+
+;レッスン所があれば控えの獲得量は基準値の50％
+SIF FLAG:レッスン場 == 1
+	LOCAL:3 = LOCAL:1 * 1 / 2
+;合宿所が建っていれば参加メンバーと同じだけ貰える
+SIF FLAG:合宿所 == 1
+	LOCAL:3 = LOCAL:1
+
+;累積経験値加算
+EXP:0:110 += LOCAL:3
+
+;全キャラ分経験値加算
+FOR LOCAL:0, 11, CHARANUM
+	IF (LOCAL:0 != FLAG:リーダー) && (LOCAL:0 != FLAG:メンバー2) && (LOCAL:0 != FLAG:メンバー3) && (LOCAL:0 != FLAG:メンバー4) && (LOCAL:0 != FLAG:メンバー5)
+		;戦闘メンバーで無い場合
+		EXP:(LOCAL:0):110 += LOCAL:3
+	ELSE
+		;戦闘メンバーの場合
+		;装備に経験値アップがある場合は反映
+		EXP:(LOCAL:0):110 += LOCAL:2 * (100 + CFLAG:(LOCAL:0):経験値アップ) / 100
+		PRINTFORML %CALLNAME:(LOCAL:0)%は{(LOCAL:2 * (100 + CFLAG:(LOCAL:0):経験値アップ) / 100)}のEXPを獲得した！
+
+	ENDIF
+NEXT
+

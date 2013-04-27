@@ -1,0 +1,485 @@
+;≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+;偶像調教典（eratohoYMから）
+;≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+;--------------------------------------------------------------------------------------------
+;このファイル内ではネタばれＱ＆Ａについての記述があります。
+;--------------------------------------------------------------------------------------------
+;攻略メモみたいなのもいつか作ってみたいところ。
+;=============================================================================
+;ネタばれＱ＆Ａ
+;=============================================================================
+;システム関係のネタばれを入れる
+;とりあえず作成といった程度。具体的に何を載せるかは未定
+;当然ながら未完成
+@DICTIONARY_NETABARE_QA
+VARSET LOCAL, 0
+;最大ページ数を示す
+LOCAL:1 = 1
+$NETABARE_QA_HELP
+DRAWLINE
+PRINTL 以下eraIm@sJのシステム等に関するＱ＆Ａです。
+PRINTFORML 内容を知りたい項目の番号を入力してください。 ＜page.{LOCAL+1}/{LOCAL:1+1}＞
+PRINTL ※いずれの項目も重度のネタばれを含みます。見る場合はそのつもりで。
+DRAWLINE
+SELECTCASE LOCAL
+	CASE 0
+		PRINTL  [0] Ｑ.押し倒しイベント発生条件
+		PRINTL  [1] Ｑ.助手可能な条件
+		PRINTL  [2] Ｑ.[恋慕]取得条件
+		PRINTL  [3] Ｑ.[親愛]取得条件
+		PRINTL  [4] Ｑ.[淫乱]取得条件
+		PRINTL  [5] Ｑ.[相愛]取得条件
+		PRINTL  [6] Ｑ.エンゲージリング出現条件
+	CASE 1
+		PRINTL [10] Ｑ.【キス魔】取得の条件
+		PRINTL [11] Ｑ.【尻穴狂い】取得の条件
+		PRINTL [12] Ｑ.【淫乳】取得の条件
+		PRINTL [13] Ｑ.【淫核】取得の条件
+		PRINTL [14] Ｑ.【淫壷】取得の条件
+		PRINTL [15] Ｑ.【マゾ】取得の条件
+ENDSELECT
+DRAWLINE
+PRINTFORMLC \@(LOCAL <= 0) ? %" " * 18% # [1001]前のページ\@
+PRINTLC [1000]戻る
+PRINTFORMLC \@(LOCAL >= LOCAL:1) ? %" " * 18% # [1009]後のページ\@
+PRINTL 
+PRINTFORMLC \@(LOCAL <= 9) ? %" " * 20% # [1011]10前のページ\@
+PRINTFORMLC %" " * 10%
+PRINTFORMLC \@(LOCAL >= (LOCAL:1 - 9)) ? %" " * 20% # [1019]10後のページ\@
+PRINTL 
+$INPUT_LOOP
+INPUT
+IF RESULT == 1000
+	RETURN 0
+ELSEIF RESULT == 1001 && LOCAL > 0
+	LOCAL -= 1
+ELSEIF RESULT == 1009 && LOCAL < LOCAL:1
+	LOCAL += 1
+ELSEIF RESULT == 1011 && LOCAL > 9
+	LOCAL -= 10
+ELSEIF RESULT == 1019 && LOCAL < (LOCAL:1 - 9)
+	LOCAL += 10
+ELSEIF RESULT >= 0 && RESULT <= (LOCAL:1+1) * 10
+	TRYCALLFORM DICTIONARY_NETABARE_Q{RESULT}
+ELSE
+	GOTO INPUT_LOOP
+ENDIF
+GOTO NETABARE_QA_HELP
+
+;押し倒しイベント発生条件
+@DICTIONARY_NETABARE_Q0
+PRINTL 【押し倒しイベント発生条件】
+PRINTFORML 日常モードで気力がゼロになった時や[999]で終了した時に、一定条件を満たすと相手に押し倒されそのままウフフモードに入る。
+PRINTFORML 最低条件は【合意】ではないことと、欲望Lv7以上or潤滑のパラメータ3000以上or欲情のパラメータ3000以上or好感度10000以上であること。
+PRINTFORML その上で能力やムードなどによる実行判定（非表示）に成功すればイベントが発生する。
+PRINTFORMW この時酒の勢いなしでも実行値を満たした場合は気力が全回復し、さらに【合意】も取得する。酒の勢い込みで辛うじて満たした場合は気力が半分回復する。
+;助手可能な条件
+@DICTIONARY_NETABARE_Q1
+PRINTL 【助手可能な条件】
+PRINTL 以下のいずれかを達成すればよい。
+PRINTL 
+PRINTL 1：パートナーとの相性が120%以上である。
+PRINTL 2：親密Lv10以上で欲望Lv8以上である。
+PRINTL 3：親密Lv5以上で欲望Lv5以上でレズっ気Lv3以上である。
+PRINTL 4：好感度が1000以上である。
+PRINTW 5：【恋人】である。
+
+;[恋慕]取得条件
+@DICTIONARY_NETABARE_Q2
+PRINTL 【[恋慕]取得条件】
+PRINTL 以下をすべて達成すること。
+PRINTL 
+PRINTL 1：反発感情が0である。
+PRINTL 2：親密Lv10以上であること。
+PRINTW 3：好感度3000以上であること。
+
+;[親愛]取得条件
+@DICTIONARY_NETABARE_Q3
+PRINTL 【[親愛]取得条件】
+PRINTL 以下をすべて達成すること。
+PRINTL 
+PRINTL 1：反発感情が0である。
+PRINTL 2：親密Lv15以上であること。
+PRINTL 3：奉仕精神Lv15以上であること。
+PRINTL 4：【恋慕】と【恋人】であること。
+PRINTL 5：好感度が10000以上であること。
+PRINTW 6：そのキャラの初期状態から異常経験が増えていないこと。
+
+;【淫乱】取得の条件
+@DICTIONARY_NETABARE_Q4
+PRINTL 【【淫乱】取得の条件】
+PRINTL 以下をすべて達成すること。
+PRINTL 
+PRINTL 1：反発感情が0であること。
+PRINTL 2：欲望Lv10以上であること。
+PRINTL 3：異常経験が100以上であること。
+PRINTW 4：そのキャラの初期状態から異常経験が10以上増えていること。
+;[相愛]取得条件
+@DICTIONARY_NETABARE_Q5
+PRINTL 【[相愛]取得条件】
+PRINTL エンゲージリングを渡すと【相愛】を得る。また【一線越えない】がある場合には消失する。
+PRINTL それぞれ特殊な条件を満たしていないと渡せません。
+PRINTW アイテムの出現方法に関してはＱ＆Ａを参照してください。
+
+;エンゲージリング出現条件
+@DICTIONARY_NETABARE_Q6
+PRINTL 【エンゲージリング出現条件】
+PRINTL eraIm@sJではエンゲージリングは渡したい相手との純愛コマンドの[102]プレゼントから選択して渡すようになっているので注意すること。
+PRINTL エンゲージリングを渡すと【相愛】を得る。また【一線越えない】がある場合には消失する。
+PRINTL エンゲージリングを渡しても基本的にはENDINGにはいかないし、ゲームは進んでいく。なお、エンゲージリングを渡すと別れることができなくなる。
+PRINTL 渡せるための条件として以下をすべて達成すること。
+PRINTL 
+PRINTL 1：助手と交代していないこと。
+PRINTL 2：既に誰かにエンゲージリングを渡していないこと。
+PRINTL 3：反発感情が0であること。
+PRINTL 4：【恋慕】と【恋人】であること。
+PRINTL 5：【服従】や【相愛】をもっていないこと。
+PRINTL 6：好感度が8000以上であること。
+PRINTL 7：親密Lvと欲望Lvと技巧Lvと奉仕精神Lvの合計Lvが40以上であること。
+PRINTW 8：資金が1000000以上あること。
+
+;青珊瑚の指輪出現条件
+@DICTIONARY_NETABARE_Q7
+;各純愛イベント発生条件１
+@DICTIONARY_NETABARE_Q8
+;各純愛イベント発生条件２
+@DICTIONARY_NETABARE_Q9
+
+;【キス魔】取得の条件
+@DICTIONARY_NETABARE_Q10
+PRINTL 【【キス魔】取得の条件】
+PRINTL 以下の1～3をすべて達成すること。
+PRINTL 
+PRINTL 1：【尻穴狂い】【淫乳】【淫核】【淫壷】【マゾ】がなく、欲望Lv10以上であること。
+PRINTL 2：親密Lv15以上であること。
+PRINTL 3：技巧Lv10以上であること。
+PRINTW 4：キス経験500以上であること。
+
+
+;【尻穴狂い】取得の条件
+@DICTIONARY_NETABARE_Q11
+PRINTL 【【尻穴狂い】取得の条件】
+PRINTL 以下をすべて達成すること。
+PRINTL 
+PRINTL 1：【キス魔】【淫乳】【淫核】【淫壷】【マゾ】はなく、欲望Lv10以上であること。
+PRINTL 2：Ａ感覚Lv4以上であること。
+PRINTL 3：Ａ経験が150以上であること。
+PRINTL 4：Ａ快楽経験が300以上あること。
+PRINTW 5：今回の調教中にＡ絶頂が30回以上あること。
+
+
+;【淫乳】取得の条件
+@DICTIONARY_NETABARE_Q12
+PRINTL 【【淫乳】取得の条件】
+PRINTL 以下をすべて達成すること。
+PRINTL 
+PRINTL 1：【キス魔】【尻穴狂い】【淫核】【淫壷】【マゾ】はなく、欲望Lv10以上であること。
+PRINTL 2：Ｂ感覚Lv8以上であること。
+PRINTL 3：自慰中毒Lvと露出癖LvがいずれもLv4以上であること。
+PRINTW 4：今回の調教中にＢ絶頂が50回以上あること。
+;【淫核】取得の条件
+@DICTIONARY_NETABARE_Q13
+PRINTL 【【淫核】取得の条件】
+PRINTL 以下をすべて達成すること。
+PRINTL 
+PRINTL 1：【キス魔】【尻穴狂い】【淫乳】【淫壷】【マゾ】はなく、欲望Lv10以上であること。
+PRINTL 2：Ｃ感覚Lv8以上であること。
+PRINTL 3：自慰中毒Lvと露出癖LvがいずれもLv4以上であること。
+PRINTW 4：今回の調教中にＣ絶頂が50回以上あること。
+;【淫壷】取得の条件
+@DICTIONARY_NETABARE_Q14
+PRINTL 【【淫壷】取得の条件】
+PRINTL 以下をすべて達成すること。
+PRINTL 
+PRINTL 1：オトコでないこと。
+PRINTL 2：主人がオトコかふたなりであること。
+PRINTL 3：【キス魔】【尻穴狂い】【淫乳】【淫核】【マゾ】はなく、欲望Lv10以上であること。
+PRINTL 4：Ｖ感覚Lv8以上であること。
+PRINTL 5：Ｖ経験が300以上あること。
+PRINTW 6：今回の調教中にＶ絶頂が50回以上あること。
+;【マゾ】取得の条件
+@DICTIONARY_NETABARE_Q15
+PRINTL 【【マゾ】取得の条件】
+PRINTL 以下をすべて達成すること
+PRINTL 
+PRINTL 1：【キス魔】【尻穴狂い】【淫乳】【淫核】【淫壷】はなく、欲望Lv10以上であること。
+PRINTL 2：マゾっ気Lvと露出癖LvがいずれもLv6以上であること。
+PRINTL 3：苦痛依存が3以上であること。
+PRINTL 4：緊縛経験と苦痛快楽経験がいずれも150以上であること。
+PRINTL 5：異常経験が100以上であること。
+PRINTW 6：今回の調教中に苦痛のパラメーターが30000以上あること。
+
+;秘密の道具屋出現条件
+@DICTIONARY_NETABARE_Q16
+;薬屋出現条件
+@DICTIONARY_NETABARE_Q17
+;料理・歌唱コマンド出現条件
+@DICTIONARY_NETABARE_Q18
+;[妄信]取得条件
+@DICTIONARY_NETABARE_Q19
+;[淫乱]取得条件
+@DICTIONARY_NETABARE_Q20
+;淫乱系(部位開発系)素質取得条件
+@DICTIONARY_NETABARE_Q21
+;[即落ち]取得条件
+@DICTIONARY_NETABARE_Q22
+;淫乱系素質同時全取得条件
+@DICTIONARY_NETABARE_Q23
+;[淫魔]取得条件
+@DICTIONARY_NETABARE_Q24
+;[両刀]取得条件
+@DICTIONARY_NETABARE_Q25
+;[人気]取得条件
+@DICTIONARY_NETABARE_Q26
+;[おもらし癖]取得条件
+@DICTIONARY_NETABARE_Q27
+;[精愛味覚]取得条件
+@DICTIONARY_NETABARE_Q28
+;[媚薬中毒]取得条件
+@DICTIONARY_NETABARE_Q29
+;[服従]取得条件
+@DICTIONARY_NETABARE_Q30
+;[隷属]取得条件
+@DICTIONARY_NETABARE_Q31
+;[烙印]取得条件
+@DICTIONARY_NETABARE_Q32
+;[傷物]取得条件
+@DICTIONARY_NETABARE_Q33
+;[使い魔]取得条件
+@DICTIONARY_NETABARE_Q34
+;赤い首輪出現条件
+@DICTIONARY_NETABARE_Q35
+;空晶石の首輪出現条件
+@DICTIONARY_NETABARE_Q36
+;隷属の証出現条件
+@DICTIONARY_NETABARE_Q37
+;使い魔の契約実行条件
+@DICTIONARY_NETABARE_Q38
+;[烙印]用特殊装備について
+@DICTIONARY_NETABARE_Q39
+;[幼児退行]取得条件
+@DICTIONARY_NETABARE_Q40
+;[狂気]取得方法～その１
+@DICTIONARY_NETABARE_Q41
+;[狂気]取得方法～その２
+@DICTIONARY_NETABARE_Q42
+;[精神崩壊]取得条件
+@DICTIONARY_NETABARE_Q43
+;[傀儡]取得条件
+@DICTIONARY_NETABARE_Q44
+;[壊造人格]取得条件
+@DICTIONARY_NETABARE_Q45
+@DICTIONARY_NETABARE_Q46
+@DICTIONARY_NETABARE_Q47
+@DICTIONARY_NETABARE_Q48
+@DICTIONARY_NETABARE_Q49
+;青珊瑚の指輪による素質変化
+@DICTIONARY_NETABARE_Q50
+;空晶石の首輪による素質変化
+@DICTIONARY_NETABARE_Q51
+;隷属の証による素質変化
+@DICTIONARY_NETABARE_Q52
+;灰の飴玉による素質変化
+@DICTIONARY_NETABARE_Q53
+;記憶消去薬関連～その１
+@DICTIONARY_NETABARE_Q54
+;記憶消去薬関連～その２
+@DICTIONARY_NETABARE_Q55
+;黒の飴玉によりEX化できるキャラ
+@DICTIONARY_NETABARE_Q56
+@DICTIONARY_NETABARE_Q57
+@DICTIONARY_NETABARE_Q58
+@DICTIONARY_NETABARE_Q59
+;ストレスによる気力回復への影響
+@DICTIONARY_NETABARE_Q60
+;ストレス負荷による[解放]消失イベント
+@DICTIONARY_NETABARE_Q61
+;ルーチンワーク調教に対する奴隷の不満
+@DICTIONARY_NETABARE_Q62
+;奴隷の異名取得処理
+@DICTIONARY_NETABARE_Q63
+;奴隷の異名取得条件～その１
+@DICTIONARY_NETABARE_Q64
+;奴隷の異名取得条件～その２
+@DICTIONARY_NETABARE_Q65
+;トリオライブ
+@DICTIONARY_NETABARE_Q66
+;集団風呂イベント
+@DICTIONARY_NETABARE_Q67
+;集団風呂イベントでの組み合わせ
+@DICTIONARY_NETABARE_Q68
+@DICTIONARY_NETABARE_Q69
+;引継ぎ時に主人が新しい素質を獲得するための条件
+@DICTIONARY_NETABARE_Q70
+;引継ぎ時に主人の種族を変更するための条件
+@DICTIONARY_NETABARE_Q71
+;主人の次周への引継ぎについて
+@DICTIONARY_NETABARE_Q72
+;資金、蒐集品、触手、風呂の次周への引継ぎについて
+@DICTIONARY_NETABARE_Q73
+;助手を引き継ぐための条件
+@DICTIONARY_NETABARE_Q74
+;助手の引継ぎ可能人数
+@DICTIONARY_NETABARE_Q75
+;助手の次周への引継ぎについて
+@DICTIONARY_NETABARE_Q76
+@DICTIONARY_NETABARE_Q77
+@DICTIONARY_NETABARE_Q78
+@DICTIONARY_NETABARE_Q79
+;主人の料理技能上昇
+@DICTIONARY_NETABARE_Q80
+;主人の撮影技能上昇
+@DICTIONARY_NETABARE_Q81
+;主人の歌唱技能上昇
+@DICTIONARY_NETABARE_Q82
+;主人の調教師Lv上昇
+@DICTIONARY_NETABARE_Q83
+;主人の技巧Lv上昇
+@DICTIONARY_NETABARE_Q84
+;主人の禁断の知識習得費用
+@DICTIONARY_NETABARE_Q85
+;種族転生儀式イベント実行条件
+@DICTIONARY_NETABARE_Q86
+;種族転生儀式イベントの対象者
+@DICTIONARY_NETABARE_Q87
+;種族転生儀式イベントの結果と代償
+@DICTIONARY_NETABARE_Q88
+;魔法儀式イベント
+@DICTIONARY_NETABARE_Q89
+;主人調教経験によるソース修整
+@DICTIONARY_NETABARE_Q90
+;調教における好感度変化のキャップ処理
+@DICTIONARY_NETABARE_Q91
+;快感増加パッチによる処理
+@DICTIONARY_NETABARE_Q92
+;残り気力によるパラメーター補正処理
+@DICTIONARY_NETABARE_Q93
+;欲情パラメーターによるパラメーター補正処理
+@DICTIONARY_NETABARE_Q94
+;抑鬱パラメーターによるパラメーター補正処理
+@DICTIONARY_NETABARE_Q95
+;酒酔いによるパラメーター上昇下降補正
+@DICTIONARY_NETABARE_Q96
+;キャラ購入時に表示されるランクの基準
+@DICTIONARY_NETABARE_Q97
+@DICTIONARY_NETABARE_Q98
+@DICTIONARY_NETABARE_Q99
+;触手を寄生させるには
+@DICTIONARY_NETABARE_Q100
+;寄生触手を使ってできること
+@DICTIONARY_NETABARE_Q101
+;寄生触手による体質変化～その１
+@DICTIONARY_NETABARE_Q102
+;寄生触手による体質変化～その２
+@DICTIONARY_NETABARE_Q103
+;触手錬金
+@DICTIONARY_NETABARE_Q104
+;触手漬けとその条件
+@DICTIONARY_NETABARE_Q105
+;触手漬けによる対象奴隷の変化
+@DICTIONARY_NETABARE_Q106
+;触手幽閉とその条件
+@DICTIONARY_NETABARE_Q107
+;触手幽閉による対象奴隷の変化
+@DICTIONARY_NETABARE_Q108
+;触手幽閉による奴隷取り込みイベント
+@DICTIONARY_NETABARE_Q109
+;触手生贄とその条件
+@DICTIONARY_NETABARE_Q110
+;触手繁殖(触手種付)
+@DICTIONARY_NETABARE_Q111
+;触手種付による対象奴隷の変化
+@DICTIONARY_NETABARE_Q112
+;触手出産による対象奴隷の変化
+@DICTIONARY_NETABARE_Q113
+;触手寄生LVにいて
+@DICTIONARY_NETABARE_Q114
+;触手インプラントについて
+@DICTIONARY_NETABARE_Q115
+@DICTIONARY_NETABARE_Q116
+@DICTIONARY_NETABARE_Q117
+@DICTIONARY_NETABARE_Q118
+@DICTIONARY_NETABARE_Q119
+;刻印取得による従順上昇
+@DICTIONARY_NETABARE_Q120
+;反発刻印取得による従順低下
+@DICTIONARY_NETABARE_Q121
+;絶頂とは
+@DICTIONARY_NETABARE_Q122
+;部位別絶頂における絶頂強度
+@DICTIONARY_NETABARE_Q123
+;多重絶頂とは
+@DICTIONARY_NETABARE_Q124
+;部位別絶頂に伴うソースや体力気力処理
+@DICTIONARY_NETABARE_Q125
+;部位別絶頂に伴う欲望Lvアップ～その１
+@DICTIONARY_NETABARE_Q126
+;部位別絶頂に伴う欲望Lvアップ～その２
+@DICTIONARY_NETABARE_Q127
+@DICTIONARY_NETABARE_Q128
+@DICTIONARY_NETABARE_Q129
+;ガーデニングアイテムの詳しい効果～その1
+@DICTIONARY_NETABARE_Q130
+;ガーデニングアイテムの詳しい効果～その２
+@DICTIONARY_NETABARE_Q131
+;ストレス低下処理について
+@DICTIONARY_NETABARE_Q132
+;助手のターン終了時のお手伝い処理について
+@DICTIONARY_NETABARE_Q133
+;助手および助手可能な場合の回復力について
+@DICTIONARY_NETABARE_Q134
+;料理技能による回復量の違いについて
+@DICTIONARY_NETABARE_Q135
+@DICTIONARY_NETABARE_Q136
+@DICTIONARY_NETABARE_Q137
+@DICTIONARY_NETABARE_Q138
+@DICTIONARY_NETABARE_Q139
+;相性限界値について～その1
+@DICTIONARY_NETABARE_Q140
+;相性限界値について～その2
+@DICTIONARY_NETABARE_Q141
+;相性限界値について～その3
+@DICTIONARY_NETABARE_Q142
+;グッドエンディングの後は？
+@DICTIONARY_NETABARE_Q143
+;[鵺]の素質変動
+@DICTIONARY_NETABARE_Q144
+;お香を利用するために必要なもの
+@DICTIONARY_NETABARE_Q145
+;お香の開発と生産担当者資格について
+@DICTIONARY_NETABARE_Q146
+@DICTIONARY_NETABARE_Q147
+@DICTIONARY_NETABARE_Q148
+@DICTIONARY_NETABARE_Q149
+;調教時のＡ快楽経験獲得について
+@DICTIONARY_NETABARE_Q150
+;調教時のＢ快楽経験獲得について
+@DICTIONARY_NETABARE_Q151
+;調教時の奉仕快楽経験獲得について
+@DICTIONARY_NETABARE_Q152
+;調教時の露出快楽経験獲得について
+@DICTIONARY_NETABARE_Q153
+;調教時の苦痛快楽経験獲得について
+@DICTIONARY_NETABARE_Q154
+;調教時のＳＭ教育経験獲得について
+@DICTIONARY_NETABARE_Q155
+;調教時のその他経験獲得について
+@DICTIONARY_NETABARE_Q156
+;奉仕快楽調教フラグのある調教コマンド
+@DICTIONARY_NETABARE_Q157
+;露出快楽調教フラグのある調教コマンド
+@DICTIONARY_NETABARE_Q158
+;ＳＭ教育経験フラグのある調教コマンド
+@DICTIONARY_NETABARE_Q159
+@DICTIONARY_NETABARE_Q160
+@DICTIONARY_NETABARE_Q161
+@DICTIONARY_NETABARE_Q162
+@DICTIONARY_NETABARE_Q163
+@DICTIONARY_NETABARE_Q164
+@DICTIONARY_NETABARE_Q165
+@DICTIONARY_NETABARE_Q166
+@DICTIONARY_NETABARE_Q167
+@DICTIONARY_NETABARE_Q168
+@DICTIONARY_NETABARE_Q169
+@DICTIONARY_NETABARE_QX
+

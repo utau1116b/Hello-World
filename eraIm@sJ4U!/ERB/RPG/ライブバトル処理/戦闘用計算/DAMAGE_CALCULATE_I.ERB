@@ -1,0 +1,157 @@
+;ダメージ計算
+
+;物理ダメージ計算
+;ARG:0	攻撃側キャラ番号
+;ARG:1	防御側キャラ番号
+;ARG:2	倍率
+;R:0	攻撃命中回数を返す
+;R:1	ダメージを返す
+@CALCULATE_DAMAGE_I(ARG:0, ARG:1, ARG:2)
+;LOCAL
+;0	LOOP
+;1	HIT COUNT
+;2	DAMAGE
+;3	属性倍率
+;4	防御倍率
+;5	攻撃回数
+;6	命中率
+;7	クリティカル
+;8	攻撃力
+;9	防御力
+;10	除算防御
+;11	属性タイプ
+;20	倍率一時記憶
+
+
+;初期化
+LOCAL:1 = 0
+LOCAL:2 = 0
+LOCAL:3 = 0
+LOCAL:4 = 100
+LOCAL:5 = 0
+LOCAL:6 = 0
+LOCAL:7 = 0
+LOCAL:8 = 0
+LOCAL:9 = 0
+LOCAL:10 = 0
+LOCAL:11 = 0
+
+
+SIF TFLAG:防御半分無視
+	LOCAL:4 = 50
+SIF TFLAG:防御無視
+	LOCAL:4 = 0
+	
+;変数を初期化
+LOCAL:0 = 100
+
+;クリティカル判定
+IF RAND:100 < (BASE:(ARG:0):ベースクリティカル) || CFLAG:(ARG:0):クリティカル状態 >= 10
+	PRINTFORML CRITICAL！！
+	LOCAL:7 = 1
+	;LOCAL:4 /= 2
+ENDIF
+
+;基本ダメージはアイテムに設定されている物を使う
+LOCAL:2 = TFLAG:アイテム基本ダメージ
+
+;計算用に100倍
+LOCAL:2 *= 100
+
+;防御中は0.4倍
+IF CFLAG:(ARG:1):ガード状態
+	TIMES LOCAL:2, 0.40
+ENDIF
+
+;属性倍率を取得
+FOR LOCAL:0, 0, 10
+	IF TFLAG:(LOCAL:0 + 1090)
+		;該当する属性を持っていれば、属性倍率計算
+		LOCAL:20 = (100 - CFLAG:(ARG:1):(LOCAL:0 + 1248))
+
+		IF LOCAL:20 > LOCAL:3
+			;その属性の倍率の方が高い場合、倍率更新
+			LOCAL:3 = LOCAL:20
+			LOCAL:11 = LOCAL:0
+		ENDIF
+	ENDIF
+NEXT
+
+IF LOCAL:3 == 0
+	LOCAL:3 = 100
+ENDIF
+
+;属性倍率反映
+LOCAL:2 = LOCAL:2 * LOCAL:3 / 100
+
+;攻撃回数はとりあえず1回
+LOCAL:5 = 1
+
+;命中率は100%
+LOCAL:6 = 100
+
+FOR LOCAL:0, 0, LOCAL:5
+	IF RAND:100 < LOCAL:6
+		;命中判定に成功した場合、命中回数+1
+		LOCAL:1 += 1
+	ENDIF
+NEXT
+	
+;ダメージを命中回数分だけ倍にする
+LOCAL:2 *= LOCAL:1
+
+
+;クリティカルなら更に1.5倍
+SIF LOCAL:7
+	LOCAL:2 = LOCAL:2 * 3 / 2
+
+;寝ている場合は威力2倍
+IF CFLAG:(ARG:1):スリープ状態
+	LOCAL:2 *= 2
+ENDIF
+;防御側の半減効果
+;IF CFLAG:(ARG:1):アピール半減状態
+;	LOCAL:2 /= 2
+;ENDIF
+
+;全力防御による軽減
+;IF CFLAG:(ARG:1):全力ガード状態
+;	LOCAL:2 /= (CFLAG:(ARG:1):全力ガード状態 * 2)
+;ENDIF
+;半減状態
+;IF CFLAG:(ARG:1):半減状態
+;	LOCAL:2 /= 2
+;ENDIF
+;四半減状態
+;IF CFLAG:(ARG:1):四半減状態
+;	LOCAL:2 /= 4
+;ENDIF
+;バーストアピール状態
+IF CFLAG:(ARG:0):バーストアピール状態
+	LOCAL:2 *= 2
+ENDIF
+
+;忘れずに100で÷
+LOCAL:2 /= 100
+
+;乱数分を計算(±5%を2回足す　最終的には中央値が出やすい±10%)
+IF TFLAG:乱数無視 == 0
+	LOCAL:2 = LOCAL:2 * (1050 - RAND:101) / 1000
+	LOCAL:2 = LOCAL:2 * (1050 - RAND:101) / 1000
+ENDIF
+
+
+;命中回数に応じて最低ダメージ保障(主に対ののわ用)
+IF LOCAL:2 < 1 && LOCAL:1 > 0
+	;命中しているのに1未満のダメージの場合、4HITごとに+1ダメージの補正を入れる
+	LOCAL:2 = LOCAL:1 / 4 + 1
+ENDIF
+
+
+;戻り値を入れる
+R:0 = LOCAL:1
+R:1 = LOCAL:2
+
+RETURN
+
+	

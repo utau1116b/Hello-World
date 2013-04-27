@@ -1,0 +1,86 @@
+@GET_SUCCESS_RATE
+#FUNCTION
+VARSET LOCAL
+;従順
+LOCAL += ABL:親密 * 5
+LOCAL += GETPALAMLV(PALAM:恭順,5) * 3
+
+;反抗的
+SIF TALENT:反抗的
+	LOCAL -= 5
+	
+;素直
+SIF TALENT:素直
+	LOCAL += 5
+	
+;気丈
+SIF TALENT:気丈
+	LOCAL -= 5
+
+;プライド高い
+SIF TALENT:プライド高い
+	LOCAL -= 15
+;プライド低い
+SIF TALENT:プライド低い
+	LOCAL += 5
+;目立ちたがり
+SIF TALENT:目立ちたがり
+	LOCAL += 2
+;抑圧
+SIF TALENT:抑圧
+	LOCAL -= 10
+;抵抗
+SIF TALENT:抵抗
+	LOCAL -= 10
+;即落ち
+SIF TALENT:即落ち
+	LOCAL += 10
+;性別嗜好
+;SIF (TALENT:男嫌い && !(TALENT:PLAYER:オトコ)) || (TALENT:性別嗜好 & 2 && TALENT:PLAYER:オトコ)
+;	LOCAL -= 7
+;男嫌い
+SIF TALENT:男嫌い && TALENT:PLAYER:オトコ
+	LOCAL -= 7
+
+;調教者の素質
+;魅惑
+SIF TALENT:PLAYER:魅惑
+	LOCAL += 6
+;謎の魅力
+SIF TALENT:PLAYER:謎の魅力
+	LOCAL += 6
+
+;相性チェック
+R = NO:PLAYER
+IF RELATION:R > 0 && RELATION:R < 30
+	LOCAL -= 10
+ELSEIF RELATION:R > 0 && RELATION:R < 70
+	LOCAL -= 6
+ELSEIF RELATION:R > 0 && RELATION:R < 100
+	LOCAL -= 3
+ELSEIF RELATION:R >= 100 && RELATION:R < 130
+	LOCAL += 3
+ELSEIF RELATION:R >= 100 && RELATION:R < 170
+	LOCAL += 6
+ELSEIF RELATION:R >= 100 && RELATION:R >= 170
+	LOCAL += 10
+ENDIF
+
+;好感度
+LOCAL += CFLAG:好感度 / 50
+
+;恋慕
+SIF TALENT:恋慕
+	LOCAL += 20
+;恋人
+SIF TALENT:恋人
+	LOCAL += 20
+;親愛
+SIF TALENT:親愛
+	LOCAL += 40
+;LOCAL += (CFLAG:MASTER:310 - CFLAG:TARGET:310) / 500
+
+SIF LOCAL < 0
+	LOCAL = 0
+
+RETURNF LOCAL

@@ -1,0 +1,203 @@
+@MESSAGE, ARGS, ARGS:1, ARGS:2 = "/" , ARG:2 = 1 , ARGS:3 = "LEFT" , ARGS:4 = "再利用しない" ,  ARG = 72, ARG:1 = -1 , ARGS:5 = "TYPE" , ARG:3 = 10 , ARG:4 = -1
+#DIMS 保存文字列 , 50
+#DIM 色 , 3
+#DIMS 表示文字列
+#DIMS 前回ARGS
+#DIM 前回ARG
+#DIM LINE
+REDRAW 0
+;ARGS 喋る人
+;ARGS:1 メッセージ内容
+;ARGS:2 メッセージを区切る文字列
+;ARG 1行の幅
+;ARG:1 行数
+;ARG:2 ログ残し
+;ARGS:4 再利用表示
+;ARGS:3 LEFT / CENTER / RIGHT
+;ARGS:5 タイプ風アニメ　/　フェードイン
+;ARG:3 フェードインの場合の、1行当たりの表示時間(*1/10sec)
+;ARG:4 フェードインの場合の最終的な文字色
+LINE = LINECOUNT
+FLAG:メッセージ速度 = MAX(1, FLAG:メッセージ速度)
+
+SIF ARGS:5 == "FADE"
+	色:0 = GETCOLOR()
+SIF ARGS:5 == "FADE" && ARG:4 == -1
+	色:1 = 色:0
+IF FLAG:口上文字色使用
+	CALL NAMECOLOR(ARGS)
+	CALL SET_COLOR(RESULT)
+	SIF ARGS:5 == "FADE"
+		色:0 = SET_COLOR_FUNC(RESULT)
+	SIF ARGS:5 == "FADE" && ARG:4 == -1
+		色:1 = 色:0
+ENDIF
+;名前部分の字数を偶数にする
+SIF STRLENS(ARGS) % 2
+	ARGS += " "
+
+;ARGS:4が"再利用"で有る場合、前回のメッセージボックスの中身をそのまま使う
+IF ARGS:4 == "再利用"
+	ARGS:1 = %前回ARGS%%ARGS:2%%ARGS:1%
+	ARG = MAX(ARG , 前回ARG)
+	IF ARGS:5 == "TYPE"
+		LOCAL = LOCAL:3 - FLAG:メッセージ速度
+	ELSEIF ARGS:5 == "FADE"
+		LOCAL = LOCAL:4 * ARG:3 -1
+	ENDIF
+ELSE
+	VARSET LOCALS , ""
+	LOCAL = - 1
+	;文字列の長さ合計をチェック
+	;LOCAL:4 表示済みの行数
+	LOCAL:4 = 0
+	;LOCAL:5 前行までの文字列の長さ合計
+	LOCAL:5 = 0
+ENDIF
+VARSET 保存文字列
+SPLIT ARGS:1 , ARGS:2 , 保存文字列
+
+;文字幅計算
+FOR LOCAL:1 , 0 , 50
+	ARG = MAX(ARG , STRLENS(保存文字列:(LOCAL:1)))
+NEXT
+
+
+;行数計算
+;ARGS:1内のARGS:2が有る個数+1が行になるはず
+LOCAL:2 = STRCOUNT(ARGS:1, ARGS:2)
+;引数として渡されている場合は変更なし
+SIF ARG:1 == -1
+	ARG:1 = LOCAL:2 + 1
+
+;文字数計算
+LOCAL:3 = STRLENSU(ARGS:1) - STRLENSU(ARGS:2) * LOCAL:2
+
+SELECTCASE ARGS:3
+	CASE "RIGHT"
+		ALIGNMENT RIGHT
+	CASE "CENTER"
+		ALIGNMENT CENTER
+	CASEELSE
+		ALIGNMENT LEFT
+ENDSELECT
+
+RESULTS = -1
+WHILE ( ARGS:5 == "FADE" ? (LOCAL:2+1) * ARG:3 # LOCAL:3 + FLAG:メッセージ速度) > LOCAL
+	IF ARGS:5 != "FADE"
+		LOCAL += FLAG:メッセージ速度
+	ELSE
+		LOCAL++
+	ENDIF
+	IF ARGS:5 == "TYPE"
+		WHILE LOCAL - LOCAL:5 >= STRLENSU(保存文字列:(LOCAL:4)) && LOCAL:4 < LOCAL:2+1
+			LOCALS:(LOCAL:4) = %保存文字列:(LOCAL:4)%
+			LOCAL:5 += STRLENSU(保存文字列:(LOCAL:4))
+			LOCAL:4 ++
+		WEND
+	ELSEIF ARGS:5 == "FADE"
+		WHILE LOCAL >= (LOCAL:4+1) * ARG:3
+			LOCAL:5 += STRLENSU(保存文字列:(LOCAL:4))
+			LOCAL:4 ++
+		WEND
+	ENDIF
+
+	CLEARLINE LINECOUNT - LINE
+	;右クリックorクリックorEnterを押していると残りも全部表示する
+	IF MOUSESKIP() || RESULTS != "-1"
+		LOCAL = (ARGS:5 != "FADE" ? LOCAL:3 # (LOCAL:2+1) * ARG:3 )
+		LOCAL:5 = LOCAL:3
+		LOCAL:4 = LOCAL:2+1
+		FOR LOCAL:1 , 0 , ARG:1
+			LOCALS:(LOCAL:1) = %保存文字列:(LOCAL:1)%
+		NEXT
+	ENDIF
+	;名前と上側を表示
+	PRINTBUTTON "┌" + ARGS + "─" * ((ARG - STRLENS(ARGS)+1) / 2) + "┐" , "-1"
+	PRINTL
+	;SPLIT ARGS:1, ARGS:2 , RESULTS
+	
+	;最新の行の中身を入力
+	IF ARGS:5 == "TYPE"
+		LOCALS:(LOCAL:4) = %SUBSTRINGU(保存文字列:(LOCAL:4) , 0 , LOCAL - LOCAL:5)%
+	ELSE
+		LOCALS:(LOCAL:4) = %保存文字列:(LOCAL:4)%
+	ENDIF
+	
+	;体裁整え+表示
+	FOR LOCAL:1, 0, ARG:1
+		;IF LOCAL:1 <= LOCAL:4
+			PRINTBUTTON "│" , "0"
+			IF ARGS:5 == "FADE" && LOCAL:1 == LOCAL:4
+				色:2 = LOCAL - LOCAL:4 * MAX(ARG:3 , 1)
+				SETCOLOR 色:1 / POWER(256 , 2) * 色:2 / MAX(ARG:3 , 1) , 色:1 / 256 % 256 * 色:2 / MAX(ARG:3 , 1) , 色:1 % 256 * 色:2 / MAX(ARG:3 , 1)
+			ELSEIF ARGS:5 == "FADE"
+				SETCOLOR 色:1
+			ENDIF
+			SELECTCASE ARGS:3
+				CASE "RIGHT"
+					PRINTBUTTON @"%LOCALS:(LOCAL:1),ARG,LEFT%", "0"
+				CASE "CENTER"
+					IF LOCAL:1 <= LOCAL:4
+						;LOCAL:7 LOCALS:(LOCAL:1)の左側のスペースを計算しておくもの
+						LOCAL:7 = (ARG - STRLENS(保存文字列:(LOCAL:1)))/2
+						PRINTBUTTON " " * LOCAL:7 + LOCALS:(LOCAL:1) + " " * (ARG - STRLENS(LOCALS:(LOCAL:1)) - LOCAL:7), "0"
+					ELSE
+						PRINTBUTTON " " * ARG , "0"
+					ENDIF
+				CASEELSE
+					PRINTBUTTON @"%LOCALS:(LOCAL:1),ARG,LEFT%" , "0"
+			ENDSELECT
+			SIF ARGS:5 == "FADE"
+				SETCOLOR 色:0
+			PRINTBUTTON "│" , "0"
+		;ENDIF
+		;PRINTBUTTON "│" + LOCALS:(LOCAL:1) + "│" , "0"
+		PRINTL
+	NEXT
+	;下表示
+	PRINTBUTTON @"└%"─"*(ARG/2)%┘" , 0
+	PRINTL
+	
+	;右クリックorクリックorEnterを押しているとここで抜ける
+	IF MOUSESKIP() || RESULTS != "-1"
+		REDRAW 1
+		BREAK
+	ENDIF
+	;入力関係
+	TINPUTS 100, "-1" , 0
+	CLEARLINE (RESULTS == "-1" ? 2 # 1)
+	
+	;IF ARGS:5 != "FADE"
+	;	LOCAL += FLAG:メッセージ速度
+	;ELSE
+	;	LOCAL++
+	;ENDIF
+	;IF ARGS:5 == "TYPE"
+	;	WHILE LOCAL - LOCAL:5 >= STRLENSU(保存文字列:(LOCAL:4)) && LOCAL:4 < LOCAL:2+1
+	;		LOCALS:(LOCAL:4) = %保存文字列:(LOCAL:4)%
+	;		LOCAL:5 += STRLENSU(保存文字列:(LOCAL:4))
+	;		LOCAL:4 ++
+	;	WEND
+	;ELSEIF ARGS:5 == "FADE"
+	;	WHILE LOCAL >= (LOCAL:4+1) * ARG:3
+	;		LOCAL:5 += STRLENSU(保存文字列:(LOCAL:4))
+	;		LOCAL:4 ++
+	;	WEND
+	;ENDIF
+WEND
+前回ARGS = %ARGS:1%
+前回ARG = ARG
+;LOCAL:4 = ARG:1
+SIF RESULTS == "-1"
+	WAIT
+SIF (MOUSESKIP() || RESULTS != "-1") && FLAG:メッセージ送り時ウェイト時間
+	TWAIT FLAG:メッセージ送り時ウェイト時間, 1
+IF !ARG:2
+	REDRAW 0
+	CLEARLINE LINECOUNT - LINE
+ENDIF
+ALIGNMENT LEFT
+RESETCOLOR
+REDRAW 1
+

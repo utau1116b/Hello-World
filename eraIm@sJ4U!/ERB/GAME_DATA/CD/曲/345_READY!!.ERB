@@ -1,0 +1,33 @@
+;345	READY!!
+
+;1, VO2, VI3, DA
+@曲タイプ_45
+
+RETURN 1
+
+;曲説明を表示
+@曲説明_45
+DRAWLINE
+PRINTFORML %SONGNAME:45%
+DRAWLINE
+
+;VOの上昇値
+@VO_45
+
+RETURN 8 * 5 * 100
+
+;VIの上昇値
+@VI_45
+
+RETURN 0 * 5 * 100
+
+;DAの上昇値
+@DA_45
+
+RETURN 2 * 5 * 100
+
+;曲のBMP
+@BPM_45
+
+RETURN 174
+

@@ -1,0 +1,370 @@
+;-------------------------------------------------
+;関数名:INSERT_V
+;概　要:Vに誰(何)が挿入中か調べる
+;引　数:ARG…キャラ登録番号
+;		ARG:1…0=キャラの部位 1=道具
+;戻り値:部位に格納されてる数値
+;備　考:文中関数
+;使用例:INSERT_V(TARGET, 1) 
+;-------------------------------------------------
+@INSERT_V(ARG, ARG:1)
+#FUNCTION
+IF ARG:1
+
+ELSE
+	LOCAL = INSERT(ARG, "V")
+	SIF LOCAL < 1000
+		RETURNF -1
+	RETURNF LOCAL%1000
+ENDIF
+RETURNF -1
+;-------------------------------------------------
+;関数名:INSERT_A
+;概　要:Aに誰(何)が挿入中か調べる
+;引　数:ARG…キャラ登録番号
+;		ARG:1…0=キャラの部位 1=道具
+;戻り値:部位に格納されてる数値
+;備　考:文中関数
+;使用例:INSERT_V(TARGET, 1) 
+;-------------------------------------------------
+@INSERT_A(ARG, ARG:1)
+#FUNCTION
+IF ARG:1
+
+ELSE
+	LOCAL = INSERT(ARG, "A")
+	SIF LOCAL < 1000
+		RETURNF -1
+	RETURNF LOCAL%1000
+ENDIF
+RETURNF -1
+;-------------------------------------------------
+;関数名:INSERT
+;概　要:調べたい部位に何が挿入中か調べる
+;引　数:ARG…キャラ登録番号
+;		ARGS…挿入部位
+;		ARG:1…0=キャラの部位 1=道具
+;戻り値:部位に格納されてる数値
+;備　考:文中関数
+;使用例:INSERT(TARGET, "V") 
+;-------------------------------------------------
+@INSERT(ARG,ARGS,ARG:1)
+#FUNCTION
+SELECTCASE ARGS
+	CASE "V","Ｖ","膣","ヴァギナ"
+		LOCALS = 膣
+	CASE "A","Ａ","アナル","アヌス"
+		LOCALS = アナル
+	CASE "C","Ｃ","クリトリス","陰核"
+		LOCALS = クリトリス
+	CASE "B","Ｂ","胸","バスト","乳首"
+		LOCALS = 胸
+	CASE "M","Ｍ","口","口内","口腔"
+		LOCALS = 口
+ENDSELECT
+RETURNF TCVAR:ARG:LOCALS
+
+@IS_ZURASI(ARG)
+#FUNCTION
+SIF CHECK_BOTTOM(ARG,2)
+	RETURNF 1
+RETURNF 0
+
+;-------------------------------------------------
+;関数名:CHECK_BOTTOM
+;概　要:捲くり可能か？などを調べる
+;引　数:ARG…キャラ登録番号
+;		ARG:1…0,半脱ぎ 1,捲くり 2,ずらし
+;戻り値:捲くり等可能なら1を返す
+;備　考:文中関数
+;使用例:CHECK_BOTTOM(TARGET, 1) 捲くり可か調べる 
+;-------------------------------------------------
+@CHECK_BOTTOM(ARG,ARG:1)
+#FUNCTION
+;水着の半脱ぎはどうする？
+;0:ズボン着用中
+;1:下着をつけていない、スカート着用中
+;2:下着をつけている、ボトムスはスカートか何も履いていない時。またはずらせるコスプレ
+;3,下半身に何かつけている
+;4:ツッコミ不可能
+;5:脱ぎレベル
+VARSET LOCAL
+SELECTCASE ARG:1
+	CASE 0
+		IF TEQUIP:ARG:コスプレ服
+			SELECTCASE EQUIP:ARG:コスプレ服
+				CASE 1, 3, 18
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+		IF TEQUIP:ARG:ボトムス
+			SELECTCASE EQUIP:ARG:ボトムス
+				CASE 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 17
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+		IF TEQUIP:ARG:上下一体服
+			SELECTCASE EQUIP:ARG:上下一体服
+				CASE 2, 3, 5, 6, 
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+	CASE 1
+		IF TEQUIP:ARG:コスプレ服
+			SELECTCASE EQUIP:ARG:コスプレ服
+				CASE 2, 8, 9, 11, 12, 14, 15, 16, 19, 20, 22
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+		SIF TEQUIP:ARG:下着（下） || TEQUIP:ARG:下着（上下一体）
+			RETURNF 0
+		IF TEQUIP:ARG:ボトムス
+			SELECTCASE EQUIP:ARG:ボトムス
+				CASE 1, 7, 15, 16
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+		IF TEQUIP:ARG:上下一体服
+			SELECTCASE EQUIP:ARG:上下一体服
+				CASE 1, 4, 15, 16, 18
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+	CASE 2
+		IF TEQUIP:ARG:コスプレ服
+			SELECTCASE EQUIP:ARG:コスプレ服
+				CASE 4, 5, 6, 10, 13, 21
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+		SIF !TEQUIP:ARG:下着（下） && !TEQUIP:ARG:下着（上下一体）
+			RETURNF 0
+		SIF !TEQUIP:ARG:コスプレ服 && !TEQUIP:ARG:ボトムス && !TEQUIP:ARG:上下一体服
+			RETURNF 1
+		IF TEQUIP:ARG:ボトムス
+			SELECTCASE EQUIP:ARG:ボトムス
+				CASE 1, 7, 15, 16
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+		IF TEQUIP:ARG:上下一体服
+			SELECTCASE EQUIP:ARG:上下一体服
+				CASE 1, 4, 15, 16, 18
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+	;ミスった…5の返り値1で調べられた
+	CASE 3
+		SIF TEQUIP:ARG:下着（下） || TEQUIP:ARG:下着（上下一体） || TEQUIP:ARG:ボトムス || TEQUIP:ARG:上下一体服 || TEQUIP:ARG:コスプレ服
+			RETURNF 1
+		RETURNF 0
+	CASE 4
+		IF TEQUIP:ARG:コスプレ服
+			SELECTCASE EQUIP:ARG:コスプレ服
+				CASE 1, 3, 18
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+		IF TEQUIP:ARG:ボトムス
+			SELECTCASE EQUIP:ARG:ボトムス
+				CASE 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 17
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+		IF TEQUIP:ARG:上下一体服
+			SELECTCASE EQUIP:ARG:上下一体服
+				CASE 2, 3, 5, 6, 
+					RETURNF 1
+			ENDSELECT
+		ENDIF
+	CASE 5
+		FOR LOCAL, 133, 141
+			SIF TEQUIP:LOCAL
+				LOCAL:1 ++
+		NEXT
+		;服を何も着ていない
+		SIF LOCAL:1 == 0
+			RETURNF 0
+		IF TEQUIP:ボトムス
+			SELECTCASE TEQUIP:ボトムス
+				;スカート
+				CASE 1,7,15,16
+					IF !TEQUIP:下着（下）
+						RETURNF 1
+					ENDIF
+			ENDSELECT
+		ENDIF
+		;今のところこれ以上使わない
+		RETURNF 2
+ENDSELECT
+
+RETURNF 0
+
+;-------------------------------------------------
+;関数名:CHECK_BOTTOM
+;概　要:ずらせる衣服などを表示する
+;引　数:ARG…キャラ登録番号
+;		ARGS…0,半脱ぎ 1,捲くり 2,ずらし
+;戻り値:ずらす部位など表示
+;備　考:文中関数
+;使用例:SHOW_BOTTOM(TARGET, 1) 捲くる服の名前を返す 
+;-------------------------------------------------
+@SHOW_BOTTOM(ARG, ARGS)
+#FUNCTIONS
+;0:ズボン着用中
+;1:下着をつけていない、スカート着用中
+;2:下着をつけている、ボトムスはスカートか何も履いていない時。またはずらせるコスプレ
+;3:どれも出来ない場合
+SELECTCASE ARGS
+	CASE "", "0"
+		IF TEQUIP:ARG:コスプレ服
+			RETURNF COSPLAY(ARG)
+		ENDIF
+		IF TEQUIP:ARG:ボトムス
+			RETURNF OUTER_B(ARG)
+		ENDIF
+		IF TEQUIP:上下一体服
+			RETURNF DRESS(ARG)
+		ENDIF
+		IF TEQUIP:ARG:下着（下）
+			RETURNF INNER_B(ARG)
+		ENDIF
+	CASE "1"
+		IF TEQUIP:ARG:コスプレ服
+			RETURNF COSPLAY(ARG)
+		ENDIF
+		IF TEQUIP:ARG:ボトムス
+			RETURNF OUTER_B(ARG)
+		ENDIF
+		IF TEQUIP:上下一体服
+			RETURNF DRESS(ARG)
+		ENDIF
+	CASE "2"
+		IF TEQUIP:ARG:コスプレ服
+			RETURNF COSPLAY(ARG)
+		ENDIF
+		IF TEQUIP:ARG:下着（下）
+			RETURNF INNER_B(ARG)
+		ENDIF
+		IF TEQUIP:ARG:下着（上下一体）
+			RETURNF INNER_TB(ARG)
+		ENDIF
+	CASE "3"
+		IF TEQUIP:ARG:コスプレ服
+			RETURNF COSPLAY(ARG)
+		ENDIF
+		IF TEQUIP:ARG:ボトムス
+			RETURNF OUTER_B(ARG)
+		ENDIF
+		IF TEQUIP:上下一体服
+			RETURNF DRESS(ARG)
+		ENDIF
+	CASE "4"
+		IF TEQUIP:ARG:コスプレ服
+			RETURNF COSPLAY(ARG)
+		ENDIF
+		IF TEQUIP:ARG:ボトムス
+			RETURNF OUTER_B(ARG)
+		ENDIF
+		IF TEQUIP:上下一体服
+			RETURNF DRESS(ARG)
+		ENDIF
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:OPPAI_DESCRIPTION
+;概　要:言葉でなく心で理解しろ
+;引　数:ARG…キャラ登録番号
+;		ARG:1…正なら形容詞だけ返す
+;戻り値:夢
+;備　考:文中関数
+;使用例:%OPPAI_DESCRIPTION(TARGET)%
+;-------------------------------------------------
+@OPPAI_DESCRIPTION(ARG, ARG:1)
+#FUNCTIONS
+IF ARG:1
+	;爆乳
+	IF TALENT:ARG:爆乳
+		RETURNF "手に余るほど大きな"
+	;巨乳
+	ELSEIF TALENT:ARG:巨乳
+		RETURNF "手から溢れそうなほどの"
+	;絶壁
+	ELSEIF TALENT:ARG:絶壁
+		RETURNF "僅かに膨らみが感じられる程度の"
+	;貧乳
+	ELSEIF TALENT:ARG:貧乳
+		RETURNF "小ぶりの"
+	;並乳
+	ELSE
+		RETURNF ""
+	ENDIF
+ELSE
+	;爆乳
+	IF TALENT:ARG:爆乳
+		RETURNF "手に余るほど大きな胸"
+	;巨乳
+	ELSEIF TALENT:ARG:巨乳
+		RETURNF "手から溢れそうなほどの胸"
+	;絶壁
+	ELSEIF TALENT:ARG:絶壁
+		RETURNF "僅かに膨らみが感じられる程度の胸"
+	;貧乳
+	ELSEIF TALENT:ARG:貧乳
+		RETURNF "小ぶりの胸"
+	;並乳
+	ELSE
+		RETURNF "胸"
+	ENDIF
+ENDIF
+
+@SAME_PLAYER
+#FUNCTION
+IF ((ASSIPLAY && TFLAG:前回コマンド助手実行) || (ASSIPLAY == 0 && TFLAG:前回コマンド助手実行 == 0))
+	RETURNF 1
+ELSE
+	RETURNF 0
+ENDIF
+
+@CHECK_PENIS(ARG)
+#FUNCTION
+SIF TALENT:ARG:オトコ
+	RETURNF 1
+SIF TALENT:ARG:ふたなり
+	RETURNF 1
+SIF TALENT:ARG:半人半妖
+	RETURNF 1
+
+RETURNF 0
+
+@IS_EQUIP(ARG, ARGS)
+#FUNCTION
+
+;ARG	対象のキャラ登録番号
+;ARGS	調べたい素質名
+@GET_TALENT_LV(ARG,ARGS)
+#FUNCTION
+SELECTCASE ARGS
+	CASE "濡れやすさ"
+		SIF TALENT:ARG:濡れやすい
+			RETURNF 1
+		SIF TALENT:ARG:濡れにくい
+			RETURNF -1
+	CASE "体型"
+		SIF TALENT:ARG:小柄体型
+			RETURNF -1
+		SIF TALENT:ARG:幼児
+			RETURNF -2
+		SIF TALENT:ARG:小人体型
+			RETURNF -3
+	CASE "バストサイズ"
+		SIF TALENT:ARG:爆乳
+			RETURNF 2
+		SIF TALENT:ARG:巨乳
+			RETURNF 1
+		SIF TALENT:ARG:貧乳
+			RETURNF -1
+		SIF TALENT:ARG:絶壁
+			RETURNF -2
+ENDSELECT
+RETURNF 0

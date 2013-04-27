@@ -1,0 +1,211 @@
+;-------------------------------------------------
+;オムツ
+;道具使用コマンド、レベル2
+;-------------------------------------------------
+@COM371
+;着脱の処理
+TEQUIP:オムツ = !TEQUIP:オムツ
+ITEM:オムツ -= 1
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:体力 += 0
+DOWNBASE:気力 += 150
+
+	SOURCE:12 = 5000
+	SOURCE:13 = 5000
+	SOURCE:14 = 1000
+	SOURCE:11 = 200
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+
+SIF !TALENT:恥じらい
+	DOWNBASE:気力 -= 50
+SIF TALENT:恥薄い
+	DOWNBASE:気力 -= 50
+	
+;反感追加（反抗的、プライド高いのみ）
+SIF TALENT:11 || TALENT:15
+	SOURCE:15 += 400
+	
+;マゾっ気をみる（露出、欲情追加、液体追加のソース）
+;マゾッ気Lv3以下の場合、液体追加のソースは夏のみ（蒸れる）
+IF ABL:21 == 0
+	TIMES SOURCE:12 , 0.80
+	SOURCE:11 = 100
+	IF DAY:2 == 1
+		SOURCE:10 = 100
+	ENDIF
+ELSEIF ABL:21 == 1
+	TIMES SOURCE:12 , 1.00
+	SOURCE:11 = 200
+	IF DAY:2 == 1
+		SOURCE:10 = 300
+	ENDIF
+ELSEIF ABL:21 == 2
+	TIMES SOURCE:12 , 1.20
+	SOURCE:11 = 400
+	IF DAY:2 == 1
+		SOURCE:10 = 700
+	ENDIF
+ELSEIF ABL:21 == 3
+	TIMES SOURCE:12 , 1.40
+	SOURCE:11 = 700
+	IF DAY:2 != 1
+		SOURCE:10 = 1200
+	ENDIF
+ELSEIF ABL:21 == 4
+	TIMES SOURCE:12 , 1.50
+	SOURCE:11 = 1100
+	SOURCE:10 = 1800
+ELSE
+	TIMES SOURCE:12 , 1.70
+	SOURCE:11 = 1500
+	SOURCE:10 = 2500
+ENDIF
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+
+RETURN 1
+
+;-------------------------------------------------
+;装着継続の処理
+;-------------------------------------------------
+@EQUIP_COMオムツ(ARG)
+VARSET LOCAL
+PRINTL ＜オムツ着用中＞
+
+DOWNBASE:ARG:体力 += 0
+DOWNBASE:ARG:気力 += 105
+
+SOURCE:ARG:快Ｖ += 125
+SOURCE:ARG:露出 += 10
+SOURCE:ARG:逸脱 += 20
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+SIF !TALENT:恥じらい
+	DOWNBASE:気力 -= 35
+SIF TALENT:恥薄い
+	DOWNBASE:気力 -= 35
+
+LOCAL = 25
+LOCAL:1 = 20
+;露出癖をみる
+IF ABL:7 == 0
+	LOCAL:1 = 3000
+	LOCAL:4 = 1000
+	LOCAL:5 = 1000
+ELSEIF ABL:7 == 1
+	LOCAL:1 = 2000
+	LOCAL:4 = 500
+	LOCAL:5 = 800
+ELSEIF ABL:7 == 2
+	LOCAL:1 = 1500
+	LOCAL:4 = 250
+	LOCAL:5 = 600
+ELSEIF ABL:7 == 3
+	LOCAL:1 = 1000
+	LOCAL:4 = 100
+	LOCAL:5 = 400
+ELSEIF ABL:7 == 4
+	LOCAL:1 = 50
+	LOCAL:4 = 10
+	LOCAL:5 = 200
+ELSE
+	LOCAL:1 = 100
+	LOCAL:4 = 5
+	LOCAL:5 = 50
+ENDIF
+
+;マゾっ気をみる
+IF ABL:8 == 0
+	TIMES LOCAL:1 , 0.80
+	LOCAL:2 = 50
+	LOCAL:3 = 50
+ELSEIF ABL:8 == 1
+	TIMES LOCAL:1 , 1.00
+	LOCAL:2 = 100
+	LOCAL:3 = 150
+ELSEIF ABL:8 == 2
+	TIMES LOCAL:1 , 1.20
+	LOCAL:2 = 200
+	LOCAL:3 = 350
+ELSEIF ABL:8 == 3
+	TIMES LOCAL:1 , 1.40
+	LOCAL:2 = 350
+	LOCAL:3 = 600
+ELSEIF ABL:8 == 4
+	TIMES LOCAL:1 , 1.50
+	LOCAL:2 = 550
+	LOCAL:3 = 900
+ELSE
+	TIMES LOCAL:1 , 1.70
+	LOCAL:2 = 750
+	LOCAL:3 = 1250
+ENDIF
+
+SIF TEQUIP:デート中
+	TIMES LOCAL:4 , 2.50
+
+LOCAL = 25
+;愛情経験をみる
+IF EXP:23 < EXPLV:1
+	TIMES LOCAL , 3.00
+ELSEIF EXP:23 < EXPLV:2
+	TIMES LOCAL , 2.50
+ELSEIF EXP:23 < EXPLV:3
+	TIMES LOCAL , 2.00
+ELSEIF EXP:23 < EXPLV:4
+	TIMES LOCAL , 1.00
+ELSEIF EXP:23 < EXPLV:5
+	TIMES LOCAL , 0.80
+ELSE
+	TIMES LOCAL , 0.60
+ENDIF
+
+;反感追加のソース（反抗的、プライド高いでおもらししてない場合のみ）
+SIF TALENT:11 || TALENT:15 || TEQUIP:20 != 2
+	SOURCE:15 += LOCAL * 2
+
+
+;露出のソース
+SOURCE:12 += LOCAL:1
+;屈従のソース（おもらししてる場合倍）
+IF  TEQUIP:20 == 2
+	SOURCE:13 += LOCAL:1 * 2
+ELSE
+	SOURCE:13 += LOCAL:1
+ENDIF
+;欲情追加のソース
+SOURCE:11 += LOCAL:2
+;液体追加のソース（夏かマゾッ気Lv4以上の場合のみ）
+SIF DAY:2 == 1 || ABL:21 >= 4
+	SOURCE:10 += LOCAL:3
+	
+;逸脱のソース
+SOURCE:14 += LOCAL:4
+
+;霧の湖、温泉、海へ行ったら強制解除
+SIF TEQUIP:2 == 3 || TEQUIP:2 == 7 ||  TEQUIP:2 == 34
+	TEQUIP:20 = 0
+
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+EXP:異常経験 ++
+
+RETURN 1
+

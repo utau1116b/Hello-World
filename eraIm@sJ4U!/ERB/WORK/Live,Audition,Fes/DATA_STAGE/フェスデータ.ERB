@@ -1,0 +1,222 @@
+;仕事番号
+@フェスデータ(ARG)
+;通常フェス
+SIF ARG != 999
+	TRYCALLFORM フェスデータ_{GET_WORK_DIFFICULTY(ARG)}
+;昇格試験の時
+IF ARG == 999
+	SELECTCASE FLAG:24
+		CASE 0
+			CALLFORM フェスデータ_1
+			CALLNAME:1 = シャドー★ラクシュミ
+		CASE 1
+			CALLFORM フェスデータ_2
+			CALLNAME:1 = シャドー★ドリラー
+		CASE 2
+			CALLFORM フェスデータ_3
+			CALLNAME:1 = シャドー★アルテミス
+		CASE 3
+			CALLFORM フェスデータ_5
+			CALLNAME:1 = シャドー★プリンス
+		CASE 4
+			CALLFORM フェスデータ_6
+			CALLNAME:1 = シャドー★マーズ
+		CASE 5
+			CALLFORM フェスデータ_8
+			CALLNAME:1 = 閣下
+		CASE 6
+			CALLFORM フェスデータ_9
+			CALLNAME:1 = シャドー★ルナ
+		CASE 7
+			CALLFORM フェスデータ_10
+			CALLNAME:1 = シャドー★ヴィーナス
+		CASE 8
+			CALLFORM フェスデータ_11
+			CALLNAME:1 = シャドー★セイレーン
+		CASE 9
+			CALLFORM フェスデータ_11
+			CALLNAME:1 = シャドー★プリンセス
+		CASE 10
+			CALLFORM フェスデータ_11
+			CALLNAME:1 = シャドー★アリス
+		CASEELSE
+			CALLFORM フェスデータ_1
+			CALLNAME:1 = エラー番号{FLAG:24}
+	ENDSELECT
+ENDIF
+@フェスデータ_1
+CALLNAME:1 = %RAND_NAME()%
+ABL:1:親密 = 1
+BASE:1:ベースボーカル = 100
+BASE:1:ベースビジュアル = 100
+BASE:1:ベースダンス = 100
+ABL:1:Ｖｏ技能 = 1
+ABL:1:Ｖｉ技能 = 1
+ABL:1:Ｄａ技能 = 1
+MAXBASE:1:ボルテージ = 10000
+BASE:1:ボルテージ = 0
+MAXBASE:1:思い出 = 0
+BASE:1:思い出 = MAXBASE:1:思い出
+CFLAG:1:ボルテージ上昇補正 = 100
+TFLAG:お任せ時合格点 = 4300
+
+@フェスデータ_2
+CALLNAME:1 = %RAND_NAME()%
+ABL:1:親密 = 2
+BASE:1:ベースボーカル = 150
+BASE:1:ベースビジュアル = 150
+BASE:1:ベースダンス = 150
+ABL:1:Ｖｏ技能 = 2
+ABL:1:Ｖｉ技能 = 2
+ABL:1:Ｄａ技能 = 2
+MAXBASE:1:ボルテージ = 10000
+BASE:1:ボルテージ = 0
+MAXBASE:1:思い出 = 0
+BASE:1:思い出 = MAXBASE:1:思い出
+CFLAG:1:ボルテージ上昇補正 = 100
+TFLAG:お任せ時合格点 = 7800
+
+@フェスデータ_3
+CALLNAME:1 = %RAND_NAME()%
+ABL:1:親密 = 7
+BASE:1:ベースボーカル = 200
+BASE:1:ベースビジュアル = 200
+BASE:1:ベースダンス = 200
+ABL:1:Ｖｏ技能 = 3
+ABL:1:Ｖｉ技能 = 4
+ABL:1:Ｄａ技能 = 3
+MAXBASE:1:ボルテージ = 10000
+BASE:1:ボルテージ = 0
+MAXBASE:1:思い出 = 1
+BASE:1:思い出 = MAXBASE:1:思い出
+CFLAG:1:ボルテージ上昇補正 = 100
+TFLAG:お任せ時合格点 = 9800
+
+@フェスデータ_4
+CALLNAME:1 = %RAND_NAME()%
+ABL:1:親密 = 10
+BASE:1:ベースボーカル = 250
+BASE:1:ベースビジュアル = 250
+BASE:1:ベースダンス = 250
+ABL:1:Ｖｏ技能 = 4
+ABL:1:Ｖｉ技能 = 4
+ABL:1:Ｄａ技能 = 5
+MAXBASE:1:ボルテージ = 10000
+BASE:1:ボルテージ = 0
+MAXBASE:1:思い出 = 1
+BASE:1:思い出 = MAXBASE:1:思い出
+CFLAG:1:ボルテージ上昇補正 = 100
+TFLAG:お任せ時合格点 = 12300
+
+@フェスデータ_5
+CALLNAME:1 = %RAND_NAME()%
+ABL:1:親密 = 18
+BASE:1:ベースボーカル = 300
+BASE:1:ベースビジュアル = 300
+BASE:1:ベースダンス = 300
+ABL:1:Ｖｏ技能 = 5
+ABL:1:Ｖｉ技能 = 5
+ABL:1:Ｄａ技能 = 5
+MAXBASE:1:ボルテージ = 10000
+BASE:1:ボルテージ = 0
+MAXBASE:1:思い出 = 2
+BASE:1:思い出 = MAXBASE:1:思い出
+CFLAG:1:ボルテージ上昇補正 = 100
+TFLAG:お任せ時合格点 = 14300
+
+@フェスデータ_6
+CALLNAME:1 = %RAND_NAME()%
+ABL:1:親密 = 20
+BASE:1:ベースボーカル = 350
+BASE:1:ベースビジュアル = 350
+BASE:1:ベースダンス = 350
+ABL:1:Ｖｏ技能 = 6
+ABL:1:Ｖｉ技能 = 6
+ABL:1:Ｄａ技能 = 6
+MAXBASE:1:ボルテージ = 10000
+BASE:1:ボルテージ = 0
+MAXBASE:1:思い出 = 2
+BASE:1:思い出 = MAXBASE:1:思い出
+CFLAG:1:ボルテージ上昇補正 = 100
+TFLAG:お任せ時合格点 = 16700
+
+@フェスデータ_7
+CALLNAME:1 = %RAND_NAME()%
+ABL:1:親密 = 25
+BASE:1:ベースボーカル = 100
+BASE:1:ベースビジュアル = 100
+BASE:1:ベースダンス = 100
+ABL:1:Ｖｏ技能 = 7
+ABL:1:Ｖｉ技能 = 7
+ABL:1:Ｄａ技能 = 7
+MAXBASE:1:ボルテージ = 10000
+BASE:1:ボルテージ = 0
+MAXBASE:1:思い出 = 3
+BASE:1:思い出 = MAXBASE:1:思い出
+CFLAG:1:ボルテージ上昇補正 = 100
+TFLAG:お任せ時合格点 = 21500
+
+@フェスデータ_8
+CALLNAME:1 = %RAND_NAME()%
+ABL:1:親密 = 27
+BASE:1:ベースボーカル = 450
+BASE:1:ベースビジュアル = 450
+BASE:1:ベースダンス = 450
+ABL:1:Ｖｏ技能 = 8
+ABL:1:Ｖｉ技能 = 8
+ABL:1:Ｄａ技能 = 8
+MAXBASE:1:ボルテージ = 10000
+BASE:1:ボルテージ = 0
+MAXBASE:1:思い出 = 3
+BASE:1:思い出 = MAXBASE:1:思い出
+CFLAG:1:ボルテージ上昇補正 = 100
+TFLAG:お任せ時合格点 = 24300
+
+@フェスデータ_9
+CALLNAME:1 = %RAND_NAME()%
+ABL:1:親密 = 30
+BASE:1:ベースボーカル = 500
+BASE:1:ベースビジュアル = 500
+BASE:1:ベースダンス = 500
+ABL:1:Ｖｏ技能 = 9
+ABL:1:Ｖｉ技能 = 9
+ABL:1:Ｄａ技能 = 9
+MAXBASE:1:ボルテージ = 10000
+BASE:1:ボルテージ = 0
+MAXBASE:1:思い出 = 4
+BASE:1:思い出 = MAXBASE:1:思い出
+CFLAG:1:ボルテージ上昇補正 = 100
+TFLAG:お任せ時合格点 = 28100
+
+@フェスデータ_10
+CALLNAME:1 = %RAND_NAME()%
+ABL:1:親密 = 38
+BASE:1:ベースボーカル = 550
+BASE:1:ベースビジュアル = 550
+BASE:1:ベースダンス = 550
+ABL:1:Ｖｏ技能 = 10
+ABL:1:Ｖｉ技能 = 10
+ABL:1:Ｄａ技能 = 10
+MAXBASE:1:ボルテージ = 10000
+BASE:1:ボルテージ = 0
+MAXBASE:1:思い出 = 4
+BASE:1:思い出 = MAXBASE:1:思い出
+CFLAG:1:ボルテージ上昇補正 = 100
+TFLAG:お任せ時合格点 = 35000
+
+@フェスデータ_11
+CALLNAME:1 = %RAND_NAME()%
+ABL:1:親密 = 40
+BASE:1:ベースボーカル = 600
+BASE:1:ベースビジュアル = 600
+BASE:1:ベースダンス = 600
+ABL:1:Ｖｏ技能 = 15
+ABL:1:Ｖｉ技能 = 15
+ABL:1:Ｄａ技能 = 15
+MAXBASE:1:ボルテージ = 10000
+BASE:1:ボルテージ = 0
+MAXBASE:1:思い出 = 5
+BASE:1:思い出 = MAXBASE:1:思い出
+CFLAG:1:ボルテージ上昇補正 = 100
+TFLAG:お任せ時合格点 = 40000
+

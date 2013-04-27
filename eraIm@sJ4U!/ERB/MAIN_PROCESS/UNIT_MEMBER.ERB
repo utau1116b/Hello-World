@@ -1,0 +1,425 @@
+;------------------------------------------
+;
+;ユニットメンバーチェンジ
+;
+;------------------------------------------
+@MEMBER_CHANGE
+;LOCALリスト
+;0	1人目
+;1	2人目
+;2	3人目
+;3	4人目
+;4	5人目
+;5	ページ数
+;6	ループで使用
+;7	今何人目を選択中か
+;8	一時記憶用
+;9	ループで使用2
+;10	変更前1人目
+;11	変更前2人目
+;12	変更前3人目
+;13	変更前4人目
+;14	変更前5人目
+
+
+;初期化
+LOCAL:0 = -1
+LOCAL:1 = -1
+LOCAL:2 = -1
+LOCAL:3 = -1
+LOCAL:4 = -1
+LOCAL:5 = 0
+LOCAL:6 = 0
+LOCAL:7 = 1
+LOCAL:8 = 0
+LOCAL:10 = FLAG:リーダー
+LOCAL:11 = FLAG:メンバー2
+LOCAL:12 = FLAG:メンバー3
+LOCAL:13 = FLAG:メンバー4
+LOCAL:14 = FLAG:メンバー5
+
+$START
+DRAWLINE
+IF LOCAL:7 == 1
+	PRINTFORML ユニットを再編成します。リーダーを選択してください。
+ELSE
+	PRINTFORML ユニットを再編成します。{LOCAL:7}人目のメンバーを選択してください。
+ENDIF
+IF LOCAL:7 > 1
+	FOR LOCAL:6, 1, LOCAL:7
+		PRINTFORM {LOCAL:6}:%CALLNAME:(LOCAL:(LOCAL:6 - 1))% 
+	NEXT
+	PRINTL 
+ENDIF
+DRAWLINE
+
+;全体表示
+FOR LOCAL:6, (11+30*LOCAL:5), (41+30*LOCAL:5)
+	IF (LOCAL:6 % 3 == 2) && (LOCAL:6 != (11+30*LOCAL:5))
+		PRINTL 
+	ENDIF
+	IF LOCAL:6 > (FLAG:キャラ数 + 10)
+		PRINTC  
+		CONTINUE
+	ENDIF
+	IF CFLAG:(LOCAL:6):勧誘状況 < 0
+		;加入済み
+		RESETCOLOR
+		;育児中・臨月中は色を変える
+		SIF MARK:(LOCAL:6):90 >= 1
+		SETCOLOR 0x333333
+		
+		SIF TALENT:(LOCAL:6):135 >= 1
+		SETCOLOR 0x333333
+		
+		PRINTFORMLC [{LOCAL:6,3}] %CALLNAME:(LOCAL:6),10,LEFT% Lv{BASE:(LOCAL:6):戦闘レベル,2}
+		RESETCOLOR
+	ELSE
+		;非加入
+		SETCOLOR 0x333333
+		PRINTFORMLC [{LOCAL:6,3}] ？？？
+		RESETCOLOR
+	ENDIF
+NEXT
+PRINTL 
+DRAWLINE
+PRINTLC [7] 前のページ
+PRINTFORMLC             Page({LOCAL:5}/{(FLAG:キャラ数 - 1)/30})
+PRINTC [9] 次のページ
+PRINTL 
+SIF LOCAL:7 == 1
+	PRINTFORML [5] パートナー（リーダー）のみ交代
+	
+IF LOCAL:7 > 1
+	PRINTL [8] これ以上選択しない
+ENDIF
+PRINTL [0] 変更をキャンセルする
+
+$INPUT_LOOP
+INPUT
+
+
+IF RESULT == 0
+	PRINTFORMW 変更をキャンセルしました
+	TARGET = FLAG:リーダー
+	RETURN
+ELSEIF RESULT == 5
+	CALL CHANGE_TARGET
+	RETURN 
+ELSEIF RESULT == 7
+	;前ページへ
+	LOCAL:5 -= 1
+	SIF LOCAL:5 < 0
+		LOCAL:5 = 0
+ELSEIF (LOCAL:7 > 1) && (RESULT == 8)
+	;中断
+	
+	;今居るメンバーをまず全員外す
+	FOR LOCAL:6, 0, 5
+		IF (FLAG:(LOCAL:6 + 1080) >= 0)
+			CFLAG:(FLAG:(LOCAL:6 + 1080)):メンバー内位置 = 0
+		ENDIF
+	NEXT
+	
+	;新しいメンバーを設定
+	FOR LOCAL:6, 0, 5
+		FLAG:(LOCAL:6 + 1080) = LOCAL:(LOCAL:6)
+		IF (LOCAL:(LOCAL:6) >= 0)
+			CFLAG:(LOCAL:(LOCAL:6)):メンバー内位置 = LOCAL:6 + 1
+		ENDIF
+	NEXT
+	CALL CHANGE_TARGET2(FLAG:リーダー, LOCAL:10)
+	TARGET = FLAG:リーダー
+	PRINTFORMW メンバーを変更しました
+	;加入口上
+	FOR LOCAL:6, 0, 5
+		LOCAL:8 = 0
+		FOR LOCAL:9, 0, 5
+			IF FLAG:(LOCAL:6 + 1080) == LOCAL:(LOCAL:9 + 10)
+				;前にもいたならフラグを立てる
+				LOCAL:8 = 1
+				BREAK
+			ENDIF
+		NEXT
+		IF LOCAL:8 == 0 && FLAG:(LOCAL:6 + 1080) >= 0
+			;新規加入キャラ
+			FLAG:1800 = 23
+			CALL KOJO(FLAG:(LOCAL:6 + 1080))
+		ENDIF
+	NEXT
+	;離脱口上
+	FOR LOCAL:6, 0, 5
+		LOCAL:8 = 0
+		FOR LOCAL:9, 0, 5
+			IF FLAG:(LOCAL:9 + 1080) == LOCAL:(LOCAL:6 + 10)
+				;変更後も居るならフラグを立てる
+				LOCAL:8 = 1
+				BREAK
+			ENDIF
+		NEXT
+		IF LOCAL:8 == 0 && LOCAL:(LOCAL:6 + 10) >= 0
+			;離脱キャラ
+			FLAG:1800 = 24
+			CALL KOJO(LOCAL:(LOCAL:6 + 10))
+		ENDIF
+	NEXT
+	RETURN
+ELSEIF RESULT == 9
+	;次ページへ
+	LOCAL:5 += 1
+	SIF LOCAL:5 > ((FLAG:キャラ数 - 1) / 30)
+		LOCAL:5 = (FLAG:キャラ数 - 1) / 30
+ELSEIF RESULT >= 11 && RESULT <= (FLAG:キャラ数 + 10)
+	;直接指定
+	IF MARK:RESULT:90 >= 1 || TALENT:RESULT:135 >= 1
+		REUSELASTLINE 臨月・育児中のキャラは選べません。
+		GOTO INPUT_LOOP
+	ENDIF
+	IF MASTER != 0 && RESULT == MASTER
+		REUSELASTLINE プレイヤーは選べません。
+		GOTO INPUT_LOOP
+	ENDIF
+	IF (RESULT == LOCAL:0) || (RESULT == LOCAL:1) || (RESULT == LOCAL:2) || (RESULT == LOCAL:3)
+		REUSELASTLINE そのキャラは既に選択されています。再入力してください
+		GOTO INPUT_LOOP
+	ELSEIF CFLAG:(RESULT):勧誘状況 < 0
+		;確認表示
+		LOCAL:8 = RESULT
+		CALL SHOW_PERSONAL_STATUS(RESULT)
+		IF LOCAL:7 == 1
+			CALL SET_COLOR(LOCAL:8)
+			PRINTFORM %CALLNAME:(LOCAL:8)%
+			RESETCOLOR
+			PRINTFORML をリーダーにしますか？
+		ELSE
+			CALL SET_COLOR(LOCAL:8)
+			PRINTFORM %CALLNAME:(LOCAL:8)%
+			RESETCOLOR
+			PRINTFORML をメンバーに加えますか？
+		ENDIF
+		PRINTL [0] はい
+		PRINTL [1] いいえ
+		INPUT
+		IF RESULT
+			GOTO START
+		ENDIF
+		LOCAL:(LOCAL:7 - 1) = LOCAL:8
+		PRINTFORMW {LOCAL:7}人目に%CALLNAME:(LOCAL:8)%を設定しました
+		LOCAL:7 += 1
+		IF LOCAL:7 > 5
+			;今居るメンバーをまず全員外す
+			FOR LOCAL:6, 0, 5
+				IF (FLAG:(LOCAL:6 + 1080) >= 0)
+					CFLAG:(FLAG:(LOCAL:6 + 1080)):メンバー内位置 = 0
+				ENDIF
+			NEXT
+			
+			;新しいメンバーを設定
+			FOR LOCAL:6, 0, 5
+				FLAG:(LOCAL:6 + 1080) = LOCAL:(LOCAL:6)
+				IF (LOCAL:(LOCAL:6) >= 0)
+					CFLAG:(LOCAL:(LOCAL:6)):メンバー内位置 = LOCAL:6 + 1
+				ENDIF
+			NEXT
+			;CALL CHANGE_TARGET(FLAG:リーダー, LOCAL:10)
+			TARGET = FLAG:リーダー
+			PRINTFORMW メンバーを変更しました
+			RETURN
+		ENDIF
+	ELSE
+		REUSELASTLINE 入力値が不正です。再入力してください
+		GOTO INPUT_LOOP
+	ENDIF
+ELSE
+	REUSELASTLINE 入力値が不正です。再入力してください
+	GOTO INPUT_LOOP
+ENDIF
+
+GOTO START
+
+;-------------------------------------------------
+;ユニット名設定
+;-------------------------------------------------
+@UNIT_NAME
+;デフォルト
+CSTR:0:22 = %DEFAULT_UNITNAME()%
+PRINTFORM %NAME:TARGET%達のユニット名を入力してください（ユニット名：「%CSTR:0:22%」）
+PRINTL
+PRINTFORM ※入力しない場合、ユニット名が%CSTR:0:22%になります
+PRINTL
+$INPUT_LOOP_SPL_3
+INPUTS
+STRLENS RESULTS
+LOCAL:0 = RESULT
+SIF LOCAL:0 == 0
+	RETURN
+IF LOCAL:0 > 20
+	PRINTFORMW 文字列が長すぎます。全角10文字以内で入力してください
+	RESTART
+ENDIF
+SIF RESULTS == "↑↑↓↓←→←→AB"
+	PRINTFORMW 何を入力している！！
+PRINTFORML %RESULTS%でよろしいですか？
+PRINTFORML [0] はい
+PRINTFORML [1] いいえ
+$INPUT_LOOP_SPL_4
+INPUT
+IF RESULT != 0 && RESULT != 1
+	GOTO INPUT_LOOP_SPL_4
+ELSEIF RESULT == 0
+	CSTR:0:22 = %RESULTS%
+	PRINTFORMW ユニット名を決定しました
+ELSE
+	;GOTO INPUT_LOOP_SPL_3
+	RESTART
+ENDIF
+
+;メンバーの配列がずれることがあるので、配列を整える
+@SHIFT_MEMBER
+;LOCAL:1 = FLAG:リーダー
+;LOCAL:2 = FLAG:メンバー2
+;LOCAL:3 = FLAG:メンバー3
+;LOCAL:4 = FLAG:メンバー4
+;LOCAL:5 = FLAG:メンバー5
+VARSET LOCAL
+FOR LOCAL, 1080, 1085
+	IF FLAG:LOCAL >= 11
+		LOCAL:(1 + LOCAL:10) = FLAG:LOCAL
+		LOCAL:10 ++
+	ELSE
+	
+	ENDIF
+NEXT
+FOR LOCAL, 1080, 1085
+	FLAG:LOCAL = LOCAL:(1 + LOCAL:11)
+	LOCAL:11 ++
+NEXT
+TARGET = FLAG:リーダー
+FOR LOCAL, 1080, 1085
+	SIF FLAG:LOCAL <= 0
+		FLAG:LOCAL = -1
+NEXT
+
+@ユニットレベル
+#FUNCTION
+#LOCALSIZE 2
+VARSET LOCAL
+LOCAL = SUM_VO(11) + SUM_VI(11) + SUM_DA(11)
+REPEAT 20
+	SIF LOCAL >= (70 + 30 * COUNT)
+		LOCAL:1 ++
+REND
+RETURNF LOCAL:1
+
+@DEFAULT_UNITNAME
+#FUNCTIONS
+VARSET LOCAL
+IF CONTAIN_CHARA("貴音") && CONTAIN_CHARA("美希") && CONTAIN_CHARA("真美")
+	LOCALS = クラッシュデビルス
+ELSEIF CONTAIN_CHARA("真") && CONTAIN_CHARA("雪歩") && CONTAIN_CHARA("春香")
+	LOCALS = みのるんず
+ELSEIF CONTAIN_CHARA("麗華") && CONTAIN_CHARA("ともみ") && CONTAIN_CHARA("りん")
+	LOCALS = 魔王エンジェル
+ELSEIF CONTAIN_CHARA("真") && CONTAIN_CHARA("雪歩") && CONTAIN_CHARA("美希")
+	LOCALS = 修羅場トリオ
+ELSEIF CONTAIN_CHARA("冬馬") && CONTAIN_CHARA("翔太") && CONTAIN_CHARA("北斗")
+	LOCALS = ジュピター
+ELSEIF CONTAIN_CHARA("絵理") && CONTAIN_CHARA("美希") && CONTAIN_CHARA("杏")
+	LOCALS = ニートリオ
+ELSEIF CONTAIN_CHARA("春香") && CONTAIN_CHARA("やよい") && CONTAIN_CHARA("真")
+	LOCALS = パーフェクトサン
+ELSEIF CONTAIN_CHARA("千早") && CONTAIN_CHARA("あずさ") && CONTAIN_CHARA("律子")
+	LOCALS = ミッシングムーン
+;ELSEIF CONTAIN_CHARA("貴音") && CONTAIN_CHARA("美希") && CONTAIN_CHARA("真美")
+;	LOCALS = ナッシングムーン
+ELSEIF CONTAIN_CHARA("貴音") && CONTAIN_CHARA("美希") && CONTAIN_CHARA("響")
+	LOCALS = プロジェクトフェアリー
+;ELSEIF CONTAIN_CHARA("貴音") && CONTAIN_CHARA("美希") && CONTAIN_CHARA("真美")
+;	LOCALS = ゆトリオ
+;ELSEIF CONTAIN_CHARA("貴音") && CONTAIN_CHARA("美希") && CONTAIN_CHARA("真美")
+;	LOCALS = 幸運エンジェル
+ELSEIF CONTAIN_CHARA("伊織") && CONTAIN_CHARA("雪歩") && (CONTAIN_CHARA("真美") || CONTAIN_CHARA("亜美"))
+	LOCALS = ワンダリングスター
+ELSEIF CONTAIN_CHARA("千早") && CONTAIN_CHARA("あずさ") && CONTAIN_CHARA("真")
+	LOCALS = ガチトリオ
+ELSEIF CONTAIN_CHARA("春香") && CONTAIN_CHARA("千早") && CONTAIN_CHARA("やよい")
+	LOCALS = Engage!
+ELSEIF CONTAIN_CHARA("春香") && CONTAIN_CHARA("律子") && CONTAIN_CHARA("雪歩")
+	LOCALS = HYR
+ELSEIF CONTAIN_CHARA("春香") && CONTAIN_CHARA("雪歩") && CONTAIN_CHARA("響")
+	LOCALS = SprouT
+ELSEIF CONTAIN_CHARA("春香") && CONTAIN_CHARA("千早") && CONTAIN_CHARA("雪歩")
+	LOCALS = TORICO
+ELSEIF CONTAIN_CHARA("やよい") && CONTAIN_CHARA("あずさ") && CONTAIN_CHARA("真美")
+	LOCALS = YMO
+ELSEIF CONTAIN_CHARA("千早") && CONTAIN_CHARA("麗華") && CONTAIN_CHARA("藍子")
+	LOCALS = zuretar
+;ELSEIF CONTAIN_CHARA("貴音") && CONTAIN_CHARA("美希") && CONTAIN_CHARA("真美")
+;	LOCALS = サイネリア
+;ELSEIF CONTAIN_CHARA("貴音") && CONTAIN_CHARA("美希") && CONTAIN_CHARA("真美")
+;	LOCALS = 年増園
+ELSEIF CONTAIN_CHARA("伊織") && CONTAIN_CHARA("あずさ") && CONTAIN_CHARA("亜美")
+	LOCALS = 竜宮小町
+;ELSEIF CONTAIN_CHARA("貴音") && CONTAIN_CHARA("美希") && CONTAIN_CHARA("真美")
+;	LOCALS = ロリカルテット
+ELSEIF CONTAIN_CHARA("愛") && CONTAIN_CHARA("絵理") && CONTAIN_CHARA("涼")
+	LOCALS = ディアリースターズ
+ELSEIF CONTAIN_CHARA("つばめ") && CONTAIN_CHARA("ひかり") && CONTAIN_CHARA("のぞみ")
+	LOCALS = 新幹少女
+ELSEIF CONTAIN_CHARA("卯月") && CONTAIN_CHARA("凛") && CONTAIN_CHARA("未央")
+	LOCALS = ニューゼネレーション
+ELSE
+	FOR LOCAL, 1080, 1085
+		SIF FLAG:LOCAL > 45
+			LOCAL:1++
+	NEXT
+	IF LOCAL:1 >= 3
+		LOCALS = シンデレラガールズ
+	ELSE
+		LOCALS = ナムコエンジェル
+	ENDIF
+ENDIF
+;SIF RESULTS == "IM@S ALLSTARS+"
+;	PRINTFORMW ？？？
+;SIF RESULTS == "iM@Sオールスター"
+;	PRINTFORMW ？？？
+RETURNF LOCALS
+
+
+;ARGSに指定した番号、名前のキャラがユニットメンバーいれば1を返す
+;ARGが1ならフルネームで名前を判定する
+@CONTAIN_CHARA(ARGS, ARG = 0)
+#FUNCTION
+VARSET LOCAL
+SIF TOINT(ARGS)
+	LOCAL:1 = RESULT
+;FLAG:1080-1085はキャラ番号だから、それをどうにか利用すれば
+;FOR LOCAL, 1080, 1085を短縮できないだろうか？
+FOR LOCAL, 1080, 1085
+	SIF FLAG:LOCAL < 0
+		CONTINUE
+	IF LOCAL:1
+		SIF FLAG:LOCAL == LOCAL:1
+			LOCAL:2 = 1
+	ELSE
+		IF ARG
+			SIF NAME:(FLAG:LOCAL) == ARGS
+				LOCAL:2 = 1
+		ELSE
+			SIF CALLNAME:(FLAG:LOCAL) == ARGS
+				LOCAL:2 = 1
+		ENDIF
+	ENDIF
+NEXT
+SIF LOCAL:2
+	RETURNF 1
+RETURNF 0
+
+@ユニット人数
+#FUNCTION
+VARSET LOCAL
+FOR LOCAL, 1080, 1085
+	SIF FLAG:LOCAL > 0
+		LOCAL:1++
+NEXT
+RETURNF LOCAL:1

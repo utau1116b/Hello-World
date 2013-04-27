@@ -1,0 +1,238 @@
+;FileName_EVENT_MESSAGE_COM.ERB -------------------- Rev1.01
+;TRAINコマンド共通メッセージ出力
+;CALL		USER
+;ARG		VOID
+;RETURN		VOID
+;COMMENT	
+;-----------------------------------------------------------
+@TRAIN_MESSAGE
+DRAWLINE
+RESULT = 1
+IF TFLAG:特殊COM
+	TRYCCALLFORM TRAIN_MESSAGE_SCOM{TFLAG:特殊COM}
+		PRINTW
+	CATCH
+	ENDCATCH
+ELSE
+	TRYCCALLFORM TRAIN_MESSAGE_COM{SELECTCOM}
+		PRINTW
+	CATCH
+	ENDCATCH
+ENDIF
+
+;-------------------------------------------
+;調教後のテキスト
+;-------------------------------------------
+@PALAM_MESSAGE_C
+;処女喪失
+FOR LOCAL,0,CHARANUM
+	;関係ない人は省く
+	SIF LOCAL != MASTER && LOCAL != TARGET && LOCAL != ASSI
+		CONTINUE
+	SIF TCVAR:LOCAL:破瓜
+		PRINTFORML %CALLNAME:LOCAL%の秘唇から、処女の証である赤い血が垂れ落ちていった……
+NEXT
+;恋人取得
+IF SELECTCOM == [[調教:告白する]]
+	IF TFLAG:SELECTCOM分岐
+		PRINTFORML %CALLNAME:TARGET%は顔を赤らめながら%CALLNAME:MASTER%の告白を受け入れた……
+		PRINTFORML  
+		PRINTFORML %CALLNAME:TARGET%と【恋人】になりました
+	ELSE
+		
+	ENDIF
+ENDIF
+
+;相愛取得
+IF SELECTCOM == [[調教:プレゼント]] && TFLAG:コマンド内容 == 6
+	;口上開始前の地の文をカットするか
+	TFLAG:イベント口上 = 7
+	CALL SELF_MAEKOJO
+	
+	;地の文章カット
+	IF CFLAG:地の文カット & 1
+		CALL SELF_KOJO
+	;地の文章表示
+	ELSE
+		PRINTFORML %CALLNAME:MASTER%は%CALLNAME:TARGET%の左手を引き寄せると、その薬指に指輪をはめてやった
+		CALL SELF_KOJO
+		PRINTFORML %CALLNAME:TARGET%は頬を染めて%CALLNAME:MASTER%の気持ちを受け入れる旨を伝えた
+		;一線越えない消滅
+		IF TALENT:一線越えない
+			PRINTFORML その顔は今までに無く幸福に満ち、すべてを吹っ切ったように見えた
+			PRINTFORML %CALLNAME:TARGET%[一線越えない]を失った
+		ENDIF
+		PRINTFORML %CALLNAME:TARGET%と寄り添い、長い間抱擁を交し合っていた……
+		PRINTFORML %CALLNAME:TARGET%は[相愛]を得た
+	ENDIF
+ENDIF
+
+IF デート終了 == 1
+	CALL CHECK_DATE
+;●友情パッチ用改変
+	IF IS_友情(TARGET)
+		PRINTFORML 外出先から帰ってきました
+		STR:0 = 外出終了
+	ELSE
+		PRINTFORML デートから帰ってきました
+		STR:0 = デート終了
+	ENDIF
+;●ここまで
+	STR:0 = デート終了
+ENDIF
+;何もしない
+IF SELECTCOM == 21
+		SIF PALAM:欲情 >= PALAMLV:3
+			PRINTFORM %CALLNAME:TARGET%は息を荒げ
+		SIF PALAM:欲情 >= PALAMLV:5
+			PRINT 熱っぽい瞳でこちらを見つめ
+		SIF PALAM:欲情 >= PALAMLV:3 && TEQUIP:媚薬
+			PRINT 、ガクガクと震える身体を抱きしめ
+		SIF PALAM:欲情 >= PALAMLV:4
+			PRINT ながら、しきりに太腿を擦りあわせ
+		SIF PALAM:欲情 >= PALAMLV:3
+			PRINTFORML ている……
+ENDIF
+
+;フェラで射精後
+IF TFLAG:お掃除 && NOWEX:PLAYER:11
+	LOCAL = MASTER_POSE(4,1,1)
+	PRINT その後、
+	;ダブルフェラ
+	IF TFLAG:特殊COM == 11
+		PRINTFORML %CALLNAME:TARGET%は%CALLNAME:MASTER%と%CALLNAME:ASSI%のペニスを交互に咥え、汚れを舐め取っていった……
+	ELSE
+		IF TFLAG:お掃除 == 3
+			PRINTFORM %CALLNAME:LOCAL%と%CALLNAME:TARGET%は
+		ELSEIF TFLAG:お掃除 == 2
+			PRINTFORM %CALLNAME:LOCAL%は
+		ELSEIF TFLAG:お掃除 == 1
+			PRINTFORM %CALLNAME:TARGET%は
+		ENDIF
+		SIF NOWEX:PLAYER:11
+			 PRINT 残った精液を吸い取りながら、
+		PRINTFORML ペニスの汚れを綺麗に舐めとっていった……
+	ENDIF
+	SIF TFLAG:お掃除 == 3 && NOWEX:MASTER:11
+		PRINTFORML 二人はそれだけでは足りないかのように互いの口に溜まった精液を舐めあっている……
+ENDIF
+
+;-------------------------------------------
+;パラメータ変化時テキスト　作成中
+;-------------------------------------------
+@PALAM_MESSAGE_D
+;欲情がLV2になったとき　などなど
+
+
+;-------------------------------------------
+;刻印取得時のテキスト
+;-------------------------------------------
+@MARK_MESSAGE
+M:1 = 0
+CALL MARK_MESSAGE_A
+CALL MARK_MESSAGE_P
+CALL MARK_MESSAGE_S
+CALL MARK_MESSAGE_R
+
+@MARK_MESSAGE_A
+;苦痛依存
+IF TFLAG:苦痛依存 == 1
+	PRINTFORML %CALLNAME:TARGET%は顔を歪ませながら苦痛を堪えている……
+	PRINTFORML %CALLNAME:TARGET%は苦痛依存LV1を得た
+	IF TFLAG:刻印取得時の親密の変化 == 1 && M:1 == 0
+		PRINTFORML そして親密が{ABL:親密}になった
+		M:1 = 1
+	ENDIF
+ELSEIF TFLAG:苦痛依存 == 2
+	PRINTFORML %CALLNAME:TARGET%はしばらくの間、苦鳴を漏らし続けていた……
+	PRINTFORML %CALLNAME:TARGET%は苦痛依存LV2を得た
+	IF TFLAG:刻印取得時の親密の変化 == 1 && M:1 == 0
+		PRINTFORML そして親密が{ABL:親密}になった
+		M:1 = 1
+	ENDIF
+ELSEIF TFLAG:苦痛依存 == 3
+	PRINTFORML %CALLNAME:TARGET%は余りの苦痛に泣き喚いていた……
+	PRINTFORML %CALLNAME:TARGET%は苦痛依存LV3を得た
+	IF TFLAG:刻印取得時の親密の変化 == 1 && M:1 == 0
+		PRINTFORML そして親密がLV{ABL:親密}になった
+		M:1 = 1
+	ENDIF
+	IF TALENT:PLAYER:サド
+		PRINTFORML 【%CALLNAME:PLAYER%がサド】
+		PRINTFORML 異常経験＋２
+	ELSEIF TALENT:PLAYER:針さばき && SELECTCOM == [[調教:アイマスク]]
+		PRINTFORML 【%CALLNAME:PLAYER%が針さばき】
+		PRINTFORML 異常経験＋２
+	ELSE
+		PRINTFORML 異常経験＋１
+	ENDIF
+ENDIF
+
+
+@MARK_MESSAGE_P
+;快楽依存
+IF TFLAG:快楽依存 == 1
+	PRINTFORML %CALLNAME:TARGET%は激しい快楽に身を打ち震わせていた……
+	PRINTFORML %CALLNAME:TARGET%は快楽依存LV1を得た
+ELSEIF TFLAG:快楽依存 == 2
+	PRINTFORML %CALLNAME:TARGET%は快楽の余韻に顔を緩ませていた……
+	PRINTFORML %CALLNAME:TARGET%は快楽依存LV2を得た
+ELSEIF TFLAG:快楽依存 == 3
+	PRINTFORML %CALLNAME:TARGET%は強烈な快楽に身も心も焦がしているようだ……
+	PRINTFORML %CALLNAME:TARGET%は快楽依存LV3を得た
+	;IF TFLAG:刻印取得時の親密の変化 == 1 && M:1 == 0
+	;	PRINTFORML そして親密がLV{ABL:親密}になった
+	;	M:1 = 1
+	;ENDIF
+ENDIF
+IF TFLAG:刻印取得時の親密の変化 == 1 && M:1 == 0
+	PRINTFORML そして親密がLV{ABL:親密}になった
+	M:1 = 1
+ENDIF
+
+@MARK_MESSAGE_S
+VARSET LOCAL
+IF TFLAG:既成事実 == 1
+	LOCAL = 1
+ELSEIF TFLAG:既成事実 == 2
+	LOCAL = 2
+ELSEIF TFLAG:既成事実 == 3
+	LOCAL = 3
+ENDIF
+;既成事実取得
+IF LOCAL > 0
+	TFLAG:既成事実 = LOCAL
+	PRINTFORML 既成事実LV{TFLAG:既成事実}を取得
+ENDIF
+IF TFLAG:刻印取得時の親密の変化 == 1 && M:1 == 0
+	PRINTFORML そして親密がLV{ABL:親密}になった
+	M:1 = 1
+ENDIF
+
+
+@MARK_MESSAGE_R
+;反発感情
+IF TFLAG:反発感情 == 1
+	PRINTFORML %CALLNAME:TARGET%は鋭い視線をこちらに向けている……
+	PRINTFORML %CALLNAME:TARGET%は反発感情LV1を得た
+ELSEIF TFLAG:反発感情 == 2
+	PRINTFORML %CALLNAME:TARGET%は怒りを滲ませた表情をしている……
+	PRINTFORML %CALLNAME:TARGET%は反発感情LV2を得た
+	IF TFLAG:刻印取得時の親密の変化 == 1
+		PRINTFORML そして親密がLV{ABL:親密}に下がった
+		M:1 = 1
+	ELSEIF TFLAG:刻印取得時の親密の変化 == 2 && M:1 == 0
+		PRINTFORML そして親密がLV{ABL:親密}に下がった
+		M:1 = 1
+	ENDIF
+ELSEIF TFLAG:反発感情 == 3
+	PRINTFORML %CALLNAME:TARGET%は憤怒に顔を歪ませて、恨み言を呟いている……
+	PRINTFORML %CALLNAME:TARGET%は反発感情LV3を得た
+	IF TFLAG:刻印取得時の親密の変化 == 1 && M:1 == 0
+		PRINTFORML そして親密がLV{ABL:親密}に下がった
+		M:1 = 1
+	ELSEIF TFLAG:刻印取得時の親密の変化 == 2 && M:1 == 0
+		PRINTFORML そして親密がLV{ABL:親密}に下がった
+		M:1 = 1
+	ENDIF
+ENDIF

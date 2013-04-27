@@ -1,0 +1,1197 @@
+;戦闘に関する共通処理
+;@SET_DEFAULT_WAIT(ARG:0)					デフォルトの待機時間を設定
+;@GET_MIN_COUNTER							カウンタ最小値を取得
+;@RENEW_STATE_TIME_PASSAGE					状態異常更新
+;@RENEW_PERSONAL_STATE_TIME_PASSAGE(ARG:0)	状態異常更新(個別)
+;@CHECK_SLIP_DAMAGE							スリップダメージチェック
+;@CHECK_PERSONAL_SLIP_DAMAGE(ARG:0)			スリップダメージチェック(個別)
+;@CHECK_HPEP_0								HP/EP0チェック
+;@CHECK_PERSONAL_HPEP_0(ARG:0)				HP/EP0チェック(個別)
+
+
+;デフォルトの待機時間を設定
+;ARG:0	対象キャラ
+@SET_DEFAULT_WAIT(ARG:0)
+IF ARG:0 <= 0 || ARG:0 > CHARANUM
+	RETURN
+ENDIF
+
+;状態を待機中に変更
+CFLAG:(ARG:0):現在状態 = 0
+
+;残り時間計算
+CALL GET_DEFAULT_WAIT(ARG:0)
+CFLAG:(ARG:0):残り待機時間 = RESULT
+
+;王者の威圧チェック
+CALL GET_MAX_ABL_PT(237)
+IF RESULT == 0
+	;ちゅらさん反映　待機時間70％
+	IF ABL:(ARG:0):ちゅらさん
+		A =  CFLAG:(ARG:0):残り待機時間
+		TIMES A , 0.70
+		CFLAG:(ARG:0):残り待機時間 = A
+	ENDIF
+	
+	;ニュージェネレーション反映　一定確率で時間を1/2
+	SELECTCASE ABL:(ARG:0):ニュージェネレーション
+		CASE 1
+			LOCAL:0 = 20
+		CASEELSE
+			LOCAL:0 = 0
+	ENDSELECT
+	IF RAND:100 < LOCAL:0
+		CFLAG:(ARG:0):残り待機時間 /= 2
+	ENDIF
+	
+	;秘めたる才能反映	一定確率で待機時間を1/2
+	SELECTCASE ABL:(ARG:0):秘めたる才能
+		CASE 1
+			LOCAL:0 = 10
+		CASEELSE
+			LOCAL:0 = 0
+	ENDSELECT
+	IF RAND:100 < LOCAL:0
+		CFLAG:(ARG:0):残り待機時間 /= 2
+	ENDIF
+ENDIF
+;WT短縮
+IF CFLAG:ARG:WT短縮状態
+	LOCAL:0 = CFLAG:ARG:WT短縮状態 % 10
+	A =  CFLAG:(ARG:0):残り待機時間 * (LOCAL:0 * 10) / 100
+	CFLAG:(ARG:0):残り待機時間 = A 
+ENDIF
+
+;最低値キャップをかける
+IF CFLAG:(ARG:0):残り待機時間 <= 5
+	CFLAG:(ARG:0):残り待機時間 = 10
+ELSEIF CFLAG:(ARG:0):残り待機時間 < 15
+	CFLAG:(ARG:0):残り待機時間 = 15
+ENDIF
+
+
+;標準的な待機時間を計算
+@GET_DEFAULT_WAIT(ARG:0)
+LOCAL:0 = (5000 / (100 + BASE:(ARG:0):ベース素早さ))
+;補正が設定されている場合は補正をかける
+IF CFLAG:(ARG:0):通常行動速度補正
+	LOCAL:0 = LOCAL:0 * CFLAG:(ARG:0):通常行動速度補正 / 100
+ENDIF
+IF LOCAL:0 <= 5
+	LOCAL:0 = 10
+ELSEIF LOCAL:0 < 15
+	LOCAL:0 = 15
+ENDIF
+
+RETURN LOCAL:0
+
+;詠唱時間軽減チェック　1倍にしておくか→これを待機時間短縮に使おう
+;ARG:0	対象キャラ
+@CHECK_REDUCE_WAIT(ARG:0)
+IF CFLAG:(ARG:0):1284
+	CFLAG:(ARG:0):残り待機時間 = CFLAG:(ARG:0):残り待機時間 * (100 - CFLAG:(ARG:0):1284) / 100
+ENDIF
+;ティンクルスター反映　一定確率で時間を1/5
+;SELECTCASE ABL:(ARG:0):5047
+;	CASE 1
+;		LOCAL:0 = 1
+;	CASE 2
+;		LOCAL:0 = 2
+;	CASE 3
+;		LOCAL:0 = 3
+;	CASE 4
+;		LOCAL:0 = 4
+;	CASE 5
+;		LOCAL:0 = 6
+;	CASEELSE
+;		LOCAL:0 = 0
+;ENDSELECT
+;IF RAND:100 < LOCAL:0
+	;変な所で表示されたりするから、メッセージはとりあえず非表示で
+	;PRINTFORML %CALLNAME:(ARG:0)%の頭上で流星が煌めいた！
+;	CFLAG:(ARG:0):残り待機時間 /= 5
+;ENDIF
+;ＷＴ押し戻し
+;
+;
+
+;カウンタ最小値を取得
+@GET_MIN_COUNTER
+;LOCAL
+;0	ループカウンタ1
+;1	ループカウンタ2
+;2	暫定最小値
+
+LOCAL:2 = TFLAG:カウントタイマー
+
+FOR LOCAL:0, 1, 11
+	IF CFLAG:(LOCAL:0):ストップ状態 || CFLAG:(LOCAL:0):スリープ状態 ||  CFLAG:(LOCAL:0):気絶状態 || CFLAG:(LOCAL:0):カウンター状態 || (CFLAG:(LOCAL:0):現在状態 == -1 || TFLAG:戦闘中 == 2 || TFLAG:戦闘中 == 3)
+		;行動不能系状態異常の間は、待機時間は考慮しない(ライブ、オーディション中も)
+		;PRINTFORMW 敵カウントしてない
+	ELSE
+		;フェス中
+		IF TFLAG:戦闘中 == 4
+			IF LOCAL:2 > CFLAG:1:残り待機時間
+				LOCAL:2 = CFLAG:1:残り待機時間
+			ENDIF
+			;PRINTFORML 戦闘中フラグ{TFLAG:戦闘中}
+			;PRINTFORMW 敵カウントした {LOCAL:2}
+		;戦闘中
+		ELSEIF LOCAL:2 > CFLAG:(LOCAL:0):残り待機時間
+			LOCAL:2 = CFLAG:(LOCAL:0):残り待機時間
+			
+		ENDIF
+	ENDIF
+NEXT
+
+FOR LOCAL:0, 1080, 1085
+	IF (FLAG:(LOCAL:0) > 0)
+		IF CFLAG:(FLAG:(LOCAL:0)):ストップ状態 || CFLAG:(FLAG:(LOCAL:0)):スリープ状態 || CFLAG:(FLAG:(LOCAL:0)):カウンター状態 || CFLAG:(FLAG:(LOCAL:0)):気絶状態 || (CFLAG:(FLAG:(LOCAL:0)):現在状態 == -1)
+			;行動不能系状態異常の間は、待機時間は考慮しない
+		ELSE
+			IF LOCAL:2 > CFLAG:(FLAG:(LOCAL:0)):残り待機時間
+				LOCAL:2 = CFLAG:(FLAG:(LOCAL:0)):残り待機時間
+			ENDIF
+		ENDIF
+	ENDIF
+NEXT
+
+RETURN LOCAL:2
+
+;状態異常更新
+@RENEW_STATE_TIME_PASSAGE
+;LOCAL
+;0	LOOP0
+;1	LOOP1
+
+;敵側更新
+FOR LOCAL:0, 1, 11
+	IF TFLAG:(LOCAL:0 + 1000) > 0
+		CALL RENEW_PERSONAL_STATE_TIME_PASSAGE(LOCAL:0)
+	ENDIF
+NEXT
+
+;味方側更新
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		CALL RENEW_PERSONAL_STATE_TIME_PASSAGE(FLAG:(LOCAL:0))
+	ENDIF
+NEXT
+
+
+;状態異常更新
+;ARG:0	対象キャラ
+@RENEW_PERSONAL_STATE_TIME_PASSAGE(ARG:0)
+;LOCAL
+;0	LOOP0
+;1	LOOP1
+
+FOR LOCAL:0, 1031, 1092
+	;気絶、リレイズ、SHINY_SMILE、バーストアピール、無敵、四分身は時間経過の影響を受けない
+	IF (LOCAL:0 == 1039 || LOCAL:0 == 1069 || LOCAL:0 == 1044 || LOCAL:0 == 1075 || LOCAL:0 == 1071 || LOCAL:0 == 1046)
+		;時間経過による更新は行わない
+	ELSE
+		IF CFLAG:(ARG:0):(LOCAL:0) >= 10
+			CFLAG:(ARG:0):(LOCAL:0) -= 10
+			IF CFLAG:(ARG:0):(LOCAL:0) < 10
+				CFLAG:(ARG:0):(LOCAL:0) = 0
+				CALL SHOW_CURE_STATE_MESSAGE(ARG:0, (LOCAL:0 - 1000))
+			ENDIF
+		ENDIF
+	ENDIF
+NEXT
+;能力値変化
+FOR LOCAL:0, 1130, 1138
+	IF CFLAG:(ARG:0):(LOCAL:0) >= 1000
+		CFLAG:(ARG:0):(LOCAL:0) -= 1000
+		IF CFLAG:(ARG:0):(LOCAL:0) < 1000
+				CFLAG:(ARG:0):(LOCAL:0) = 0
+				CALL SHOW_CURE_STATE_MESSAGE(ARG:0, (LOCAL:0 - 1000))
+			;ENDIF
+		ENDIF
+	ENDIF
+NEXT
+;耐性変化
+FOR LOCAL:0, 1138, 1151
+	IF CFLAG:(ARG:0):(LOCAL:0) >= 1000
+		CFLAG:(ARG:0):(LOCAL:0) -= 1000
+		IF CFLAG:(ARG:0):(LOCAL:0) < 1000
+			CFLAG:(ARG:0):(LOCAL:0) = 0
+			CALL SHOW_CURE_STATE_MESSAGE(ARG:0, (LOCAL:0 - 1000))
+		ENDIF
+	ENDIF
+NEXT
+
+
+;スキル発動前の初期化処理
+@INIT_USE_SKILL_FLAG
+FOR LOCAL:0, 1020, 1251
+	TFLAG:(LOCAL:0) = 0
+NEXT
+
+
+;攻撃回数計算
+;ARG:0	攻撃側番号
+;ARG:1	防御側番号
+@GET_ATTACK_NUMBER(ARG:0, ARG:1)
+
+;基本は一回
+LOCAL:0 = 1
+
+
+;アピール回数増加状態を反映
+IF CFLAG:(ARG:0):アピール回数増加状態
+	LOCAL:0 += (CFLAG:(ARG:0):アピール回数増加状態 % 10)
+ENDIF
+
+;攻撃回数指定フラグがたっている場合、その回数に強制変更
+IF TFLAG:攻撃回数指定 > 0
+	LOCAL:0 = TFLAG:攻撃回数指定
+ENDIF
+
+;攻撃回数追加フラグが立っている場合、その分を追加
+IF TFLAG:攻撃回数追加 != 0
+	LOCAL:0 += TFLAG:攻撃回数追加
+ENDIF
+
+RETURN LOCAL:0
+
+;命中率計算
+;ARG:0	攻撃側番号
+;ARG:1	防御側番号
+;ARG:2	種類(0:物理命中で計算　1:魔法命中で計算　2:性命中で計算(基本必中))
+@GET_HIT_RATE(ARG:0, ARG:1, ARG:2)
+;LOCAL
+;0	命中
+;1	攻撃側命中
+;2	防御側回避
+;3	補正値
+LOCAL:0 = 0
+LOCAL:1 = 0
+LOCAL:2 = 0
+LOCAL:3 = 0
+
+;相手が停止中の場合、100%
+IF CFLAG:(ARG:1):ストップ状態
+	RETURN 100
+ENDIF
+;必中補正ありなら100%
+IF TFLAG:必中補正
+	RETURN 100
+ENDIF
+IF ARG:2 == 0
+	LOCAL:1 = BASE:(ARG:0):最終命中率
+ELSE
+	PRINTFORMW 不明な属性が使われています
+ENDIF
+
+LOCAL:2 = BASE:(ARG:1):最終回避率
+
+LOCAL:0 = 50
+
+;+-100までは、10ごとに1%増減
+LOCAL:0 += (LOCAL:1 - LOCAL:2) / 10
+
+;この時点で10%以上変動した場合、キャップをかける
+SIF LOCAL:0 < 40
+	LOCAL:0 = 40
+SIF LOCAL:0 > 60
+	LOCAL:0 = 60
+
+;更に、差の平方に相当する量と、1割の差につき1.5%を加える
+IF LOCAL:1 >= LOCAL:2
+	LOCAL:0 += SQRT(LOCAL:1 - LOCAL:2)
+	LOCAL:3 = 15 * (LOCAL:1 - LOCAL:2) / (LOCAL:2 + 1)
+	SIF LOCAL:3 > 15
+		LOCAL:3 = 15
+	LOCAL:0 += LOCAL:3
+ELSE
+	LOCAL:0 -= SQRT(LOCAL:2 - LOCAL:1)
+	LOCAL:3 = 15 * (LOCAL:2 - LOCAL:1) / (LOCAL:1 + 1)
+	SIF LOCAL:3 > 15
+		LOCAL:3 = 15
+	LOCAL:0 -= LOCAL:3
+ENDIF
+	
+
+;命中補正追加
+IF TFLAG:命中補正 != 0
+	LOCAL:0 += TFLAG:命中補正
+ENDIF
+	
+;回避補正追加
+IF CFLAG:(ARG:1):回避ボーナス
+	LOCAL:0 -= CFLAG:(ARG:1):回避ボーナス
+ENDIF
+	
+	
+	
+;最終的に25%以下か97%以上になった場合、キャップをかける
+;元５だった。が、命中率が低いと（少なくともJの人は）ストレスが溜まるので25％に
+SIF LOCAL:0 < 25
+	LOCAL:0 = 25
+SIF LOCAL:0 > 97
+	LOCAL:0 = 97
+
+;影分身中の場合
+IF CFLAG:(ARG:1):分身状態 > 10
+	LOCAL:0 = LOCAL:0 * (100 - (CFLAG:(ARG:1):分身状態 % 10) * 10) / 100
+ENDIF
+
+;ARG:0	対象スキルID
+;ARG:1	気絶キャラ無視フラグ	1で無視
+;分析持ちで命中率表示
+CALL GET_MAX_ABL_PT(219)
+SIF RESULT
+	PRINTFORML HIT：{LOCAL:0}％
+
+RETURN LOCAL:0
+
+;生存者の中からランダムで対象を選ぶ
+@SELECT_LIVE_MEMBER_PT
+;LOCAL
+;0	LOOP
+;1	乱数保存
+;2	生存者カウンタ
+;3～7	選択される確率
+;8	RESULT
+
+;変数初期化
+FOR LOCAL:0, 1, 9
+	LOCAL:(LOCAL:0) = 0
+NEXT
+LOCAL:2 = 0
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0 && CFLAG:(FLAG:(LOCAL:0)):気絶状態 == 0
+		LOCAL:2 += 10
+	ENDIF
+	LOCAL:(LOCAL:0 - 1077) = LOCAL:2
+NEXT
+
+SIF LOCAL:2 == 0
+	RETURN 1
+
+LOCAL:1 = RAND:(LOCAL:2)
+
+IF LOCAL:1 < LOCAL:3
+	LOCAL:8 = 1
+ELSEIF LOCAL:1 < LOCAL:4
+	LOCAL:8 = 2
+ELSEIF LOCAL:1 < LOCAL:5
+	LOCAL:8 = 3
+ELSEIF LOCAL:1 < LOCAL:6
+	LOCAL:8 = 4
+ELSEIF LOCAL:1 < LOCAL:7
+	LOCAL:8 = 5
+ELSE
+	;誰も選ばれない場合(エラーっぽいけど、先頭を返しておく)
+	LOCAL:8 = 1
+ENDIF
+
+RETURN LOCAL:8
+
+
+;生存者の中からランダムで対象を選ぶ(敵版)
+@SELECT_LIVE_MEMBER_ENEMY
+;LOCAL
+;0	LOOP
+;1	乱数保存
+;2	生存者カウンタ
+;3～12	選択される確率
+;13	RESULT
+
+;変数初期化
+FOR LOCAL:0, 1, 14
+	LOCAL:(LOCAL:0) = 0
+NEXT
+LOCAL:2 = 0
+FOR LOCAL:0, 1, 11
+	IF TFLAG:(LOCAL:0 + 1000) > 0 && CFLAG:(LOCAL:0):気絶状態 == 0
+		LOCAL:2 += 10
+	ENDIF
+	LOCAL:(LOCAL:0 + 2) = LOCAL:2
+NEXT
+
+SIF LOCAL:2 == 0
+	RETURN 1
+
+LOCAL:1 = RAND:(LOCAL:2)
+
+IF LOCAL:1 < LOCAL:3
+	LOCAL:8 = 1
+ELSEIF LOCAL:1 < LOCAL:4
+	LOCAL:8 = 2
+ELSEIF LOCAL:1 < LOCAL:5
+	LOCAL:8 = 3
+ELSEIF LOCAL:1 < LOCAL:6
+	LOCAL:8 = 4
+ELSEIF LOCAL:1 < LOCAL:7
+	LOCAL:8 = 5
+ELSEIF LOCAL:1 < LOCAL:8
+	LOCAL:8 = 6
+ELSEIF LOCAL:1 < LOCAL:9
+	LOCAL:8 = 7
+ELSEIF LOCAL:1 < LOCAL:10
+	LOCAL:8 = 8
+ELSEIF LOCAL:1 < LOCAL:11
+	LOCAL:8 = 9
+ELSEIF LOCAL:1 < LOCAL:12
+	LOCAL:8 = 10
+ELSE
+	;誰も選ばれない場合(エラーっぽいけど、先頭を返しておく)
+	LOCAL:8 = 1
+ENDIF
+
+RETURN LOCAL:8
+
+
+
+;コンマ付加
+;ARG:0	元の数値
+@ADD_COMMA(ARG:0)
+#FUNCTIONS
+
+;C#と同等の書式使えるなら関数作る必要無かったなぁ……
+
+RETURNF TOSTR(ARG:0, "#,0")
+
+
+
+
+;共通処理など
+;一覧
+;@POWER_D(ARG:0, ARG:1)			小数の指数計算。例えば1.1^2が欲しい場合、(11, 2)を渡すと、121(実際の値の100倍。小数第二位まで計算してると思って)が返ってくる。
+;指数計算(小数入り)
+;ARG:0	元の数。小数を想定するので、実際の値の100倍を渡すこと
+;ARG:1	何乗するか
+;戻り値	計算結果。小数点第２位まで計算するので、実際の値の100倍を返す
+@POWER_D(ARG:0, ARG:1)
+#FUNCTION
+#LOCALSIZE 2
+IF ARG:1 <= 0
+	;面倒だから負の数全部0乗扱い
+	RETURNF 100
+ELSEIF ARG:1 == 1
+	RETURNF ARG:0
+ENDIF
+
+LOCAL:1 = ARG:0 * 100
+FOR LOCAL:0, 1, ARG:1
+	LOCAL:1 = LOCAL:1 * ARG:0 / 100
+NEXT
+
+RETURNF (LOCAL:1 / 100)
+
+
+
+;HP/EP0チェック
+;ARG:0	脱がし方(0：通常　1：下段(下→上→秘→胸)　2：めくり(下→秘→上→胸))
+@CHECK_HPEP_0(ARG:0)
+;LOCAL
+;0	LOOP0
+;1	LOOP1
+
+;敵側更新
+FOR LOCAL:0, 1, 11
+	IF TFLAG:(LOCAL:0 + 1000) > 0
+		CALL CHECK_PERSONAL_HPEP_0(LOCAL:0, ARG:0)
+	ENDIF
+NEXT
+
+;味方側更新
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		CALL CHECK_PERSONAL_HPEP_0(FLAG:(LOCAL:0), ARG:0)
+	ENDIF
+NEXT
+
+
+
+;HP/EP0チェック
+;ARG:0	対象キャラ
+;ARG:1	脱がし方(0：通常　1：下段(下→上→秘→胸)　2：めくり(下→秘→上→胸))
+@CHECK_PERSONAL_HPEP_0(ARG:0, ARG:1)
+;LOCAL
+;0	LOOP
+;1	気絶フラグ
+;2	強度
+;3	恍惚強度
+;4	絶頂強度
+;5	WAITフラグ
+;6	仕切り直し成功率
+;7	TEMP
+
+;気絶している場合と時間が止まっている場合は除外
+IF CFLAG:(ARG:0):ストップ状態 || CFLAG:(ARG:0):気絶状態
+	RETURN
+ENDIF
+
+;!!!
+;死なない系特殊効果は後回し
+
+;★0チェック
+
+LOCAL:1 = 0
+LOCAL:2 = 0
+
+IF (BASE:(ARG:0):HP <= 0)
+	LOCAL:1 = 1
+	;未使用
+	;強度？らしいが使い方が分からないのでコメントアウト
+	;LOCAL:2 -= BASE:(ARG:0):HP
+	;LOCAL:2 = ((LOCAL:2 / MAXBASE:(ARG:0):HP) + 1) / 2 + 2
+	;IF LOCAL:2 > 12
+	;	LOCAL:2 = 12
+	;ENDIF
+	
+	CALL STATUS_RENEW_2(ARG:0)	
+	
+	IF LOCAL:1 && CFLAG:(ARG:0):気絶状態 == 0
+		;SP0による気絶口上
+		FLAG:フェス中口上 = 5
+		CALL KOJO(ARG:0)
+		
+		TFLAG:獲得経験値 += CFLAG:(ARG:0):獲得経験値
+		TFLAG:獲得金額 += CFLAG:(ARG:0):獲得金額
+		BASE:(ARG:0):HP = 0
+		CALL FAINT_CHARACTER(ARG:0)
+		CALL STATUS_RENEW_2(ARG:0)
+	ELSEIF LOCAL:1 && CFLAG:(ARG:0):気絶状態
+		;既に気絶済みで超オーバーキル
+		BASE:(ARG:0):HP = 0
+	ELSE
+		;通常強度（服の事）
+		PRINT 回復する
+		BASE:(ARG:0):HP = MAXBASE:(ARG:0):HP
+	ENDIF
+ENDIF
+;乱数分変化(±5%を2回足す　最終的には中央値が出やすい±10%)
+;ARG:0	対象数値
+@ADD_RAND(ARG:0)
+#FUNCTION
+#LOCALSIZE 1
+LOCAL:0 = ARG:0
+LOCAL:0 = LOCAL:0 * (1050 - RAND:101) / 1000
+LOCAL:0 = LOCAL:0 * (1050 - RAND:101) / 1000
+
+RETURNF LOCAL:0
+;キャラを気絶させる
+;ARG:0	対象キャラ
+@FAINT_CHARACTER(ARG:0)
+;LOCAL
+;0	LOOP
+;不屈状態
+IF CFLAG:(ARG:0):不屈の闘志状態
+	CFLAG:(ARG:0):不屈の闘志状態 = 0
+	;HPが0以下なら1にする
+	IF BASE:(ARG:0):HP <= 0
+		BASE:(ARG:0):HP = 1
+	ENDIF
+	;回復後、SPが1以上なら気絶キャンセル
+	IF BASE:(ARG:0):HP > 0
+		;ユニークスキル発動した場合文字色変える
+		SETCOLOR 0x10EEEE
+		PRINTFORML %CALLNAME:(ARG:0)%＞＞不屈の闘志によって耐えきった！
+		RESETCOLOR
+		CALL BMSG_WAIT(1)
+		RETURN
+	ENDIF
+ENDIF
+;王者の威圧チェック
+CALL GET_MAX_ABL_PT(237)
+IF RESULT == 0
+	;ど根性状態
+	IF ABL:(ARG:0):ど根性
+		IF RAND:100 < 25
+			;SPが0以下なら1にする
+			IF BASE:(ARG:0):HP <= 0
+				BASE:(ARG:0):HP = 1
+			ENDIF
+			;回復後、SPが1以上なら気絶キャンセル
+			IF BASE:(ARG:0):HP > 0
+				;ユニークスキル発動した場合文字色変える
+				SETCOLOR 0x10EEEE
+				PRINTFORML %CALLNAME:(ARG:0)%＞＞ど根性で気絶に耐えた！
+				RESETCOLOR
+				CALL BMSG_WAIT(1)
+				RETURN
+			ENDIF
+		ELSE
+		ENDIF
+	ENDIF
+
+	;ど根性状態
+	IF ABL:(ARG:0):ちびギャルの意地 || ABL:(ARG:0):ギャルの意地
+		IF RAND:100 < 10
+			;SPが0以下なら1にする
+			IF BASE:(ARG:0):HP <= 0
+				BASE:(ARG:0):HP = 1
+			ENDIF
+			;回復後、★が1以上なら気絶キャンセル
+			IF BASE:(ARG:0):HP > 0
+				;ユニークスキル発動した場合文字色変える
+				SETCOLOR 0x10EEEE
+				PRINTFORML %CALLNAME:(ARG:0)%＞＞ギャルの意地で気絶に耐えた！
+				RESETCOLOR
+				CALL BMSG_WAIT(1)
+				RETURN
+			ENDIF
+		ELSE
+		ENDIF
+	ENDIF
+ENDIF
+;リレイズ状態
+IF CFLAG:(ARG:0):リレイズ状態
+	CFLAG:(ARG:0):リレイズ状態 = 0
+	;★が0以下なら★半分で回復
+	IF BASE:(ARG:0):HP <= 0
+		BASE:(ARG:0):HP = (MAXBASE:(ARG:0):HP / 2)
+	ENDIF
+	;回復後、★が1以上なら気絶キャンセル
+	IF BASE:(ARG:0):HP > 0
+		PRINTFORML リレイズ発動＞＞%CALLNAME:(ARG:0)%＞＞気絶から復活！
+		CALL BMSG_WAIT(1)
+		RETURN
+	ENDIF
+ENDIF
+;★変化を元に戻す
+IF CFLAG:(ARG:0):変化★ > 0
+	MAXBASE:(ARG:0):HP = CFLAG:(ARG:0):変化前最大★保存
+	IF BASE:(ARG:0):HP > MAXBASE:(ARG:0):HP
+		BASE:(ARG:0):HP = MAXBASE:(ARG:0):HP
+	ENDIF
+ENDIF
+;全ての状態異常回復
+FOR LOCAL:0, 1031, 1092
+	CFLAG:(ARG:0):(LOCAL:0) = 0
+NEXT
+FOR LOCAL:0, 1130, 1151
+	CFLAG:(ARG:0):(LOCAL:0) = 0
+NEXT
+
+;気絶状態にする
+CFLAG:(ARG:0):気絶状態 = 1
+CALL SET_DEFAULT_WAIT(ARG:0)
+CFLAG:(ARG:0):現在状態 = -1
+CFLAG:(ARG:0):行動の対象 = 0
+CFLAG:(ARG:0):集中フラグ = 0
+PRINTFORML %CALLNAME:(ARG:0)%＞＞気絶！
+CALL BMSG_WAIT(1)
+;スキル名を取得する　※ABLNAMEで普通にとると通常攻撃などが変になる対策
+;ARG:0	対象スキル番号
+@GET_ABLNAME(ARG:0)
+#FUNCTIONS
+#LOCALSIZE 1
+LOCALS:0 = 
+
+SELECTCASE ARG:0
+	CASE 1001
+		LOCALS:0 = 通常アピール
+	CASE 1003
+		LOCALS:0 = ガード
+	CASEELSE
+		LOCALS:0 = %ABLNAME:(ARG:0)%
+ENDSELECT
+
+
+RETURNF LOCALS:0
+
+
+
+;PTメンバー内の最大スキルレベル取得
+;ARG:0	対象スキルID
+;ARG:1	気絶キャラ無視フラグ	1で無視
+@GET_MAX_ABL_PT(ARG:0, ARG:1)
+;LOCAL
+;0	LOOP
+;1	TEMP
+LOCAL:1 = 0
+
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) >= 0 && (ARG:1 == 1 || CFLAG:(FLAG:(LOCAL:0)):気絶状態 == 0)
+		IF LOCAL:1 < ABL:(FLAG:(LOCAL:0)):(ARG:0)
+			LOCAL:1 = ABL:(FLAG:(LOCAL:0)):(ARG:0)
+		ENDIF
+	ENDIF
+NEXT
+
+RETURN LOCAL:1
+
+
+;PTメンバー内の最大CFLAG取得(アイテム能力などに利用)
+;ARG:0	対象ID
+;ARG:1	気絶キャラ無視フラグ	1で無視
+@GET_MAX_CFLAG_PT(ARG:0, ARG:1)
+;LOCAL
+;0	LOOP
+;1	TEMP
+LOCAL:1 = 0
+
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) >= 0 && (ARG:1 == 0 || CFLAG:(FLAG:(LOCAL:0)):気絶状態 == 0)
+		IF LOCAL:1 < CFLAG:(FLAG:(LOCAL:0)):(ARG:0)
+			LOCAL:1 = CFLAG:(FLAG:(LOCAL:0)):(ARG:0)
+		ENDIF
+	ENDIF
+NEXT
+
+RETURN LOCAL:1
+
+
+;戦闘中メッセージスキップ処理
+;ARG:0	スキップレベル
+@BMSG_WAIT(ARG:0)
+;IF TFLAG:14 == 0
+	;非戦闘中は常に止める
+	;WAIT
+IF FLAG:1704 < ARG:0
+	WAIT
+ENDIF
+
+
+
+;現在位置が屋内か屋外かを返す
+;RETURN		0:屋内	1;屋外
+@CHECK_IN_OUT
+LOCAL:1 = 0
+
+IF FLAG:現在挑戦中仕事 == 10
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 11 && FLAG:現在フロア <= 5
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 12
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 13
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 14 && FLAG:現在フロア <= 5
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 15 && FLAG:現在フロア <= 5
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 16 && FLAG:現在フロア <= 5
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 17 && FLAG:現在フロア <= 5
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 18
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 19
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 20
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 21
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 22 && FLAG:現在フロア <= 5
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 23 && FLAG:現在フロア <= 5
+	LOCAL:1 = 1
+ENDIF
+
+;◆神霊廟
+IF FLAG:現在挑戦中仕事 == 24 && FLAG:現在フロア <= 5
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 30 && FLAG:現在フロア <= 5
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 31 && FLAG:現在フロア <= 5
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 32
+;	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 33
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 34 && FLAG:現在フロア <= 15
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 40
+;	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 41
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 42
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 43
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 44
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 45
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 46
+	LOCAL:1 = 1
+ENDIF
+
+IF FLAG:現在挑戦中仕事 == 50
+	LOCAL:1 = 1
+ENDIF
+
+RETURN LOCAL:1
+
+;全滅処理
+@WIPEOUT
+PRINTFORMW %CALLNAME:(FLAG:リーダー)%達は敗北してしまった……
+;全滅回数+1
+FLAG:全滅回数 += 1
+
+;未鑑定アイテム紛失
+FOR LOCAL:0, 100, 300
+	FLAG:(LOCAL:0 + 1000) = 0
+NEXT
+FLAG:所持アイテム数 = 0
+
+;お金5％ロス
+LOCAL:0 = MONEY:0 / 20
+IF LOCAL:0 > 0
+	PRINTFORMW %ADD_COMMA(LOCAL:0)%Ｇ失った…
+	MONEY:0 -= LOCAL:0
+ENDIF
+;帰還フラグON
+FLAG:帰還フラグ = 1
+
+
+;改行しつつ出力
+;ARG:0	0:通常　1:カウンタ初期化　2:終了処理
+;ARG:1	出力文字列
+@PRINT_LCL(ARG:0, ARGS:0)
+IF ARG:0 == 1
+	LOCAL:0 = 0
+	RETURN
+ENDIF
+IF ARG:0 == 2
+	;3つ目まで出力が終わっていれば改行しない
+	IF LOCAL:0 % 3 != 0
+		PRINTL 
+	ENDIF
+	RETURN
+ENDIF
+
+PRINTFORMLC %ARGS:0%
+LOCAL:0 += 1
+IF LOCAL:0 % 3 == 0
+	PRINTL 
+ENDIF
+
+
+;未使用
+;ステータス名・値取得
+;ARG:0	対象キャラ
+;ARG:1	対象ステータス(0：筋力～7：運)
+@STATUS_NAME_VALUE(ARG:0, ARG:1)
+#FUNCTIONS
+#LOCALSSIZE 1
+SELECTCASE ARG:1
+	CASE 0
+		LOCALS:0 = POW
+	CASE 1
+		LOCALS:0 = GUA
+	CASE 5
+		LOCALS:0 = HIT
+	CASE 6
+		LOCALS:0 = SPD
+	CASEELSE
+		LOCALS:0 = LUC
+ENDSELECT
+
+LOCALS:0 = %LOCALS:0% {CFLAG:(ARG:0):(ARG:1 + 1234),3}
+RETURNF LOCALS:0
+
+;未使用
+;ステータス名取得
+;ARG:0	対象ステータス(0：筋力～7：運)
+@GET_STATUS_NAME(ARG:0)
+#FUNCTIONS
+#LOCALSSIZE 1
+SELECTCASE ARG:0
+	CASE 0
+		LOCALS:0 = POW
+	CASE 1
+		LOCALS:0 = GUA
+	CASE 5
+		LOCALS:0 = HIT
+	CASE 6
+		LOCALS:0 = SPD
+	CASEELSE
+		LOCALS:0 = LUC
+ENDSELECT
+
+RETURNF LOCALS:0
+
+
+;未使用
+;数値を色つきで表示
+;ARG:0	表示する数値
+@PRINT_COLOR_VALUE(ARG:0)
+;LOCAL
+;0		LOOP
+;1～6	各桁での数値
+;7		自分より上の桁が存在するフラグ
+
+;初期化
+LOCAL:7 = 0
+
+;数値取得
+FOR LOCAL:0, 0, 6
+	LOCAL:(LOCAL:0 + 1) = (ARG:0 / POWER(1000, LOCAL:0)) % 1000
+NEXT
+
+FOR LOCAL:0, 6, 0, -1
+	SELECTCASE LOCAL:0
+		CASE 6
+			SETCOLOR 0xEE6610
+		CASE 5
+			SETCOLOR 0x10EE10
+		CASE 4
+			SETCOLOR 0xEE1010
+		CASE 3
+			SETCOLOR 0xEEEE10
+		CASE 2
+			SETCOLOR 0x10EEEE
+		CASEELSE
+			RESETCOLOR
+	ENDSELECT
+	
+	IF LOCAL:(LOCAL:0) > 0
+		IF LOCAL:7
+			PRINTFORM %TOSTR(LOCAL:(LOCAL:0), "000")%
+		ELSE
+			PRINTFORM {LOCAL:(LOCAL:0)}
+		ENDIF
+		LOCAL:7 = 1
+	ELSEIF LOCAL:7
+		PRINTFORM %TOSTR(LOCAL:(LOCAL:0), "000")%
+	ELSEIF LOCAL:0 == 1
+		;最後まで表示するものが無い（0以下）なら普通に表示
+		PRINTFORM {LOCAL:(LOCAL:0)}
+	ENDIF
+NEXT
+
+RESETCOLOR
+
+;対象選択の処理統一
+;ARG:0	スキルID
+;ARG:1	使用キャラ
+@SELECT_SKILL_TARGET_COMMON(ARG:0, ARG:1)
+
+TRYCCALLFORM SELECT_SKILL_TARGET_{ARG:0}(ARG:1)
+CATCH
+	PRINTFORMW このスキル(ID:{ARG:0})は未実装のため使用できません
+	RESULT = 0
+ENDCATCH
+IF RESULT
+	;スキル選択用口上
+	FLAG:フェス中口上 = 30
+	CALL KOJO(ARG:1, ARG:0)
+	RETURN 1
+ENDIF
+
+RETURN 0
+
+
+
+;庇うラインの取得
+;ARG:0	効果レベル
+@GET_COVER_RATE(ARG:0)
+LOCAL:1 = 0
+SELECTCASE ARG:0
+CASE 0
+	LOCAL:1 = 5
+CASE 1
+	LOCAL:1 = 15
+CASE 2
+	LOCAL:1 = 25
+CASE 3
+	LOCAL:1 = 35
+CASE 4
+	LOCAL:1 = 45
+CASE 5
+	LOCAL:1 = 55
+CASE 6
+	LOCAL:1 = 65
+CASE 7
+	LOCAL:1 = 75
+CASE 8
+	LOCAL:1 = 85
+CASEELSE
+	LOCAL:1 = 95
+ENDSELECT
+
+RETURN LOCAL:1
+
+;戦闘状況表示
+@SHOW_BATTLE_NORMAL_STATE
+;敵状況
+DRAWLINE
+CALL SHOW_ENEMY_SIMPLE
+DRAWLINE
+CALL SHOW_PT_SIMPLE_BATTLE
+DRAWLINE
+
+;スキルの対象として設定されているキャラの登録番号を取得する
+;ARG:0	対象ID(1～5：味方　11～20：敵　　それ以外は無視)
+@GET_SKILL_TARGET_NO(ARG:0)
+;LOCAL
+;0	LOOP
+;1	TEMP
+
+LOCAL:1 = 0
+IF (ARG:0 >= 1) && (ARG:0 <= 10)
+	LOCAL:1 = FLAG:(1079 + ARG:0)
+ELSEIF (ARG:0 >= 11) && (ARG:0 <= 20)
+	LOCAL:1 = ARG:0 - 10
+ENDIF
+
+RETURN LOCAL:1
+;HPなどを表示
+;ARG:0	対象キャラ
+;ARG:1	表示内容（0:HP 1:MP 2:EP）
+@PRINT_HPMPEP(ARG:0, ARG:1)
+;LOCAL
+;0	LOOP
+;1	TEMP
+
+SELECTCASE ARG:1
+	CASE 0
+		IF BASE:(ARG:0):HP == 0
+			SETCOLOR 0xEE1010
+		ELSEIF (BASE:(ARG:0):HP  * 100 / MAXBASE:(ARG:0):HP) < 25
+			SETCOLOR 0xEE9910
+		ELSEIF (BASE:(ARG:0):HP  * 100 / MAXBASE:(ARG:0):HP) < 50
+			SETCOLOR 0xEEEE10
+		ENDIF
+		
+		IF FLAG:1712 == 0
+			;短縮表示
+			CALL STARMARK_Y 
+			PRINTFORM %GET_SHORT_DESC(BASE:(ARG:0):HP),6%/%GET_SHORT_DESC(MAXBASE:(ARG:0):HP),7% 
+		ELSE
+			CALL STARMARK_Y 
+			PRINTFORM  {BASE:(ARG:0):HP,6}/{MAXBASE:(ARG:0):HP,6} 
+		ENDIF
+		RESETCOLOR
+		
+	CASE 1
+		IF BASE:(ARG:0):MP == 0
+			SETCOLOR 0xEE1010
+		ELSEIF (BASE:(ARG:0):MP * 100 / MAXBASE:(ARG:0):MP) < 25
+			SETCOLOR 0xEE9910
+		ELSEIF (BASE:(ARG:0):MP * 100 / MAXBASE:(ARG:0):MP) < 50
+			SETCOLOR 0xEEEE10
+		ENDIF
+		IF FLAG:1712 == 0
+		;短縮表示
+		CALL HEARTMARK_P
+		PRINTFORM  %GET_SHORT_DESC(BASE:(ARG:0):MP),5%/%GET_SHORT_DESC(MAXBASE:(ARG:0):MP),6% 
+		ELSE
+		CALL HEARTMARK_P
+		PRINTFORM  {BASE:(ARG:0):MP,4}/{MAXBASE:(ARG:0):MP,4} 
+		ENDIF
+
+		RESETCOLOR
+		
+	CASE 2
+		IF BASE:(ARG:0):ボルテージ == 0
+			SETCOLOR 0xEE1010
+		ELSEIF BASE:(ARG:0):ボルテージ * 100 / MAXBASE:(ARG:0):ボルテージ < 25
+			SETCOLOR 0xEE9910
+		ELSEIF BASE:(ARG:0):ボルテージ * 100 / MAXBASE:(ARG:0):ボルテージ < 50
+			SETCOLOR 0xEEEE10
+		ENDIF
+		IF FLAG:1712 == 0
+			;短縮表示
+			PRINTFORM VL %GET_SHORT_DESC(BASE:(ARG:0):ボルテージ),6%/%GET_SHORT_DESC(MAXBASE:(ARG:0):ボルテージ),7% 
+		ELSE
+			PRINTFORM VL {BASE:(ARG:0):ボルテージ,6}/{MAXBASE:(ARG:0):ボルテージ,6} 
+		ENDIF
+		RESETCOLOR
+ENDSELECT
+
+;何に使っているのかよく分からん
+;数値の短縮表記取得
+;ARG:0	数値
+@GET_SHORT_DESC(ARG:0)
+#FUNCTIONS
+#LOCALSSIZE 1
+IF ARG:0 < 100000
+	LOCALS:0 = {ARG:0}%" "%
+ELSEIF ARG:0 < 100000000
+	LOCALS:0 = {ARG:0 / 1000}K
+ELSEIF ARG:0 < 100000000000
+	LOCALS:0 = {ARG:0 / 1000000}M
+ELSEIF ARG:0 < 100000000000000
+	LOCALS:0 = {ARG:0 / 1000000000}G
+ELSEIF ARG:0 < 100000000000000000
+	LOCALS:0 = {ARG:0 / 1000000000000}T
+ELSE
+	LOCALS:0 = {ARG:0 / 1000000000000000}P
+ENDIF
+
+RETURNF LOCALS:0
+
+;;-------------------------------------------------
+;口上色設定@AVERAGE_LV
+;ユニットの平均レベルを返す関数
+;-------------------------------------------------
+@AVERAGE_LV
+#FUNCTION
+#LOCALSIZE 3
+;LOCAL		ループ用
+;LOCAL:1	合計戦闘レベル
+;LOCAL:2	ユニット人数
+
+LOCAL:1 = 0
+LOCAL:2 = 0
+FOR LOCAL, 1080, 1085
+	IF FLAG:LOCAL > 0
+		LOCAL:1 += BASE:(FLAG:LOCAL):戦闘レベル
+		LOCAL:2 += 1
+	ENDIF
+NEXT
+
+LOCAL:1 /= LOCAL:2
+
+RETURNF LOCAL:1
+
+

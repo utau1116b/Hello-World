@@ -1,0 +1,194 @@
+;キャラの装備性能再計算処理
+;ARG:0	対象キャラ登録番号
+;LOCAL:1 ループ用
+;LOCAL:2 ループ用
+;LOCAL:3 強度
+;LOCAL:5 服ID
+@EQUIP_RENEW(ARG:0)
+;能力初期化
+VARSET LOCAL
+;ステータス変化をリセット
+FOR LOCAL:1, 0, 30
+	CFLAG:(ARG:0):(LOCAL:1 + 1100) = 0
+NEXT
+;特殊能力付加をリセット
+FOR LOCAL:1, 0, 79
+	CFLAG:(ARG:0):(LOCAL:1 + 1151) = 0
+NEXT
+
+;対象となる服のIDをTに保存
+T = 0
+
+;装備中服ＩＤをLOCAL：５に保存
+;これをアクセサリーなどにも適用
+
+LOCAL:5 = EQUIP:ARG:装着中服ID
+IF LOCAL:5 <= 0
+	;0だった場合は着ていないので無視
+	RETURN
+ENDIF
+LOCAL:4 = 0
+
+;装備のベース能力を代入
+TRYCALLFORM HP_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):★総計 = RESULT / 100
+TRYCALLFORM MP_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):ハート総計 = RESULT / 100
+TRYCALLFORM POW_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):POW総計 = RESULT / 100
+TRYCALLFORM GUA_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):GUA総計 = RESULT / 100
+TRYCALLFORM DEX_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):DEX総計 = RESULT / 100
+TRYCALLFORM SPD_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):SPD総計 = RESULT / 100
+TRYCALLFORM LUC_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):LUC総計 = RESULT / 100
+
+;ここにボルテージからVOVIDA補正を入れる
+TRYCALLFORM VO_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):VO総計 = RESULT / 100
+TRYCALLFORM VI_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):VI総計 = RESULT / 100
+TRYCALLFORM DA_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):DA総計 = RESULT / 100
+TRYCALLFORM VO耐性_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):VO耐性総計 = RESULT / 100
+TRYCALLFORM VI耐性_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):VI耐性総計 = RESULT / 100
+TRYCALLFORM DA耐性_{EQUIP:ARG:装着中服ID}
+BASE:(ARG:0):DA耐性総計 = RESULT / 100
+;未完成
+;特殊能力
+;FOR LOCAL:2, 0, 5
+;	;強度をLOCAL:3に保存
+;	LOCAL:3 = DITEMTYPE:(LOCAL:5):(LOCAL:2 + 28) / 10000
+;	SELECTCASE (DITEMTYPE:(LOCAL:5):(LOCAL:2 + 28) % 100)
+;		CASE 1
+;			;★+
+;			CFLAG:(ARG:0):補正★ += LOCAL:3
+;			SIF CFLAG:(ARG:0):補正★ > 100
+;				CFLAG:(ARG:0):補正★ = 100
+;		CASE 2
+;			;ハート+
+;			CFLAG:(ARG:0):補正ハート += LOCAL:3
+;			SIF CFLAG:(ARG:0):補正ハート > 100
+;				CFLAG:(ARG:0):補正ハート = 100
+;		CASE 3
+;			;VL+
+;
+;		CASE 4 TO 11
+;			;能力値補正
+;			CFLAG:(ARG:0):((DITEMTYPE:(LOCAL:5):(LOCAL:2 + 28) % 100) + 1149) += LOCAL:3
+;		CASE 12 TO 24
+;			;状態異常付加
+;			CFLAG:(ARG:0):((DITEMTYPE:(LOCAL:5):(LOCAL:2 + 28) % 100) + 1258) += (LOCAL:3 / 10)
+;		CASE 25 TO 42
+;			;状態異常耐性
+;			CFLAG:(ARG:0):((DITEMTYPE:(LOCAL:5):(LOCAL:2 + 28) % 100) + 1156) += LOCAL:3
+;		CASE 43
+;			;行動不能耐性
+;			;睡眠に耐性＋
+;			BASE:(ARG:0):補正スリープ耐性 += LOCAL:3
+;		CASE 44
+;			;能力半減耐性
+;			;スリップ・スロウ・暗闇・に耐性＋
+;;			BASE:(ARG:0):補正スリップ耐性 += LOCAL:3
+;			BASE:(ARG:0):補正スロウ耐性 += LOCAL:3
+;			BASE:(ARG:0):補正ブライン耐性 += LOCAL:3
+;		CASE 45
+;			;行動制限耐性
+;			;呪い・恐怖・封印に耐性＋
+;			BASE:(ARG:0):補正カース耐性 += LOCAL:3
+;			BASE:(ARG:0):補正フィアー耐性 += LOCAL:3
+;			BASE:(ARG:0):補正シール耐性 += LOCAL:3
+;		CASE 46
+;			;全異常耐性
+;			FOR LOCAL:4, 0, 18
+;				CFLAG:(ARG:0):(LOCAL:4 + 1181) += LOCAL:3
+;			NEXT
+;			CFLAG:(ARG:0):1199 += LOCAL:3 * 4 / 5
+;			CFLAG:(ARG:0):1200 += LOCAL:3
+;		CASE 47
+;			;消費MP軽減
+;			CFLAG:(ARG:0):消費ハート軽減 += LOCAL:3
+;			SIF CFLAG:(ARG:0):消費ハート軽減 > 20
+;				CFLAG:(ARG:0):消費ハート軽減 = 20
+;		CASE 48
+;			;準備時間軽減→待機時間軽減
+;
+;		CASE 49
+;			;攻撃回数増加
+;			CFLAG:(ARG:0):攻撃回数増加 += LOCAL:3
+;			SIF CFLAG:(ARG:0):攻撃回数増加 > 1
+;				CFLAG:(ARG:0):攻撃回数増加 = 1
+;		CASE 50
+;			;範囲攻撃
+;			SIF ABL:(ARG:0):攻撃範囲 < LOCAL:3
+;			ABL:(ARG:0):攻撃範囲 = LOCAL:3
+;			
+;		CASE 52 TO 58
+;			;属性攻撃
+;			SIF CFLAG:(ARG:0):((DITEMTYPE:(LOCAL:5):(LOCAL:2 + 28) % 100) + 1236) < LOCAL:3
+;				CFLAG:(ARG:0):((DITEMTYPE:(LOCAL:5):(LOCAL:2 + 28) % 100) + 1236) = LOCAL:3
+;		CASE 59 TO 68
+;			;属性耐性
+;			CFLAG:(ARG:0):((DITEMTYPE:(LOCAL:5):(LOCAL:2 + 28) % 100) + 1112) += LOCAL:3
+;		CASE 69
+;			;４属性耐性
+;			BASE:(ARG:0):補正VO耐性 += LOCAL:3
+;			BASE:(ARG:0):補正DA耐性 += LOCAL:3
+;			BASE:(ARG:0):補正VI耐性 += LOCAL:3
+;			BASE:(ARG:0):補正EX耐性 += LOCAL:3
+;		CASE 71
+;			;クリティカル率アップ
+;			CFLAG:(ARG:0):クリティカルアップ += LOCAL:3
+;			SIF CFLAG:(ARG:0):クリティカルアップ > 3
+;				CFLAG:(ARG:0):クリティカルアップ = 3
+;		CASE 72
+;			;獲得経験値アップ
+;			CFLAG:(ARG:0):経験値アップ += LOCAL:3
+;			SIF CFLAG:(ARG:0):経験値アップ > 300
+;				CFLAG:(ARG:0):経験値アップ = 300
+;		CASE 73
+;			;獲得金額アップ
+;			CFLAG:(ARG:0):獲得金額アップ += LOCAL:3
+;			SIF CFLAG:(ARG:0):獲得金額アップ > 300
+;				CFLAG:(ARG:0):獲得金額アップ = 300
+;		CASE 74
+;			;獲得ファン人数・人気アップ
+;			CFLAG:(ARG:0):1298 += LOCAL:3
+;			SIF CFLAG:(ARG:0):1298 > 300
+;				CFLAG:(ARG:0):1298 = 300
+;		CASE 75
+;			;アイテム獲得率アップ
+;			CFLAG:(ARG:0):アイテムアップ += LOCAL:3
+;			SIF CFLAG:(ARG:0):アイテムアップ > 100
+;				CFLAG:(ARG:0):アイテムアップ = 100
+;		CASE 76
+;			;ドレイン
+;			SIF CFLAG:(ARG:0):ドレイン < LOCAL:3
+;				CFLAG:(ARG:0):ドレイン = LOCAL:3
+;		CASE 77
+;			;背水の陣→★が少なくなるとパワーアップ
+;			SIF CFLAG:(ARG:0):背水の陣 < LOCAL:3
+;				CFLAG:(ARG:0):背水の陣 = LOCAL:3
+;		CASE 78
+;			;やよいゾーン
+;
+;		CASE 79
+;			;とかちゴールド→運気上昇
+;
+;		CASEELSE
+;			;何もなし(or不正値)
+;	ENDSELECT
+;次の能力へ
+;NEXT
+
+;増えすぎた属性耐性切り捨て(装備補正は計60まで)
+FOR LOCAL:1, 0, 3
+	SIF BASE:(ARG:0):(LOCAL:1 + 126) > 60
+		BASE:(ARG:0):(LOCAL:1 + 126) = 60
+NEXT
+
+RETURN

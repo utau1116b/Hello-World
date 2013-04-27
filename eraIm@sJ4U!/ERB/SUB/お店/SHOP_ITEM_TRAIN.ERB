@@ -1,0 +1,214 @@
+;=============================================================================
+;アイテム関連の処理
+;=============================================================================
+;--------------------------------------------------
+;アイテム購入処理
+;--------------------------------------------------
+@TOOL_BUY_MAIN
+;売られているアイテムを確認
+;PRINT_ITEM
+;PRINTFORMW {ITEM:0}
+CALL SALEITEM_CHECK
+;PRINTFORMW {ITEM:0}セールチェック後
+DRAWLINE
+PRINTFORML 調教道具を購入できます。何を買いますか？(残り%ADD_COMMA(MONEY)%Ｇ)
+DRAWLINE
+;売り物表示
+REPEAT 100
+	;購入費用が足りないアイテムを非表示にしたい場合は右のカッコ内の構文を直下の行の右端に追加してください。「 && ITEMPRICE:COUNT <= MONEY」
+	SIF ITEMSALES:COUNT == 1 && ITEMPRICE:COUNT > 0
+		CALL PRINT_NEW_SHOPITEM, COUNT
+REND
+IF LINEISEMPTY()
+	PRINTL 買えるものがありません
+ELSE
+	PRINTL 
+ENDIF
+DRAWLINE
+PRINTLC [100] 戻る
+$INPUT_LOOP
+INPUT
+IF RESULT == 100
+	VARSET ITEMSALES, 0
+	RETURN 0
+ELSEIF RESULT < 0 || RESULT > 100 || ITEMSALES:RESULT == 0
+	CLEARLINE 1
+	GOTO INPUT_LOOP
+ELSEIF  MONEY < ITEMPRICE:RESULT
+	CLEARLINE 1
+	REUSELASTLINE 所持金が足りません
+	GOTO INPUT_LOOP
+ENDIF
+;PRINTFORMW {ITEM:0}買い物確定後
+LOCAL = RESULT
+;消耗品
+;購入したことを分かりやすくしてみよう
+SIF LOCAL < 25 || (LOCAL >= 40 && LOCAL < 60) || LOCAL >= 70
+	PRINTFORMW ＜%ITEMNAME:LOCAL%を購入しました＞
+	ITEM:LOCAL += 1
+	MONEY -= ITEMPRICE:LOCAL
+SIF LOCAL > 61 && LOCAL < 69
+	PRINTFORMW ＜%ITEMNAME:LOCAL%を身につけました＞
+;調教アイテムは買ったら消える
+SIF LOCAL < 25 || LOCAL >= 40
+	ITEMSALES:LOCAL = 0
+;素質アイテム、キャラカードは買ったら消える
+IF (LOCAL >= 60 && LOCAL < 84) || LOCAL == 98
+	ITEMSALES:LOCAL = 0
+	ITEM:LOCAL = 0
+ENDIF
+
+;特殊アイテム【初月の証】
+IF LOCAL == 99
+	ITEM:LOCAL = 1
+	PRINTFORMW 初月モードに突入しました(高レベルへのLvUPに必要な珠軽減)
+ENDIF
+
+;素質アイテム【技巧Lv】
+IF LOCAL == 60 && ABL:MASTER:2 < 99
+	A = 5000
+	B = (ABL:MASTER:2 - 2) * (ABL:MASTER:2 - 5) / 2
+	SIF B <= 0
+		B = 1
+	C = A * (B - 1)
+
+	DRAWLINE
+	IF MONEY < C
+		PRINTFORMW 次のLvになるためには【技巧Lv】が{B}個必要です。お金が足りません。
+		;払い戻し
+		MONEY += A
+		ITEMSALES:LOCAL = 1
+		RETURN 0
+	ELSE
+		PRINTFORML 次のLvになるためには【技巧Lv】が{B}個必要です。購入しますか？(合計費用 ${C+5000})
+		PRINTL [0] はい
+		PRINTL [1] いいえ
+	ENDIF
+	
+	$INPUT_LOOP4
+	INPUT
+	
+	IF RESULT != 0 && RESULT != 1
+		PRINTFORML 正しい値を入力してください
+		GOTO INPUT_LOOP4
+	ENDIF
+
+	IF RESULT == 0
+		MONEY -= C
+		ABL:MASTER:2 += 1
+		PRINTFORMW ＜%NAME:MASTER%の技巧Lvが1つ上がった　今の技巧Lv：{ABL:MASTER:2}＞
+		SIF ABL:MASTER:2 < 99
+			ITEMSALES:LOCAL = 1
+	ELSE
+		;払い戻し
+		MONEY += A
+		ITEMSALES:LOCAL = 1
+		RETURN 0
+	ENDIF
+	RETURN 1
+ENDIF
+;主人専用能力アップアイテム【撮影技能】
+IF LOCAL == 61 && ABL:MASTER:91 < 99
+	A = 30000
+	IF ABL:MASTER:91 >= 3
+		B = (ABL:MASTER:91 - 3) * (ABL:MASTER:91 - 4)
+	ELSE
+		B = 1
+	ENDIF
+	SIF B <= 0
+		B = 1
+	C = A * (B - 1)
+
+	DRAWLINE
+	IF MONEY < C
+		PRINTFORMW 次のLvになるためには【撮影技能】が{B}個必要です。お金が足りません。
+		;払い戻し
+		MONEY += A
+		ITEMSALES:LOCAL = 1
+		RETURN 0
+	ELSE
+		PRINTFORML 次のLvになるためには【撮影技能】が{B}個必要です。購入しますか？(合計費用 ${C+30000})
+		PRINTL [0] はい
+		PRINTL [1] いいえ
+	ENDIF
+	
+	$INPUT_LOOP_ASA
+	INPUT
+	
+	IF RESULT != 0 && RESULT != 1
+		PRINTFORML 正しい値を入力してください
+		GOTO INPUT_LOOP_ASA
+	ENDIF
+
+	IF RESULT == 0
+		MONEY -= C
+		ABL:MASTER:91 += 1
+		PRINTFORMW ＜%NAME:MASTER%の撮影技能Lvが1つ上がった　今の撮影技能Lv:{ABL:MASTER:91}＞
+		SIF ABL:MASTER:91 < 99
+			ITEMSALES:LOCAL = 1
+	ELSE
+		;払い戻し
+		MONEY += A
+		ITEMSALES:LOCAL = 1
+		RETURN 0
+	ENDIF
+	RETURN 1
+ENDIF
+;素質アイテム【汚れ無視】
+SIF LOCAL == 62
+	TALENT:MASTER:64 = 1
+;素質アイテム【サド】
+SIF LOCAL == 63
+	TALENT:MASTER:83 = 1
+;素質アイテム【早漏】
+SIF LOCAL == 64
+	TALENT:MASTER:133 = 1
+;素質アイテム【調合知識】
+SIF LOCAL == 65
+	TALENT:MASTER:55 = 1
+;素質アイテム【禁断の知識】
+SIF LOCAL == 66
+	TALENT:MASTER:125 = 1
+;素質アイテム【変身魔法を使う程度の能力】
+SIF LOCAL == 67
+	TALENT:MASTER:211 = 1
+;素質アイテム【結界を操る程度の能力】
+SIF LOCAL == 68
+	TALENT:MASTER:212 = 1
+
+;PRINTFORMW {ITEM:0}多数アイテム扱い前
+SIF LOCAL == 25 || LOCAL == 26 || LOCAL == 27 || LOCAL == 28 || LOCAL == 29 || LOCAL == 30 || LOCAL == 31 || LOCAL == 33 || LOCAL == 34 || LOCAL == 35
+	CALL BUY_PLURAL(LOCAL)
+SIF LOCAL == 70 || LOCAL == 71 || LOCAL == 72 || LOCAL == 73 || LOCAL == 74 || LOCAL == 75 || LOCAL == 76 || LOCAL == 77 || LOCAL == 78 || LOCAL == 79 || LOCAL == 80 || LOCAL == 83 || LOCAL == 85 || LOCAL == 86 || LOCAL == 87 || LOCAL == 98
+	CALL USE_ITEM(LOCAL)
+;単体エンドアイテムはSHOPメニューに戻るように
+IF LOCAL == 85 || LOCAL == 86 || LOCAL == 87
+	VARSET ITEMSALES, 0
+	RETURN 0
+ENDIF
+RESTART
+;--------------------------------------------------
+;売り物表示
+;--------------------------------------------------
+@PRINT_NEW_SHOPITEM, ARG
+PRINTFORMLC [{ARG, 2}]%ITEMNAME:ARG,12,LEFT%(%ADD_COMMA(ITEMPRICE:ARG)%Ｇ)
+;(%SHOW_YEN(ITEMPRICE:ARG)%)
+;-------------------------------------------------
+;萬圓表示
+;-------------------------------------------------
+@SHOW_YEN(ARG)
+#FUNCTIONS
+RETURNF @"\@(ARG >= 10000) ? {ARG/10000}萬 # \@\@(ARG%10000 > 0) ? {ARG%10000} # \@Ｇ"
+
+;--------------------------------------------------
+;アイテム購入に対するキャラ口上
+;--------------------------------------------------
+@MESSAGE_ITEM_BUY
+;アイテムを購入したことに対する助手の口上
+;TFLAG:99 = 0
+;SIF ASSI > 0
+;	CALL DISPLAY_KOJO_MESSAGE_SUB_EVENT, ASSI, 35, 0
+;アイテムを購入したことに対する奴隷の口上
+;SIF TARGET > 0 && TFLAG:99 == 0
+;	CALL DISPLAY_KOJO_MESSAGE_SUB_EVENT, TARGET, 36
+

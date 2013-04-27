@@ -1,0 +1,90 @@
+;-------------------------------------------------
+;関数名:SEARCH_WORK
+;概　要:仕事番号取得関数
+;引　数:
+;　　　:ARG:0…仕事難易度(0=レベル1　1=レベル2…)
+;	   :ARG:1…仕事の種類(0= オーディション 1=ライブ 2=フェス 3=営業 4=オーディション2 5=ライブ2 6=フェス2 7=営業2)
+;内容…TAに仕事番号を格納する
+;備考…TA:地方：仕事難易度：仕事の種類
+;-------------------------------------------------
+@SEARCH_WORK(ARG, ARG:1)
+;オーディション2なども忘れずに
+VARSET A
+FOR LOCAL:0, 0, 6
+	FOR LOCAL:1, 0, 6
+		FOR LOCAL:2, 0, 8
+			FOR LOCAL:3, 0, 10
+				$COUNT_LOOP
+				;0を避けるために1＋しておく
+				A:(LOCAL:3) = RAND:15 + 1
+				FOR LOCAL:4, 0, 10
+					;自分と同じカウントの時はコンテニュー
+					SIF LOCAL:4 == LOCAL:3
+						CONTINUE
+					IF A:(LOCAL:3) == A:(LOCAL:4)
+						GOTO COUNT_LOOP
+					ENDIF
+				NEXT
+			NEXT
+		NEXT
+	NEXT
+NEXT
+FOR LOCAL:0, 0, 10
+	IF A:(LOCAL:0) != 15 && A:(LOCAL:0) != 14 && A:(LOCAL:0) != 13
+		;B:(A:(LOCAL:0)) = LOCAL:0
+		;TA:0:ARG:(A:(LOCAL:0)) = LOCAL:0
+		;仕事の種類ARG:1
+		;オーディション = 0 ライブ = 1 フェス = 2 営業 = 3
+		SELECTCASE A:(LOCAL:0)
+			CASE 1
+				TA:0:ARG:(0 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+			CASE 7
+				TA:0:ARG:(4 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+			CASE 2
+				TA:1:ARG:(0 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+			CASE 8
+				TA:1:ARG:(4 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+			CASE 3
+				TA:2:ARG:(0 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+			CASE 9
+				TA:2:ARG:(4 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+			CASE 4
+				TA:3:ARG:(0 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+			CASE 10
+				TA:3:ARG:(4 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+			CASE 5
+				TA:4:ARG:(0 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+			CASE 11
+				TA:4:ARG:(4 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+			CASE 6
+				TA:5:ARG:(0 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+			CASE 12
+				TA:5:ARG:(4 + ARG:1) = LOCAL:0 + (100 * (10 + ARG:1)) + (10 * ARG)
+		ENDSELECT
+	ENDIF
+NEXT
+
+;TA:(ARG:0):(ARG:1):(FLAG:仕事難易度)
+;0 - 10を並べる
+;0 - 15
+;A:0 にまずランダムに場所を選ばせる
+;次にA:1に選ばせる
+;中身がA:0と同じならやり直し
+;これを繰り返す
+
+;仕事をシャッフルする関数
+@RESET_WORK
+VARSET TA:0:0:0
+;仕事難易度
+FOR LOCAL:0, 0, 6
+	CALL SEARCH_WORK(LOCAL, 0)
+NEXT
+FOR LOCAL:0, 0, 6
+	CALL SEARCH_WORK(LOCAL, 1)
+NEXT
+FOR LOCAL:0, 0, 6
+	CALL SEARCH_WORK(LOCAL, 2)
+NEXT
+FOR LOCAL:0, 0, 6
+	CALL SEARCH_WORK(LOCAL, 3)
+NEXT

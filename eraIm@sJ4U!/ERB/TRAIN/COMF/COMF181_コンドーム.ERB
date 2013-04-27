@@ -1,0 +1,86 @@
+;-------------------------------------------------
+;コンドーム
+;道具使用コマンド、レベル2
+;-------------------------------------------------
+@COM181
+;着脱の処理
+;TEQUIP:コンドーム = !TEQUIP:コンドーム
+PRINTFORML 誰にコンドームを使用しますか？(残り:{ITEM:29})
+PRINTFORML （既に装着している対象を選んだ場合、コンドームを外します）
+FOR LOCAL, 0, 3
+	SIF LOCAL == 0
+		LOCAL:1 = PLAYER
+	SIF LOCAL == 1
+		LOCAL:1 = TARGET
+	IF LOCAL == 2 && ASSIPLAY
+		LOCAL:1 = ASSI
+	ELSE
+		LOCAL:1 = 0
+	ENDIF
+	IF !(LOCAL && !LOCAL:1) && CHECK_PENIS(LOCAL:1)
+		PRINTFORM [{LOCAL}] %CALLNAME:(LOCAL:1)% 
+		IF TEQUIP:(LOCAL:1):85
+			PRINTL (装着済み)
+		ELSE
+			PRINTL (未装着)
+		ENDIF
+	ENDIF
+NEXT
+PRINT [3] やめる
+$INPUTLOOP
+INPUT
+IF RESULT == 0
+	TEQUIP:MASTER:コンドーム = !TEQUIP:MASTER:コンドーム
+	SIF TEQUIP:MASTER:コンドーム
+		ITEM:コンドーム --
+ELSEIF RESULT == 1
+	TEQUIP:コンドーム = !TEQUIP:コンドーム
+	SIF TEQUIP:コンドーム
+		ITEM:コンドーム --
+ELSEIF RESULT == 2
+	TEQUIP:ASSI:コンドーム = !TEQUIP:ASSI:コンドーム
+	SIF TEQUIP:ASSI:コンドーム
+		ITEM:コンドーム --
+ELSEIF RESULT == 3
+	RETURN -1
+ELSE
+	CALL 再入力
+	GOTO INPUTLOOP
+ENDIF
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:体力 += 0
+DOWNBASE:気力 += 10
+
+;調教対象が処女
+IF TALENT:0
+	SOURCE:3 = 10
+	SOURCE:9 = 10
+	SOURCE:11 = 20
+ELSE
+	SOURCE:3 = 10
+	SOURCE:13 = 20
+ENDIF
+
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+;貞操観念
+SIF TALENT:30
+	TIMES SOURCE:3 , 1.50
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+
+
+RETURN 1

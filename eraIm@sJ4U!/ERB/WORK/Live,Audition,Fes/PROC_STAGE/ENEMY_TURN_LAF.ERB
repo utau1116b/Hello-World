@@ -1,0 +1,26 @@
+;敵のターンを処理
+;ARG 1しかないけど一応設定
+@ENEMY_TURN_LAF(ARG)
+VARSET LOCAL
+;フェス以外はリターン
+SIF TFLAG:戦闘中 != 4
+	RETURN
+;どうするか判断
+IF BASE:1:ボルテージ >= 10000
+	TFLAG:アピール種別 = 5
+ELSEIF TFLAG:思い出使用 > 0 && TFLAG:敵思い出 > 0
+	TFLAG:アピール種別 = 4
+ELSE
+	LOCAL = RAND:3
+	;ボーカル
+	IF LOCAL == 0
+		TFLAG:アピール種別 = 1
+	;ビジュアル
+	ELSEIF LOCAL == 1
+		TFLAG:アピール種別 = 2
+	;ダンス
+	ELSE
+		TFLAG:アピール種別 = 3
+	ENDIF
+ENDIF
+CALL アピール処理(1)

@@ -1,0 +1,25 @@
+;ARG	基礎成功値
+;ARG:1	大成功率
+@COM300_SUCCESS(ARG = 95, ARG:1 = 9)
+LOCAL = RAND:100
+LOCAL:1 = ARG + GET_SUCCESS_RATE() / 5
+SIF LOCAL:1 > 99
+	LOCAL:1 = 99
+IF LOCAL <= ARG:1
+	;10％で大成功
+	TFLAG:SELECTCOM分岐 = 1
+	TFLAG:成功判定 = 1
+	;EXP:MASTER:会話経験 ++
+	IF TEQUIP:TARGET:デート中
+		EXP:MASTER:デート経験 ++
+		EXP:TARGET:デート経験 ++
+	ENDIF
+ELSEIF LOCAL >= LOCAL:1
+	;10～1％で失敗
+	TFLAG:SELECTCOM分岐 = -1
+	TFLAG:成功判定 = -1
+ELSE
+	;残りは成功
+	TFLAG:SELECTCOM分岐 = 0
+	TFLAG:成功判定 = 0
+ENDIF

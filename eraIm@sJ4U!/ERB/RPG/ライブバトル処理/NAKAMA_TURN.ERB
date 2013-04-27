@@ -1,0 +1,350 @@
+;味方の行動入力
+;メモ：前提として、現在状態が待機中かつ残り待機時間が０になっている
+;ARG:0	対象キャラ
+@NAKAMA_TURN(ARG:0)
+;LOCAL
+;0	LOOP
+;1	TEMP
+;2	オートスキル選択用
+;8	短縮スキル用
+	;テスト用ボルテージ
+;	MAXBASE:(ARG:0):ボルテージ = 300
+;	BASE:(ARG:0):ボルテージ = 300
+;集中状態なら対応するアクションを取った後にリターン
+IF CFLAG:(ARG:0):集中フラグ
+	PRINTFORML 集中状態
+	PRINTFORML 現在状態 {CFLAG:(ARG:0):現在状態}
+	PRINTFORMW 行動の対象 {CFLAG:(ARG:0):行動の対象}
+	CALL DO_ACTION(ARG:0, CFLAG:(ARG:0):現在状態, CFLAG:(ARG:0):行動の対象)
+	CALL BEFORE_SELECT_ACTION(ARG:0)
+	CALL SET_DEFAULT_WAIT(ARG:0)
+	RETURN
+ELSE
+	CALL BEFORE_SELECT_ACTION(ARG:0)
+ENDIF
+$START
+;スキル発動チェック
+IF CFLAG:(ARG:0):SHINY_SMILE
+	IF CFLAG:(ARG:0):SHINY_SMILE == 1
+		CALL USE_SKILL_406_2
+		CFLAG:(ARG:0):SHINY_SMILE = 0
+	ELSE
+		CFLAG:(ARG:0):SHINY_SMILE -= 1
+	ENDIF
+ENDIF
+
+IF TFLAG:フルオート中
+	;フルオート中なので勝手に選択
+	CALL SELECT_AUTO_ACTION(ARG:0)
+	RETURN
+ENDIF
+
+;戦闘状況表示
+IF FLAG:1073
+;	PRINTFORML %CALLNAME:(ARG:0)% 物攻:{CFLAG:(ARG:0):310} 物防:{CFLAG:(ARG:0):311} 魔攻:{CFLAG:(ARG:0):312} 魔防:{CFLAG:(ARG:0):313} 性攻:{CFLAG:(ARG:0):314} 性防:{CFLAG:(ARG:0):316}
+ENDIF
+
+;口上呼び出し
+FLAG:フェス中口上 = 51
+CALL KOJO(ARG:0)
+CUSTOMDRAWLINE =
+CALL SHOW_ENEMY_SIMPLE
+DRAWLINE
+;CALL SHOW_PT_STATUS
+CALL SHOW_NOW_FORMATION_U,1
+DRAWLINE
+CALL WAIT_ANIME_2
+CUSTOMDRAWLINE =
+
+IF CFLAG:(ARG:0):ガード状態 == 1
+	BASE:(ARG:0):ベースGUA = C
+	;ふわふわスマイル反映
+	CALL GET_MAX_ABL_PT(271)
+	SIF RESULT
+		C *= 2
+ENDIF
+LOCALS = %CSTR:(ARG:0):21%
+PRINTFORM ＡＰＰＥＡＬＥＲ ：
+CALL PRINTCOLORL (SET_COLOR_FUNC(ARG), @"%CALLNAME:(ARG:0)%") 
+$INPUT_LOOP
+CALL PRINT_LIVE_COMMAND(ARG:0)
+IF RESULT == 999 && FLAG:フルオート表示 == 0
+	;アイドルにお任せ
+	PRINTFORMW 戦闘終了までオートを選択し続けます
+	TFLAG:フルオート中 = 1
+	GOTO START
+ELSEIF RESULT < 0 || ( RESULT > 9 && RESULT != 100 && RESULT != 101)
+	REUSELASTLINE 入力値が不正です。再入力してください
+	GOTO INPUT_LOOP
+ELSEIF (RESULT == 2 && CFLAG:(ARG:0):シール状態)
+	REUSELASTLINE 封印状態のため特技は使用できません。再入力してください
+	GOTO INPUT_LOOP
+ELSEIF RESULT == 101 && BASE:(ARG:0):ボルテージ >= 100
+	;バーストアピール
+	CALL SELECT_SKILL_TARGET_202(ARG:0)
+	IF RESULT == 0
+		;使用をキャンセルした場合、最初に戻す
+		GOTO START
+	ELSE
+		BASE:(ARG:0):ボルテージ -= 100
+					;王者の威圧チェック
+					CALL GET_MAX_ABL_PT(237)
+					IF RESULT == 0
+		;満点スマイルチェック
+		IF ABL:ARG:満点スマイル
+			IF RAND:100 <= 30
+				BASE:(ARG:0):ボルテージ += 100
+				;ユニークスキル発動した場合文字色変える
+				SETCOLOR 0x10EEEE
+				PRINTFORML %CALLNAME:ARG%＞＞満点スマイル発動！消費VL0！
+				RESETCOLOR
+			ENDIF
+		ENDIF
+					ENDIF
+		CALL DO_ACTION(ARG:0, CFLAG:(ARG:0):現在状態, CFLAG:(ARG:0):行動の対象)
+	ENDIF
+	RETURN
+	;今は春香だけ
+ELSEIF RESULT == 100 && BASE:(ARG:0):ボルテージ >= 300 && ARG:0 == 11
+	;マスタースペシャル
+	CALL MASTER_SPECIAL(ARG:0)
+	IF RESULT == 0
+		;使用をキャンセルした場合、最初に戻す
+		GOTO START
+	ELSE
+		CALL SET_DEFAULT_WAIT(ARG:0)
+		CFLAG:(ARG:0):残り待機時間 *= 2
+	ENDIF
+	RETURN
+ELSEIF RESULT == 1
+	;Voアピール
+	CALL SELECT_SKILL_TARGET_204(ARG:0)
+	IF RESULT == 0
+		;使用をキャンセルした場合、最初に戻す
+		GOTO START
+	ELSE
+		CALL DO_ACTION(ARG:0, CFLAG:(ARG:0):現在状態, CFLAG:(ARG:0):行動の対象)
+	ENDIF
+	BASE:(ARG:0):ボルテージ += 10
+					;王者の威圧チェック
+					CALL GET_MAX_ABL_PT(237)
+					IF RESULT == 0
+	;スポ魂もちなら更に+5
+	SIF ABL:ARG:スポ魂
+		BASE:ARG:ボルテージ += 5
+					ENDIF
+	SIF BASE:(ARG:0):ボルテージ > MAXBASE:(ARG:0):ボルテージ
+		BASE:(ARG:0):ボルテージ = MAXBASE:(ARG:0):ボルテージ
+	RETURN
+ELSEIF RESULT == 8
+	;Viアピール
+	CALL SELECT_SKILL_TARGET_205(ARG:0)
+	IF RESULT == 0
+		;使用をキャンセルした場合、最初に戻す
+		GOTO START
+	ELSE
+		CALL DO_ACTION(ARG:0, CFLAG:(ARG:0):現在状態, CFLAG:(ARG:0):行動の対象)
+	ENDIF
+	BASE:(ARG:0):ボルテージ += 10
+						;王者の威圧チェック
+					CALL GET_MAX_ABL_PT(237)
+					IF RESULT == 0
+	;スポ魂もちなら更に+5
+	SIF ABL:ARG:スポ魂
+		BASE:ARG:ボルテージ += 5
+					ENDIF
+	SIF BASE:(ARG:0):ボルテージ > MAXBASE:(ARG:0):ボルテージ
+		BASE:(ARG:0):ボルテージ = MAXBASE:(ARG:0):ボルテージ
+	RETURN
+ELSEIF RESULT == 9
+	;Daアピール
+	CALL SELECT_SKILL_TARGET_206(ARG:0)
+	IF RESULT == 0
+		;使用をキャンセルした場合、最初に戻す
+		GOTO START
+	ELSE
+		CALL DO_ACTION(ARG:0, CFLAG:(ARG:0):現在状態, CFLAG:(ARG:0):行動の対象)
+	ENDIF
+	BASE:(ARG:0):ボルテージ += 10
+						;王者の威圧チェック
+					CALL GET_MAX_ABL_PT(237)
+					IF RESULT == 0
+	;スポ魂もちなら更に+5
+	SIF ABL:ARG:スポ魂
+		BASE:ARG:ボルテージ += 5
+					ENDIF
+	SIF BASE:(ARG:0):ボルテージ > MAXBASE:(ARG:0):ボルテージ
+		BASE:(ARG:0):ボルテージ = MAXBASE:(ARG:0):ボルテージ
+	RETURN
+ELSEIF RESULT == 3
+	;ガード
+	CALL SELECT_SKILL_TARGET_203(ARG:0)
+	IF RESULT == 0
+	;使用をキャンセルした場合、最初に戻す
+		GOTO START
+	ELSE
+		CALL DO_ACTION(ARG:0, CFLAG:(ARG:0):現在状態, CFLAG:(ARG:0):行動の対象)
+	ENDIF
+		BASE:(ARG:0):ボルテージ += 5
+					;王者の威圧チェック
+					CALL GET_MAX_ABL_PT(237)
+					IF RESULT == 0
+	;スポ魂もちなら更に+5
+	SIF ABL:ARG:スポ魂
+		BASE:ARG:ボルテージ += 5
+					ENDIF
+	SIF BASE:(ARG:0):ボルテージ > MAXBASE:(ARG:0):ボルテージ
+		BASE:(ARG:0):ボルテージ = MAXBASE:(ARG:0):ボルテージ
+	RETURN
+ELSEIF RESULT == 2
+	;スキル
+	CALL SELECT_USE_SKILL(ARG:0)
+	IF RESULT == 0
+	;使用をキャンセルした場合、最初に戻す
+		GOTO START
+	;集中する場合は1ターンの溜めが必要
+	ELSEIF CFLAG:(ARG:0):集中フラグ
+		CALL SET_DEFAULT_WAIT(ARG:0)
+	ELSE
+		CALL DO_ACTION(ARG:0, CFLAG:(ARG:0):現在状態, CFLAG:(ARG:0):行動の対象)
+	ENDIF
+		BASE:(ARG:0):ボルテージ += 15
+					;王者の威圧チェック
+					CALL GET_MAX_ABL_PT(237)
+					IF RESULT == 0
+	;スポ魂もちなら更に+5
+	SIF ABL:ARG:スポ魂
+		BASE:ARG:ボルテージ += 5
+					ENDIF
+	SIF BASE:(ARG:0):ボルテージ > MAXBASE:(ARG:0):ボルテージ
+		BASE:(ARG:0):ボルテージ = MAXBASE:(ARG:0):ボルテージ
+	RETURN
+ELSEIF RESULT == 4
+	;アイテム
+	CALL SHOW_BATTLE_ITEM_LIST(ARG:0)
+	IF RESULT == 0
+		;アイテム使用をキャンセルした場合、最初に戻す
+		GOTO START
+	ELSE
+		;待機時間は通常の二倍
+		CALL SET_DEFAULT_WAIT(ARG:0)
+		CFLAG:(ARG:0):残り待機時間 *= 2
+	ENDIF
+ELSEIF RESULT == 5
+	;待機
+	CALL SET_DEFAULT_WAIT(ARG:0)
+	CFLAG:(ARG:0):残り待機時間 /= 4
+	SIF CFLAG:(ARG:0):残り待機時間 < 5
+		CFLAG:(ARG:0):残り待機時間 = 5
+ELSEIF RESULT == 6
+	;ステータス
+	CALL SHOW_STATUS_LIST
+	;最初に戻す
+	GOTO START
+ELSEIF RESULT == 7
+	;逃げる
+	;30％で成功 先制攻撃仕掛けていた場合は絶対成功
+	IF RAND:10 < 3 || TFLAG:先制攻撃
+		TFLAG:逃走成功 = 1
+	ELSE
+		PRINTFORMW %CALLNAME:(FLAG:リーダー)%達は逃げ出した！
+		PRINTFORMW しかし回り込まれてしまった！
+	ENDIF
+	CALL SET_DEFAULT_WAIT(ARG:0)
+	CFLAG:(ARG:0):残り待機時間 = CFLAG:(ARG:0):残り待機時間 * 2 + 10
+ELSE
+	;念のためエラートラップ
+	REUSELASTLINE 入力値が不正です。再入力してください
+	GOTO INPUT_LOOP
+ENDIF
+
+;数回行動
+;IF CFLAG:(ARG:0):二回行動状態 && TFLAG:残り攻撃回数 == 0
+;TFLAG:残り攻撃回数 は2で二回攻撃
+;	PRINTFORMW 連続行動開始
+;	TFLAG:残り攻撃回数 = CFLAG:(ARG:0):二回行動状態
+;	CFLAG:(ARG:0):残り待機時間 = 0
+;	TFLAG:残り攻撃回数 -= 1
+;	GOTO START
+;ELSEIF CFLAG:(ARG:0):二回行動状態 && TFLAG:残り攻撃回数 == 1
+;	PRINTFORMW 連続行動終了
+;	TFLAG:残り攻撃回数 = 0
+;	RETURN
+;ELSEIF CFLAG:(ARG:0):二回行動状態
+;	PRINTFORMW 連続行動発動中
+;	CFLAG:(ARG:0):残り待機時間 = 0
+;	TFLAG:残り攻撃回数 -= 1
+;	GOTO START
+;ELSE
+
+;ENDIF
+
+
+;行動選択前の共通処理
+;ARG:0	対象キャラID
+@BEFORE_SELECT_ACTION(ARG:0)
+;LOCAL
+;0	LOOP
+
+;ターンが回ってきたことによる状態解除のチェック
+CFLAG:(ARG:0):ガード状態 = 0
+CFLAG:(ARG:0):全力ガード状態 = 0
+IF CFLAG:(ARG:0):EX状態 && BASE:(ARG:0):MP <= 0
+	;50によるEX化解除
+	CALL SHOW_CURE_STATE_MESSAGE(ARG:0, 69)
+	CFLAG:(ARG:0):EX状態 = 0
+	CALL STATUS_RENEW_2(ARG:0)
+ENDIF
+IF CFLAG:(ARG:0):変身状態 && BASE:(ARG:0):MP <= 0
+	;50による変身解除
+	CALL SHOW_CURE_STATE_MESSAGE(ARG:0, 120)
+	CFLAG:(ARG:0):変身状態 = 0
+	CALL STATUS_RENEW_2(ARG:0)
+ENDIF
+;行動に関連するフラグを初期化
+CFLAG:(ARG:0):行動の対象 = 0
+CFLAG:(ARG:0):集中フラグ = 0
+
+;オート時のコマンド選択
+;ARG:0	対象キャラ
+@SELECT_AUTO_ACTION(ARG:0)
+;LOCAL
+;0	LOOP
+;1	TEMP
+;2	オートスキル選択用 0:防御 1:物 2:魔 3:性
+;3	比較用
+;4	TEMP
+
+LOCAL:2 = 0
+
+IF LOCAL:2 == 0
+		;物理
+		LOCAL:2 = 1
+ENDIF
+
+IF ABL:(ARG:0):攻撃範囲 >= 7 && (LOCAL:2 == 1 || LOCAL:2 == 2)
+	;物理か魔法で、装備に全体攻撃つきなら目標は全体
+	LOCAL:1 = 32
+ELSE
+	LOCAL:1 = 11
+	FOR LOCAL:0, 1, 11
+		IF TFLAG:(LOCAL:0 + 1000) && CFLAG:(LOCAL:0):気絶状態 == 0
+			LOCAL:1 = LOCAL:0 + 10
+			BREAK
+		ENDIF
+	NEXT
+ENDIF
+IF LOCAL:2 == 1
+	CFLAG:(ARG:0):現在状態 = 201
+	CFLAG:(ARG:0):行動の対象 = LOCAL:1
+	CFLAG:(ARG:0):集中フラグ = 0
+	;物理キャラは通常アピール
+	CALL DO_ACTION(ARG:0, CFLAG:(ARG:0):現在状態, CFLAG:(ARG:0):行動の対象)
+	RETURN
+ELSE
+	;防御
+	;ガード
+	CALL SELECT_SKILL_TARGET_COMMON(203, ARG:0)
+	CALL DO_ACTION(ARG:0, CFLAG:(ARG:0):現在状態, CFLAG:(ARG:0):行動の対象)
+	RETURN
+ENDIF

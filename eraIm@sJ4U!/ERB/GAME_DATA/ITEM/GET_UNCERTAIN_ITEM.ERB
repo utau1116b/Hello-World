@@ -1,0 +1,82 @@
+;不確定アイテム入手
+;ARG:0	アイテムID
+@GET_UNCERTAIN_ITEM(ARG:0)
+
+;何も拾えないなら無視
+IF ARG:0 == 0
+	RETURN
+ENDIF
+
+;アイテム欄が一杯なら無視
+;IF FLAG:所持アイテム数 >= FLAG:最大所持可能アイテム数
+;	RETURN
+;ENDIF
+
+;アイテム追加
+IF ARG:0 >= 100	
+	;FLAG:(FLAG:所持アイテム数 + 1100) = ARG:0
+	;FLAG:所持アイテム数 += 1
+	;PRINTFORMW %UNCERTAIN_ITEM_NAME(ARG)% を手に入れた！
+	CALL SE("ダンジョン","宝箱","アイテムゲット")
+	PRINTFORMW %ITEMNAME:ARG%を手に入れた
+	CALL GET_ITEM,ARG
+ELSE
+	PRINTFORMW エラー!不明なアイテムID{ARG:0}が指定されました
+ENDIF
+;
+;不確定時のアイテム名
+;ARG アイテム番号
+@UNCERTAIN_ITEM_NAME(ARG)
+#FUNCTIONS
+SELECTCASE ARG
+	CASE 500 TO 509
+		RETURNF  "？お香"
+	CASE 510 TO 512
+		RETURNF  "？お菓子"
+	CASE 513 TO 515
+		RETURNF  "？ハーブ"
+	CASE 516
+		RETURNF  "？よくわからない物"
+	CASE 517
+		RETURNF  "？薬"
+	CASE 518
+		RETURNF  "？果物"
+	CASE 519 TO 528
+		RETURNF  "？薬"
+	CASE 101 TO 113
+		RETURNF  "？栄養剤"
+	CASE 115 TO 117
+		RETURNF  "？酒"
+	CASE 120 TO 121
+		RETURNF  "？飲み物"
+	CASE 123 TO 124
+		RETURNF  "？薬"
+	CASE 125 TO 127
+		RETURNF  "？よくわからない物"
+	CASE 128 TO 129
+		RETURNF  "？薬"
+	CASE 150 TO 159
+		RETURNF  "？爆弾"
+	CASE 181
+		RETURNF  "？スコップ"
+	CASE 191 TO 193
+		RETURNF  "？よくわからない物"
+	CASE 200 TO 499
+		RETURNF  "？楽譜"
+	CASE 600 TO 699
+		RETURNF  "？衣装"
+	CASE 700 TO 799
+		RETURNF  "？衣装"
+	CASE 800 TO 899
+		RETURNF  "？衣装"
+	CASE 900 TO 999
+		RETURNF  "？衣装"
+	CASE 1000 TO 1399
+		RETURNF  "？アクセサリー"
+	CASE 1400 TO 1499
+		RETURNF  "？お守り"
+	CASE 1500 TO 1999
+		RETURNF  "？素材"
+	CASEELSE
+		RETURNF  "不明なアイテム"
+ENDSELECT

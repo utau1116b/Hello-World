@@ -1,0 +1,74 @@
+@SELECT_SCHEDULE
+CALL スケジュール選択画面
+IF FLAG:705 == 1
+	FLAG:705 = 0
+	PRINTFORM %"\n"*5%
+	PRINTL 
+	PRINTFORML スケジュール選択についてのチュートリアルを表示しますか？
+	PRINTFORML [0] はい
+	PRINTFORML [1] いいえ
+	$INPUT_LOOP705
+	INPUT
+	;これは活動が始まってから
+	IF RESULT == 0
+		CALL チュートリアル("スケジュール選択")
+	ELSE
+		
+	ENDIF
+ENDIF
+IF FLAG:706 == 1
+	CALL チュートリアル("スケジュール選択２")
+	FLAG:706 = 0
+	RESTART
+ENDIF
+;表示終了
+$INPUT_LOOP
+INPUT
+IF RESULT == 100 || RESULT == 101 || RESULT == 102 || RESULT == 103 || RESULT == 105 || RESULT == 106 || RESULT == 150 || RESULT == 140 || RESULT == 130
+	CALL SET_WORK(RESULT)
+ELSEIF RESULT >= 0 && RESULT <= 5
+	FLAG:地方フラグ = RESULT
+ELSEIF RESULT == -1
+	FLAG:午前の予定 = 0
+	FLAG:午後の予定 = 0
+	FLAG:午前の予定2 = 0
+	FLAG:午後の予定2 = 0
+	BASE:0:タイムコスト = MAXBASE:0:タイムコスト
+	RETURN
+ELSEIF RESULT >= 1000 && RESULT <= 1500
+	CALL WORK_EXPLAIN(RESULT)
+ELSEIF RESULT == 999
+	CALL END_SELECT_SCHEDULE
+	IF RESULT
+		FLAG:スケジュール決定 = 1
+		RETURN 1	
+	ENDIF
+ELSEIF RESULT >= 10 && RESULT <= 18
+	FLAG:仕事難易度 = (RESULT - 10)
+ELSE
+
+ENDIF
+CALL RETURNLINE
+REDRAW 1
+RESTART
+
+;
+@END_SELECT_SCHEDULE
+;行動を一つも取らないなら警告文
+IF FLAG:午前の予定 == 0 && FLAG:午後の予定 == 0 && FLAG:午前の予定2 == 0 && FLAG:午後の予定2 == 0
+	PRINTFORML 行動を一つも選択していませんがよろしいですか？
+ELSE
+	PRINTFORML スケジュールを決定しますか？
+ENDIF
+
+PRINTBUTTONLC "[はい]", 0
+PRINTBUTTONLC "[いいえ]", 1
+$INPUT_LOOP
+INPUT
+IF RESULT == 0
+	FLAG:イベント用ターゲット一時保存 = TARGET
+	RETURN 1
+ELSE
+	RETURN 0
+ENDIF
+

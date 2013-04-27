@@ -1,0 +1,111 @@
+;不確定アイテム一覧確認
+@SHOW_UNCERTAIN_LIST
+;LOCALリスト
+;0	ループで使用
+;1	現在のページ位置
+;2	一時記憶用
+
+;初期化
+LOCAL:0 = 0
+LOCAL:1 = 0
+
+$START
+
+IF FLAG:所持アイテム数 <= 0
+	PRINTFORMW 不確定アイテムを１つも持っていません
+	RETURN
+ENDIF
+
+DRAWLINE
+PRINTL どのアイテムを捨てますか？
+DRAWLINE
+;全体表示
+FOR LOCAL:0, (1+60*LOCAL:1), (61+60*LOCAL:1)
+	IF (LOCAL:0 % 3 == 1) && (LOCAL:0 != (1+60*LOCAL:1))
+		PRINTL 
+	ENDIF
+	IF LOCAL:0 > FLAG:所持アイテム数
+		PRINT  
+		CONTINUE
+	ENDIF
+	IF FLAG:(1099 + LOCAL:0) > 0
+		;手持ち
+		PRINTFORM [{(LOCAL:0 + 10), 3}]   %UNCERTAIN_ITEM_NAME((FLAG:(1099 + LOCAL:0))), 25, LEFT%
+	ELSE
+		;持っていない
+		PRINT  
+		CONTINUE
+	ENDIF
+NEXT
+PRINTL 
+DRAWLINE
+PRINTLC [7] 前のページ
+PRINTFORMLC             Page({LOCAL:1}/{(FLAG:所持アイテム数 - 1)/60})
+PRINTC [9] 次のページ
+PRINTL 
+PRINTL [0] 戻る
+
+$INPUT_LOOP
+INPUT
+
+IF RESULT == 0
+	RETURN
+ELSEIF RESULT == 7
+	;前ページへ
+	LOCAL:1 -= 1
+	SIF LOCAL:1 < 0
+		LOCAL:1 = 0
+ELSEIF RESULT == 9
+	;次ページへ
+	LOCAL:1 += 1
+	SIF LOCAL:1 > ((FLAG:所持アイテム数 - 1) / 60)
+		LOCAL:1 = (FLAG:所持アイテム数 - 1) / 60
+ELSEIF RESULT >= 11 && RESULT <= FLAG:所持アイテム数 + 10 && FLAG:(RESULT + 1089) != 0
+	;直接指定
+	;RESULT退避
+	LOCAL:2 = RESULT + 1089
+	PRINTFORML %STR:(FLAG:(LOCAL:2))%を捨ててもよろしいですか？
+	PRINTL [0] はい
+	PRINTL [1] いいえ
+	INPUT
+	IF RESULT == 0
+		;廃棄作業
+		PRINTFORMW %STR:(FLAG:(LOCAL:2))%を捨てました
+		CALL TRUSH_UNCERTAIN_ITEM(LOCAL:2)
+	ELSE
+		PRINTFORMW 廃棄をキャンセルしました
+	ENDIF
+ELSE
+	REUSELASTLINE 入力値が不正です。再入力してください
+	GOTO INPUT_LOOP
+ENDIF
+
+GOTO START
+
+;不確定アイテム廃棄
+;ARG:0	対象ID(FLAG:1100～に入っているので、1100～で指定)
+@TRUSH_UNCERTAIN_ITEM(ARG:0)
+;LOOP
+;0	LOOP
+;1	TEMP
+;2	対象
+
+LOCAL:2 = ARG:0
+
+;不正な値なら無視
+IF LOCAL:2 > (FLAG:所持アイテム数 + 1099) || LOCAL:2 < 1100
+	RETURN
+ENDIF
+
+IF LOCAL:2 < (FLAG:所持アイテム数 + 1099)
+	;最後尾のアイテムを捨てた場合以外は、前に詰める処理が必要
+	FOR LOCAL:0, LOCAL:2, (FLAG:所持アイテム数 + 1099)
+		;1個後ろの物を前に詰める
+		FLAG:(LOCAL:0) = FLAG:(LOCAL:0 + 1)
+	NEXT
+ENDIF
+;最後尾のアイテムを消去
+FLAG:(FLAG:所持アイテム数 + 1099) = 0
+;アイテム所持数-1
+FLAG:所持アイテム数 -= 1
+

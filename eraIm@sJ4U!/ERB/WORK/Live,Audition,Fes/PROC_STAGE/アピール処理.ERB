@@ -1,0 +1,360 @@
+;---------------------------------------------------------------------
+;@アピール処理
+;アピールの計算を行う
+;ARG 	アピール使用者
+;ARGS	
+;ARG:1	代入する数値
+;---------------------------------------------------------------------
+@アピール処理(ARG)
+;LOCAL		TEMP
+;LOCAL;1	命中率
+;LOCAL:2	パフェ率
+;LOCAL:3	アピールの結果(0 バッド 1 グッド 2 パーフェクト )
+;LOCAL:4	値
+#DIM バースト, 10
+#DIM 思い出点, 10
+#DIM バースト保存, 11
+VARSET LOCAL
+VARSET バースト
+TFLAG:得点一時保存 = 0
+TFLAG:アピール記憶 = TFLAG:アピール種別
+IF TFLAG:アピール種別 == 5
+	;バーストアピールの何アピールかをR:1～R:10に入れて返す
+	CALL バースト順代入(ARG)
+	FOR LOCAL, 1, 11
+		LOCAL:1 = 0
+		IF R:LOCAL == 1
+			LOCAL:1 += バースト計算(ARG, 1)
+			SIF LOCAL:1 > 0
+				バースト:1 += 1
+			TSTR:LOCAL = 　　　　　　　　　　　　　　　　　　　　+%TOSTR(LOCAL:1)%
+			IF TFLAG:チェイン数 > 1
+				TSTR:(50 + LOCAL) = 　　　　　　　　　　　　　　　　　　　　%TOSTR(TFLAG:チェイン数), 5%CHAIN
+				TSTR:(100 + LOCAL) = 　　　　　　　　　　　　　　　　　　　　￣￣￣￣￣
+				TSTR:(150 + LOCAL) = 　　　　　　　　　　　　　　　　　　　　BONUS+%TOSTR(5 + (TFLAG:チェイン数 - 2) * 1), 4%
+			ENDIF
+			バースト保存:LOCAL = 1
+		ELSEIF R:LOCAL == 2
+			LOCAL:1 += バースト計算(ARG, 2)
+			SIF LOCAL:1 > 0
+				バースト:2 += 1
+			TSTR:LOCAL = 　　　　　　　　　　+%TOSTR(LOCAL:1)%
+			IF TFLAG:チェイン数 > 1
+				TSTR:(50 + LOCAL) = 　　　　　　　　　　%TOSTR(TFLAG:チェイン数), 5%CHAIN
+				TSTR:(100 + LOCAL) = 　　　　　　　　　　￣￣￣￣￣
+				TSTR:(150 + LOCAL) = 　　　　　　　　　　BONUS+%TOSTR(5 + (TFLAG:チェイン数 - 2) * 1), 4%
+			ENDIF
+			バースト保存:LOCAL = 2
+		ELSEIF R:LOCAL == 3
+			LOCAL:1 += バースト計算(ARG, 3)
+			SIF LOCAL:1 > 0
+				バースト:3 += 1
+			TSTR:LOCAL = %TOSTR(LOCAL:1)%
+			TSTR:LOCAL = +%TSTR:LOCAL%
+			IF TFLAG:チェイン数 > 1
+				TSTR:(50 + LOCAL) = %TOSTR(TFLAG:チェイン数), 5%CHAIN
+				TSTR:(100 + LOCAL) = ￣￣￣￣￣
+				TSTR:(150 + LOCAL) = BONUS+%TOSTR(5 + (TFLAG:チェイン数 - 2) * 1), 4%
+			ENDIF
+			バースト保存:LOCAL = 3
+		ELSE
+			REUSELASTLINE エラー！不明な値が選択されました(R:{LOCAL}={R:LOCAL})(@アピール処理<バーストアピール>)
+		ENDIF
+		
+		IF ARG >= 11 && TFLAG:チェイン数 > 1
+			TFLAG:得点一時保存 += (5 + (TFLAG:チェイン数 - 2) * 1)
+			TFLAG:トータルチェイン += (5 + (TFLAG:チェイン数 - 2) * 1)
+		ENDIF
+		TFLAG:得点一時保存 += LOCAL:1
+		;トータル点数に加算
+		TFLAG:トータルバースト += LOCAL:1
+	NEXT
+;それぞれの属性によるバースト色
+;また、素質と属性でバースト順決定
+SETBGCOLOR (SET_COLOR_FUNC(13))
+CALL SET_COLOR("ボーカル")
+
+IF ARG >= 11
+	CALL FULLCUTIN2(40, 10, "ＢＵＲＳＴ", "　", "　", "　　　　　　　　――ＡＰＰＥＡＬ", " ", " ")
+ELSE
+	CALL FULLCUTIN2(40, 10, "ＲＩＶＡＬ", "　", "　", "　　　　　　　　――ＢＵＲＳＴ", " ", " ")
+	RESETBGCOLOR
+ENDIF
+RESETCOLOR
+IF ARG >= 11
+	ALIGNMENT CENTER
+	CALL SAVELINE
+	FOR LOCAL, 0, 150
+		PRINTL 
+	NEXT
+	TSTR = %" "%
+	FOR LOCAL, 1, 11
+		SELECTCASE バースト保存:LOCAL
+			CASE 1
+				LOCAL:1 = SET_COLOR_FUNC("ボーカル")
+			CASE 2
+				LOCAL:1 = SET_COLOR_FUNC("ビジュアル")
+			CASE 3
+				LOCAL:1 = SET_COLOR_FUNC("ダンス")
+			CASEELSE
+			
+		ENDSELECT
+		LOCAL:2 = GETBGCOLOR()
+		CALL FADE(8, LOCAL:1, LOCAL:2, TSTR:LOCAL, TSTR, TSTR:(50 + LOCAL), TSTR:(100 + LOCAL), TSTR:(150 + LOCAL), TSTR, TSTR, TSTR, TSTR, TSTR)
+		FOR LOCAL:3, 0, LOCAL + 10
+			PRINTL
+		NEXT
+	NEXT
+	RESETBGCOLOR
+	CALL RETURNLINE
+	ALIGNMENT LEFT
+ENDIF
+;思い出
+ELSEIF TFLAG:アピール種別 == 4
+		
+	CALL SAVELINE
+	;絶対入る点
+	LOCAL = (基礎能力合計() * 5 / 9 + BASE:ARG:親密度 * 5 + (30 + ABL:ARG:親密)) * 5
+	;LOCAL *= 100
+	;TIMES LOCAL, 0.58666
+	;LOCAL /= 100
+	;30 ～ 40点 * 5 * 0.58666
+	思い出点 = LOCAL
+	思い出点 *= 10000
+	TIMES 思い出点, 1.70
+	思い出点 /= 10000
+	;以下通常アピール計算
+	;PRINTFORML ボーナス{LOCAL}
+	LOCAL:1 += JUDGE_APPEALHIT(ARG, 1)
+
+	LOCAL:1 += JUDGE_APPEALHIT(ARG, 2)
+	
+	LOCAL:1 += JUDGE_APPEALHIT(ARG, 3)
+	
+	;命中率の和を１/３して
+	LOCAL:1 /= 3
+	;	PRINTFORML 命中{LOCAL:1}
+	IF RAND:100 < LOCAL:1
+		;ヒットしてたらパフェアピ率計算
+		LOCAL:2 += JUDGE_PERFECTAPPEAL(ARG, 1)
+		LOCAL:2 += JUDGE_PERFECTAPPEAL(ARG, 2)
+		LOCAL:2 += JUDGE_PERFECTAPPEAL(ARG, 3)
+		
+		;パフェ率を１/３する
+		LOCAL:2 /= 3
+		
+		IF RAND:100 < LOCAL:2
+			LOCAL:3 = 2
+		ELSE
+			LOCAL:3 = 1
+		ENDIF
+		
+	ELSE
+		LOCAL:3 = 0
+	ENDIF
+	;味方は別処理
+	IF ARG >= 11
+		LOCAL:3 = TFLAG:アピール成功
+	ENDIF
+	;	PRINTFORML パフェ{LOCAL:2}
+	;ここからがそれぞれのアピール×3
+	;全部アピール判定は共通させるのでグッド、バッド、パーフェクトはこちらで指示
+	CALL APPEAL_CALCLATE(ARG, LOCAL:3, 1)
+	思い出点:1 = RESULT
+	;アピール表示(VO, LOCAL:3, 値)
+	CALL APPEAL_CALCLATE(ARG, LOCAL:3, 2)
+	思い出点:2 = RESULT
+	;アピール表示(VO, LOCAL:3, 値)
+	CALL APPEAL_CALCLATE(ARG, LOCAL:3, 3)
+	思い出点:3 = RESULT
+	;新仕様
+	;TIMES 思い出点:1, 1.70
+	;TIMES 思い出点:2, 1.70
+	;TIMES 思い出点:3, 1.70
+	;思い出点表示
+	;PRINTFORML 思い出:1{思い出点:1}思い出:2{思い出点:3}思い出:4{思い出点:4}
+	IF ARG >= 11
+		;PRINTFORML 思い出:1{思い出点:1}思い出:2{思い出点:3}思い出:4{思い出点:4}
+		CALL アピール表示(ARG, LOCAL:3, 0, 思い出点:1, 思い出点:2, 思い出点:3, 思い出点)
+		FOR LOCAL, 0, 4
+			TFLAG:得点一時保存 += 思い出点:LOCAL
+		;少し多めになるけどまあいいか
+			IF TFLAG:チェイン数 > 1 && ARG >= 11
+				TFLAG:得点一時保存 += (5 + (TFLAG:チェイン数 - 2) * 1)
+				TFLAG:トータルチェイン += (5 + (TFLAG:チェイン数 - 2) * 1)
+			ENDIF
+		NEXT
+		TFLAG:思い出使用 = 1
+	ELSE
+		FOR LOCAL, 0, 4
+			TFLAG:得点一時保存 += 思い出点:LOCAL
+		NEXT
+		TFLAG:思い出使用 = 0
+	ENDIF
+	CALL RETURNLINE
+;ノーアピール
+;処理なし
+ELSEIF TFLAG:アピール種別 == 0
+	TFLAG:チェイン数 = 0
+ELSE
+	CALL SAVELINE
+	CALL 通常アピール(ARG, TFLAG:アピール種別)
+	CALL RETURNLINE
+ENDIF
+
+$APPEAL_END
+VARSET LOCAL
+IF ARG >= 11
+	TFLAG:味方スコア += TFLAG:得点一時保存
+ELSE
+	TFLAG:敵スコア += TFLAG:得点一時保存
+ENDIF
+;思い出アピールなら思い出を一つ減らす
+IF TFLAG:アピール記憶 == 4
+	IF ARG >= 11
+		TFLAG:味方思い出 -= 1
+	ELSE
+		TFLAG:敵思い出 -= 1
+	ENDIF
+ENDIF
+;VL増減チェック
+;のちにお守りの効果を反映させることを考えて、それぞれのケースで場合分け
+;補正も考えて…
+SELECTCASE TFLAG:アピール記憶
+
+;ノーアピール
+CASE 0
+
+;VOアピール
+CASE 1
+	LOCAL += 300
+	;スポ魂持ちは更に+50
+	SIF ABL:ARG:スポ魂 > 0
+		LOCAL += 50
+;VIアピール
+CASE 2
+	LOCAL += 300
+	;スポ魂持ちは更に+50
+	SIF ABL:ARG:スポ魂 > 0
+		LOCAL += 50
+;DAアピール
+CASE 3
+	LOCAL += 300
+	;スポ魂持ちは更に+50
+	SIF ABL:ARG:スポ魂 > 0
+		LOCAL += 50
+;思い出アピール
+CASE 4
+	LOCAL += 3000
+	;スポ魂持ちは更に+100
+	SIF ABL:ARG:スポ魂 > 0
+		LOCAL += 100
+	LOCAL:1 += 1428
+;バーストアピール
+CASE 5
+	;バースト時はボルテージをリセット
+	LOCAL = -1
+	LOCAL:1 += 3000
+CASEELSE
+	PRINTFORMW エラー！不明なアピール({TFLAG:アピール記憶})が選択されました（@アピール処理）
+ENDSELECT
+
+
+;自然減衰も込みで
+IF ARG >= 11
+	;記者ブースト
+	IF (FLAG:記者 % 10) == 1
+		LOCAL *= 10000
+		TIMES LOCAL, 1.40
+		LOCAL /= 10000
+	ELSEIF (FLAG:記者 % 10) == 5
+		LOCAL *= 10000
+		TIMES LOCAL, 1.20
+		LOCAL /= 10000
+	ENDIF
+	BASE:0:ボルテージ += (LOCAL - 74)
+	BASE:1:ボルテージ -= LOCAL:1
+ELSE
+	BASE:1:ボルテージ += (LOCAL - 74)
+	BASE:0:ボルテージ -= LOCAL:1
+ENDIF
+;バーストアピール時はボルテージリセット
+IF LOCAL == -1
+	IF ARG >= 11
+		BASE:0:ボルテージ = 0
+	ELSE
+		BASE:1:ボルテージ = 1
+	ENDIF
+ENDIF
+;80未満なら0に
+SIF BASE:0:ボルテージ < 0
+	BASE:0:ボルテージ = 0
+	
+SIF BASE:1:ボルテージ < 0
+	BASE:1:ボルテージ = 0
+	
+;ボルテージ10000以上なら10000に
+SIF BASE:0:ボルテージ > 10000
+	BASE:0:ボルテージ = 10000
+	
+SIF BASE:1:ボルテージ > 10000
+	BASE:1:ボルテージ = 10000
+	
+;味方側アピールの時はレート変動有り
+IF ARG >= 11
+;レート変更
+;Vo
+	IF TFLAG:アピール記憶 == 1
+	
+		TIMES TFLAG:VOレート , 0.95
+		TIMES TFLAG:DAレート , 1.03
+	;Vi
+	ELSEIF TFLAG:アピール記憶 == 2
+	
+		TIMES TFLAG:VIレート , 0.95
+		TIMES TFLAG:VOレート , 1.03
+	;Da
+	ELSEIF TFLAG:アピール記憶 == 3
+	
+		TIMES TFLAG:DAレート , 0.95
+		TIMES TFLAG:VIレート , 1.03
+	;思い出
+	ELSEIF TFLAG:アピール記憶 == 4
+		;アピールしたキャラによって、固有レートに設定したい所
+		TFLAG:VOレート = 11000
+		TFLAG:VIレート = 11000
+		TFLAG:DAレート = 11000
+	;バースト
+	ELSEIF TFLAG:アピール記憶 == 5
+		TFLAG:VOレート = 7000 + バースト:1 * 1000
+		TFLAG:VIレート = 7000 + バースト:2 * 1000
+		TFLAG:DAレート = 7000 + バースト:3 * 1000
+	;ノーアピール
+	ELSEIF TFLAG:アピール記憶 == 0
+	
+	;エラートラップ
+	ELSE
+		PRINTFORMW エラー！不明なアピール({TFLAG:アピール記憶})が選択されました（@アピール処理\レート変動）
+	ENDIF
+	
+	SIF TFLAG:VIレート > 15000
+		TFLAG:VIレート = 15000
+	SIF TFLAG:VOレート > 15000
+		TFLAG:VOレート = 15000
+	SIF TFLAG:DAレート > 15000
+		TFLAG:DAレート = 15000
+		
+	SIF TFLAG:VIレート < 0
+		TFLAG:VIレート = 0
+	SIF TFLAG:VOレート < 0
+		TFLAG:VOレート = 0
+	SIF TFLAG:DAレート < 0
+		TFLAG:DAレート = 0
+ELSE
+
+ENDIF
+
+SIF TFLAG:チェイン数 >= TFLAG:MAXチェイン数
+	TFLAG:MAXチェイン数 = TFLAG:チェイン数
+
+CALL 待機時間セット_LAF(ARG, TFLAG:アピール記憶)

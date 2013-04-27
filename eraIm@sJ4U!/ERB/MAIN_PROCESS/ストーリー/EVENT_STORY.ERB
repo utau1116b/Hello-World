@@ -1,0 +1,27 @@
+@ストーリーイベント
+;唐突過ぎるので、ちゃんと後でチュートリアル用に1,2日確保して
+;その中でリリースするように
+IF FLAG:24 == 1 && FLAG:CD発売許可 == 0 && TIME == 0 && TIME:12 == 0
+	FLAG:CD発売許可 = 1
+	FLAG:初回リリース = 1
+	PRINTFORMW さあ、いよいよ今日から%CSTR:0:22%のプロデュース活動が始まる！
+	PRINTFORMW 息を巻く%CALLNAME:MASTER%と%CALLNAME:TARGET%達の前に、どこからともなく閣下が現れた
+	PRINTFORMW 「はーい、いよいよ本格的なプロデュース活動の始まりね」
+	PRINTFORMW 「今日は私からあなた達に提案があるの」
+	PRINTFORMW 「せっかくだからこの機会に%CSTR:0:22%のCDをリリースしてみない？」
+	PRINTFORMW 「CDセールスは、%CALLNAME:TARGET%達がどの程度のアイドルの目安になるし、売り上げはもちろん%CSTR:0:22%の活動資金にしていいわ」
+	PRINTFORMW 「本当はいくらか手数料を頂くところだけど、初めてだから今回はタダでリリースさせてあげる」
+	PRINTFORMW 「断る理由は無いわね？　では、%CSTR:0:22%がリリースするCDを選びなさい」
+	CALL 新曲リリース
+	;初回リリースフラグを折る
+	FLAG:初回リリース = 0
+	PRINTFORMW 「よし、これでCDリリースの準備が出来たわね」
+	PRINTFORMW 「CDについての情報は、[どっとっぷTV]で確認ができるわ」
+	PRINTFORMW 「CD発売から一週間経てば[どっとっぷTV]から、再び新曲をリリースできるから覚えておきなさい」
+	PRINTFORMW 「それじゃあ、健闘を祈ってるわ♪」
+	PRINTFORMW フッ…、とまるで最初から居なかったかのように閣下は姿を消した
+	PRINTFORMW 何はともあれ、これでプロデュース活動の準備は整った
+	PRINTFORMW さあ、%CSTR:0:22%のプロデュースを始めよう！
+ELSE
+
+ENDIF

@@ -1,0 +1,158 @@
+;FileName_SOURCE_CALLCOM.ERB ----------------------- Rev1.01
+;@COM呼出統括
+;CALL		USER
+;ARG		キャラNO
+;RETURN		VOID
+;COMMENT	@COMを呼び出す。コンボ発生判定もここ
+;-----------------------------------------------------------
+@CALL_COM(ARG)
+DEBUGPRINTFORML SELECTCOM = {SELECTCOM}　PREVCOM = {PREVCOM}
+;=== ウフフ系コンボ ===
+IF TFLAG:うふふ
+	;シックスナイン
+	IF (GET_INSERT_CHARA(ARG,"M","P") == PLAYER || GET_INSERT_CHARA(ARG,"M","C") == PLAYER) && (GET_INSERT_CHARA(ARG,"P","M") == PLAYER || GET_INSERT_CHARA(ARG,"C","M") == PLAYER) && (SELECTCOM == [[調教:クンニ]] || SELECTCOM == [[調教:フェラチオ]])
+		TFLAG:特殊COM = 1
+		TFLAG:派生COM番号 = 69
+	;岩清水
+	ELSEIF TEQUIP:ARG:羞恥プレイ && SELECTCOM == [[調教:クンニ]]
+		TFLAG:特殊COM = 2
+		TFLAG:派生COM番号 = 87
+	;Gスポット刺激
+	ELSEIF SELECTCOM == [[調教:指挿入れ]] && PREVCOM == SELECTCOM
+	; && TFLAG:103 == ARG
+		TFLAG:特殊COM = 3
+		TFLAG:派生COM番号 = 84
+	;乱れ牡丹
+	ELSEIF TEQUIP:ARG:羞恥プレイ && SELECTCOM == [[調教:背面座位]]
+		TFLAG:特殊COM = 4
+		TFLAG:派生COM番号 = 88
+	;手淫フェラ
+	ELSEIF (GET_INSERT_CHARA(ARG,"F","P") == PLAYER && GET_INSERT_CHARA(ARG,"M","P",1) == PLAYER) || (GET_INSERT_CHARA(ARG,"M","P") == PLAYER && GET_INSERT_CHARA(ARG,"F","P",1) == PLAYER)
+		;フェラ-手淫
+		IF GET_INSERT_CHARA(ARG,"F","P") == PLAYER
+			TFLAG:SELECTCOM分岐2 = 0
+		;手淫-フェラ
+		ELSE
+			TFLAG:SELECTCOM分岐2 = 1
+		ENDIF
+		TFLAG:特殊COM = 5
+	;挿入Ｇスポット責め、子宮口責め、交互挿入
+	ELSEIF (SELECTCOM == [[調教:正常位]] || SELECTCOM == [[調教:後背位]] || SELECTCOM == [[調教:騎乗位]] || SELECTCOM == [[調教:対面座位]] || SELECTCOM == [[調教:背面座位]]) 
+		IF TEQUIP:ARG:体位 == TEQUIP:ARG:体位２ && GET_INSERT_CHARA(ARG,"V","P",1) == PLAYER
+			IF SELECTCOM == [[調教:騎乗位]] || RAND:2
+				TFLAG:特殊COM = 7
+				TFLAG:派生COM番号 = 255
+			ELSE
+				TFLAG:特殊COM = 6
+				TFLAG:派生COM番号 = 256
+			ENDIF
+		ENDIF
+		;交互挿入
+		IF GET_INSERT_CHARA(ARG,"V","P") == PLAYER && (MASTER_POSE(6,1,1) && MASTER_POSE(6,1,1) != ARG)
+			TFLAG:特殊COM = 13
+			TFLAG:派生COM番号 = 64
+		ENDIF
+	;シックスナインパイズリ
+	ELSEIF GET_INSERT_CHARA(ARG,"B","P") == PLAYER && (GET_INSERT_CHARA(ARG,"P","M") == PLAYER || GET_INSERT_CHARA(ARG,"C","M") == PLAYER) && (SELECTCOM == [[調教:クンニ]] || SELECTCOM == [[調教:パイズリ]])
+		TFLAG:特殊COM = 8
+	;ダブルフェラ
+	ELSEIF GET_INSERT_CHARA(ARG,"M","P") == PLAYER && (MASTER_POSE(4,1,1) && MASTER_POSE(4,1,1) != ARG )
+		TFLAG:特殊COM = 9
+		TFLAG:派生COM番号 = 68
+	;ダブル素股
+	ELSEIF GET_INSERT_CHARA(ARG,"C","P") == PLAYER && (MASTER_POSE(2,1,1) && MASTER_POSE(2,1,1) != ARG )
+		TFLAG:特殊COM = 10
+	;ダブルパイズリ
+	ELSEIF GET_INSERT_CHARA(ARG,"B","P") == PLAYER && (MASTER_POSE(5,1,1) && MASTER_POSE(5,1,1) != ARG )
+		TFLAG:特殊COM = 11
+	;パイズリフェラ
+	ELSEIF (GET_INSERT_CHARA(ARG,"B","P") == PLAYER && GET_INSERT_CHARA(ARG,"M","P",1) == PLAYER) || (GET_INSERT_CHARA(ARG,"M","P") == PLAYER && GET_INSERT_CHARA(ARG,"B","P",1) == PLAYER)
+		TFLAG:特殊COM = 12
+	;強制放尿
+	ELSEIF SELECTCOM == [[調教:放尿]]
+		;おもらし癖なし、従順４以上欲望３以上、マゾっ気３以上orおもらし癖ありで利尿剤が無い
+		IF (!TALENT:57 && ABL:0 >= 4 && ABL:1 >= 3 && ABL:8 >= 3) || (TALENT:57 && !TEQUIP:22)
+			TFLAG:特殊COM = 14
+			TFLAG:派生COM番号 = 86
+		ENDIF
+	;Ｗフェラ
+	ELSEIF GET_INSERT_CHARA(ARG,"M","P") == PLAYER && GET_INSERT_CHARA(ASSI,"P","M") == ASSI
+		TFLAG:特殊COM = 15
+		TFLAG:派生COM番号 = 66
+	ENDIF
+ENDIF
+
+;=== 日常系 ===
+IF !TFLAG:うふふ
+	;耳かき
+	IF SELECTCOM == [[調教:スキンシップ]] && PREVCOM == [[調教:膝枕して貰う]]
+		TFLAG:特殊COM = 60
+	;デコちゅー
+	ELSEIF (SELECTCOM == [[調教:バードキス]] || SELECTCOM == [[調教:ソフトキス]]) && PREVCOM == [[調教:頭を撫でる]]
+		TFLAG:特殊COM = 62 
+	ENDIF
+ENDIF
+
+;=== デート系 ===
+;IF CFLAG:MASTER:デート中
+;	;手を引く
+;	IF SELECTCOM == [[調教:正常位]]3 && PREVCOM == 603
+;		TFLAG:特殊COM = 80
+
+;ENDIF
+DEBUGPRINTFORML 【CALLCOM】TFLAG={TFLAG:特殊COM}, SELECTCOM={SELECTCOM}
+;PRINTFORML SELECTCOM = {SELECTCOM} TFLAG:SELECTCOM保存 = {TFLAG:SELECTCOM保存}
+;PRINTFORML 【CALLCOM】TFLAG={TFLAG:特殊COM}, SELECTCOM={SELECTCOM}
+RESULT = 0
+IF TFLAG:特殊COM
+	CALLFORM COM_ABLE{500 + TFLAG:特殊COM}
+	IF RESULT
+		TRYCALLFORM CAN_SCOM{TFLAG:特殊COM}(1)
+		IF RESULT
+			TRYCCALLFORM CAN_SCOM{TFLAG:特殊COM}
+			CATCH
+				PRINTFORML %コマンド名(TFLAG:特殊COM, 1)%
+				TFLAG:派生COM番号 = 0
+				;%STR:(1500 + TFLAG:特殊COM)%
+			ENDCATCH
+			STR:0 = %コマンド名(TFLAG:特殊COM, 1)%
+			;%STR:(1500 + TFLAG:特殊COM)%
+			TRYCALLFORM SCOM{TFLAG:特殊COM}
+		ENDIF
+	ELSE
+		;実行判定失敗口上呼び出し
+		TFLAG:イベント口上 = 99
+		CALL SELF_KOJO
+		;実行判定非表示にしている場合下記の文章が表示されないと実行できない場合が分かり難いため文章表示
+		IF ((FLAG:コンフィグ & 1p27) == 0) && FLAG:特殊モード != 1
+			;実行判定を表示する場合は文章表示の必要なし
+		ELSE
+			PRINTFORMW %CALLNAME:TARGET%の合意を得られませんでした
+		ENDIF
+	ENDIF
+ENDIF
+;DEBUGPRINTFORML 【CALLCOM】RESULT={RESULT}
+SIF RESULT
+	RETURN RESULT
+TFLAG:特殊COM = 0
+;LOCALS = %TRAINNAME:SELECTCOM%
+;%STR:(1000 + SELECTCOM)%
+TRYCCALLFORM CAN_COM{SELECTCOM}
+CATCH
+	PRINTFORML %コマンド名(SELECTCOM)%
+ENDCATCH
+;実行できない場合
+IF A < V
+	;実行判定失敗口上呼び出し
+	TFLAG:イベント口上 = 99
+	CALL SELF_KOJO
+	;実行判定非表示にしている場合下記の文章が表示されないと実行できない場合が分かり難いため文章表示
+	IF ((FLAG:コンフィグ & 1p27) == 0) && FLAG:特殊モード != 1
+		;実行判定を表示する場合は文章表示の必要なし
+	ELSE
+		PRINTFORMW %CALLNAME:TARGET%の合意を得られませんでした
+	ENDIF
+ENDIF
+STR:0 = %コマンド名(SELECTCOM)%
+TRYCALLFORM COM{SELECTCOM}
+RETURN RESULT

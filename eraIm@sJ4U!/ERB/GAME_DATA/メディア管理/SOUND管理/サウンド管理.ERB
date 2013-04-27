@@ -1,0 +1,314 @@
+;BGM,ループする
+@MMPLAY(ARGS)
+SIF GLOBAL:1003
+	RETURN
+SELECTCASE ARGS
+	CASE "メイン画面" , "" , "0", "タイトル"
+		SOUNDXPLAY メイン画面
+	;ちゃっちゃっちゃちゃちゃー、ちゃっちゃ、ちゃちゃちゃちゃー
+	CASE "BRIGHT", "1"
+		SOUNDXPLAY BRIGHT
+	;たたたん、たったったー、ったったたー
+	CASE "ENERGY", "2"
+		SOUNDXPLAY ENERGY
+	;夜の事務所の曲
+	;たらら～んら～んらん　たらら～
+	CASE "NIGHT", "3"
+		SOUNDXPLAY NIGHT
+	;でれれれれ！　ずばずばずばずば　ずばずばずばずば
+	CASE "SPEED", "4"
+		SOUNDXPLAY SPEED
+	;営業の曲
+	;んてれれ　てんれてんれ　てれてれ
+	CASE "Tender", "5"
+		SOUNDXPLAY Tender
+	;てってってー
+	CASE "Town", "6"
+		SOUNDXPLAY Town
+	CASE "TRIAL DANCE", "7"
+		SOUNDXPLAY TRIAL DANCE
+	CASE "和風Town", "8"
+		SOUNDXPLAY 和風Town
+	CASE "和風メイン画面", "9"
+		SOUNDXPLAY 和風メイン画面
+	CASE "夜", "10"
+		SOUNDXPLAY Dark
+	CASE "Morning", "11"
+		SOUNDXPLAY Morning
+	CASE "Sentaku2", "12"
+		SOUNDXPLAY Sentaku2
+	CASE "ファンキー1", "13"
+		SOUNDXPLAY ファンキー1
+	CASE "月夜幻想", "14"
+		SOUNDXPLAY 月夜幻想
+	CASE "Guiter_Sawayaka", "15"
+		SOUNDXPLAY Guiter_Sawayaka
+	CASE "心の揺らめき", "16"
+		SOUNDXPLAY 心の揺らめき
+	CASE "ED_Seikou", "17"
+		SOUNDXPLAY ED_Seikou
+	CASE "日光浴", "18"
+		SOUNDXPLAY 日光浴
+	CASE "雑魚戦曲", "19"
+		SOUNDXPLAY 雑魚戦曲
+	CASE "散歩道", "20"
+		SOUNDXPLAY 散歩道
+	CASE "行楽日和", "21"
+		SOUNDXPLAY 行楽日和
+	CASE "パスワード", "22"
+		SOUNDXPLAY パスワード
+	CASE "エイブルアップ", "23"
+		SOUNDXPLAY エイブルアップ
+	CASE "Dragon Dive ～アガットのアは赤毛のア～", "24"
+		SOUNDXPLAY Dragon Dive ～アガットのアは赤毛のア～
+	CASE "25", "遠い昔の記憶"
+		SOUNDXPLAY 遠い昔の記憶
+	CASE "26", "月の雫 2"
+		SOUNDXPLAY 月の雫 2
+	CASE "27", "line_down"
+		SOUNDXPLAY line_down
+	CASEELSE
+		SOUNDXPLAY メイン画面
+ENDSELECT
+
+@MMSTOP
+SOUNDXSTOP 
+
+;ARGS	シチュエーション
+;ARGS:1 ～	詳細
+@BGM(ARGS, ARGS:1, ARGS:2)
+SELECTCASE ARGS
+	CASE "イベント"
+		SELECTCASE ARGS:1
+			;イベントではないけど、他に入れる所がない
+			CASE "タイトル"
+				IF IS_お正月()
+					CALL MMPLAY(9)
+				ELSE
+					CALL MMPLAY(0)
+				ENDIF
+			CASE "パートナー選択"
+				CALL MMPLAY(12)
+			CASE "オープニング"
+				
+			CASE "チュートリアル"
+				IF IS_お正月()
+					CALL MMPLAY(8)
+				ELSE
+					CALL MMPLAY(6)
+				ENDIF
+		ENDSELECT
+	CASE "ダンジョン"
+		SELECTCASE ARGS:1
+			CASE "1", "765プロ", "７６５プロ"
+				;CALL MMPLAY(19)
+				SELECTCASE ARGS:2
+					CASE "0","1"
+						CALL MMPLAY("散歩道")
+					CASE "2"
+						CALL MMPLAY("日光浴")
+				ENDSELECT
+		ENDSELECT
+		
+	CASE "戦闘"
+		SELECTCASE ARGS:1
+			CASE "雑魚戦"
+				CALL MMPLAY(19)
+			CASE "閣下に挑戦"
+				CALL MMPLAY(24)
+		ENDSELECT
+		
+	CASE "TRAIN"
+		SELECTCASE ARGS:1
+			CASE "BEFORETRAIN"
+				IF TIME && TIME:12
+					CALL MMPLAY(14)
+				ELSE
+					CALL MMPLAY(15)
+				ENDIF
+			CASE "メイン"
+				SIF TFLAG:うふふ > 0
+					CALL MMPLAY(16)
+			CASE "ABLUP"
+				CALL MMPLAY(23)
+			ENDSELECT
+			
+	CASE "お仕事", "WORK"
+		SELECTCASE ARGS:1
+			CASE "営業"
+				IF RAND:2 == 0
+					CALL MMPLAY(2)
+				ELSE
+					CALL MMPLAY(5)
+				ENDIF
+			CASE "レッスン"
+				CALL MMPLAY(2)
+			CASE "ステージ"
+				CALL MMPLAY(27)
+		ENDSELECT
+	CASE "SHOP", "ショップ"
+		SELECTCASE ARGS:1
+			CASE "メイン", "SHOPMAIN"
+				IF TIME && TIME:12
+					CALL MMPLAY("NIGHT")
+				ELSE
+					CALL MMPLAY("Morning")
+				ENDIF
+			CASE "買い物"
+				IF IS_お正月()
+					CALL MMPLAY(8)
+				ELSE
+					CALL MMPLAY(6)
+				ENDIF
+			CASE "スケジュール選択"
+				CALL MMPLAY(13)
+			CASE "DAYEFFECT"
+				IF TIME && TIME:12
+					CALL MMPLAY("NIGHT")
+				ELSE
+					CALL MMPLAY("Morning")
+				ENDIF
+		ENDSELECT
+	CASE "週末"
+		SELECTCASE ARGS:1
+			CASE "決算スタート"
+				CALL MMPLAY("パスワード")
+			CASE "コマンド"
+				CALL MMPLAY("エイブルアップ")
+		ENDSELECT
+	
+	CASEELSE
+
+ENDSELECT
+
+@SE(ARGS, ARGS:1, ARGS:2)
+
+SELECTCASE ARGS
+	CASE "WORK","お仕事","仕事"
+		SELECTCASE ARGS:1
+			CASE "レッスン"
+				SELECTCASE ARGS:2
+					CASE "成功"
+						CALL SEPLAY(23)
+					CASE "失敗"
+						CALL SEPLAY(5)
+				ENDSELECT
+			CASE "営業"
+				SELECTCASE ARGS:2
+					CASE "成功"
+						CALL SEPLAY(23)
+					;CASE "普通"
+					CASE "失敗"
+						CALL SEPLAY(5)
+				ENDSELECT
+			CASE "ステージ"
+				SELECTCASE ARGS:2
+					CASE "成功"
+						CALL SEPLAY(19)
+					CASE "失敗"
+						CALL SEPLAY(5)
+					CASE "歓声"
+						CALL SEPLAY(9)
+					CASE "ガヤ"
+						CALL SEPLAY(8)
+				ENDSELECT
+		ENDSELECT
+	CASE "ダンジョン"
+		SELECTCASE ARGS:1
+			CASE "宝箱"
+				SELECTCASE ARGS:2
+					CASE "OPEN","開"
+						CALL SEPLAY(26)
+					CASE "GET","アイテムゲット","アイテム"
+						CALL SEPLAY(25)
+				ENDSELECT
+			CASE "エレベーター"
+				CALL SEPLAY(22)
+		ENDSELECT
+	CASE "タイトル"
+		SELECTCASE ARGS:1
+			CASE  "お正月"
+				IF !GLOBAL:1050 && IS_お正月()
+					CALL SEPLAY("SofTalk")
+					GLOBAL:1050 = 1
+					SAVEGLOBAL
+				ENDIF
+		ENDSELECT
+	CASE "メンバーイン"
+		CALL SEPLAY(27)
+	CASE "ポイントゲット"
+		CALL SEPLAY(28)
+ENDSELECT
+
+@SEPLAY(ARGS)
+SIF GLOBAL:1003
+	RETURN
+SELECTCASE ARGS
+	CASE "アイドル登場音" , "" , "0"
+		SOUNDXSE アイドル登場音
+	CASE "Blackout_piano1", "1"
+		SOUNDXSE Blackout_piano1
+	CASE "Something_call_to_you", "2"
+		SOUNDXSE Something_call_to_you
+	CASE "シュピン", "3"
+		SOUNDXSE シュピン
+	CASE "そこに跪いて", "4"
+		SOUNDXSE そこに跪いて
+	CASE "おまぬけ", "5"
+		SOUNDXSE おまぬけ 5
+	CASE "Blackout_piano2", "6"
+		SOUNDXSE Blackout_piano2
+	CASE "ピタゴラスイッチ", "7"
+		SOUNDXSE ピタゴラスイッチ
+	CASE "会場ガヤ", "8"
+		SOUNDXSE 会場ガヤ1
+	CASE "歓声", "9"
+		SOUNDXSE 歓声 2
+	CASE "歓声2", "10"
+		SOUNDXSE 歓声2
+	CASE "必殺仕事人", "11"
+		SOUNDXSE 必殺仕事人-斬
+	CASE "NG", "12"
+		SOUNDXSE NG
+	CASE "うわーお", "13"
+		SOUNDXSE うわーお 3
+	CASE "敵出現", "14"
+		SOUNDXSE 敵出現
+	CASE "宿屋で一泊", "15"
+		SOUNDXSE 宿屋で一泊
+	CASE "紙をめくる", "16"
+		SOUNDXSE 紙をめくる 4
+	CASE "階段昇", "17"
+		SOUNDXSE 階段昇 2
+	CASE "階段降", "18"
+		SOUNDXSE 階段降
+	CASE "ファンファーレ", "19"
+		SOUNDXSE ファンファーレ
+	CASE "ピキーン", "20"
+		SOUNDXSE ピキーン
+	CASE "ＭＳ回復", "21"
+		SOUNDXSE ＭＳ回復
+	CASE "エレベーター", "22"
+		SOUNDXSE エレベーター
+	CASE "グッドコミュニケーション", "23"
+		SOUNDXSE グッドコミュニケーション
+	CASE "SofTalk", "24"
+		SOUNDXSE SofTalk
+	CASE "アイテムゲット", "25"
+		SOUNDXSE アイテムゲット
+	CASE "宝箱開ける", "26"
+		SOUNDXSE 宝箱開ける
+	CASE "仲間ＧＥＴ", "27"
+		SOUNDXSE 仲間ＧＥＴ
+	CASE "ピロン", "28"
+		SOUNDXSE ピロン
+	CASE "ピストル音", "29"
+		SOUNDXSE ピストル音
+	CASE "ツバメ", "30"
+		SOUNDXSE ツバメ
+	CASEELSE
+		SOUNDXSE アイドル登場音
+ENDSELECT
+
+@SESTOP
+SOUNDXSESTOP 

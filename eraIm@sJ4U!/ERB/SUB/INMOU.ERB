@@ -1,0 +1,83 @@
+
+;=============================================================================
+;陰毛成長関連
+;=============================================================================
+;陰毛の成長具合(BASE:MP)の増減処理や、状態判定をここで行う。細かくやると面倒なため、処理は大雑把に
+;剃毛プレイ等を実行(つまり初期状態のときではない場合)または脱毛状態でないときは毛が生えてくるように
+;大まかな目安として、0～50：ツルツル、51～250：生えかけ、251～1000：生えそろった(剃毛可能)……となっている
+;--------------------------------------------------
+;時間経過における陰毛成長処理
+;--------------------------------------------------
+;ARG:0 対象キャラ
+@CHECK_DAY_PUBIC_HAIR(ARG:0)
+;LOCAL:5 陰毛生え具合
+;LOCAL = TARGET
+;LOCAL:1 = TFLAG:900
+;TARGET = TFLAG:900
+
+;日光浴、月光浴、吸血鬼
+IF TIME == 0
+	LOCAL:5 = 5
+	SIF TALENT:(ARG:0):115
+		TIMES LOCAL:5 , 1.20
+ELSE
+	LOCAL:5 = 10
+	SIF TALENT:(ARG:0):114 || TALENT:(ARG:0):116
+		TIMES LOCAL:5 , 1.20
+ENDIF
+
+;回復早い、回復遅い、吸血鬼、蓬莱人
+IF TALENT:(ARG:0):111 || TALENT:(ARG:0):114
+	TIMES LOCAL:5 , 1.30
+ELSEIF TALENT:(ARG:0):112
+	TIMES LOCAL:5 , 0.70
+ENDIF
+
+;小柄体型
+SIF TALENT:(ARG:0):100
+	LOCAL:5 /= 2
+
+BASE:(ARG:0):9 = MIN(BASE:(ARG:0):9 + MAX(LOCAL:5, 1), 1000)
+
+IF BASE:(ARG:0):9 > 250 && TALENT:パイパン
+	PRINTFORML %CALLNAME:(ARG:0)%の下の毛が生えそろいました
+	PRINTFORMW %CALLNAME:(ARG:0)%は[%TALENTNAME:65%]ではなくなった
+	TALENT:(ARG:0):パイパン = 0
+ENDIF
+
+;TARGET = LOCAL
+;TFLAG:900 = LOCAL:1
+
+;------------------------------------------------
+;陰毛の状態表示処理
+;-------------------------------------------------
+@PRINT_PUBIC_HAIR, ARG
+
+CALL NEW_DRAWLINE
+;PRINTFORML \@(FLAG:12 & 2) ? □ 陰毛状態 # 陰毛状態:\@
+PRINTL □陰毛状態
+;小人体型か小柄体型の場合はデフォならつるつる
+IF (TALENT:ARG:100 || TALENT:ARG:149) && CFLAG:ARG:毛の成長判定 != 2
+	PRINTFORML 　陰毛は生えてません。\@(CFLAG:ARG:毛の成長判定 == 1) ? 脱毛処理をされているので、 # そして、\@生える気配もありません。
+;小人か小柄以外でデフォなら生えてる
+ELSEIF TALENT:ARG:100 == 0 && TALENT:ARG:149 == 0 && CFLAG:ARG:毛の成長判定 == 0 && TALENT:ARG:65 == 0
+	PRINTL 　陰毛が綺麗に生え揃っています。
+;それ以外はBASE:MPを参照
+ELSEIF BASE:ARG:9 > 500
+	PRINTFORML 　陰毛が鬱葱と生い繁っています。\@(CFLAG:ARG:毛の成長判定 == 1) ? 脱毛処理はされているので今後さらに伸びることはないでしょう。 # \@
+ELSEIF BASE:ARG:9 > 250
+	PRINTFORML 　陰毛が綺麗に生え揃っています。\@(CFLAG:ARG:毛の成長判定 == 1) ? 脱毛処理はされているので今後さらに伸びることはないでしょう。 # \@
+ELSEIF BASE:ARG:9 > 125
+	PRINTFORML 　陰毛がだいぶ生え揃いつつあるようで\@(CFLAG:ARG:毛の成長判定 == 1) ? すが、脱毛処理がされているので今後さらに伸びることはないでしょう。 # す。\@
+ELSEIF BASE:ARG:9 > 51
+	PRINTFORML 　陰毛が所々に生えつつあるようで\@(CFLAG:ARG:毛の成長判定 == 1) ? すが、脱毛処理がされているので今後さらに伸びることはないでしょう。 # す。\@
+ELSE
+	PRINTFORML 　陰毛は生えてません。\@(CFLAG:ARG:毛の成長判定 == 1) ? 脱毛処理がされているので今後生えることはないでしょう。 # 今後生えてくることになるでしょう。\@
+ENDIF
+
+;CALL NEW_DRAWLINE
+;PRINTFORMW 
+;陰毛の状態
+@INMOU_INFO(ARG:0)
+CALL PRINT_PUBIC_HAIR, ARG
+

@@ -1,0 +1,186 @@
+;-------------------------------------------------------------------------------
+;	カラーコンフィグ
+;-------------------------------------------------------------------------------
+;	例	CALL COLORCONFIG
+;	あとは見ての通りだよ！お兄ちゃん！
+;===============================================================================
+;	ARGS = INI/SET/GET(省略可)  ARG = 指定色  ARG:1 = 指定スタイル
+@COLORCONFIG(ARG,ARGS = "文字色")
+#DIM RED,1
+#DIM GRE,1
+#DIM BLU,1
+#DIMS LEF,1
+#DIMS RIG,1
+#LOCALSIZE 3
+#LOCALSSIZE 1
+VARSET LOCALS
+RED = HEXTORGB(GETCOLOR(),"R")
+GRE = HEXTORGB(GETCOLOR(),"G")
+BLU = HEXTORGB(GETCOLOR(),"B")
+LEF = %UNICODE(0x25C0)%
+RIG = %UNICODE(0x25B6)%
+LOCAL:0 = LINECOUNT
+LOCAL:1 = GETCOLOR()
+$REPRINT
+REDRAW 0
+SETCOLOR RED,GRE,BLU
+DRAWLINE
+;CALL PRINT_DIALOG(@"%ARGS%を変更して下さい  %"現在:0x" + TOSTR(GETCOLOR(), "X")%",1,1,)
+PRINTFORML %ARGS%を変更してください    %"現在:0x" + TOSTR(GETCOLOR(), "X")%
+;CALL EX_DRAWLINE(,,COLOR_2())
+DRAWLINE
+
+CALL COLORCONFIG_SUB(@"R:{RED,3}",1e4,-3e7)
+CALL COLORCONFIG_SUB(@"G:{GRE,3}",1e2,-2e7)
+CALL COLORCONFIG_SUB(@"B:{BLU,3}",  1,-1e7)
+
+;CALL EX_DRAWLINE(,,COLOR_2())
+DRAWLINE
+;CALL PRINTC_COMMAND( -6e7,@"[CANCEL]"	,1,,9,4,BULLETSPACE())
+;CALL PRINTC_COMMAND( -5e7,@"[RESET]"	,1,,8,4,BULLETSPACE())
+;CALL PRINTC_COMMAND( -4e7,@"[OK]"		,1,,5,4,BULLETSPACE())
+PRINTBUTTON "[CANCEL]  ", -6e7
+PRINTBUTTON "[RESET]  ", -5e7
+PRINTBUTTON "[OK]  ", -4e7
+
+;CALL NOLINEINPUT
+INPUT
+
+SELECTCASE RESULT
+	CASE -1e4, 1e4, -16e4, 16e4		; RED<-+>
+		RED = LIMIT(RED + RESULT/10000,0,255)
+	CASE -1e2, 1e2, -16e2, 16e2		; GRE<-+>
+		GRE = LIMIT(GRE + RESULT/100,0,255)
+	CASE -1, 1, -16, 16				; BLU<-+>
+		BLU = LIMIT(BLU + RESULT,0,255)
+	CASE -3e7, -2e7, -1e7			; RGB直接入力
+		CLEARLINE 2
+		SELECTCASE RESULT
+			CASE -3e7
+				LOCAL:1 = 1
+				LOCALS = RED:{RED,3}
+			CASE -2e7
+				LOCAL:1 = 2
+				LOCALS = GRE:{GRE,3}
+			CASE -1e7
+				LOCAL:1 = 3
+				LOCALS = BLU:{BLU,3} 
+		ENDSELECT
+		;CALL PRINT_DIALOG(@"%LOCALS%  数値を直接入力して下さい(0-255)",1,1,1)
+		PRINTFORML %LOCALS%  数値を直接入力して下さい(0-255)
+		INPUT
+		IF RANGE(RESULT,0,255)
+			SELECTCASE LOCAL:1
+				CASE 1
+					RED = RESULT
+				CASE 2
+					GRE = RESULT
+				CASE 3
+					BLU = RESULT
+			ENDSELECT
+		ENDIF
+	CASE -6e7
+		CLEARLINE LINECOUNT - LOCAL
+		SETCOLOR LOCAL:1
+		REDRAW 1
+		RETURN 0
+	CASE -5e7
+		RED = HEXTORGB(LOCAL:1,"R")
+		GRE = HEXTORGB(LOCAL:1,"G")
+		BLU = HEXTORGB(LOCAL:1,"B")
+		SETCOLOR LOCAL:1
+	CASE -4e7
+		CLEARLINE LINECOUNT - LOCAL
+		REDRAW 1
+		;CALL PRINT_DIALOG(@"%ARGS%を{RED},{GRE},{BLU}に変更しました",2,2,2)
+		PRINTFORML %ARGS%を{RED},{GRE},{BLU}に変更しました
+		RETURN 1
+ENDSELECT
+CLEARLINE LINECOUNT - LOCAL
+REDRAW 1
+GOTO REPRINT
+
+@COLORCONFIG_SUB(ARGS,ARG,ARG:1)
+#LOCALSIZE 1
+LOCAL = RESULT
+;CALL PRINTC_COMMAND(-16*ARG,@"[%UNICODE(0x25C0)%]"	,1,,4,5,BULLETSPACE())
+PRINTBUTTON @"[%UNICODE(0x25C0)%]",-16 * ARG
+;CALL PRINTC_COMMAND( -1*ARG, "[-]"					,1,,4,5,BULLETSPACE())
+PRINTBUTTON "[-]",-1 * ARG
+;CALL PRINTC_COMMAND(  ARG:1,@"[%ARGS%]"				,1,,8,5,BULLETSPACE())
+PRINTBUTTON @"[%ARGS%]", ARG:1
+;CALL PRINTC_COMMAND(  1*ARG, "[+]"					,1,,4,5,BULLETSPACE())
+PRINTBUTTON "[+]",1 * ARG
+;CALL PRINTC_COMMAND( 16*ARG,@"[%UNICODE(0x25B6)%]"	,1,,4,5,BULLETSPACE())
+PRINTBUTTON @"[%UNICODE(0x25B6)%]",16 * ARG
+PRINTL 
+RETURN LOCAL
+
+
+;-------------------------------------------------------------------------------
+;	色を明度のパーセントで変更
+;-------------------------------------------------------------------------------
+;	例  CALL BRIGHTCOLOR(70)	※70%の暗さへSETCOLOR
+;		CALL BRIGHTCOLOR(150)	※150%の明るさへSETCOLOR
+;===============================================================================
+@BRIGHTCOLOR(ARG)
+SETCOLOR BRIGHTCOLORF(ARG)
+RETURN RESULT
+
+;-------------------------------------------------------------------------------
+;	上のやつの式中版
+;-------------------------------------------------------------------------------
+;	例	SETCOLOR BRIGHTCOLORF(50) ※50%の暗さへSETCOLOR
+;		直でこれ叩くほうが早い気もする
+;===============================================================================
+@BRIGHTCOLORF(ARG, ARG:1 = -1)
+#FUNCTION
+#LOCALSIZE 1
+#DIM NOW,1
+ARG = LIMIT(ARG, 0, 1000)
+LOCAL = ARG:1 == -1 ? GETCOLOR() # ARG:1
+RETURNF RGBTOHEX( TIMESF(HEXTORGB(LOCAL,"R"),ARG), TIMESF(HEXTORGB(LOCAL,"G"),ARG), TIMESF(HEXTORGB(LOCAL,"B"),ARG) )
+
+;-------------------------------------------------------------------------------
+;	16進数の色値からRGBを取得(BRIGHTCOLORで使用)
+;-------------------------------------------------------------------------------
+;	例	RED   = HEXTORGB(GETCOLOR(),"R")
+;		GREEN = HEXTORGB(GETCOLOR(),"G")
+;		BLUE  = HEXTORGB(GETCOLOR(),"B")
+;===============================================================================
+@HEXTORGB(ARG, ARGS)
+#FUNCTION
+SELECTCASE ARGS
+	CASE "R","RED"
+		RETURNF ((ARG & 0xFF0000) >> 16)
+	CASE "G","GREEN"
+		RETURNF ((ARG & 0xFF00) >> 8)
+	CASE "B","BLUE"
+		RETURNF (ARG & 0xFF)
+	CASE "BRIGHTNESS"
+		RETURNF (((ARG & 0xFF0000) >> 16) + ((ARG & 0xFF00) >> 8) + (ARG & 0xFF)) / 3
+ENDSELECT
+
+;-------------------------------------------------------------------------------
+;	RGBの各値から数値に(BRIGHTCOLORで使用)
+;-------------------------------------------------------------------------------
+;	例	LOCAL = RGBTOHEX(128,64,208)
+;		LOCAL == 0x8040D0
+;===============================================================================
+@RGBTOHEX(ARG, ARG:1, ARG:2)
+#FUNCTION
+RETURNF (LIMIT(ARG:0,0,255) << 16) + (LIMIT(ARG:1,0,255) << 8) + (LIMIT(ARG:2,0,255))
+
+
+;-------------------------------------------------------------------------------
+;	TIMESの式中関数版TIMESF(式中関数)
+;-------------------------------------------------------------------------------
+;	例  LOCAL = TIMESF(100,200)
+;       この場合 100 * 2.00 + 0 = 200
+;===============================================================================
+@TIMESF(ARG, ARG:1, ARG:2)
+#FUNCTION
+; とりあえず0から1兆
+RETURNF LIMIT((ARG * ARG:1 / 100) + ARG:2, 0, 999999999999)
+
+

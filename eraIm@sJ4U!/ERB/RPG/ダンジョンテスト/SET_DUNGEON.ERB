@@ -1,0 +1,74 @@
+
+;======================================================================
+;現在居るフロアのデータを入力するための関数群のファイルです
+;======================================================================
+
+;=====================================================================
+;フロアデータの入力処理
+;=====================================================================
+;ARG	y座標
+;ARGS	マップ表示文字列
+;LOCAL	x座標
+@MAKE_FLOOR_LINE,ARG,ARGS
+FOR LOCAL,0,FLAG:最大X
+	DA:LOCAL:ARG = TOINT(TOHALF(SUBSTRING(ARGS,LOCAL*2,2)))
+	SIF SUBSTRING(ARGS,LOCAL*2,2) == "Ｄ"
+		DA:LOCAL:ARG = -1
+	SIF SUBSTRING(ARGS,LOCAL*2,2) == "　" || SUBSTRING(ARGS,LOCAL*2,2) == "  " || SUBSTRING(ARGS,LOCAL*2,2) == "＿" || SUBSTRING(ARGS,LOCAL*2,2) == "__" || SUBSTRING(ARGS,LOCAL*2,2) == "＿" || SUBSTRING(ARGS,LOCAL*2,2) == "■"
+		DA:LOCAL:ARG = 0
+	TRYCCALLFORM DEFINE_TILES_{FLAG:現ダンジョン}, SUBSTRING(ARGS,LOCAL*2,2), LOCAL, ARG
+		IF RESULT == 0
+			CALL DEFINE_TILES,ARGS,LOCAL,ARG
+		ELSE
+			DA:LOCAL:ARG = RESULT
+		ENDIF
+	CATCH
+		CALL DEFINE_TILES,ARGS,LOCAL,ARG
+	ENDCATCH
+	TRYCALLFORM MAKE_FLOOR_LINE_COMMON_{FLAG:現ダンジョン}, DA:LOCAL:ARG, LOCAL, ARG
+NEXT
+
+;=====================================================================
+;条件付きで床以外のタイルを指定された座標にセット
+;=====================================================================
+@SET_TILE,ARG,ARG:1,ARG:2,ARG:3,ARG:4
+SIF ARG:2 == ARG:3
+	DA:ARG:(ARG:1) = ARG:4
+
+@SET_TILES,ARG,ARG:1,ARG:2,ARG:3,ARG:4,ARGS
+SIF (ARGS == "＝" && ARG:2 == ARG:3) || (ARGS == "＜" && ARG:2 < ARG:3) || (ARGS == "＜＝" && ARG:2 <= ARG:3) || (ARGS == "＞" && ARG:2 > ARG:3) || (ARGS == "＞＝" && ARG:2 >= ARG:3)
+	DA:ARG:(ARG:1) = ARG:4
+
+;X,Y
+@DEFINE_TILES, ARGS, ARG, ARG:1
+;T
+SIF SUBSTRING(ARGS, ARG*2, 2) == "Ｔ"
+	DA:ARG:(ARG:1) = -9
+;R
+SIF SUBSTRING(ARGS, ARG*2, 2) == "Ｒ"
+	DA:ARG:(ARG:1) = -19
+;机
+SIF SUBSTRING(ARGS, ARG*2, 2) == "机"
+	DA:ARG:(ARG:1) = 30
+;窓
+SIF SUBSTRING(ARGS, ARG*2, 2) == "窓"
+	DA:ARG:(ARG:1) = 40
+;エレベーター
+SIF SUBSTRING(ARGS, ARG*2, 2) == "Ｅ"
+	DA:ARG:(ARG:1) = -29
+;壁の側面(見通せる)
+SIF SUBSTRING(ARGS, ARG*2, 2) == "早"
+	DA:ARG:(ARG:1) = 20
+;壁の側面(見通せない)
+SIF SUBSTRING(ARGS, ARG*2, 2) == "壁"
+	DA:ARG:(ARG:1) = -20
+;壁の上面(見通せる)
+SIF SUBSTRING(ARGS, ARG*2, 2) == "千"
+	DA:ARG:(ARG:1) = 10
+;壁の上面(見通せない)(ようは０なので必要なし)
+;SIF SUBSTRING(ARGS, ARG*2, 2) == "b1"
+;	DA:ARG:(ARG:1) = -10
+;黒地
+SIF SUBSTRING(ARGS, ARG*2, 2) == "黒"
+	DA:ARG:(ARG:1) = 50
+	

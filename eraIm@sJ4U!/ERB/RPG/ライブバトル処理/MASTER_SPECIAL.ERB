@@ -1,0 +1,26 @@
+;ARG:0	使用者のキャラ登録番号
+@MASTER_SPECIAL(ARG:0)
+;LOCAL:0	ループ用
+;LOCAL:8	スキル番号
+;LOCAL:1	TEMP
+;LOCAL:2	TEMP
+
+LOCAL:1 = 0
+LOCAL:2 = 0
+LOCAL:8 = 600 + ARG:0
+CALLFORM SELECT_SKILL_TARGET_{LOCAL:8}(ARG:0)
+IF RESULT == 0
+	;使用をキャンセルした場合、最初に戻す
+	RETURN 0
+ELSE
+	BASE:(ARG:0):ボルテージ -= 300
+	CALL DO_ACTION(ARG:0, CFLAG:(ARG:0):現在状態, CFLAG:(ARG:0):行動の対象)
+ENDIF
+RETURN 1
+
+
+
+
+
+
+

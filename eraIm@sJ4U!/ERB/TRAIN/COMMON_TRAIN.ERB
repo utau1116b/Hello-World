@@ -1,0 +1,241 @@
+;-------------------------------------------------
+;関数名:GET_REVISION
+;概　要:汎用補正値取得関数
+;引　数:ARG:0…参照する数値
+;       ARG:1…上限
+;       ARG:2…上昇率
+;戻り値:補正後の値
+;備　考:式中関数
+;ある数値を、上限値に漸近していく数値に変換したいときに
+;ARG:2が小さいとすぐに上限に達する、大きいと逆になかなか上限まで近づかない
+;-------------------------------------------------
+@GET_REVISION(ARG:0, ARG:1, ARG:2)
+#FUNCTION
+RETURNF ARG:1 - ARG:2 * ARG:1 / (ARG:2 + ARG:0)
+
+@GET_REVISION2(ARG:0, ARG:1, ARG:2)
+#FUNCTION
+RETURNF ARG:1 * (ARG:0 + 1) / (ARG:2 + ARG:0 + 1)
+;-------------------------------------------------
+;関数名:EXP_UP
+;概　要:経験値変動チェック
+;引　数:ARG:0…参照するEXP
+;       ARG:1…参照するキャラ番号
+;-------------------------------------------------
+@EXP_UP(ARG,ARG:1)
+#FUNCTION
+RETURNF EXP:(ARG:1):ARG - TCVAR:(ARG:1):(400 + ARG)
+;-------------------------------------------------
+;関数名:TRAIN_NO
+;概　要:調教コマンドの番号チェック
+;引　数:ARG:0…参照する調教名
+;-------------------------------------------------
+@TRAIN_NO(ARGS)
+#FUNCTION
+;RETURNF EXP:(ARG:1):ARG - TCVAR:(ARG:1):(400 + ARG)
+FOR LOCAL, 0, 1000
+	SIF TRAINNAME:LOCAL == ARGS
+		RETURNF LOCAL
+NEXT
+RETURNF -1
+;-------------------------------------------------
+;関数名:HETEROSEX
+;ARGとARG:1の性別が同じかどうかを返すほんとはHOMOSEXだけど語感が悪いので
+;女性器を持つものは女、持たないものを男とする
+;戻り値0=異性
+;戻り値1=同性(レズ)
+;戻り値2=同性(ゲイ)
+;-------------------------------------------------
+@HETEROSEX(ARG,ARG:1)
+#FUNCTION
+;IF GETBIT(TALENT:ARG:2,0) == GETBIT(TALENT:(ARG:1):2,0)
+;	IF GETBIT(TALENT:ARG:2,0)
+;		RETURNF 1
+;	ELSE
+;		RETURNF 2
+;	ENDIF
+IF TALENT:ARG:オトコ && TALENT:(ARG:1):オトコ
+	RETURNF 2
+ELSEIF !TALENT:ARG:オトコ && !TALENT:(ARG:1):オトコ
+	RETURNF 1
+ELSE
+	RETURNF 0
+ENDIF
+
+;-------------------------------------------------
+;関数名:SOURCE_REVISION1
+;快楽系SOURCEの快楽系ABLによる補正
+;1/10される
+;-------------------------------------------------
+@SOURCE_REVISION1(ARG)
+#FUNCTION
+SELECTCASE ARG
+	CASE 0
+		RETURNF 5
+	CASE 1 TO 3
+		RETURNF 10 * ARG
+	CASE 4 TO 9
+		RETURNF 20 * ARG - 30
+	CASEELSE
+		RETURNF 150 + 5 * ARG
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:SOURCE_REVISION2
+;快楽系SOURCEに依存するUP:欲望のABL:欲望による補正
+;1/100される
+;-------------------------------------------------
+@SOURCE_REVISION2(ARG)
+#FUNCTION
+SELECTCASE ARG
+	CASE 0 TO 5
+		RETURNF 50 + 10 * ARG
+	CASE 6 TO 9
+		RETURNF 75 + 5 * ARG
+	CASEELSE
+		RETURNF 20 * ARG - 60 
+ENDSELECT
+
+@TALENT_LV(ARG, ARGS)
+#FUNCTION
+SELECTCASE ARGS
+	CASE "快感応答"
+		SIF TALENT:ARG:快感に素直
+			RETURNF 1
+		SIF TALENT:ARG:快感の否定
+			RETURNF -1
+	CASE "汚臭耐性"
+		SIF TALENT:ARG:汚れ無視
+			RETURNF 2
+		SIF TALENT:ARG:汚臭鈍感
+			RETURNF 1
+		SIF TALENT:ARG:汚臭敏感
+			RETURNF -1
+	CASE "バストサイズ"
+		SIF TALENT:ARG:爆乳
+			RETURNF 2
+		SIF TALENT:ARG:巨乳
+			RETURNF 1
+		SIF TALENT:ARG:貧乳
+			RETURNF -1
+		SIF TALENT:ARG:絶壁
+			RETURNF -2
+	CASE "Ｂ感度"
+		SIF TALENT:ARG:Ｂ敏感	
+			RETURNF 1
+		SIF TALENT:ARG:Ｂ鈍感
+			RETURNF -1
+	CASEELSE
+ENDSELECT
+RETURNF 0
+@素質検索(ARGS)
+#FUNCTION
+FOR LOCAL,0,CHARANUM
+	
+	;関係ない人は省く
+	SIF LOCAL != MASTER && LOCAL != TARGET && LOCAL != ASSI
+		CONTINUE
+	SIF TALENT:LOCAL:ARGS
+		RETURNF 1
+NEXT
+RETURNF 0
+;ARG	コマンド番号or特殊COM番号
+;ARG:1	0,通常,1,派生COM
+@コマンド名(ARG, ARG:1)
+#FUNCTIONS
+IF ARG:1
+	SELECTCASE ARG
+		CASE 1
+			RETURNF "シックスナイン"
+		CASE 2
+			RETURNF "岩清水"
+		CASE 3
+			RETURNF "Gスポット刺激"
+		CASE 4
+			RETURNF "乱れ牡丹"
+		CASE 5
+			RETURNF "手淫フェラ"
+		CASE 6
+			RETURNF "挿入Ｇスポット責め"
+		CASE 7
+			RETURNF "挿入子宮口責め"
+		CASE 8
+			RETURNF "６９パイズリ"
+		CASE 9
+			RETURNF "ダブルフェラ"
+		CASE 10
+			RETURNF "ダブル素股"
+		CASE 11
+			RETURNF "ダブルパイズリ"
+		CASE 12
+			RETURNF "パイズリフェラ"
+		CASE 13
+			RETURNF "交互挿入"
+		CASE 14
+			RETURNF "強制放尿"
+		CASE 15
+			RETURNF "Ｗフェラ"
+		CASE 60
+			RETURNF "耳かき"
+		CASE 62
+			RETURNF "デコちゅー"
+	ENDSELECT
+ELSE
+	SELECTCASE ARG
+			CASE 11
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手挿入"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能バイブ"
+			CASE 13
+				SIF TEQUIP:触手プレイ
+					RETURNF "アナル触手"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能アナルバイブ"
+			CASE 14
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手クリキャップ"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能電動クリキャップ"
+				RETURNF "電動クリキャップ"
+			CASE 15
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手乳首責め"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能二プルキャップ"
+				RETURNF "二プルキャップ"
+			CASE 16
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手搾乳"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能搾乳機"
+			CASE 17
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手ペニス責め"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能オナホール"
+			CASE 44
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手緊縛"
+			CASE 116
+				SIF TFLAG:45
+					RETURNF "剃毛される"
+			CASE 173
+				SIF TFLAG:45
+					RETURNF "腹パンされる"
+			CASE 280 TO 284
+				RETURNF CSTR:(ARG - 200)
+			CASE 323
+				SIF TEQUIP:デート中 && IS_友情(TARGET)
+					RETURNF "遠出する(5,000Ｇを消費)"
+				SIF TEQUIP:デート中
+					RETURNF "デート(5,000Ｇを消費)"
+				RETURNF "デート終了"
+		CASEELSE
+			RETURNF TRAINNAME:ARG
+	ENDSELECT
+ENDIF
+
+SIF STRLENS(TRAINNAME:ARG) > 0
+	RETURNF TRAINNAME:ARG
+RETURNF ""

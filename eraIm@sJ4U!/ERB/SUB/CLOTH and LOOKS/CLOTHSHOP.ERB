@@ -1,0 +1,187 @@
+;-------------------------------------------------
+;衣装名
+;-------------------------------------------------
+@CLOTH_NAME
+VARSET TSTR, ""
+TSTR:1 = 学ラン
+TSTR:2 = セーラー服
+TSTR:3 = ブルマ
+TSTR:4 = 水着
+TSTR:5 = スクール水着（紺）
+TSTR:6 = スクール水着（白）
+TSTR:7 = 白衣
+TSTR:8 = ナース服
+TSTR:9 = 女性警察官制服
+TSTR:10 = ボンテージスーツ
+TSTR:11 = 浴衣
+TSTR:12 = 巫女服
+TSTR:13 = セーラーミズギ
+;TSTR:14 = 初音ミクのコスプレ
+TSTR:14 = ステージ衣装
+TSTR:15 = メイド服
+;TSTR:16 = サンタ服
+TSTR:16 = スモック
+TSTR:17 = リボン
+TSTR:18 = ヨガウェア
+TSTR:19 = 魔法少女コスチューム
+TSTR:20 = ゴシックロリータ衣装
+TSTR:21 = バニーガール
+TSTR:22 = Yシャツ
+TSTR:23 = 普段着
+TSTR:24 = %CALLNAME:MASTER%の服
+
+;追加未定の候補達
+
+;ブラジル水着
+;大正袴
+;チャイナ服
+;バニースーツ
+;チアガール
+;パジャマ
+;園児服
+;ウェディングドレス
+;ウェイトレス
+;宇宙服
+;囚人服
+;サンタ服
+;拘束衣
+;軍服
+;修道服
+;割烹着
+;レオタード
+
+;-------------------------------------------------
+;衣装名（省略版）
+;-------------------------------------------------
+@CLOTH_EQUIP_NAME
+VARSET TSTR, ""
+
+TSTR:1 = 学ラン
+TSTR:2 = セーラー服
+TSTR:3 = ブルマ
+TSTR:4 = 水着
+TSTR:5 = スク水（紺）
+TSTR:6 = スク水（白）
+TSTR:7 = 白衣
+TSTR:8 = ナース服
+TSTR:9 = 女性警察官制服
+TSTR:10 = ボンテージスーツ
+TSTR:11 = 浴衣
+TSTR:12 = 巫女服
+TSTR:13 = セーラー水着
+;TSTR:14 = ミクの衣装
+TSTR:14 = ステージ衣装
+TSTR:15 = メイド服
+;TSTR:16 = サンタ服
+TSTR:16 = スモック
+TSTR:17 = リボン
+TSTR:18 = ヨガウェア
+TSTR:19 = 魔法少女コス
+TSTR:20 = ゴスロリ
+TSTR:21 = バニーガール
+TSTR:22 = 裸Yシャツ
+TSTR:23 = 普段着
+TSTR:24 = %CALLNAME:MASTER%の服
+TSTR:255 = ボロボロの布切れ
+
+;-------------------------------------------------
+;怪しい衣装屋（ってかコスプレショップ）
+;-------------------------------------------------
+;FLAG:70：持ってる服（ビット演算）
+@CLOTHES_SHOP
+VARSET LOCAL, 0
+
+;衣装名取得
+CALL CLOTH_NAME
+
+;普段着、%CALLNAME:MASTER%の服は常に所持
+SETBIT FLAG:70, 23
+SETBIT FLAG:70, 24
+
+PRINTL 所持コスプレ衣装:
+;改行用
+LOCAL:99 = 0
+REPEAT 30
+	;TSTR:COUNTが設定されていなかったら表示しない
+	IF TSTR:COUNT == ""
+		CONTINUE
+	;LOCAL:COUNTが-1なら表示しない
+	ELSEIF LOCAL:COUNT < 0
+		CONTINUE
+	ENDIF
+
+	IF GETBIT(FLAG:70, COUNT)
+		PRINTFORMLC [{COUNT,2}] %TSTR:COUNT%
+	ELSE
+		LOCAL:100 = 1
+		CONTINUE
+	ENDIF
+	
+	LOCAL:99 ++
+	;改行するのか？ 続けて出力するのか？
+	IF LOCAL:99 > 2
+		PRINTL 
+		LOCAL:99 = 0
+	ELSE
+		PRINT 
+	ENDIF
+REND
+;最後のループで改行してなかったら、ここで改行しておく
+SIF LOCAL:99 != 0
+	PRINTL 
+PRINTL 
+;以下販売表示
+SIF LOCAL:100
+	PRINTL どの衣装を購入しますか？(各10,000Ｇ)
+;改行用
+LOCAL:99 = 0
+REPEAT 30
+	;TSTR:COUNTが設定されていなかったら表示しない
+	IF TSTR:COUNT == ""
+		CONTINUE
+	;LOCAL:COUNTが-1なら表示しない
+	ELSEIF LOCAL:COUNT < 0
+		CONTINUE
+	ENDIF
+	IF GETBIT(FLAG:70, COUNT)
+		CONTINUE
+	ELSE
+		PRINTFORMLC [{COUNT,2}] %TSTR:COUNT%
+		LOCAL:COUNT = 1
+	ENDIF
+	LOCAL:99 ++
+	;改行するのか？ 続けて出力するのか？
+	IF LOCAL:99 > 2
+		PRINTL 
+		LOCAL:99 = 0
+	ELSE
+		PRINT 
+	ENDIF
+REND
+;最後のループで改行してなかったら、ここで改行しておく
+SIF LOCAL:99 != 0
+	PRINTL 
+PRINTL [100] 戻る
+$INPUT_LOOP
+INPUT
+IF RESULT == 100
+	RETURN 0
+ELSEIF RESULT > 100
+	PRINTW 正しい値を入力して下さい
+	GOTO INPUT_LOOP
+ELSEIF GETBIT(FLAG:70, RESULT)
+	;ここで各衣装の説明文表示できると良いんですが
+	PRINTW 既に所持しています
+	GOTO INPUT_LOOP
+ELSEIF LOCAL:RESULT == 0
+	PRINTW 正しい値を入力して下さい
+	GOTO INPUT_LOOP
+ELSEIF MONEY <= 10000
+	PRINTW ゲイツが足りません
+ELSE
+	PRINTFORMW ＜%TSTR:RESULT%を購入しました＞
+	MONEY -= 10000
+	SETBIT FLAG:70, RESULT
+ENDIF
+
+RESTART

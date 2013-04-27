@@ -1,0 +1,97 @@
+;-------------------------------------------------
+;緊急避妊薬
+;道具使用コマンド、レベル2
+;-------------------------------------------------
+@COM187
+VARSET LOCAL
+;着脱の処理
+;TEQUIP:緊急避妊薬 = !TEQUIP:緊急避妊薬
+PRINTFORML 誰に緊急避妊薬を使用しますか？(残り:{ITEM:緊急避妊薬})
+FOR LOCAL, 0, 3
+	SIF LOCAL == 0
+		LOCAL:1 = MASTER
+	SIF LOCAL == 1
+		LOCAL:1 = TARGET
+	IF LOCAL == 2 && ASSIPLAY
+		LOCAL:1 = ASSI
+	ELSE
+		LOCAL:1 = 0
+	ENDIF
+	RESULT = 0
+	CALL CAN_緊急避妊薬(LOCAL:1, LOCAL)
+	SIF RESULT && CHECK_PENIS(LOCAL:1)
+		PRINTFORM [{LOCAL}] %CALLNAME:(LOCAL:1)% 
+NEXT
+PRINT [3] やめる
+$INPUTLOOP
+INPUT
+IF RESULT == 0
+	TEQUIP:MASTER:緊急避妊薬 = !TEQUIP:MASTER:緊急避妊薬
+	SIF TEQUIP:MASTER:緊急避妊薬
+		ITEM:緊急避妊薬 --
+	LOCAL = MASTER
+ELSEIF RESULT == 1
+	TEQUIP:緊急避妊薬 = !TEQUIP:緊急避妊薬
+	SIF TEQUIP:緊急避妊薬
+		ITEM:緊急避妊薬 --
+	LOCAL = TARGET
+ELSEIF RESULT == 2
+	TEQUIP:ASSI:緊急避妊薬 = !TEQUIP:ASSI:緊急避妊薬
+	SIF TEQUIP:ASSI:緊急避妊薬
+		ITEM:緊急避妊薬 --
+	LOCAL = ASSI
+ELSEIF RESULT == 3
+	RETURN -1
+ELSE
+	CALL 再入力
+	GOTO INPUTLOOP
+ENDIF
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:LOCAL:体力 += 0
+DOWNBASE:LOCAL:気力 += 50
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+SIF 素質検索("調合知識")
+	DOWNBASE:LOCAL:気力 -= 20
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+
+
+RETURN 1
+
+;ARG	装着者
+;ARG:1	0,MASTER,1,TARGET,2,ASSI
+@CAN_緊急避妊薬(ARG, ARG:1)
+;実行判定
+SIF ARG:1 && !ASSIPLAY
+	RETURN 0
+;すでに使用中なら使えない
+SIF TEQUIP:ARG:86
+	RETURN 0
+;排卵誘発剤を使っていたら使えない
+SIF TEQUIP:ARG:87
+	RETURN 0
+;妊娠中なら不可
+SIF TALENT:ARG:134
+	RETURN 0
+;薬毒耐性だとダメ
+SIF TALENT:ARG:56
+	RETURN 0
+;オトコだとダメ
+SIF TALENT:ARG:122
+	RETURN 0
+	
+RETURN 1

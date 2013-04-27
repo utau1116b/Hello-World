@@ -1,0 +1,2275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=Shift_JIS">
+<title>eraIm@sJ</title>
+<style type="text/css">
+<!--
+body {
+  color: #CCCCCC;
+  background-color: black;
+  font-family : Trebuchet MS, Arial, Helvetica, sans-serif;
+  font-weight : normal;
+  text-align : left;
+  line-height: 1.2em;
+  margin: 0px;
+  padding: 0px;
+}
+
+a {
+  text-decoration: none;
+  margin: 0px;
+  padding: 0px;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a.h {
+  color: #EE0000;
+}
+
+a.menu_char {
+  color: #EE0000;
+}
+
+h1 {
+  color: #EE0000;
+  font-size: 24pt;
+  line-height: 1.4em;
+  background-color: black;
+  margin: 4px 0px 12px 0px;
+  padding: 4px 8px 4px 8px;
+  border-top:   2px #990000 solid;;
+  border-bottom:2px #990000 solid;
+}
+
+h2 {
+  color: #EE0000;
+  font-size: 18pt;
+  line-height: 1.4em;
+  background-color: black;
+  margin: 4px 0px 12px 0px;
+  padding: 2px 4px 2px 16px;
+  border-top:   2px #990000 solid;;
+  border-bottom:2px #990000 solid;
+}
+
+h3 {
+  color: #EE0000;
+  font-size: 14pt;
+  line-height: 1.4em;
+  background-color: black;
+  margin: 0px;
+  padding: 1px 0px 0px 16px;
+  border-top:   2px #990000 solid;;
+  border-bottom:2px #990000 solid;
+}
+
+h4 {
+  color: #DD0000;
+  font-size: 12pt;
+  line-height: 1.4em;
+  background-color: black;
+  margin: 0px;
+  padding: 4px 0px 0px 32px;
+}
+
+.base {
+  width : 700px;
+  background-color : #333333;
+  margin : 0 auto;
+}
+
+table {
+  border: none;
+  border-spacing: 4px;
+  margin: 0px;
+  padding: 0px;
+}
+
+table.gamebase {
+  margin: 0px 0px 32px 70px;
+  border-spacing: 16px 4px;
+}
+
+table.Ability {
+  margin: 0px 0px 32px 70px;
+}
+
+table.Palam {
+  margin: 0px 0px 32px 70px;
+}
+
+table.Talent {
+  margin: 0px 0px 32px 70px;
+}
+
+table.Item {
+  margin: 0px 0px 32px 70px;
+}
+
+table.Mark {
+  margin: 0px 0px 32px 70px;
+}
+
+table.Train {
+  margin: 0px 0px 32px 70px;
+}
+
+table.Exp {
+  margin: 0px 0px 32px 70px;
+}
+
+td.tag {
+  font-weight: bold;
+	text-align: right;
+  white-space: nowrap;
+}
+
+td.data {
+  padding: 0px 16px 0px 0px;
+}
+
+table.char {
+  width: 600px;
+  border: 0px;
+  background: #555555;
+  margin: 8px 0px 48px 70px;
+  padding: 0px;
+}
+
+td.char_palam {
+  width: 180px;
+}
+
+span.life {
+  color: #EE0000;
+  font-weight: bold;
+  margin-left: 42px;
+}
+span.mind {
+  color: #2222FF;
+  font-weight: bold;
+  margin-left: 42px;
+}
+span.sei {
+  color: #EEEEEE;
+  font-weight: bold;
+  margin-left: 42px;
+}
+
+table.char_ability {
+  min-width: 190px;
+  font-weight: bold;
+  text-align: right;
+  margin-left: 42px;
+}
+
+td.char_ability_tag {
+  width: 124px;
+}
+
+td.char_ability_data {
+  width: 32px;
+}
+
+div.char_talent {
+  font-weight: bold;
+  line-height: 1.6em;
+  margin-left: 42px;
+}
+
+span.talent {
+  white-space: nowrap;
+  margin: 0px 5px 0px 0px;
+}
+
+table.char_exp {
+  font-weight: bold;
+  text-align: right;
+  margin-left: 42px;
+}
+
+td.char_exp_tag {
+  width: 124px;
+}
+
+td.char_exp_data {
+  width: 32px;
+}
+
+table.char_relation {
+  font-weight: bold;
+  text-align: right;
+  margin-left: 42px;
+}
+
+td.relation {
+  width: 124px;
+}
+
+
+a.relation_posi {
+  color: #EEAAAA;
+}
+
+a.relation_nega {
+  color: #9999EE;
+}
+
+a.relation_normal {
+  color: #CCCCCC;
+}
+
+td.char_relation_data {
+  width: 32px;
+}
+
+table.char_flag {
+  font-weight: bold;
+  text-align: right;
+  margin-left: 42px;
+}
+
+td.char_flag_tag {
+  width: 124px;
+}
+
+td.char_flag_data {
+  width: 32px;
+}
+
+
+body.menu_base {
+  color: #CCCCCC;
+  background-color: black;
+  font-family : Trebuchet MS, Arial, Helvetica, sans-serif;
+  font-weight : normal;
+  text-align : left;
+  line-height: 1.2em;
+  margin: 0px;
+  padding: 0px;
+}
+
+.menu_base {
+  width : 140px;
+  margin : 0 auto;
+}
+
+h1.menu {
+  font-size: 14pt;
+  margin: 2px 0px 2px 0px;
+  padding: 6px 0px 6px 8px;
+}
+
+h2.menu {
+  font-size: 11pt;
+  margin: 12px 0px 2px 0px;
+  padding: 2px 0px 2px 14px;
+}
+
+
+div.menu_char {
+  font-size: 10px;
+  font-weight: bold;
+  margin: 0px 0px 0px 24px;
+  padding: 0px;
+}
+
+div.datasummary {
+  float: left;
+  margin: 0px 0px 4px 1px;
+}
+
+table.datasummary {
+  table-layout: fixed;
+  width: 130px;
+  padding: 0px;
+  line-height: 1.05em;
+  border-collapse: collapse; 
+  letter-spacing: -0.05em;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+th.summarytag {
+  width: 130px;
+  color: #EE0000;
+  background-color: #black;
+  padding-right: 4px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px #666666 solid;
+}
+th.summarytag_empty {
+  color:            #333333;
+  background-color: #333333;
+  border: none;
+}
+
+td.summarytag {
+  width: 26px;
+  color: #990000;
+  background-color: #black;
+  padding-right: 4px;
+  text-align: right;
+  font-weight: bold;
+  border: 1px #666666 solid;
+}
+td.summarytag_empty {
+  color:            #333333;
+  background-color: #333333;
+  border: 1px #333333 solid;
+}
+
+td.summarydata {
+  width: 98px;
+  background-color: #222222;
+  padding-left: 4px;
+  font-size: small;
+  border: 1px #666666 solid;
+}
+td.summarydata_empty {
+  color:            #333333;
+  background-color: #333333;
+  border: 1px #333333 solid;
+}
+-->
+</style>
+</head>
+<body>
+<div class="base">
+<h1>eraIm@sJ</h1>
+<a name="summary">
+<h2>EraData Summary</h2>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">PALAM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">0</td><td class="summarydata">快Ｃ</td></tr>
+    <tr><td class="summarytag">1</td><td class="summarydata">快Ｖ</td></tr>
+    <tr><td class="summarytag">2</td><td class="summarydata">快Ａ</td></tr>
+    <tr><td class="summarytag">3</td><td class="summarydata">潤滑</td></tr>
+    <tr><td class="summarytag">4</td><td class="summarydata">恭順</td></tr>
+    <tr><td class="summarytag">5</td><td class="summarydata">欲情</td></tr>
+    <tr><td class="summarytag">6</td><td class="summarydata">屈服</td></tr>
+    <tr><td class="summarytag">7</td><td class="summarydata">習得</td></tr>
+    <tr><td class="summarytag">8</td><td class="summarydata">恥情</td></tr>
+    <tr><td class="summarytag">9</td><td class="summarydata">苦痛</td></tr>
+    <tr><td class="summarytag">10</td><td class="summarydata">恐怖</td></tr>
+    <tr><td class="summarytag">11</td><td class="summarydata">反感</td></tr>
+    <tr><td class="summarytag">12</td><td class="summarydata">不快</td></tr>
+    <tr><td class="summarytag">13</td><td class="summarydata">抑鬱</td></tr>
+    <tr><td class="summarytag">14</td><td class="summarydata">快Ｂ</td></tr>
+    <tr><td class="summarytag">15</td><td class="summarydata">好意</td></tr>
+    <tr><td class="summarytag">16</td><td class="summarydata">生活</td></tr>
+    <tr><td class="summarytag">17</td><td class="summarydata">優越</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">PALAM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">18</td><td class="summarydata">快Ｍ</td></tr>
+    <tr><td class="summarytag">19</td><td class="summarydata">気分</td></tr>
+    <tr><td class="summarytag">20</td><td class="summarydata">情調</td></tr>
+    <tr><td class="summarytag">100</td><td class="summarydata">否定</td></tr>
+    <tr><td class="summarytag">105</td><td class="summarydata">歌唱</td></tr>
+    <tr><td class="summarytag">106</td><td class="summarydata">被写</td></tr>
+    <tr><td class="summarytag">107</td><td class="summarydata">舞踊</td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">0</td><td class="summarydata">親密</td></tr>
+    <tr><td class="summarytag">1</td><td class="summarydata">欲望</td></tr>
+    <tr><td class="summarytag">2</td><td class="summarydata">技巧</td></tr>
+    <tr><td class="summarytag">3</td><td class="summarydata">Ｃ感覚</td></tr>
+    <tr><td class="summarytag">4</td><td class="summarydata">Ｖ感覚</td></tr>
+    <tr><td class="summarytag">5</td><td class="summarydata">Ａ感覚</td></tr>
+    <tr><td class="summarytag">6</td><td class="summarydata">奉仕精神</td></tr>
+    <tr><td class="summarytag">7</td><td class="summarydata">露出癖</td></tr>
+    <tr><td class="summarytag">8</td><td class="summarydata">マゾっ気</td></tr>
+    <tr><td class="summarytag">9</td><td class="summarydata">レズっ気</td></tr>
+    <tr><td class="summarytag">10</td><td class="summarydata">自慰中毒</td></tr>
+    <tr><td class="summarytag">11</td><td class="summarydata">精液中毒</td></tr>
+    <tr><td class="summarytag">12</td><td class="summarydata">レズ中毒</td></tr>
+    <tr><td class="summarytag">13</td><td class="summarydata">ＢＬっ気</td></tr>
+    <tr><td class="summarytag">14</td><td class="summarydata">Ｂ感覚</td></tr>
+    <tr><td class="summarytag">15</td><td class="summarydata">サドっ気</td></tr>
+    <tr><td class="summarytag">16</td><td class="summarydata">ＢＬ中毒</td></tr>
+    <tr><td class="summarytag">17</td><td class="summarydata">Ｍ感覚</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">50</td><td class="summarydata">料理素質</td></tr>
+    <tr><td class="summarytag">81</td><td class="summarydata">好感度ボーナス</td></tr>
+    <tr><td class="summarytag">82</td><td class="summarydata">生活費軽減</td></tr>
+    <tr><td class="summarytag">83</td><td class="summarydata">戦闘経験ボーナス</td></tr>
+    <tr><td class="summarytag">84</td><td class="summarydata">霧無効化能力強化</td></tr>
+    <tr><td class="summarytag">85</td><td class="summarydata">霧浄化能力強化</td></tr>
+    <tr><td class="summarytag">86</td><td class="summarydata">獲得資金増加</td></tr>
+    <tr><td class="summarytag">87</td><td class="summarydata">戦闘能力強化</td></tr>
+    <tr><td class="summarytag">88</td><td class="summarydata">戦闘技能</td></tr>
+    <tr><td class="summarytag">89</td><td class="summarydata">金銭感覚</td></tr>
+    <tr><td class="summarytag">90</td><td class="summarydata">料理技能</td></tr>
+    <tr><td class="summarytag">91</td><td class="summarydata">撮影技能</td></tr>
+    <tr><td class="summarytag">97</td><td class="summarydata">浪費癖</td></tr>
+    <tr><td class="summarytag">101</td><td class="summarydata">歌唱素質</td></tr>
+    <tr><td class="summarytag">102</td><td class="summarydata">被写素質</td></tr>
+    <tr><td class="summarytag">103</td><td class="summarydata">舞踊素質</td></tr>
+    <tr><td class="summarytag">105</td><td class="summarydata">Ｖｏ技能</td></tr>
+    <tr><td class="summarytag">106</td><td class="summarydata">Ｖｉ技能</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">107</td><td class="summarydata">Ｄａ技能</td></tr>
+    <tr><td class="summarytag">110</td><td class="summarydata">Pランク</td></tr>
+    <tr><td class="summarytag">111</td><td class="summarydata">総計ファン人数</td></tr>
+    <tr><td class="summarytag">112</td><td class="summarydata">人気維持</td></tr>
+    <tr><td class="summarytag">113</td><td class="summarydata">獲得人気アップ</td></tr>
+    <tr><td class="summarytag">114</td><td class="summarydata">お店価格改定</td></tr>
+    <tr><td class="summarytag">115</td><td class="summarydata">お店種類増加</td></tr>
+    <tr><td class="summarytag">116</td><td class="summarydata">経験値増加</td></tr>
+    <tr><td class="summarytag">117</td><td class="summarydata">非戦闘員の経験値</td></tr>
+    <tr><td class="summarytag">118</td><td class="summarydata">疲労減少</td></tr>
+    <tr><td class="summarytag">119</td><td class="summarydata">生活費軽減</td></tr>
+    <tr><td class="summarytag">120</td><td class="summarydata">コマンド成功率上昇</td></tr>
+    <tr><td class="summarytag">121</td><td class="summarydata">レベル限界突破</td></tr>
+    <tr><td class="summarytag">122</td><td class="summarydata">ドロップお守りレベル</td></tr>
+    <tr><td class="summarytag">123</td><td class="summarydata">プロデュース技能</td></tr>
+    <tr><td class="summarytag">150</td><td class="summarydata">交友値</td></tr>
+    <tr><td class="summarytag">151</td><td class="summarydata">ファン数</td></tr>
+    <tr><td class="summarytag">152</td><td class="summarydata">アイドルランク</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1000</td><td class="summarydata">基本レベル</td></tr>
+    <tr><td class="summarytag">1001</td><td class="summarydata">ランダムアピール</td></tr>
+    <tr><td class="summarytag">1002</td><td class="summarydata">バーストアピール</td></tr>
+    <tr><td class="summarytag">1003</td><td class="summarydata">ガード</td></tr>
+    <tr><td class="summarytag">1004</td><td class="summarydata">アピール</td></tr>
+    <tr><td class="summarytag">1005</td><td class="summarydata">アシストアタック</td></tr>
+    <tr><td class="summarytag">1006</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1007</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1008</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1009</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1010</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1011</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1012</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1013</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1014</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1015</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1016</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1017</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1018</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1019</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1020</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1021</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1022</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1023</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1024</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1025</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1026</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1027</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1028</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1029</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1030</td><td class="summarydata">ポジティブ思考</td></tr>
+    <tr><td class="summarytag">1031</td><td class="summarydata">孤高の歌姫</td></tr>
+    <tr><td class="summarytag">1032</td><td class="summarydata">歌姫の威光</td></tr>
+    <tr><td class="summarytag">1033</td><td class="summarydata">ピンチに弱い</td></tr>
+    <tr><td class="summarytag">1034</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1035</td><td class="summarydata">first step</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1036</td><td class="summarydata">ポテンシャライズ</td></tr>
+    <tr><td class="summarytag">1037</td><td class="summarydata">ど根性</td></tr>
+    <tr><td class="summarytag">1038</td><td class="summarydata">スカウトフィンガー</td></tr>
+    <tr><td class="summarytag">1039</td><td class="summarydata">分析</td></tr>
+    <tr><td class="summarytag">1040</td><td class="summarydata">サポーター</td></tr>
+    <tr><td class="summarytag">1041</td><td class="summarydata">商人の目利き</td></tr>
+    <tr><td class="summarytag">1042</td><td class="summarydata">ノブレスオブリージュ</td></tr>
+    <tr><td class="summarytag">1043</td><td class="summarydata">パワフル乙女</td></tr>
+    <tr><td class="summarytag">1044</td><td class="summarydata">どたぷーん</td></tr>
+    <tr><td class="summarytag">1045</td><td class="summarydata">ジャンパー</td></tr>
+    <tr><td class="summarytag">1046</td><td class="summarydata">ツインシスターズ</td></tr>
+    <tr><td class="summarytag">1047</td><td class="summarydata">ラッキー☆</td></tr>
+    <tr><td class="summarytag">1048</td><td class="summarydata">ハピネスシング</td></tr>
+    <tr><td class="summarytag">1049</td><td class="summarydata">覚醒</td></tr>
+    <tr><td class="summarytag">1050</td><td class="summarydata">美姫のゆとり</td></tr>
+    <tr><td class="summarytag">1051</td><td class="summarydata">妄想癖</td></tr>
+    <tr><td class="summarytag">1052</td><td class="summarydata">元アイドル</td></tr>
+    <tr><td class="summarytag">1053</td><td class="summarydata">ちゅらさん</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1054</td><td class="summarydata">舞姫の激励</td></tr>
+    <tr><td class="summarytag">1055</td><td class="summarydata">明鏡止水</td></tr>
+    <tr><td class="summarytag">1056</td><td class="summarydata">日高の血</td></tr>
+    <tr><td class="summarytag">1057</td><td class="summarydata">王者の矜持</td></tr>
+    <tr><td class="summarytag">1058</td><td class="summarydata">突撃！豆タンク！</td></tr>
+    <tr><td class="summarytag">1059</td><td class="summarydata">カムフラージュ</td></tr>
+    <tr><td class="summarytag">1060</td><td class="summarydata">ハングドマン</td></tr>
+    <tr><td class="summarytag">1061</td><td class="summarydata">ニューロマンサー</td></tr>
+    <tr><td class="summarytag">1062</td><td class="summarydata">ネットアイドル</td></tr>
+    <tr><td class="summarytag">1063</td><td class="summarydata">天上天下唯我独尊</td></tr>
+    <tr><td class="summarytag">1064</td><td class="summarydata">糖蜜カップル</td></tr>
+    <tr><td class="summarytag">1065</td><td class="summarydata">マネージャー</td></tr>
+    <tr><td class="summarytag">1066</td><td class="summarydata">過保護</td></tr>
+    <tr><td class="summarytag">1067</td><td class="summarydata">情報収集</td></tr>
+    <tr><td class="summarytag">1068</td><td class="summarydata">プロデューサー</td></tr>
+    <tr><td class="summarytag">1069</td><td class="summarydata">ｒｉｏｒａ</td></tr>
+    <tr><td class="summarytag">1070</td><td class="summarydata">天賦の資質</td></tr>
+    <tr><td class="summarytag">1071</td><td class="summarydata">アイドル神</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1072</td><td class="summarydata">退廃の魔王</td></tr>
+    <tr><td class="summarytag">1073</td><td class="summarydata">アンフェア</td></tr>
+    <tr><td class="summarytag">1074</td><td class="summarydata">天使のわけまえ</td></tr>
+    <tr><td class="summarytag">1075</td><td class="summarydata">クールビューティー</td></tr>
+    <tr><td class="summarytag">1076</td><td class="summarydata">カウンター</td></tr>
+    <tr><td class="summarytag">1077</td><td class="summarydata">敏腕プロデューサー</td></tr>
+    <tr><td class="summarytag">1078</td><td class="summarydata">スカウト</td></tr>
+    <tr><td class="summarytag">1079</td><td class="summarydata">サバイバー</td></tr>
+    <tr><td class="summarytag">1080</td><td class="summarydata">ブラックメドゥ</td></tr>
+    <tr><td class="summarytag">1081</td><td class="summarydata">スポ魂</td></tr>
+    <tr><td class="summarytag">1082</td><td class="summarydata">敏腕記者</td></tr>
+    <tr><td class="summarytag">1083</td><td class="summarydata">特ダネ！</td></tr>
+    <tr><td class="summarytag">1084</td><td class="summarydata">小さい</td></tr>
+    <tr><td class="summarytag">1085</td><td class="summarydata">大きい</td></tr>
+    <tr><td class="summarytag">1086</td><td class="summarydata">だらだら妖精</td></tr>
+    <tr><td class="summarytag">1087</td><td class="summarydata">ニュージェネレーション</td></tr>
+    <tr><td class="summarytag">1088</td><td class="summarydata">静かな闘志</td></tr>
+    <tr><td class="summarytag">1089</td><td class="summarydata">オーラ</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1090</td><td class="summarydata">神秘のオーラ</td></tr>
+    <tr><td class="summarytag">1091</td><td class="summarydata">ふわふわスマイル</td></tr>
+    <tr><td class="summarytag">1092</td><td class="summarydata">ちびギャルの意地</td></tr>
+    <tr><td class="summarytag">1093</td><td class="summarydata">ギャルの意地</td></tr>
+    <tr><td class="summarytag">1094</td><td class="summarydata">ラブリープリンセス</td></tr>
+    <tr><td class="summarytag">1095</td><td class="summarydata">どＳ</td></tr>
+    <tr><td class="summarytag">1096</td><td class="summarydata">不幸の星</td></tr>
+    <tr><td class="summarytag">1097</td><td class="summarydata">秘めたる才能</td></tr>
+    <tr><td class="summarytag">1098</td><td class="summarydata">鬼畜眼鏡</td></tr>
+    <tr><td class="summarytag">1099</td><td class="summarydata">豆腐メンタル</td></tr>
+    <tr><td class="summarytag">1100</td><td class="summarydata">一気呵成</td></tr>
+    <tr><td class="summarytag">1101</td><td class="summarydata">太陽のジェラシー</td></tr>
+    <tr><td class="summarytag">1102</td><td class="summarydata">乙女よ大志を抱け！</td></tr>
+    <tr><td class="summarytag">1103</td><td class="summarydata">鳥の詩</td></tr>
+    <tr><td class="summarytag">1104</td><td class="summarydata">遠い音楽</td></tr>
+    <tr><td class="summarytag">1105</td><td class="summarydata">蒼い鳥</td></tr>
+    <tr><td class="summarytag">1106</td><td class="summarydata">魔法をかけて！</td></tr>
+    <tr><td class="summarytag">1107</td><td class="summarydata">my song</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1108</td><td class="summarydata">フタリの記憶</td></tr>
+    <tr><td class="summarytag">1109</td><td class="summarydata">きゅんっ！ヴァンパイアガール</td></tr>
+    <tr><td class="summarytag">1110</td><td class="summarydata">迷走Mind</td></tr>
+    <tr><td class="summarytag">1111</td><td class="summarydata">恋するミカタ</td></tr>
+    <tr><td class="summarytag">1112</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1113</td><td class="summarydata">隣に…</td></tr>
+    <tr><td class="summarytag">1114</td><td class="summarydata">まっすぐ</td></tr>
+    <tr><td class="summarytag">1115</td><td class="summarydata">思い出をありがとう</td></tr>
+    <tr><td class="summarytag">1116</td><td class="summarydata">Brand New Day!</td></tr>
+    <tr><td class="summarytag">1117</td><td class="summarydata">9:02pm</td></tr>
+    <tr><td class="summarytag">1118</td><td class="summarydata">HELLO!!</td></tr>
+    <tr><td class="summarytag">1119</td><td class="summarydata">またね</td></tr>
+    <tr><td class="summarytag">1120</td><td class="summarydata">神さまのBirthday</td></tr>
+    <tr><td class="summarytag">1121</td><td class="summarydata">i</td></tr>
+    <tr><td class="summarytag">1122</td><td class="summarydata">The world is all one !!</td></tr>
+    <tr><td class="summarytag">1123</td><td class="summarydata">ALIVE</td></tr>
+    <tr><td class="summarytag">1124</td><td class="summarydata">LOST</td></tr>
+    <tr><td class="summarytag">1125</td><td class="summarydata">約束</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1126</td><td class="summarydata">深紅</td></tr>
+    <tr><td class="summarytag">1127</td><td class="summarydata">島唄</td></tr>
+    <tr><td class="summarytag">1128</td><td class="summarydata">SMOKY THRILL</td></tr>
+    <tr><td class="summarytag">1129</td><td class="summarydata">チアリングレター</td></tr>
+    <tr><td class="summarytag">1130</td><td class="summarydata">ナツノハナ</td></tr>
+    <tr><td class="summarytag">1131</td><td class="summarydata">花</td></tr>
+    <tr><td class="summarytag">1132</td><td class="summarydata">涙そうそう</td></tr>
+    <tr><td class="summarytag">1133</td><td class="summarydata">光</td></tr>
+    <tr><td class="summarytag">1134</td><td class="summarydata">Kiss Me Good-Bye</td></tr>
+    <tr><td class="summarytag">1135</td><td class="summarydata">ウィスキーが、お好きでしょ</td></tr>
+    <tr><td class="summarytag">1136</td><td class="summarydata">笑って!</td></tr>
+    <tr><td class="summarytag">1137</td><td class="summarydata">ハッピース</td></tr>
+    <tr><td class="summarytag">1138</td><td class="summarydata">さよならをありがとう</td></tr>
+    <tr><td class="summarytag">1139</td><td class="summarydata">悠久の旅人</td></tr>
+    <tr><td class="summarytag">1140</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1141</td><td class="summarydata">じゅもんをあげるよ</td></tr>
+    <tr><td class="summarytag">1142</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1143</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1144</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1145</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1146</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1147</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1148</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1149</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1150</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1151</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1152</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1153</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1154</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1155</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1156</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1157</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1158</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1159</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1160</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1161</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1162</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1163</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1164</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1165</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1166</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1167</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1168</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1169</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1170</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1171</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1172</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1173</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1174</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1175</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1176</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1177</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1178</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1179</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1180</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1181</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1182</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1183</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1184</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1185</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1186</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1187</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1188</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1189</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1190</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1191</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1192</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1193</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1194</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1195</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1196</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1197</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1198</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1199</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1200</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1201</td><td class="summarydata">グレゴリオ</td></tr>
+    <tr><td class="summarytag">1202</td><td class="summarydata">さよならエトランゼ</td></tr>
+    <tr><td class="summarytag">1203</td><td class="summarydata">目が逢う瞬間</td></tr>
+    <tr><td class="summarytag">1204</td><td class="summarydata">Here We go!!</td></tr>
+    <tr><td class="summarytag">1205</td><td class="summarydata">ストレートラブ！</td></tr>
+    <tr><td class="summarytag">1206</td><td class="summarydata">shiny smile</td></tr>
+    <tr><td class="summarytag">1207</td><td class="summarydata">My Best Friend</td></tr>
+    <tr><td class="summarytag">1208</td><td class="summarydata">バレンタインkiss</td></tr>
+    <tr><td class="summarytag">1209</td><td class="summarydata">ポジティブ！</td></tr>
+    <tr><td class="summarytag">1210</td><td class="summarydata">L・O・B・M</td></tr>
+    <tr><td class="summarytag">1211</td><td class="summarydata">私はアイドル</td></tr>
+    <tr><td class="summarytag">1212</td><td class="summarydata">愛 LIKE ハンバーガー</td></tr>
+    <tr><td class="summarytag">1213</td><td class="summarydata">Colorful Days</td></tr>
+    <tr><td class="summarytag">1214</td><td class="summarydata">おはよう！！朝ご飯</td></tr>
+    <tr><td class="summarytag">1215</td><td class="summarydata">いっぱい、いっぱい</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1216</td><td class="summarydata">ふるふるフューチャー☆</td></tr>
+    <tr><td class="summarytag">1217</td><td class="summarydata">Little Match Girl</td></tr>
+    <tr><td class="summarytag">1218</td><td class="summarydata">MEGARE!</td></tr>
+    <tr><td class="summarytag">1219</td><td class="summarydata">自分REST@RT</td></tr>
+    <tr><td class="summarytag">1220</td><td class="summarydata">私たちはずっと…でしょう？</td></tr>
+    <tr><td class="summarytag">1221</td><td class="summarydata">プリコグ.;昏睡させる刺激的な香り暗闇状態にする</td></tr>
+    <tr><td class="summarytag">1222</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1223</td><td class="summarydata">THE 愛</td></tr>
+    <tr><td class="summarytag">1224</td><td class="summarydata">ARLIGHT*</td></tr>
+    <tr><td class="summarytag">1225</td><td class="summarydata">七彩ボタン.;スターオブドリーム</td></tr>
+    <tr><td class="summarytag">1226</td><td class="summarydata">自転車</td></tr>
+    <tr><td class="summarytag">1227</td><td class="summarydata">メリー</td></tr>
+    <tr><td class="summarytag">1228</td><td class="summarydata">フラワーガール</td></tr>
+    <tr><td class="summarytag">1229</td><td class="summarydata">すいみん不足</td></tr>
+    <tr><td class="summarytag">1230</td><td class="summarydata">晴れ色</td></tr>
+    <tr><td class="summarytag">1231</td><td class="summarydata">resolution</td></tr>
+    <tr><td class="summarytag">1232</td><td class="summarydata">ゲンキトリッパー</td></tr>
+    <tr><td class="summarytag">1233</td><td class="summarydata">おもいでのはじまり</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1234</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1235</td><td class="summarydata">サニー</td></tr>
+    <tr><td class="summarytag">1236</td><td class="summarydata">スキ</td></tr>
+    <tr><td class="summarytag">1237</td><td class="summarydata">あったかな雪</td></tr>
+    <tr><td class="summarytag">1238</td><td class="summarydata">YES♪</td></tr>
+    <tr><td class="summarytag">1239</td><td class="summarydata">チェリー</td></tr>
+    <tr><td class="summarytag">1240</td><td class="summarydata">ラビットパニック</td></tr>
+    <tr><td class="summarytag">1241</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1242</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1243</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1244</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1245</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1246</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1247</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1248</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1249</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1250</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1251</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1252</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1253</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1254</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1255</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1256</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1257</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1258</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1259</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1260</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1261</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1262</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1263</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1264</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1265</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1266</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1267</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1268</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1269</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1270</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1271</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1272</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1273</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1274</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1275</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1276</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1277</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1278</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1279</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1280</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1281</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1282</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1283</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1284</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1285</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1286</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1287</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1288</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1289</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1290</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1291</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1292</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1293</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1294</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1295</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1296</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1297</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1298</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1299</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1300</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1301</td><td class="summarydata">GO MY WAY!!</td></tr>
+    <tr><td class="summarytag">1302</td><td class="summarydata">I WANT</td></tr>
+    <tr><td class="summarytag">1303</td><td class="summarydata">inferno</td></tr>
+    <tr><td class="summarytag">1304</td><td class="summarydata">arcadia</td></tr>
+    <tr><td class="summarytag">1305</td><td class="summarydata">キラメキラリ</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1306</td><td class="summarydata">エージェント夜を往く</td></tr>
+    <tr><td class="summarytag">1307</td><td class="summarydata">relations</td></tr>
+    <tr><td class="summarytag">1308</td><td class="summarydata">マリオネットの心</td></tr>
+    <tr><td class="summarytag">1309</td><td class="summarydata">ID:[OL]</td></tr>
+    <tr><td class="summarytag">1310</td><td class="summarydata">リゾラ</td></tr>
+    <tr><td class="summarytag">1311</td><td class="summarydata">Do-Dai</td></tr>
+    <tr><td class="summarytag">1312</td><td class="summarydata">Honey Heartbeat</td></tr>
+    <tr><td class="summarytag">1313</td><td class="summarydata">スタ→トスタ→</td></tr>
+    <tr><td class="summarytag">1314</td><td class="summarydata">First Stage</td></tr>
+    <tr><td class="summarytag">1315</td><td class="summarydata">Kosmos</td></tr>
+    <tr><td class="summarytag">1316</td><td class="summarydata">オーバーマスター</td></tr>
+    <tr><td class="summarytag">1317</td><td class="summarydata">CHANGE!!!!</td></tr>
+    <tr><td class="summarytag">1318</td><td class="summarydata">キミはメロディ</td></tr>
+    <tr><td class="summarytag">1319</td><td class="summarydata">神SUMMER!!</td></tr>
+    <tr><td class="summarytag">1320</td><td class="summarydata">Dazzling World</td></tr>
+    <tr><td class="summarytag">1321</td><td class="summarydata">DREAM</td></tr>
+    <tr><td class="summarytag">1322</td><td class="summarydata">ハニカミ！ファーストバイト</td></tr>
+    <tr><td class="summarytag">1323</td><td class="summarydata">ambivalent world</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1324</td><td class="summarydata">黎明スターライン</td></tr>
+    <tr><td class="summarytag">1325</td><td class="summarydata">おとなのはじまり</td></tr>
+    <tr><td class="summarytag">1326</td><td class="summarydata">Next Life</td></tr>
+    <tr><td class="summarytag">1327</td><td class="summarydata">月のワルツ</td></tr>
+    <tr><td class="summarytag">1328</td><td class="summarydata">笑顔のゲンキ</td></tr>
+    <tr><td class="summarytag">1329</td><td class="summarydata">sugar sweet nightmere</td></tr>
+    <tr><td class="summarytag">1330</td><td class="summarydata">livE</td></tr>
+    <tr><td class="summarytag">1331</td><td class="summarydata">We just started</td></tr>
+    <tr><td class="summarytag">1332</td><td class="summarydata">今 スタート!</td></tr>
+    <tr><td class="summarytag">1333</td><td class="summarydata">ショッキングな彼</td></tr>
+    <tr><td class="summarytag">1334</td><td class="summarydata">KisS</td></tr>
+    <tr><td class="summarytag">1335</td><td class="summarydata">シャララ</td></tr>
+    <tr><td class="summarytag">1336</td><td class="summarydata">いっしょ</td></tr>
+    <tr><td class="summarytag">1337</td><td class="summarydata">It's Show</td></tr>
+    <tr><td class="summarytag">1338</td><td class="summarydata">強い女</td></tr>
+    <tr><td class="summarytag">1339</td><td class="summarydata">Fly High!</td></tr>
+    <tr><td class="summarytag">1340</td><td class="summarydata">EXCAVATE</td></tr>
+    <tr><td class="summarytag">1341</td><td class="summarydata">Labyrinth</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1342</td><td class="summarydata">Tower of Adventure</td></tr>
+    <tr><td class="summarytag">1343</td><td class="summarydata">乙女心盗んで!</td></tr>
+    <tr><td class="summarytag">1344</td><td class="summarydata">ハリキリ★ラリー</td></tr>
+    <tr><td class="summarytag">1345</td><td class="summarydata">禁恋歌</td></tr>
+    <tr><td class="summarytag">1346</td><td class="summarydata">L<>R</td></tr>
+    <tr><td class="summarytag">1347</td><td class="summarydata">Shooting!!!</td></tr>
+    <tr><td class="summarytag">1348</td><td class="summarydata">うれし・あやかし道中記</td></tr>
+    <tr><td class="summarytag">1349</td><td class="summarydata">旅の途中で</td></tr>
+    <tr><td class="summarytag">1350</td><td class="summarydata">飛べ!スカイキッド</td></tr>
+    <tr><td class="summarytag">1351</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1352</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1353</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1354</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1355</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1356</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1357</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1358</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1359</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1360</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1361</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1362</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1363</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1364</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1365</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1366</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1367</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1368</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1369</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1370</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1371</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1372</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1373</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1374</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1375</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1376</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1377</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1378</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1379</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1380</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1381</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1382</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1383</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1384</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1385</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1386</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1387</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1388</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1389</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1390</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1391</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1392</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1393</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1394</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1395</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1396</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1397</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1398</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1399</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1500</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1501</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1502</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1503</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1504</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1505</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1506</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1507</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1508</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1509</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1510</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1511</td><td class="summarydata">START！！</td></tr>
+    <tr><td class="summarytag">1512</td><td class="summarydata">眠り姫</td></tr>
+    <tr><td class="summarytag">1513</td><td class="summarydata">何度も言えるよ</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1514</td><td class="summarydata">スマイル体操</td></tr>
+    <tr><td class="summarytag">1515</td><td class="summarydata">LOVEオーダーメイド</td></tr>
+    <tr><td class="summarytag">1516</td><td class="summarydata">DIAMOND</td></tr>
+    <tr><td class="summarytag">1517</td><td class="summarydata">tear</td></tr>
+    <tr><td class="summarytag">1518</td><td class="summarydata">ラブリ</td></tr>
+    <tr><td class="summarytag">1519</td><td class="summarydata">YOU往MY進!</td></tr>
+    <tr><td class="summarytag">1520</td><td class="summarydata">ジェミー</td></tr>
+    <tr><td class="summarytag">1521</td><td class="summarydata">Day of the future</td></tr>
+    <tr><td class="summarytag">1522</td><td class="summarydata">空</td></tr>
+    <tr><td class="summarytag">1523</td><td class="summarydata">TRIAL DANCE</td></tr>
+    <tr><td class="summarytag">1524</td><td class="summarydata">風花</td></tr>
+    <tr><td class="summarytag">1525</td><td class="summarydata">はなまる</td></tr>
+    <tr><td class="summarytag">1526</td><td class="summarydata">ヒミツの珊瑚礁</td></tr>
+    <tr><td class="summarytag">1527</td><td class="summarydata">クロスワード</td></tr>
+    <tr><td class="summarytag">1528</td><td class="summarydata">日高流奥義 舞式七星ALIVE</td></tr>
+    <tr><td class="summarytag">1529</td><td class="summarydata">LIVING DEAD</td></tr>
+    <tr><td class="summarytag">1530</td><td class="summarydata">WORLD OF PAIN</td></tr>
+    <tr><td class="summarytag">1531</td><td class="summarydata">TOWN</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1532</td><td class="summarydata">riola式プロトプリコグ</td></tr>
+    <tr><td class="summarytag">1533</td><td class="summarydata">女二人の港町</td></tr>
+    <tr><td class="summarytag">1534</td><td class="summarydata">偶像の支配者</td></tr>
+    <tr><td class="summarytag">1535</td><td class="summarydata">ゆるして☆パイタッチ</td></tr>
+    <tr><td class="summarytag">1536</td><td class="summarydata">ラッキースター！</td></tr>
+    <tr><td class="summarytag">1537</td><td class="summarydata">WORLD IS OVER</td></tr>
+    <tr><td class="summarytag">1538</td><td class="summarydata">絶対運命黙示録</td></tr>
+    <tr><td class="summarytag">1539</td><td class="summarydata">ブラックメドゥ</td></tr>
+    <tr><td class="summarytag">1540</td><td class="summarydata">天地紡ぐ福音の証し</td></tr>
+    <tr><td class="summarytag">1541</td><td class="summarydata">Here It Goes Again！</td></tr>
+    <tr><td class="summarytag">1542</td><td class="summarydata">つばめ返し</td></tr>
+    <tr><td class="summarytag">1543</td><td class="summarydata">ぶらり廃駅下車の旅</td></tr>
+    <tr><td class="summarytag">1544</td><td class="summarydata">トゥインクルスター</td></tr>
+    <tr><td class="summarytag">1545</td><td class="summarydata">風神少女</td></tr>
+    <tr><td class="summarytag">1546</td><td class="summarydata">あんずのうた</td></tr>
+    <tr><td class="summarytag">1547</td><td class="summarydata">Never say never</td></tr>
+    <tr><td class="summarytag">1548</td><td class="summarydata">こいかぜ</td></tr>
+    <tr><td class="summarytag">1549</td><td class="summarydata">ショコラ・ティアラ</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1550</td><td class="summarydata">DOKIDOKIリズム</td></tr>
+    <tr><td class="summarytag">1551</td><td class="summarydata">？？？</td></tr>
+    <tr><td class="summarytag">1552</td><td class="summarydata">？？？</td></tr>
+    <tr><td class="summarytag">1553</td><td class="summarydata">コバルトブルー</td></tr>
+    <tr><td class="summarytag">1554</td><td class="summarydata">きまぐれロマンティック</td></tr>
+    <tr><td class="summarytag">1555</td><td class="summarydata">ワタシ式プチALIVE</td></tr>
+    <tr><td class="summarytag">1556</td><td class="summarydata">ハリケーンミキサー</td></tr>
+    <tr><td class="summarytag">1557</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1558</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1559</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1560</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1561</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1562</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1563</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1564</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1565</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1566</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1567</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1568</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1569</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1570</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1571</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1572</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1573</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1574</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1575</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1576</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1577</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1578</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1579</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1580</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1581</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1582</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1583</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1584</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1585</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1586</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1587</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1588</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1589</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1590</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1591</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1592</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1593</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1594</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1595</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1596</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1597</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1598</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1599</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1600</td><td class="summarydata">亡國覚醒カタルシス</td></tr>
+    <tr><td class="summarytag">1601</td><td class="summarydata">協奏曲の構え</td></tr>
+    <tr><td class="summarytag">1602</td><td class="summarydata">フォルテッシモ</td></tr>
+    <tr><td class="summarytag">1603</td><td class="summarydata">どんがらがっしゃーん</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1604</td><td class="summarydata">小夜曲の構え</td></tr>
+    <tr><td class="summarytag">1605</td><td class="summarydata">セグエ</td></tr>
+    <tr><td class="summarytag">1606</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1607</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1608</td><td class="summarydata">ドリルで掘ります</td></tr>
+    <tr><td class="summarytag">1609</td><td class="summarydata">天元突破</td></tr>
+    <tr><td class="summarytag">1610</td><td class="summarydata">一緒に歌いましょ♪</td></tr>
+    <tr><td class="summarytag">1611</td><td class="summarydata">独唱曲の構え</td></tr>
+    <tr><td class="summarytag">1612</td><td class="summarydata">アリエッタ</td></tr>
+    <tr><td class="summarytag">1613</td><td class="summarydata">くっ！</td></tr>
+    <tr><td class="summarytag">1614</td><td class="summarydata">パイ投げ</td></tr>
+    <tr><td class="summarytag">1615</td><td class="summarydata">う～わっほい!</td></tr>
+    <tr><td class="summarytag">1616</td><td class="summarydata">Coda</td></tr>
+    <tr><td class="summarytag">1617</td><td class="summarydata">茶柱が立ちました</td></tr>
+    <tr><td class="summarytag">1618</td><td class="summarydata">穴掘ります</td></tr>
+    <tr><td class="summarytag">1619</td><td class="summarydata">うっうー</td></tr>
+    <tr><td class="summarytag">1620</td><td class="summarydata">はいたーっち</td></tr>
+    <tr><td class="summarytag">1621</td><td class="summarydata">もやし祭りです</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1622</td><td class="summarydata">やよいゾーン</td></tr>
+    <tr><td class="summarytag">1623</td><td class="summarydata">こらっ！</td></tr>
+    <tr><td class="summarytag">1624</td><td class="summarydata">話を聞きなさい！</td></tr>
+    <tr><td class="summarytag">1625</td><td class="summarydata">いい加減にしなさい！</td></tr>
+    <tr><td class="summarytag">1626</td><td class="summarydata">説教が必要ね</td></tr>
+    <tr><td class="summarytag">1627</td><td class="summarydata">この変態！ド変態！</td></tr>
+    <tr><td class="summarytag">1628</td><td class="summarydata">にひひっ♪</td></tr>
+    <tr><td class="summarytag">1629</td><td class="summarydata">お仕置き決定ね♪</td></tr>
+    <tr><td class="summarytag">1630</td><td class="summarydata">まっこまっこりーん♪</td></tr>
+    <tr><td class="summarytag">1631</td><td class="summarydata">きゃっぴぴぴぴぴ～ん☆</td></tr>
+    <tr><td class="summarytag">1632</td><td class="summarydata">チェスト</td></tr>
+    <tr><td class="summarytag">1633</td><td class="summarydata">ののわハンティング</td></tr>
+    <tr><td class="summarytag">1634</td><td class="summarydata">ダーンッ！！</td></tr>
+    <tr><td class="summarytag">1635</td><td class="summarydata">恋の二丁拳銃</td></tr>
+    <tr><td class="summarytag">1636</td><td class="summarydata">JPY!!</td></tr>
+    <tr><td class="summarytag">1637</td><td class="summarydata">あらあら</td></tr>
+    <tr><td class="summarytag">1638</td><td class="summarydata">ここはどこかしら？</td></tr>
+    <tr><td class="summarytag">1639</td><td class="summarydata">じって～ん</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1640</td><td class="summarydata">んっふっふ～</td></tr>
+    <tr><td class="summarytag">1641</td><td class="summarydata">スーパーじゃんけん</td></tr>
+    <tr><td class="summarytag">1642</td><td class="summarydata">あふぅ</td></tr>
+    <tr><td class="summarytag">1643</td><td class="summarydata">おにぎり波～</td></tr>
+    <tr><td class="summarytag">1644</td><td class="summarydata">ハニーフラッシュ</td></tr>
+    <tr><td class="summarytag">1645</td><td class="summarydata">おにぎりなのー</td></tr>
+    <tr><td class="summarytag">1646</td><td class="summarydata">ぴよぴよ</td></tr>
+    <tr><td class="summarytag">1647</td><td class="summarydata">夜</td></tr>
+    <tr><td class="summarytag">1648</td><td class="summarydata">雪</td></tr>
+    <tr><td class="summarytag">1649</td><td class="summarydata">自分は完璧さ―！！</td></tr>
+    <tr><td class="summarytag">1650</td><td class="summarydata">なんくるないさー！</td></tr>
+    <tr><td class="summarytag">1651</td><td class="summarydata">best friend</td></tr>
+    <tr><td class="summarytag">1652</td><td class="summarydata">二十郎</td></tr>
+    <tr><td class="summarytag">1653</td><td class="summarydata">花鳥月夕</td></tr>
+    <tr><td class="summarytag">1654</td><td class="summarydata">面妖な！</td></tr>
+    <tr><td class="summarytag">1655</td><td class="summarydata">千本桜</td></tr>
+    <tr><td class="summarytag">1656</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1657</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1658</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1659</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1660</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1661</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1662</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1663</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1664</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1665</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1666</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1667</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1668</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1669</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1670</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1671</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1672</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1673</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1674</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1675</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1676</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1677</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1678</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1679</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1680</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1681</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1682</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1683</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1684</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1685</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1686</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1687</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1688</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1689</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1690</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1691</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1692</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1693</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ABL</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1694</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1695</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1696</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1697</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1698</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1699</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">EXP</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">0</td><td class="summarydata">Ｖ経験</td></tr>
+    <tr><td class="summarytag">1</td><td class="summarydata">Ａ経験</td></tr>
+    <tr><td class="summarytag">2</td><td class="summarydata">絶頂経験</td></tr>
+    <tr><td class="summarytag">3</td><td class="summarydata">射精経験</td></tr>
+    <tr><td class="summarytag">10</td><td class="summarydata">自慰経験</td></tr>
+    <tr><td class="summarytag">11</td><td class="summarydata">強制自慰経験</td></tr>
+    <tr><td class="summarytag">20</td><td class="summarydata">精液経験</td></tr>
+    <tr><td class="summarytag">21</td><td class="summarydata">奉仕快楽経験</td></tr>
+    <tr><td class="summarytag">22</td><td class="summarydata">フェラ経験</td></tr>
+    <tr><td class="summarytag">23</td><td class="summarydata">愛情経験</td></tr>
+    <tr><td class="summarytag">24</td><td class="summarydata">膣射経験</td></tr>
+    <tr><td class="summarytag">30</td><td class="summarydata">苦痛快楽経験</td></tr>
+    <tr><td class="summarytag">31</td><td class="summarydata">放尿経験</td></tr>
+    <tr><td class="summarytag">32</td><td class="summarydata">Ａ快楽経験</td></tr>
+    <tr><td class="summarytag">40</td><td class="summarydata">レズ経験</td></tr>
+    <tr><td class="summarytag">41</td><td class="summarydata">ＢＬ経験</td></tr>
+    <tr><td class="summarytag">50</td><td class="summarydata">異常経験</td></tr>
+    <tr><td class="summarytag">51</td><td class="summarydata">緊縛経験</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">EXP</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">52</td><td class="summarydata">Ｖ拡張経験</td></tr>
+    <tr><td class="summarytag">53</td><td class="summarydata">Ａ拡張経験</td></tr>
+    <tr><td class="summarytag">54</td><td class="summarydata">噴乳経験</td></tr>
+    <tr><td class="summarytag">55</td><td class="summarydata">触手経験</td></tr>
+    <tr><td class="summarytag">56</td><td class="summarydata">吸血経験</td></tr>
+    <tr><td class="summarytag">57</td><td class="summarydata">被吸血経験</td></tr>
+    <tr><td class="summarytag">60</td><td class="summarydata">産卵経験</td></tr>
+    <tr><td class="summarytag">61</td><td class="summarydata">出産経験</td></tr>
+    <tr><td class="summarytag">89</td><td class="summarydata">調合経験</td></tr>
+    <tr><td class="summarytag">90</td><td class="summarydata">家事経験</td></tr>
+    <tr><td class="summarytag">91</td><td class="summarydata">撮影経験</td></tr>
+    <tr><td class="summarytag">92</td><td class="summarydata">被写経験</td></tr>
+    <tr><td class="summarytag">93</td><td class="summarydata">歌唱経験</td></tr>
+    <tr><td class="summarytag">94</td><td class="summarydata">デート経験</td></tr>
+    <tr><td class="summarytag">95</td><td class="summarydata">戦闘経験</td></tr>
+    <tr><td class="summarytag">96</td><td class="summarydata">キス経験</td></tr>
+    <tr><td class="summarytag">97</td><td class="summarydata">主導経験</td></tr>
+    <tr><td class="summarytag">98</td><td class="summarydata">記憶消去経験</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">EXP</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">103</td><td class="summarydata">舞踊経験</td></tr>
+    <tr><td class="summarytag">110</td><td class="summarydata">経験値</td></tr>
+    <tr><td class="summarytag">111</td><td class="summarydata">LP</td></tr>
+    <tr><td class="summarytag">120</td><td class="summarydata">指導経験</td></tr>
+    <tr><td class="summarytag">121</td><td class="summarydata">開発Pt</td></tr>
+    <tr><td class="summarytag">122</td><td class="summarydata">開発Pt総計</td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">SOURCE</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">0</td><td class="summarydata">快Ｃ</td></tr>
+    <tr><td class="summarytag">1</td><td class="summarydata">快Ｖ</td></tr>
+    <tr><td class="summarytag">2</td><td class="summarydata">快Ａ</td></tr>
+    <tr><td class="summarytag">3</td><td class="summarydata">情愛</td></tr>
+    <tr><td class="summarytag">4</td><td class="summarydata">性行動</td></tr>
+    <tr><td class="summarytag">5</td><td class="summarydata">達成感</td></tr>
+    <tr><td class="summarytag">6</td><td class="summarydata">痛み</td></tr>
+    <tr><td class="summarytag">7</td><td class="summarydata">中毒充足</td></tr>
+    <tr><td class="summarytag">8</td><td class="summarydata">不潔</td></tr>
+    <tr><td class="summarytag">9</td><td class="summarydata">接触</td></tr>
+    <tr><td class="summarytag">10</td><td class="summarydata">液体追加</td></tr>
+    <tr><td class="summarytag">11</td><td class="summarydata">欲情追加</td></tr>
+    <tr><td class="summarytag">12</td><td class="summarydata">露出</td></tr>
+    <tr><td class="summarytag">13</td><td class="summarydata">屈従</td></tr>
+    <tr><td class="summarytag">14</td><td class="summarydata">逸脱</td></tr>
+    <tr><td class="summarytag">15</td><td class="summarydata">反感追加</td></tr>
+    <tr><td class="summarytag">16</td><td class="summarydata">恭順追加</td></tr>
+    <tr><td class="summarytag">17</td><td class="summarydata">快Ｂ</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">SOURCE</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">18</td><td class="summarydata">歓楽</td></tr>
+    <tr><td class="summarytag">19</td><td class="summarydata">家務</td></tr>
+    <tr><td class="summarytag">20</td><td class="summarydata">征服</td></tr>
+    <tr><td class="summarytag">21</td><td class="summarydata">受動</td></tr>
+    <tr><td class="summarytag">22</td><td class="summarydata">懐疑</td></tr>
+    <tr><td class="summarytag">23</td><td class="summarydata">不安</td></tr>
+    <tr><td class="summarytag">24</td><td class="summarydata">快Ｍ</td></tr>
+    <tr><td class="summarytag">105</td><td class="summarydata">歌唱</td></tr>
+    <tr><td class="summarytag">106</td><td class="summarydata">被写</td></tr>
+    <tr><td class="summarytag">107</td><td class="summarydata">舞踊</td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">MARK</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">0</td><td class="summarydata">苦痛依存</td></tr>
+    <tr><td class="summarytag">1</td><td class="summarydata">快楽依存</td></tr>
+    <tr><td class="summarytag">2</td><td class="summarydata">既成事実</td></tr>
+    <tr><td class="summarytag">3</td><td class="summarydata">反発感情</td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">TALENT</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">0</td><td class="summarydata">処女</td></tr>
+    <tr><td class="summarytag">10</td><td class="summarydata">臆病</td></tr>
+    <tr><td class="summarytag">11</td><td class="summarydata">反抗的</td></tr>
+    <tr><td class="summarytag">12</td><td class="summarydata">気丈</td></tr>
+    <tr><td class="summarytag">13</td><td class="summarydata">素直</td></tr>
+    <tr><td class="summarytag">14</td><td class="summarydata">大人しい</td></tr>
+    <tr><td class="summarytag">15</td><td class="summarydata">プライド高い</td></tr>
+    <tr><td class="summarytag">16</td><td class="summarydata">生意気</td></tr>
+    <tr><td class="summarytag">17</td><td class="summarydata">プライド低い</td></tr>
+    <tr><td class="summarytag">18</td><td class="summarydata">ツンデレ</td></tr>
+    <tr><td class="summarytag">20</td><td class="summarydata">自制心</td></tr>
+    <tr><td class="summarytag">21</td><td class="summarydata">無関心</td></tr>
+    <tr><td class="summarytag">22</td><td class="summarydata">感情乏しい</td></tr>
+    <tr><td class="summarytag">23</td><td class="summarydata">好奇心</td></tr>
+    <tr><td class="summarytag">24</td><td class="summarydata">保守的</td></tr>
+    <tr><td class="summarytag">25</td><td class="summarydata">楽観的</td></tr>
+    <tr><td class="summarytag">26</td><td class="summarydata">悲観的</td></tr>
+    <tr><td class="summarytag">27</td><td class="summarydata">一線越えない</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">TALENT</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">28</td><td class="summarydata">目立ちたがり</td></tr>
+    <tr><td class="summarytag">30</td><td class="summarydata">貞操観念</td></tr>
+    <tr><td class="summarytag">31</td><td class="summarydata">貞操無頓着</td></tr>
+    <tr><td class="summarytag">32</td><td class="summarydata">抑圧</td></tr>
+    <tr><td class="summarytag">33</td><td class="summarydata">解放</td></tr>
+    <tr><td class="summarytag">34</td><td class="summarydata">抵抗</td></tr>
+    <tr><td class="summarytag">35</td><td class="summarydata">恥じらい</td></tr>
+    <tr><td class="summarytag">36</td><td class="summarydata">恥薄い</td></tr>
+    <tr><td class="summarytag">37</td><td class="summarydata">弱味</td></tr>
+    <tr><td class="summarytag">40</td><td class="summarydata">痛みに弱い</td></tr>
+    <tr><td class="summarytag">41</td><td class="summarydata">痛みに強い</td></tr>
+    <tr><td class="summarytag">42</td><td class="summarydata">濡れやすい</td></tr>
+    <tr><td class="summarytag">43</td><td class="summarydata">濡れにくい</td></tr>
+    <tr><td class="summarytag">50</td><td class="summarydata">習得早い</td></tr>
+    <tr><td class="summarytag">51</td><td class="summarydata">習得遅い</td></tr>
+    <tr><td class="summarytag">52</td><td class="summarydata">舌使い</td></tr>
+    <tr><td class="summarytag">53</td><td class="summarydata">針さばき</td></tr>
+    <tr><td class="summarytag">54</td><td class="summarydata">猫舌</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">TALENT</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">55</td><td class="summarydata">調合知識</td></tr>
+    <tr><td class="summarytag">56</td><td class="summarydata">薬毒耐性</td></tr>
+    <tr><td class="summarytag">57</td><td class="summarydata">おもらし癖</td></tr>
+    <tr><td class="summarytag">58</td><td class="summarydata">淫具知識</td></tr>
+    <tr><td class="summarytag">60</td><td class="summarydata">自慰しやすい</td></tr>
+    <tr><td class="summarytag">61</td><td class="summarydata">汚臭鈍感</td></tr>
+    <tr><td class="summarytag">62</td><td class="summarydata">汚臭敏感</td></tr>
+    <tr><td class="summarytag">63</td><td class="summarydata">献身的</td></tr>
+    <tr><td class="summarytag">64</td><td class="summarydata">汚れ無視</td></tr>
+    <tr><td class="summarytag">65</td><td class="summarydata">パイパン</td></tr>
+    <tr><td class="summarytag">70</td><td class="summarydata">快感に素直</td></tr>
+    <tr><td class="summarytag">71</td><td class="summarydata">快感の否定</td></tr>
+    <tr><td class="summarytag">72</td><td class="summarydata">中毒しやすい</td></tr>
+    <tr><td class="summarytag">73</td><td class="summarydata">即落ち</td></tr>
+    <tr><td class="summarytag">74</td><td class="summarydata">淫壷</td></tr>
+    <tr><td class="summarytag">75</td><td class="summarydata">淫核</td></tr>
+    <tr><td class="summarytag">76</td><td class="summarydata">淫乱</td></tr>
+    <tr><td class="summarytag">77</td><td class="summarydata">尻穴狂い</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">TALENT</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">78</td><td class="summarydata">淫乳</td></tr>
+    <tr><td class="summarytag">79</td><td class="summarydata">マゾ</td></tr>
+    <tr><td class="summarytag">80</td><td class="summarydata">倒錯的</td></tr>
+    <tr><td class="summarytag">81</td><td class="summarydata">両刀</td></tr>
+    <tr><td class="summarytag">82</td><td class="summarydata">男嫌い</td></tr>
+    <tr><td class="summarytag">83</td><td class="summarydata">サド</td></tr>
+    <tr><td class="summarytag">84</td><td class="summarydata">嫉妬</td></tr>
+    <tr><td class="summarytag">85</td><td class="summarydata">恋慕</td></tr>
+    <tr><td class="summarytag">86</td><td class="summarydata">妄信</td></tr>
+    <tr><td class="summarytag">87</td><td class="summarydata">小悪魔</td></tr>
+    <tr><td class="summarytag">88</td><td class="summarydata">親愛</td></tr>
+    <tr><td class="summarytag">89</td><td class="summarydata">相愛</td></tr>
+    <tr><td class="summarytag">90</td><td class="summarydata">妖狐</td></tr>
+    <tr><td class="summarytag">91</td><td class="summarydata">魅惑</td></tr>
+    <tr><td class="summarytag">92</td><td class="summarydata">謎の魅力</td></tr>
+    <tr><td class="summarytag">93</td><td class="summarydata">狐</td></tr>
+    <tr><td class="summarytag">100</td><td class="summarydata">小柄体型</td></tr>
+    <tr><td class="summarytag">101</td><td class="summarydata">Ｃ鈍感</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">TALENT</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">102</td><td class="summarydata">Ｃ敏感</td></tr>
+    <tr><td class="summarytag">103</td><td class="summarydata">Ｖ鈍感</td></tr>
+    <tr><td class="summarytag">104</td><td class="summarydata">Ｖ敏感</td></tr>
+    <tr><td class="summarytag">105</td><td class="summarydata">Ａ鈍感</td></tr>
+    <tr><td class="summarytag">106</td><td class="summarydata">Ａ敏感</td></tr>
+    <tr><td class="summarytag">107</td><td class="summarydata">Ｂ鈍感</td></tr>
+    <tr><td class="summarytag">108</td><td class="summarydata">Ｂ敏感</td></tr>
+    <tr><td class="summarytag">109</td><td class="summarydata">貧乳</td></tr>
+    <tr><td class="summarytag">110</td><td class="summarydata">巨乳</td></tr>
+    <tr><td class="summarytag">111</td><td class="summarydata">回復早い</td></tr>
+    <tr><td class="summarytag">112</td><td class="summarydata">回復遅い</td></tr>
+    <tr><td class="summarytag">113</td><td class="summarydata">魅力</td></tr>
+    <tr><td class="summarytag">114</td><td class="summarydata">吸血鬼</td></tr>
+    <tr><td class="summarytag">115</td><td class="summarydata">日光浴</td></tr>
+    <tr><td class="summarytag">116</td><td class="summarydata">月光浴</td></tr>
+    <tr><td class="summarytag">117</td><td class="summarydata">治療</td></tr>
+    <tr><td class="summarytag">118</td><td class="summarydata">鼓舞</td></tr>
+    <tr><td class="summarytag">119</td><td class="summarydata">半人半妖</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">TALENT</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">120</td><td class="summarydata">不思議な根</td></tr>
+    <tr><td class="summarytag">121</td><td class="summarydata">ふたなり</td></tr>
+    <tr><td class="summarytag">122</td><td class="summarydata">オトコ</td></tr>
+    <tr><td class="summarytag">123</td><td class="summarydata">狂気</td></tr>
+    <tr><td class="summarytag">124</td><td class="summarydata">動物耳</td></tr>
+    <tr><td class="summarytag">125</td><td class="summarydata">禁断の知識</td></tr>
+    <tr><td class="summarytag">126</td><td class="summarydata">人気</td></tr>
+    <tr><td class="summarytag">127</td><td class="summarydata">具現</td></tr>
+    <tr><td class="summarytag">128</td><td class="summarydata">蓬莱人</td></tr>
+    <tr><td class="summarytag">129</td><td class="summarydata">狂気の目</td></tr>
+    <tr><td class="summarytag">130</td><td class="summarydata">母乳体質</td></tr>
+    <tr><td class="summarytag">131</td><td class="summarydata">幼児</td></tr>
+    <tr><td class="summarytag">132</td><td class="summarydata">幼稚</td></tr>
+    <tr><td class="summarytag">133</td><td class="summarydata">早漏</td></tr>
+    <tr><td class="summarytag">134</td><td class="summarydata">妊娠</td></tr>
+    <tr><td class="summarytag">135</td><td class="summarydata">育児中</td></tr>
+    <tr><td class="summarytag">136</td><td class="summarydata">母性</td></tr>
+    <tr><td class="summarytag">137</td><td class="summarydata">危険日</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">TALENT</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">138</td><td class="summarydata">生理</td></tr>
+    <tr><td class="summarytag">140</td><td class="summarydata">絶壁</td></tr>
+    <tr><td class="summarytag">141</td><td class="summarydata">爆乳</td></tr>
+    <tr><td class="summarytag">142</td><td class="summarydata">着痩せ</td></tr>
+    <tr><td class="summarytag">149</td><td class="summarydata">小人体型</td></tr>
+    <tr><td class="summarytag">150</td><td class="summarydata">パートナー</td></tr>
+    <tr><td class="summarytag">151</td><td class="summarydata">キス未経験</td></tr>
+    <tr><td class="summarytag">152</td><td class="summarydata">合意</td></tr>
+    <tr><td class="summarytag">153</td><td class="summarydata">恋人</td></tr>
+    <tr><td class="summarytag">154</td><td class="summarydata">童貞</td></tr>
+    <tr><td class="summarytag">155</td><td class="summarydata">キス魔</td></tr>
+    <tr><td class="summarytag">180</td><td class="summarydata">服従</td></tr>
+    <tr><td class="summarytag">181</td><td class="summarydata">烙印</td></tr>
+    <tr><td class="summarytag">182</td><td class="summarydata">隷属</td></tr>
+    <tr><td class="summarytag">196</td><td class="summarydata">大乳導</td></tr>
+    <tr><td class="summarytag">197</td><td class="summarydata">つるぺた堕し</td></tr>
+    <tr><td class="summarytag">198</td><td class="summarydata">大甲斐性</td></tr>
+    <tr><td class="summarytag">200</td><td class="summarydata">幻想郷の女性を虜にする程度の能力</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">TALENT</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">201</td><td class="summarydata">eratohoJも支配する程度の能力</td></tr>
+    <tr><td class="summarytag">202</td><td class="summarydata">脱衣制限解除</td></tr>
+    <tr><td class="summarytag">203</td><td class="summarydata">恋人ボーナス強化</td></tr>
+    <tr><td class="summarytag">204</td><td class="summarydata">恋慕ボーナス強化</td></tr>
+    <tr><td class="summarytag">205</td><td class="summarydata">親愛ボーナス強化</td></tr>
+    <tr><td class="summarytag">206</td><td class="summarydata">淫乱ボーナス強化</td></tr>
+    <tr><td class="summarytag">207</td><td class="summarydata">逃走能力強化</td></tr>
+    <tr><td class="summarytag">208</td><td class="summarydata">後戻りできる程度の能力</td></tr>
+    <tr><td class="summarytag">209</td><td class="summarydata">野菜を育てる程度の能力</td></tr>
+    <tr><td class="summarytag">210</td><td class="summarydata">バグだらけな程度の能力</td></tr>
+    <tr><td class="summarytag">211</td><td class="summarydata">変身魔法</td></tr>
+    <tr><td class="summarytag">212</td><td class="summarydata">結界操作</td></tr>
+    <tr><td class="summarytag">213</td><td class="summarydata">羽</td></tr>
+    <tr><td class="summarytag">214</td><td class="summarydata">角</td></tr>
+    <tr><td class="summarytag">215</td><td class="summarydata">しっぽ</td></tr>
+    <tr><td class="summarytag">216</td><td class="summarydata">奇跡</td></tr>
+    <tr><td class="summarytag">217</td><td class="summarydata">酒豪</td></tr>
+    <tr><td class="summarytag">218</td><td class="summarydata">眷属</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">TALENT</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">219</td><td class="summarydata">虜</td></tr>
+    <tr><td class="summarytag">220</td><td class="summarydata">主人</td></tr>
+    <tr><td class="summarytag">221</td><td class="summarydata">お嫁さん</td></tr>
+    <tr><td class="summarytag">222</td><td class="summarydata">お婿さん</td></tr>
+    <tr><td class="summarytag">240</td><td class="summarydata">千里眼</td></tr>
+    <tr><td class="summarytag">250</td><td class="summarydata">プロデューサー</td></tr>
+    <tr><td class="summarytag">251</td><td class="summarydata">団結</td></tr>
+    <tr><td class="summarytag">252</td><td class="summarydata">風邪</td></tr>
+    <tr><td class="summarytag">253</td><td class="summarydata">大ドジ</td></tr>
+    <tr><td class="summarytag">254</td><td class="summarydata">八重歯</td></tr>
+    <tr><td class="summarytag">255</td><td class="summarydata">攻撃範囲小+</td></tr>
+    <tr><td class="summarytag">256</td><td class="summarydata">攻撃範囲中+</td></tr>
+    <tr><td class="summarytag">257</td><td class="summarydata">攻撃範囲大+</td></tr>
+    <tr><td class="summarytag">258</td><td class="summarydata">メールブースト</td></tr>
+    <tr><td class="summarytag">259</td><td class="summarydata">妄想癖</td></tr>
+    <tr><td class="summarytag">260</td><td class="summarydata">歌姫</td></tr>
+    <tr><td class="summarytag">261</td><td class="summarydata">美姫</td></tr>
+    <tr><td class="summarytag">262</td><td class="summarydata">舞姫</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">TALENT</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">290</td><td class="summarydata">音痴</td></tr>
+    <tr><td class="summarytag">291</td><td class="summarydata">音感</td></tr>
+    <tr><td class="summarytag">292</td><td class="summarydata">料理苦手</td></tr>
+    <tr><td class="summarytag">293</td><td class="summarydata">料理得意</td></tr>
+    <tr><td class="summarytag">294</td><td class="summarydata">調理名人</td></tr>
+    <tr><td class="summarytag">296</td><td class="summarydata">報道者</td></tr>
+    <tr><td class="summarytag">298</td><td class="summarydata">超常目算</td></tr>
+    <tr><td class="summarytag">299</td><td class="summarydata">地獄の勲章</td></tr>
+    <tr><td class="summarytag">589</td><td class="summarydata">蕩唇</td></tr>
+    <tr><td class="summarytag">596</td><td class="summarydata">Ｍ鈍感</td></tr>
+    <tr><td class="summarytag">597</td><td class="summarydata">Ｍ敏感</td></tr>
+    <tr><td class="summarytag">998</td><td class="summarydata">Debug</td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">0</td><td class="summarydata">ローター</td></tr>
+    <tr><td class="summarytag">1</td><td class="summarydata">バイブ</td></tr>
+    <tr><td class="summarytag">3</td><td class="summarydata">アナルバイブ</td></tr>
+    <tr><td class="summarytag">4</td><td class="summarydata">ペニスバンド</td></tr>
+    <tr><td class="summarytag">5</td><td class="summarydata">アイマスク</td></tr>
+    <tr><td class="summarytag">6</td><td class="summarydata">ビデオカメラ</td></tr>
+    <tr><td class="summarytag">9</td><td class="summarydata">ボールギャグ</td></tr>
+    <tr><td class="summarytag">10</td><td class="summarydata">鞭</td></tr>
+    <tr><td class="summarytag">11</td><td class="summarydata">針</td></tr>
+    <tr><td class="summarytag">12</td><td class="summarydata">オナホール</td></tr>
+    <tr><td class="summarytag">13</td><td class="summarydata">プレイマット</td></tr>
+    <tr><td class="summarytag">14</td><td class="summarydata">縄</td></tr>
+    <tr><td class="summarytag">16</td><td class="summarydata">大鏡</td></tr>
+    <tr><td class="summarytag">18</td><td class="summarydata">首輪</td></tr>
+    <tr><td class="summarytag">19</td><td class="summarydata">エプロン</td></tr>
+    <tr><td class="summarytag">20</td><td class="summarydata">アナルビーズ</td></tr>
+    <tr><td class="summarytag">25</td><td class="summarydata">ローション</td></tr>
+    <tr><td class="summarytag">26</td><td class="summarydata">媚薬</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">27</td><td class="summarydata">利尿剤</td></tr>
+    <tr><td class="summarytag">28</td><td class="summarydata">ビデオテープ</td></tr>
+    <tr><td class="summarytag">29</td><td class="summarydata">コンドーム</td></tr>
+    <tr><td class="summarytag">33</td><td class="summarydata">排卵誘発剤</td></tr>
+    <tr><td class="summarytag">34</td><td class="summarydata">緊急避妊薬</td></tr>
+    <tr><td class="summarytag">35</td><td class="summarydata">オムツ</td></tr>
+    <tr><td class="summarytag">40</td><td class="summarydata">クスコ</td></tr>
+    <tr><td class="summarytag">45</td><td class="summarydata">マイク</td></tr>
+    <tr><td class="summarytag">51</td><td class="summarydata">櫛</td></tr>
+    <tr><td class="summarytag">52</td><td class="summarydata">炬燵</td></tr>
+    <tr><td class="summarytag">60</td><td class="summarydata">【技巧Lv】</td></tr>
+    <tr><td class="summarytag">62</td><td class="summarydata">【汚れ無視】</td></tr>
+    <tr><td class="summarytag">63</td><td class="summarydata">【サド】</td></tr>
+    <tr><td class="summarytag">64</td><td class="summarydata">【早漏】</td></tr>
+    <tr><td class="summarytag">70</td><td class="summarydata">元気になる薬</td></tr>
+    <tr><td class="summarytag">71</td><td class="summarydata">薬の材料(双)</td></tr>
+    <tr><td class="summarytag">72</td><td class="summarydata">薬の材料(消)</td></tr>
+    <tr><td class="summarytag">73</td><td class="summarydata">青の飴玉</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">74</td><td class="summarydata">赤の飴玉</td></tr>
+    <tr><td class="summarytag">75</td><td class="summarydata">豊胸剤</td></tr>
+    <tr><td class="summarytag">76</td><td class="summarydata">縮胸剤</td></tr>
+    <tr><td class="summarytag">77</td><td class="summarydata">止乳剤</td></tr>
+    <tr><td class="summarytag">78</td><td class="summarydata">尿漏れ改善薬</td></tr>
+    <tr><td class="summarytag">80</td><td class="summarydata">金の飴玉</td></tr>
+    <tr><td class="summarytag">83</td><td class="summarydata">虹の飴玉</td></tr>
+    <tr><td class="summarytag">86</td><td class="summarydata">赤い首輪</td></tr>
+    <tr><td class="summarytag">87</td><td class="summarydata">隷属の証</td></tr>
+    <tr><td class="summarytag">98</td><td class="summarydata">記憶消去薬</td></tr>
+    <tr><td class="summarytag">500</td><td class="summarydata">シダーウッド</td></tr>
+    <tr><td class="summarytag">501</td><td class="summarydata">サイプレスウッド</td></tr>
+    <tr><td class="summarytag">502</td><td class="summarydata">アローズウッド</td></tr>
+    <tr><td class="summarytag">503</td><td class="summarydata">ペパーミント</td></tr>
+    <tr><td class="summarytag">504</td><td class="summarydata">メリッサ</td></tr>
+    <tr><td class="summarytag">505</td><td class="summarydata">ミルトス</td></tr>
+    <tr><td class="summarytag">506</td><td class="summarydata">ジャスミン</td></tr>
+    <tr><td class="summarytag">507</td><td class="summarydata">ラヴェンダー</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">508</td><td class="summarydata">ムスク</td></tr>
+    <tr><td class="summarytag">509</td><td class="summarydata">フランキンセンス</td></tr>
+    <tr><td class="summarytag">510</td><td class="summarydata">きなこクッキー</td></tr>
+    <tr><td class="summarytag">511</td><td class="summarydata">ポンデリング</td></tr>
+    <tr><td class="summarytag">512</td><td class="summarydata">ビーフストロガノフ</td></tr>
+    <tr><td class="summarytag">513</td><td class="summarydata">セージ</td></tr>
+    <tr><td class="summarytag">514</td><td class="summarydata">ラベンダー</td></tr>
+    <tr><td class="summarytag">515</td><td class="summarydata">ローズマリー</td></tr>
+    <tr><td class="summarytag">516</td><td class="summarydata">お天気ママさん</td></tr>
+    <tr><td class="summarytag">517</td><td class="summarydata">スタミナドリンク</td></tr>
+    <tr><td class="summarytag">518</td><td class="summarydata">天界の桃</td></tr>
+    <tr><td class="summarytag">519</td><td class="summarydata">新芽のエキス</td></tr>
+    <tr><td class="summarytag">520</td><td class="summarydata">若木のエキス</td></tr>
+    <tr><td class="summarytag">521</td><td class="summarydata">大樹のエキス</td></tr>
+    <tr><td class="summarytag">522</td><td class="summarydata">朝の雫</td></tr>
+    <tr><td class="summarytag">523</td><td class="summarydata">夜の雫</td></tr>
+    <tr><td class="summarytag">524</td><td class="summarydata">紫色の秘薬</td></tr>
+    <tr><td class="summarytag">525</td><td class="summarydata">満月の秘薬</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">526</td><td class="summarydata">娼婦の秘薬</td></tr>
+    <tr><td class="summarytag">527</td><td class="summarydata">赤色の秘薬</td></tr>
+    <tr><td class="summarytag">528</td><td class="summarydata">桃色の秘薬</td></tr>
+    <tr><td class="summarytag">800</td><td class="summarydata">レシピの断片</td></tr>
+    <tr><td class="summarytag">801</td><td class="summarydata">絵で見る錬金術</td></tr>
+    <tr><td class="summarytag">802</td><td class="summarydata">初等錬金術講座</td></tr>
+    <tr><td class="summarytag">803</td><td class="summarydata">中等錬金術講座</td></tr>
+    <tr><td class="summarytag">804</td><td class="summarydata">高等錬金術講座</td></tr>
+    <tr><td class="summarytag">900</td><td class="summarydata">雑草</td></tr>
+    <tr><td class="summarytag">901</td><td class="summarydata">薬草</td></tr>
+    <tr><td class="summarytag">902</td><td class="summarydata">どんぐり</td></tr>
+    <tr><td class="summarytag">903</td><td class="summarydata">りんご</td></tr>
+    <tr><td class="summarytag">904</td><td class="summarydata">牛乳</td></tr>
+    <tr><td class="summarytag">905</td><td class="summarydata">四葉のクローバー</td></tr>
+    <tr><td class="summarytag">906</td><td class="summarydata">長ネギ</td></tr>
+    <tr><td class="summarytag">907</td><td class="summarydata">カレー粉</td></tr>
+    <tr><td class="summarytag">908</td><td class="summarydata">ヤツメウナギ</td></tr>
+    <tr><td class="summarytag">909</td><td class="summarydata">ポーション</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">910</td><td class="summarydata">茶葉</td></tr>
+    <tr><td class="summarytag">911</td><td class="summarydata">亀の甲羅</td></tr>
+    <tr><td class="summarytag">912</td><td class="summarydata">紅白まんじゅう</td></tr>
+    <tr><td class="summarytag">913</td><td class="summarydata">お札</td></tr>
+    <tr><td class="summarytag">914</td><td class="summarydata">霧の湖の水</td></tr>
+    <tr><td class="summarytag">915</td><td class="summarydata">カエル</td></tr>
+    <tr><td class="summarytag">916</td><td class="summarydata">氷精の氷</td></tr>
+    <tr><td class="summarytag">917</td><td class="summarydata">紅い霧の瓶詰め</td></tr>
+    <tr><td class="summarytag">918</td><td class="summarydata">ひまわり</td></tr>
+    <tr><td class="summarytag">919</td><td class="summarydata">蜂蜜</td></tr>
+    <tr><td class="summarytag">920</td><td class="summarydata">蓮の花</td></tr>
+    <tr><td class="summarytag">921</td><td class="summarydata">プロテア</td></tr>
+    <tr><td class="summarytag">922</td><td class="summarydata">ベニテングタケ</td></tr>
+    <tr><td class="summarytag">923</td><td class="summarydata">コウモリの羽</td></tr>
+    <tr><td class="summarytag">924</td><td class="summarydata">大理石のカケラ</td></tr>
+    <tr><td class="summarytag">925</td><td class="summarydata">小さなヒトダマ</td></tr>
+    <tr><td class="summarytag">926</td><td class="summarydata">電池</td></tr>
+    <tr><td class="summarytag">927</td><td class="summarydata">温泉のお湯</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">928</td><td class="summarydata">温泉卵</td></tr>
+    <tr><td class="summarytag">929</td><td class="summarydata">硫黄</td></tr>
+    <tr><td class="summarytag">930</td><td class="summarydata">湯の花</td></tr>
+    <tr><td class="summarytag">931</td><td class="summarydata">アオカビ</td></tr>
+    <tr><td class="summarytag">932</td><td class="summarydata">銀の食器</td></tr>
+    <tr><td class="summarytag">933</td><td class="summarydata">パチュリー(お香)</td></tr>
+    <tr><td class="summarytag">934</td><td class="summarydata">禁書目録</td></tr>
+    <tr><td class="summarytag">935</td><td class="summarydata">桜の花びら</td></tr>
+    <tr><td class="summarytag">936</td><td class="summarydata">焼き鳥</td></tr>
+    <tr><td class="summarytag">937</td><td class="summarydata">ふしぎなキノコ</td></tr>
+    <tr><td class="summarytag">938</td><td class="summarydata">西行妖の花びら</td></tr>
+    <tr><td class="summarytag">939</td><td class="summarydata">ポップコーン</td></tr>
+    <tr><td class="summarytag">940</td><td class="summarydata">ソフトクリーム</td></tr>
+    <tr><td class="summarytag">941</td><td class="summarydata">ネズミのしっぽ</td></tr>
+    <tr><td class="summarytag">942</td><td class="summarydata">ヒトデ</td></tr>
+    <tr><td class="summarytag">943</td><td class="summarydata">ガラスのカケラ</td></tr>
+    <tr><td class="summarytag">944</td><td class="summarydata">サンゴ</td></tr>
+    <tr><td class="summarytag">945</td><td class="summarydata">孔雀の羽</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">946</td><td class="summarydata">ライオンの鬣</td></tr>
+    <tr><td class="summarytag">947</td><td class="summarydata">海水</td></tr>
+    <tr><td class="summarytag">948</td><td class="summarydata">貝殻</td></tr>
+    <tr><td class="summarytag">949</td><td class="summarydata">真珠</td></tr>
+    <tr><td class="summarytag">950</td><td class="summarydata">漢書</td></tr>
+    <tr><td class="summarytag">951</td><td class="summarydata">ミイラ</td></tr>
+    <tr><td class="summarytag">952</td><td class="summarydata">化石</td></tr>
+    <tr><td class="summarytag">953</td><td class="summarydata">フィルムの切れ端</td></tr>
+    <tr><td class="summarytag">954</td><td class="summarydata">豆</td></tr>
+    <tr><td class="summarytag">955</td><td class="summarydata">銃弾</td></tr>
+    <tr><td class="summarytag">956</td><td class="summarydata">黒い髪</td></tr>
+    <tr><td class="summarytag">957</td><td class="summarydata">リボン</td></tr>
+    <tr><td class="summarytag">958</td><td class="summarydata">魚</td></tr>
+    <tr><td class="summarytag">959</td><td class="summarydata">ウミネコ</td></tr>
+    <tr><td class="summarytag">960</td><td class="summarydata">真っ赤な彼岸花</td></tr>
+    <tr><td class="summarytag">961</td><td class="summarydata">餅</td></tr>
+    <tr><td class="summarytag">962</td><td class="summarydata">桃</td></tr>
+    <tr><td class="summarytag">963</td><td class="summarydata">ロケットの破片</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">964</td><td class="summarydata">月の石</td></tr>
+    <tr><td class="summarytag">965</td><td class="summarydata">汚れた布きれ</td></tr>
+    <tr><td class="summarytag">966</td><td class="summarydata">鉄クズ</td></tr>
+    <tr><td class="summarytag">967</td><td class="summarydata">天狗の羽</td></tr>
+    <tr><td class="summarytag">968</td><td class="summarydata">御柱</td></tr>
+    <tr><td class="summarytag">969</td><td class="summarydata">まな板</td></tr>
+    <tr><td class="summarytag">970</td><td class="summarydata">小さな要石</td></tr>
+    <tr><td class="summarytag">971</td><td class="summarydata">無縫の天衣</td></tr>
+    <tr><td class="summarytag">972</td><td class="summarydata">骨</td></tr>
+    <tr><td class="summarytag">973</td><td class="summarydata">車輪</td></tr>
+    <tr><td class="summarytag">974</td><td class="summarydata">黒太陽の炎</td></tr>
+    <tr><td class="summarytag">975</td><td class="summarydata">不思議な眼球</td></tr>
+    <tr><td class="summarytag">976</td><td class="summarydata">ハリボテ</td></tr>
+    <tr><td class="summarytag">977</td><td class="summarydata">鉄板</td></tr>
+    <tr><td class="summarytag">978</td><td class="summarydata">マグマの杖</td></tr>
+    <tr><td class="summarytag">979</td><td class="summarydata">丈夫な糸</td></tr>
+    <tr><td class="summarytag">980</td><td class="summarydata">妖精の羽</td></tr>
+    <tr><td class="summarytag">981</td><td class="summarydata">盗品</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">982</td><td class="summarydata">掴める雲</td></tr>
+    <tr><td class="summarytag">983</td><td class="summarydata">虎の毛皮</td></tr>
+    <tr><td class="summarytag">984</td><td class="summarydata">船の一部</td></tr>
+    <tr><td class="summarytag">985</td><td class="summarydata">数珠</td></tr>
+    <tr><td class="summarytag">986</td><td class="summarydata">アホ毛</td></tr>
+    <tr><td class="summarytag">987</td><td class="summarydata">バラの棘</td></tr>
+    <tr><td class="summarytag">988</td><td class="summarydata">ダークマター</td></tr>
+    <tr><td class="summarytag">989</td><td class="summarydata">肉</td></tr>
+    <tr><td class="summarytag">990</td><td class="summarydata">騎馬の手綱</td></tr>
+    <tr><td class="summarytag">991</td><td class="summarydata">十字架</td></tr>
+    <tr><td class="summarytag">992</td><td class="summarydata">聖骸布</td></tr>
+    <tr><td class="summarytag">1010</td><td class="summarydata">おにぎり</td></tr>
+    <tr><td class="summarytag">1011</td><td class="summarydata">ハイパーおにぎり</td></tr>
+    <tr><td class="summarytag">1012</td><td class="summarydata">パーフェクトおにぎり</td></tr>
+    <tr><td class="summarytag">1013</td><td class="summarydata">美希印おにぎり</td></tr>
+    <tr><td class="summarytag">1014</td><td class="summarydata">らぁめんセット</td></tr>
+    <tr><td class="summarytag">1015</td><td class="summarydata">パーフェクトらぁめんセット</td></tr>
+    <tr><td class="summarytag">1016</td><td class="summarydata">貴音印らぁめんセット</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1020</td><td class="summarydata">お茶</td></tr>
+    <tr><td class="summarytag">1021</td><td class="summarydata">ハイパーお茶</td></tr>
+    <tr><td class="summarytag">1022</td><td class="summarydata">パーフェクトお茶</td></tr>
+    <tr><td class="summarytag">1023</td><td class="summarydata">雪歩印お茶</td></tr>
+    <tr><td class="summarytag">1030</td><td class="summarydata">たるき亭のお酒</td></tr>
+    <tr><td class="summarytag">1031</td><td class="summarydata">あずさ印のテキーラ</td></tr>
+    <tr><td class="summarytag">1040</td><td class="summarydata">オレンジジュース</td></tr>
+    <tr><td class="summarytag">1041</td><td class="summarydata">伊織印オレンジジュース</td></tr>
+    <tr><td class="summarytag">1051</td><td class="summarydata">アウェイクンおにぎり</td></tr>
+    <tr><td class="summarytag">1052</td><td class="summarydata">美希印アウェイクンおにぎり</td></tr>
+    <tr><td class="summarytag">1060</td><td class="summarydata">春香印クッキー</td></tr>
+    <tr><td class="summarytag">1061</td><td class="summarydata">春香印マドレーヌ</td></tr>
+    <tr><td class="summarytag">1062</td><td class="summarydata">春香印フルーツパイ</td></tr>
+    <tr><td class="summarytag">1065</td><td class="summarydata">絵理キシル剤</td></tr>
+    <tr><td class="summarytag">1066</td><td class="summarydata">ラスト絵理キシル剤</td></tr>
+    <tr><td class="summarytag">1070</td><td class="summarydata">雪歩印スコップ</td></tr>
+    <tr><td class="summarytag">1080</td><td class="summarydata">セイレーンの素</td></tr>
+    <tr><td class="summarytag">1081</td><td class="summarydata">ヴィーナスの素</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1082</td><td class="summarydata">マーズの素</td></tr>
+    <tr><td class="summarytag">1100</td><td class="summarydata">ボーカルボム</td></tr>
+    <tr><td class="summarytag">1101</td><td class="summarydata">ダンスボム</td></tr>
+    <tr><td class="summarytag">1102</td><td class="summarydata">ビジュアルボム</td></tr>
+    <tr><td class="summarytag">1103</td><td class="summarydata">メガボーカルボム</td></tr>
+    <tr><td class="summarytag">1104</td><td class="summarydata">メガダンスボム</td></tr>
+    <tr><td class="summarytag">1105</td><td class="summarydata">メガビジュアルボム</td></tr>
+    <tr><td class="summarytag">1106</td><td class="summarydata">テラボーカルボム</td></tr>
+    <tr><td class="summarytag">1107</td><td class="summarydata">テラダンスボム</td></tr>
+    <tr><td class="summarytag">1108</td><td class="summarydata">テラビジュアルボム</td></tr>
+    <tr><td class="summarytag">1111</td><td class="summarydata">千早ボム</td></tr>
+    <tr><td class="summarytag">1201</td><td class="summarydata">春香のカード</td></tr>
+    <tr><td class="summarytag">1202</td><td class="summarydata">千早のカード</td></tr>
+    <tr><td class="summarytag">1203</td><td class="summarydata">雪歩のカード</td></tr>
+    <tr><td class="summarytag">1204</td><td class="summarydata">やよいのカード</td></tr>
+    <tr><td class="summarytag">1205</td><td class="summarydata">律子のカード</td></tr>
+    <tr><td class="summarytag">1206</td><td class="summarydata">伊織のカード</td></tr>
+    <tr><td class="summarytag">1207</td><td class="summarydata">真のカード</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1208</td><td class="summarydata">あずさのカード</td></tr>
+    <tr><td class="summarytag">1209</td><td class="summarydata">亜美のカード</td></tr>
+    <tr><td class="summarytag">1210</td><td class="summarydata">真美のカード</td></tr>
+    <tr><td class="summarytag">1211</td><td class="summarydata">美希のカード</td></tr>
+    <tr><td class="summarytag">1212</td><td class="summarydata">小鳥のカード</td></tr>
+    <tr><td class="summarytag">1213</td><td class="summarydata">響のカード</td></tr>
+    <tr><td class="summarytag">1214</td><td class="summarydata">貴音のカード</td></tr>
+    <tr><td class="summarytag">1215</td><td class="summarydata">SR春香のカード</td></tr>
+    <tr><td class="summarytag">1216</td><td class="summarydata">SR千早のカード</td></tr>
+    <tr><td class="summarytag">1217</td><td class="summarydata">SR雪歩のカード</td></tr>
+    <tr><td class="summarytag">1218</td><td class="summarydata">SRやよいのカード</td></tr>
+    <tr><td class="summarytag">1219</td><td class="summarydata">SR律子のカード</td></tr>
+    <tr><td class="summarytag">1220</td><td class="summarydata">SR伊織のカード</td></tr>
+    <tr><td class="summarytag">1221</td><td class="summarydata">SR真のカード</td></tr>
+    <tr><td class="summarytag">1222</td><td class="summarydata">SRあずさのカード</td></tr>
+    <tr><td class="summarytag">1223</td><td class="summarydata">SR亜美のカード</td></tr>
+    <tr><td class="summarytag">1224</td><td class="summarydata">SR真美のカード</td></tr>
+    <tr><td class="summarytag">1225</td><td class="summarydata">SR美希のカード</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1226</td><td class="summarydata">SR小鳥のカード</td></tr>
+    <tr><td class="summarytag">1227</td><td class="summarydata">SR響のカード</td></tr>
+    <tr><td class="summarytag">1228</td><td class="summarydata">SR貴音のカード</td></tr>
+    <tr><td class="summarytag">1229</td><td class="summarydata">iM@Sカード</td></tr>
+    <tr><td class="summarytag">1501</td><td class="summarydata">ザ☆ワイルドストロベリー</td></tr>
+    <tr><td class="summarytag">1502</td><td class="summarydata">バイタルサンフラワー</td></tr>
+    <tr><td class="summarytag">1503</td><td class="summarydata">モーニンググローリーJP</td></tr>
+    <tr><td class="summarytag">1504</td><td class="summarydata">ダリアノワール</td></tr>
+    <tr><td class="summarytag">1505</td><td class="summarydata">リリーオブグレン</td></tr>
+    <tr><td class="summarytag">1506</td><td class="summarydata">タータンチェックローズ</td></tr>
+    <tr><td class="summarytag">1507</td><td class="summarydata">ビターショコラミント</td></tr>
+    <tr><td class="summarytag">1508</td><td class="summarydata">モルフォハイドランジア</td></tr>
+    <tr><td class="summarytag">1509</td><td class="summarydata">スウィートタンジェリン</td></tr>
+    <tr><td class="summarytag">1510</td><td class="summarydata">レイクサイドパンジー</td></tr>
+    <tr><td class="summarytag">1511</td><td class="summarydata">シャイニングオーキッド</td></tr>
+    <tr><td class="summarytag">1512</td><td class="summarydata">クリーミーラズベリー</td></tr>
+    <tr><td class="summarytag">1513</td><td class="summarydata">フォーチュンクローバー</td></tr>
+    <tr><td class="summarytag">1514</td><td class="summarydata">サクラストーム</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1515</td><td class="summarydata">セントアイリス</td></tr>
+    <tr><td class="summarytag">1516</td><td class="summarydata">イブニングカンパニュラ</td></tr>
+    <tr><td class="summarytag">1517</td><td class="summarydata">ノルディックブルーベリー</td></tr>
+    <tr><td class="summarytag">1518</td><td class="summarydata">ジャパネスクボタン</td></tr>
+    <tr><td class="summarytag">1519</td><td class="summarydata">バレンタインプラム</td></tr>
+    <tr><td class="summarytag">1520</td><td class="summarydata">ウィンディチェリーズ</td></tr>
+    <tr><td class="summarytag">1521</td><td class="summarydata">チューリップフィールド</td></tr>
+    <tr><td class="summarytag">1522</td><td class="summarydata">アゼリアブライド</td></tr>
+    <tr><td class="summarytag">1523</td><td class="summarydata">ファンシーペチュニア</td></tr>
+    <tr><td class="summarytag">1524</td><td class="summarydata">ホットサマーシトラス</td></tr>
+    <tr><td class="summarytag">1525</td><td class="summarydata">ハピネスルピナス</td></tr>
+    <tr><td class="summarytag">1526</td><td class="summarydata">エレガントIVY</td></tr>
+    <tr><td class="summarytag">1527</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1528</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1529</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1530</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1531</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1532</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1533</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1534</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1535</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1601</td><td class="summarydata">ピンクダイヤモンド165</td></tr>
+    <tr><td class="summarytag">1602</td><td class="summarydata">パウダースノーホワイティ</td></tr>
+    <tr><td class="summarytag">1603</td><td class="summarydata">エバーグリーンリーブス</td></tr>
+    <tr><td class="summarytag">1604</td><td class="summarydata">ギルデッドマドモアゼル</td></tr>
+    <tr><td class="summarytag">1605</td><td class="summarydata">メイデンインブラック</td></tr>
+    <tr><td class="summarytag">1606</td><td class="summarydata">スカーレットスプライト</td></tr>
+    <tr><td class="summarytag">1607</td><td class="summarydata">セイクリッドジラフ</td></tr>
+    <tr><td class="summarytag">1608</td><td class="summarydata">ワイルドアニマルテイマー</td></tr>
+    <tr><td class="summarytag">1609</td><td class="summarydata">グッドラックターコイズ</td></tr>
+    <tr><td class="summarytag">1610</td><td class="summarydata">ハーツイーズアメシスト</td></tr>
+    <tr><td class="summarytag">1611</td><td class="summarydata">ジャングルサバイバー</td></tr>
+    <tr><td class="summarytag">1612</td><td class="summarydata">スカイパズラー</td></tr>
+    <tr><td class="summarytag">1613</td><td class="summarydata">ファイアオパール７６ｃｔ</td></tr>
+    <tr><td class="summarytag">1614</td><td class="summarydata">ベイビーブルージャガー</td></tr>
+    <tr><td class="summarytag">1615</td><td class="summarydata">デザートトラベラー</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1616</td><td class="summarydata">クラッシーモノグラム</td></tr>
+    <tr><td class="summarytag">1617</td><td class="summarydata">ナイトオンステージ</td></tr>
+    <tr><td class="summarytag">1618</td><td class="summarydata">ストライプフォレスター</td></tr>
+    <tr><td class="summarytag">1619</td><td class="summarydata">ダンシングタイガー</td></tr>
+    <tr><td class="summarytag">1620</td><td class="summarydata">オーシャンブルーレース</td></tr>
+    <tr><td class="summarytag">1621</td><td class="summarydata">モノクロームカウガール</td></tr>
+    <tr><td class="summarytag">1622</td><td class="summarydata">レザードクィーン</td></tr>
+    <tr><td class="summarytag">1623</td><td class="summarydata">スタイリッシュデニム</td></tr>
+    <tr><td class="summarytag">1624</td><td class="summarydata">トワイライトサファリ</td></tr>
+    <tr><td class="summarytag">1625</td><td class="summarydata">スネーキーショーガール</td></tr>
+    <tr><td class="summarytag">1626</td><td class="summarydata">ハイネスルージュ</td></tr>
+    <tr><td class="summarytag">1627</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1628</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1629</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1630</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1631</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1632</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1633</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1634</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1635</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1701</td><td class="summarydata">チャーミングヴィーナス</td></tr>
+    <tr><td class="summarytag">1702</td><td class="summarydata">ビューティフルアース</td></tr>
+    <tr><td class="summarytag">1703</td><td class="summarydata">バイナリースターR&B</td></tr>
+    <tr><td class="summarytag">1704</td><td class="summarydata">ファンキーサテライト</td></tr>
+    <tr><td class="summarytag">1705</td><td class="summarydata">ピュアホワイトノヴァ</td></tr>
+    <tr><td class="summarytag">1706</td><td class="summarydata">ピッチブラックプローブ</td></tr>
+    <tr><td class="summarytag">1707</td><td class="summarydata">ピンキースタークラスター</td></tr>
+    <tr><td class="summarytag">1708</td><td class="summarydata">ジェイドスターダスト</td></tr>
+    <tr><td class="summarytag">1709</td><td class="summarydata">レッドシフトボーダー</td></tr>
+    <tr><td class="summarytag">1710</td><td class="summarydata">パステルミルキーウェイ</td></tr>
+    <tr><td class="summarytag">1711</td><td class="summarydata">サイバースターシップ</td></tr>
+    <tr><td class="summarytag">1712</td><td class="summarydata">ディープスペースドリーム</td></tr>
+    <tr><td class="summarytag">1713</td><td class="summarydata">プレアデスＭ４５</td></tr>
+    <tr><td class="summarytag">1714</td><td class="summarydata">パズルデルソル</td></tr>
+    <tr><td class="summarytag">1715</td><td class="summarydata">オリオンネビュラ</td></tr>
+    <tr><td class="summarytag">1716</td><td class="summarydata">レディアントスターボウ</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1717</td><td class="summarydata">ホロスコープキャスター</td></tr>
+    <tr><td class="summarytag">1718</td><td class="summarydata">ムーンライトシャンパン</td></tr>
+    <tr><td class="summarytag">1719</td><td class="summarydata">カシオペアハート</td></tr>
+    <tr><td class="summarytag">1720</td><td class="summarydata">ブラックスワンＸ－１</td></tr>
+    <tr><td class="summarytag">1721</td><td class="summarydata">バイオレットライトニング</td></tr>
+    <tr><td class="summarytag">1722</td><td class="summarydata">インターステラフライヤー</td></tr>
+    <tr><td class="summarytag">1723</td><td class="summarydata">エターナルテラ＆ルナ</td></tr>
+    <tr><td class="summarytag">1724</td><td class="summarydata">ハニカムアストロノート</td></tr>
+    <tr><td class="summarytag">1725</td><td class="summarydata">ビジターフロムスペース</td></tr>
+    <tr><td class="summarytag">1726</td><td class="summarydata">ネクストオービター</td></tr>
+    <tr><td class="summarytag">1727</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1728</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1729</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1730</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1731</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1732</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1733</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1734</td><td class="summarydata"></td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1735</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag">1801</td><td class="summarydata">キャンディレディ</td></tr>
+    <tr><td class="summarytag">1802</td><td class="summarydata">ビヨンドザスターズ</td></tr>
+    <tr><td class="summarytag">1803</td><td class="summarydata">フラALOHAガール</td></tr>
+    <tr><td class="summarytag">1804</td><td class="summarydata">パレスオブドラゴン</td></tr>
+    <tr><td class="summarytag">1805</td><td class="summarydata">グッドスリープパジャマ</td></tr>
+    <tr><td class="summarytag">1806</td><td class="summarydata">トレーニングウェア</td></tr>
+    <tr><td class="summarytag">1807</td><td class="summarydata">ヨガウェア</td></tr>
+    <tr><td class="summarytag">1808</td><td class="summarydata">ビューティミズギ</td></tr>
+    <tr><td class="summarytag">1809</td><td class="summarydata">天使のミズギ</td></tr>
+    <tr><td class="summarytag">1810</td><td class="summarydata">スクールデイズブレザー</td></tr>
+    <tr><td class="summarytag">1811</td><td class="summarydata">ラフタイムスクール</td></tr>
+    <tr><td class="summarytag">1812</td><td class="summarydata">スノーフレークリリパット</td></tr>
+    <tr><td class="summarytag">1813</td><td class="summarydata">ザベストスクールメイト</td></tr>
+    <tr><td class="summarytag">1814</td><td class="summarydata">ストリートホッパー</td></tr>
+    <tr><td class="summarytag">1815</td><td class="summarydata">バーガースケーター</td></tr>
+    <tr><td class="summarytag">1816</td><td class="summarydata">プリンセスメロディ♪</td></tr>
+    <tr><td class="summarytag">1817</td><td class="summarydata">アイドル＠スクール</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1818</td><td class="summarydata">セーラーミズギ</td></tr>
+    <tr><td class="summarytag">1819</td><td class="summarydata">ミクオリジナル</td></tr>
+    <tr><td class="summarytag">1820</td><td class="summarydata">ホーリーナイトギフター</td></tr>
+    <tr><td class="summarytag">1821</td><td class="summarydata">ワイヤードマリオネット</td></tr>
+    <tr><td class="summarytag">1822</td><td class="summarydata">８７６プロ★キュート愛</td></tr>
+    <tr><td class="summarytag">1823</td><td class="summarydata">チェンジ２ＭＹカラー</td></tr>
+    <tr><td class="summarytag">1824</td><td class="summarydata">ミクアペンド</td></tr>
+    <tr><td class="summarytag">1825</td><td class="summarydata">スクールガールウェア</td></tr>
+    <tr><td class="summarytag">1826</td><td class="summarydata">７６５学園ジャージ</td></tr>
+    <tr><td class="summarytag">1827</td><td class="summarydata">８７６プロ★クール絵理</td></tr>
+    <tr><td class="summarytag">1828</td><td class="summarydata">フォーエバースター☆☆☆</td></tr>
+    <tr><td class="summarytag">1829</td><td class="summarydata">マイディアヴァンパイア</td></tr>
+    <tr><td class="summarytag">1830</td><td class="summarydata">８７６プロ★コズミック涼</td></tr>
+    <tr><td class="summarytag">1831</td><td class="summarydata">７６５スクールミズギ</td></tr>
+    <tr><td class="summarytag">1832</td><td class="summarydata">ビビッドビキニ</td></tr>
+    <tr><td class="summarytag">1833</td><td class="summarydata">カラフルバレリーナ</td></tr>
+    <tr><td class="summarytag">1834</td><td class="summarydata">パンキッシュゴシック</td></tr>
+    <tr><td class="summarytag">1835</td><td class="summarydata">エクササイズウェアNEO</td></tr>
+  </table>
+</div>
+<div class="datasummary">
+  <table class="datasummary">
+    <tr><th class="summarytag" colspan="2">ITEM</th></tr>
+  </table>
+  <table class="datasummary">
+    <tr><td class="summarytag">1836</td><td class="summarydata"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+    <tr><td class="summarytag_empty">　</td><td class="summarydata_empty"></td></tr>
+  </table>
+</div>
+</a>
+</div>
+</body>
+</html>

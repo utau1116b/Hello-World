@@ -1,0 +1,74 @@
+;カロッテうさぎ
+;primo最初のからの造語
+;ARG:0 代入先
+@SET_ENEMY_STATUS_102(ARG:0, ARG:1, ARG:2)
+CALLNAME:(ARG:1) = プリ・モデル
+
+;ドロップアイテム
+CFLAG:(ARG:1):ドロップアイテム1 = 101
+CFLAG:(ARG:1):ドロップ確率1 = 3000
+CFLAG:(ARG:1):ドロップアイテム2 = 500
+CFLAG:(ARG:1):ドロップ確率2 = 1000
+CFLAG:(ARG:1):ドロップアイテム3 = 510
+CFLAG:(ARG:1):ドロップ確率3 = 300
+
+
+;ベースランク設定
+LOCAL:3 = 1
+
+;基礎レベル取得
+LOCAL:1 = 1 + ARG:0
+
+;ランク補正強化
+IF ARG:2 > LOCAL:3
+	LOCAL:1 += (ARG:2 - LOCAL:3) * 2
+ENDIF
+
+IF LOCAL:1 < 1
+	LOCAL:1 = 1
+ENDIF
+
+CALL SET_DEFAULT_ENEMY_STATUS(ARG:1)
+
+;レベル設定
+BASE:(ARG:1):戦闘レベル = LOCAL:1
+
+
+
+BASE:(ARG:1):ベースPOW = 7
+BASE:(ARG:1):ベースGUA = 2
+BASE:(ARG:1):ベースDEX = 5
+BASE:(ARG:1):ベースHIT = 10
+BASE:(ARG:1):ベースSPD = 6
+BASE:(ARG:1):ベースLUC = 7
+CFLAG:(ARG:1):敵★ = 20
+;20
+CFLAG:(ARG:1):敵ハート = 16
+
+CFLAG:(ARG:1):獲得経験値 = 7
+CFLAG:(ARG:1):獲得金額 = 24
+
+;行動決定
+;ARG:0	登録番号
+@SELECT_ENEMY_ACTION_102(ARG:0)
+;LOCAL
+;0	LOOP
+;1	予定行動
+;2	TEMP
+
+LOCAL:1 = 0
+
+;行動テーブル決定
+;一旦初期化
+FOR LOCAL:0, 1296, 1306
+	CFLAG:(ARG:0):(LOCAL:0) = 0
+NEXT
+;通常テーブル
+CFLAG:(ARG:0):通常行動1 = 201
+CFLAG:(ARG:0):通常行動2 = 201
+CFLAG:(ARG:0):通常行動3 = 203
+CFLAG:(ARG:0):通常行動4 = 201
+
+
+;実際の行動決定
+CALL SELECT_ENEMY_ACTION_COMMON(ARG:0)

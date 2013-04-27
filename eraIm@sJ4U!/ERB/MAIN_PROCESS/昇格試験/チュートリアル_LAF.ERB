@@ -1,0 +1,558 @@
+@チュートリアル_LAF(ARG)
+CALL チュートLAFコマンド(ARG)
+@チュートLAFコマンド(ARG)
+#DIM PRICOLOR,1
+
+#DIM RED,2
+#DIM GREEN,2
+#DIM BLUE,2
+
+#DIM RED2,2
+#DIM GREEN2,2
+#DIM BLUE2,2
+
+#DIM RED3,2
+#DIM GREEN3,2
+#DIM BLUE3,2
+
+#DIM RED4,2
+#DIM GREEN4,2
+#DIM BLUE4,2
+
+#DIM REPEATCOUNT
+
+VARSET LOCAL
+
+$START
+
+VARSET REPEATCOUNT
+
+VARSET RED
+VARSET GREEN
+VARSET BLUE
+
+VARSET RED2
+VARSET GREEN2
+VARSET BLUE2
+
+VARSET RED3
+VARSET GREEN3
+VARSET BLUE3
+
+VARSET RED4
+VARSET GREEN4
+VARSET BLUE4
+
+;曲によって違ったタイムを
+ARG = 6
+;初期設定
+BASE:0:ボルテージ = 0
+SIF LOCAL:5 == 3
+	BASE:0:ボルテージ = 10000
+TFLAG:VOレート = 10000
+TFLAG:VIレート = 10000
+TFLAG:DAレート = 10000
+
+
+SETCOLOR GETBGCOLOR()
+
+PRICOLOR = GETBGCOLOR()
+
+;初期色
+ARG:2 = SET_COLOR_FUNC("ビジュアル")
+;RGBそれぞれのベース値、減少値を各色:0と1に代入
+RED = GETRED()
+IF RED > GETRED(ARG:2)
+	RED:1 = MAX(1, (RED-GETRED(ARG:2))/ARG)
+ELSEIF RED < GETRED(ARG:2)
+	RED:1 = MIN(-1, (RED-GETRED(ARG:2))/ARG)
+ENDIF
+GREEN = GETGREEN()
+IF GREEN > GETGREEN(ARG:2)
+	GREEN:1 = MAX(1, (GREEN-GETGREEN(ARG:2))/ARG)
+ELSEIF GREEN < GETGREEN(ARG:2)
+	GREEN:1 = MIN(-1, (GREEN-GETGREEN(ARG:2))/ARG)
+ENDIF
+BLUE = GETBLUE()
+IF BLUE > GETBLUE(ARG:2)
+	BLUE:1 = MAX(1, (BLUE-GETBLUE(ARG:2))/ARG)
+ELSEIF BLUE < GETBLUE(ARG:2)
+	BLUE:1 = MIN(-1, (BLUE-GETBLUE(ARG:2))/ARG)
+ENDIF
+
+;初期色
+ARG:2 = SET_COLOR_FUNC("ダンス")
+;RGBそれぞれのベース値、減少値を各色:0と1に代入
+RED2 = GETRED()
+IF RED2 > GETRED(ARG:2)
+	RED2:1 = MAX(1, (RED2-GETRED(ARG:2))/ARG)
+ELSEIF RED2 < GETRED(ARG:2)
+	RED2:1 = MIN(-1, (RED2-GETRED(ARG:2))/ARG)
+ENDIF
+GREEN2 = GETGREEN()
+IF GREEN2 > GETGREEN(ARG:2)
+	GREEN2:1 = MAX(1, (GREEN2-GETGREEN(ARG:2))/ARG)
+ELSEIF GREEN2 < GETGREEN(ARG:2)
+	GREEN2:1 = MIN(-1, (GREEN2-GETGREEN(ARG:2))/ARG)
+ENDIF
+BLUE2 = GETBLUE()
+IF BLUE2 > GETBLUE(ARG:2)
+	BLUE2:1 = MAX(1, (BLUE2-GETBLUE(ARG:2))/ARG)
+ELSEIF BLUE2 < GETBLUE(ARG:2)
+	BLUE2:1 = MIN(-1, (BLUE2-GETBLUE(ARG:2))/ARG)
+ENDIF
+
+;初期色
+ARG:2 = SET_COLOR_FUNC("ボーカル")
+;RGBそれぞれのベース値、減少値を各色:0と1に代入
+RED3 = GETRED()
+IF RED3 > GETRED(ARG:2)
+	RED3:1 = MAX(1, (RED3-GETRED(ARG:2))/ARG)
+ELSEIF RED3 < GETRED(ARG:2)
+	RED3:1 = MIN(-1, (RED3-GETRED(ARG:2))/ARG)
+ENDIF
+GREEN3 = GETGREEN()
+IF GREEN3 > GETGREEN(ARG:2)
+	GREEN3:1 = MAX(1, (GREEN3-GETGREEN(ARG:2))/ARG)
+ELSEIF GREEN3 < GETGREEN(ARG:2)
+	GREEN3:1 = MIN(-1, (GREEN3-GETGREEN(ARG:2))/ARG)
+ENDIF
+BLUE3 = GETBLUE()
+IF BLUE3 > GETBLUE(ARG:2)
+	BLUE3:1 = MAX(1, (BLUE3-GETBLUE(ARG:2))/ARG)
+ELSEIF BLUE3 < GETBLUE(ARG:2)
+	BLUE3:1 = MIN(-1, (BLUE3-GETBLUE(ARG:2))/ARG)
+ENDIF
+
+;初期色(バースト)
+ARG:2 = 0X4bec50
+;RGBそれぞれのベース値、減少値を各色:0と1に代入
+RED4 = GETRED()
+IF RED4 > GETRED(ARG:2)
+	RED4:1 = MAX(1, (RED4-GETRED(ARG:2))/ARG)
+ELSEIF RED4 < GETRED(ARG:2)
+	RED4:1 = MIN(-1, (RED4-GETRED(ARG:2))/ARG)
+ENDIF
+GREEN4 = GETGREEN()
+IF GREEN4 > GETGREEN(ARG:2)
+	GREEN4:1 = MAX(1, (GREEN4-GETGREEN(ARG:2))/ARG)
+ELSEIF GREEN4 < GETGREEN(ARG:2)
+	GREEN4:1 = MIN(-1, (GREEN4-GETGREEN(ARG:2))/ARG)
+ENDIF
+BLUE4 = GETBLUE()
+IF BLUE4 > GETBLUE(ARG:2)
+	BLUE4:1 = MAX(1, (BLUE4-GETBLUE(ARG:2))/ARG)
+ELSEIF BLUE4 < GETBLUE(ARG:2)
+	BLUE4:1 = MIN(-1, (BLUE4-GETBLUE(ARG:2))/ARG)
+ENDIF
+
+TSTR = %" "%
+REDRAW 0
+	$REPEAT_LOOP
+	CALL SAVELINE
+	
+RESETCOLOR
+;///メイン画面///
+
+		PRINTFORM ┏━━━━━━━━━━━━━━━━━━━━━━┓
+		;PRINTFORM (TIME：{TFLAG:アピールタイム, 16})
+		PRINTFORM (TIME：
+		CALL BAR_LAF_TIME
+		PRINTFORM )
+		PRINTFORM ┏━━━━━━━━━━━━━━━━━━━━━━┓
+		PRINTL
+		PRINTFORM ┃%CSTR:0:22, 44, LEFT%┃
+		PRINTFORM %TSTR, 24%
+		PRINTFORM ┃%CALLNAME:1, 44, LEFT%┃
+		PRINTL
+		PRINTFORM ┗━━━━━━━━━━━━━━━━━━━━━━┛
+		PRINTFORM %TSTR, 24%
+		PRINTFORM ┗━━━━━━━━━━━━━━━━━━━━━━┛
+		PRINTL
+		PRINTFORM SCORE：
+		FONTBOLD
+		PRINTFORM {TFLAG:味方スコア}
+		FONTREGULAR
+		PRINTFORM %TSTR, 96%
+		FONTBOLD
+		PRINTFORM {TFLAG:敵スコア}
+		RESETCOLOR
+		FONTREGULAR
+		PRINTFORM ：SCORE
+		PRINTL
+		PRINTFORM VL 
+		CALL BAR_ボルテージ(0)
+		PRINTFORM %TSTR, 46%
+		CALL BAR_ボルテージ(1)
+		PRINTFORM  VL
+		PRINTL 
+		CALL 思い出表示(11)
+		PRINTFORM %TSTR, 50%
+		CALL 思い出表示(1)
+		PRINTL 
+
+;///メンバーステータス表示///
+
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		PRINTFORM ┏━━━━━━━━━┓
+	ENDIF
+NEXT
+PRINTL
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		LOCAL:1 = FLAG:(LOCAL:0)
+		PRINTFORM ┃
+		CALL SET_COLOR(LOCAL:1)
+		PRINTFORM %(CALLNAME:(LOCAL:1)), 16, LEFT%
+		RESETCOLOR
+		IF LOCAL:1 == TARGET
+			CALL SET_COLOR(20)
+			PRINTFORM ★
+			RESETCOLOR
+			PRINTFORM ┃
+		ELSE
+			PRINTFORM 　┃
+		ENDIF
+	ENDIF
+NEXT
+PRINTL
+
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		LOCAL:1 = FLAG:(LOCAL:0)
+		PRINTFORM ┃
+		;長さは18
+		CALL BAR_待機時間(FLAG:LOCAL)
+		PRINTFORM ┃
+	ENDIF
+NEXT
+PRINTL
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		PRINTFORM ┗━━━━━━━━━┛
+	ENDIF
+NEXT
+PRINTL
+
+;///////////////////////////
+CUSTOMDRAWLINE =
+PRINTFORM ＡＰＰＥＡＬ：
+CALL SET_COLOR(TARGET)
+PRINTFORML %CALLNAME:(TARGET), 8, LEFT%
+;↑残り思い出数も表示するように
+RESETCOLOR
+;//////////
+
+	;初期色
+	ARG:1 = GETBGCOLOR()
+	SETCOLOR ARG:1
+	ALIGNMENT CENTER
+	
+	PRINTL 
+	
+	GETFONT
+	CHKFONT "NSimSun"
+	SIF RESULT
+		SETFONT "NSimSun"
+
+	;色の減算は16進数を割ってマイナスしていく
+	IF BASE:0:ボルテージ >= 10000
+		RED4 = MAX(0, RED4-RED4:1)
+		GREEN4 = MAX(0, GREEN4-GREEN4:1)
+		BLUE4 = MAX(0, BLUE4-BLUE4:1)
+		SIF RED4 > 255
+			RED4 = 255
+		SIF GREEN4 > 255
+			GREEN4 = 255
+		SIF BLUE4 > 255
+			BLUE4 = 255
+		SETCOLOR RED4, GREEN4, BLUE4
+		LOCALS = [ＢＡ]%UNICODE(0x2196)%
+		PRINTBUTTON LOCALS, 101
+		PRINTFORM 　 
+		RESETCOLOR
+		;RESETCOLOR
+	ELSE
+	
+	ENDIF
+	
+	
+	;///////////////
+	RED2 = MAX(0, RED2-RED2:1)
+	GREEN2 = MAX(0, GREEN2-GREEN2:1)
+	BLUE2 = MAX(0, BLUE2-BLUE2:1)
+	SIF RED2 > 255
+		RED2 = 255
+	SIF GREEN2 > 255
+		GREEN2 = 255
+	SIF BLUE2 > 255
+		BLUE2 = 255
+	
+	SETCOLOR RED2, GREEN2, BLUE2
+	PRINTBUTTON "[Ｄａ]←", 9
+	PRINTFORM 　
+	RESETCOLOR
+	
+	RED = MAX(0, RED-RED:1)
+	GREEN = MAX(0, GREEN-GREEN:1)
+	BLUE = MAX(0, BLUE-BLUE:1)
+	SIF RED > 255
+		RED = 255
+	SIF GREEN > 255
+		GREEN = 255
+	SIF BLUE > 255
+		BLUE = 255
+	SETCOLOR RED, GREEN, BLUE
+	PRINTBUTTON "[Ｖｉ]↑", 8
+	RESETCOLOR
+	
+	PRINTFORM 　
+	RED3 = MAX(0, RED3-RED3:1)
+	GREEN3 = MAX(0, GREEN3-GREEN3:1)
+	BLUE3 = MAX(0, BLUE3-BLUE3:1)
+	
+	SIF RED3 > 255
+		RED3 = 255
+	SIF GREEN3 > 255
+		GREEN3 = 255
+	SIF BLUE3 > 255
+		BLUE3 = 255
+	
+	SETCOLOR RED3, GREEN3, BLUE3
+	PRINTBUTTON "[Ｖｏ]→", 1
+	RESETCOLOR
+	
+	;画面合わせ用バーストアピール
+	IF BASE:0:ボルテージ >= 10000
+		SETCOLOR GETBGCOLOR()
+		PRINTFORM 　 
+		LOCALS = [ＢＡ]%UNICODE(0x2196)%
+		PRINTFORM LOCALS
+		RESETCOLOR
+	ELSE
+	
+	ENDIF
+	
+	
+	PRINTL
+	PRINTL
+	CALL SHOW_RATE_DA
+	PRINT 　　
+	CALL SHOW_RATE_VI
+	PRINT 　　
+	CALL SHOW_RATE_VO
+	PRINTL
+	PRINTL 
+	
+	PRINTBUTTON "[思い出]", 2
+	PRINTL
+	PRINTL
+	
+	PRINTBUTTON "[ノーアピール]↓", 3
+	PRINTL 
+	SETFONT RESULTS
+	IF (LOCAL:1) == 0
+		LOCAL += 1
+		SIF LOCAL == 34
+			LOCAL:1 = 1
+	ELSEIF (LOCAL:1) == 1
+		LOCAL -= 1
+		SIF LOCAL == 0
+			LOCAL:1 = 0
+	ENDIF
+	PRINTL 
+	PRINTL 
+	PRINTL 
+	PRINTL 
+	PRINTL 
+	ALIGNMENT LEFT
+		SELECTCASE LOCAL:5
+			CASE 0
+				PRINTL ～アピールについて～
+				PRINTL
+				PRINTL 「さて、上に明滅するコマンドが見えるわね？これらがステージ中に使用するコマンドよ」
+				PRINT 「
+				CALL PRINTCOLOR(SET_COLOR_FUNC("ボーカル"), "[Vo]")
+				PRINT は
+				;CALL チュートリアルVO()
+				PRINT ボーカル、
+				CALL PRINTCOLOR(SET_COLOR_FUNC("ビジュアル"), "[Vi]")
+				PRINT は
+				;CALL チュートリアルVI()
+				PRINT ビジュアル、
+				CALL PRINTCOLOR(SET_COLOR_FUNC("ダンス"), "[Da]")
+				PRINT は
+				;CALL チュートリアルDA()
+				PRINTL ダンスを表し、クリックすることで、対応したアピールを実行するわ」
+				PRINTL 「ここで重要になるのが、ボタンをクリックするタイミングよ」
+				PRINT 「クリックした時、
+				CALL PRINTCOLOR(0x10EEEE, "ボタンの明滅が最大に近い程、NICEアピール")
+				PRINTL になり、得点が大きく加算されるわ」
+				PRINT 「逆に
+				CALL PRINTCOLOR(0XEE1010, "タイミングをはずすとBADアピール")
+				PRINTL になり、得点はマイナスされてしまうわ」
+				PRINTL 「『ノーアピール』は強制BADアピールになるコマンドだけど、私には使う必要性が分からないわね」
+				PRINTL 
+				PRINTL 
+				PRINTL  　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　[1]次へ
+			CASE 1
+				PRINTL ～興味レートについて～
+				PRINTL 
+				PRINT 「それから、コマンドの下側に数字が見えるでしょう？それは審査員や観客の
+				CALL チュートリアル興味(1)
+				;PRINTL 『興味レート』
+				PRINTL を示しているわ」
+				PRINT 「同じアピールを繰り返すことで、
+				CALL PRINTCOLOR(0XEE1010, "そのアピールに対する『興味』が減っていき")
+				PRINT 、反対に
+				CALL PRINTCOLOR(0x10EEEE, "別のアピールを行えば『興味』が回復する")
+				PRINTL の」
+				PRINT 「当然
+				CALL PRINTCOLOR(0x10EEEE, "『興味』の高い状態でアピールすると高得点に")
+				PRINT 、
+				CALL PRINTCOLOR(0XEE1010, "『興味』の低い状態でアピールすると得点は小さくなる")
+				PRINTL わ」
+				PRINT 「
+				;CALL チュートリアル興味(1)
+				PRINT 『興味レート』は、後述する
+				;CALL チュートリアル思い出(1)
+				PRINT 『思い出アピール』
+				PRINT 、
+				;CALL チュートリアルVL(1)
+				PRINT 『バーストアピール』
+				PRINTL を行う事でも回復が可能よ」
+				PRINTL 「ただ、この2つは使用制限があるから、どう使うかは、あなたの判断に委ねるわ」
+				PRINTL 
+				PRINTL 
+				PRINTL 
+				PRINTL 　　　　　　　　　　　　[0]前へ　　　　　　　　　　　　　　　[1]次へ
+			CASE 2
+				PRINTL ～思い出アピールついて～
+				PRINTL 
+				PRINT 「ユニット名の下に
+
+				CALL SET_COLOR(16)
+				GETFONT
+				CHKFONT "Times New Roman"
+				SIF RESULT
+					SETFONT "Times New Roman"
+				PRINTFORM %UNICODE(0x2665),2,LEFT%
+				SETFONT RESULTS
+				RESETCOLOR
+				PRINT が見えるわね？それは
+				CALL チュートリアル思い出()
+				;PRINT 『思い出』
+				PRINT と言って、
+				;1つにつき1回
+				CALL チュートリアル思い出(1)
+				PRINTL を行うのに必要なの」
+				PRINTFORM 「今は1つしかないけど、
+				;CALL PRINTCOLOR(SET_COLOR_FUNC(TARGET), @"%CALLNAME:TARGET%")
+				SETCOLOR 0x10EEEE
+				PRINTFORM %CALLNAME:TARGET%達と親しくなれば、
+				;CALL チュートリアル思い出()
+				PRINT 『思い出』が増えていき
+				RESETCOLOR
+				PRINT 、その数だけ
+				;CALL チュートリアル思い出(1)
+				PRINTL 『思い出アピール』を行えるわ」
+				PRINT 「
+				;CALL チュートリアル思い出(1)
+				PRINT 中心の[思い出]をクリックすることで行え、
+				CALL PRINTCOLOR(0x10EEEE, "得点に加え、審査員の『興味レート』を回復させられる")
+				PRINTL わ」
+				PRINT 「
+				PRINT 相手の『ボルテージ』を減らし、自分たちの『ボルテージ』を増加させる
+				PRINTL 効果もあるから念頭に置いておきなさい」
+				PRINT 「この
+				;CALL チュートリアルVL(0)
+				PRINTL 『ボルテージ』を何に使うかを次に説明して、チュートリアル終了よ」
+				PRINTL 
+				PRINTL 
+				PRINTL 
+				PRINTL 　　　　　　　　　　　　[0]前へ　　　　　　　　　　　　　　　[1]次へ
+			CASE 3
+				PRINTL ～バーストアピールついて～
+				PRINTL 
+				PRINT 「ユニット名の下の
+				CALL チュートリアルVL()
+				PRINT がMAXになり、さっきまでは無かった
+				CALL PRINTCOLOR(0X4bec50, "[BA]")
+				PRINTL というコマンドが増えているでしょう？」
+				PRINT 「これは
+				CALL チュートリアルVL(1)
+				PRINTL が行えるようになったことを表しているの」
+				PRINT 「
+				;CALL チュートリアルVL(1)
+				PRINT 『バーストアピール』は言わば
+				;CALL PRINTCOLOR(0Xff00c4, "必殺技")
+				PRINT 必殺技のようなもので、
+				CALL PRINTCOLOR(0x10EEEE, "大きく得点が入り、相手の『ボルテージ』も大幅に減らせる")
+				PRINTL わ」
+				PRINT 「条件を満たせば
+				CALL PRINTCOLOR(0XEE1010, "相手も『バーストアピール』を撃ってくる")
+				PRINTL から、気を付けなさい」
+				PRINT 「一度『バーストアピール』を使うと
+				;CALL チュートリアルVL()
+				PRINTL 『ボルテージ』は0に戻ってしまうけど、再びMAXまで溜めることで何度も打つことができるわ」
+				PRINTL 「さて、私からはこんな所かしら？もう十分なら[2]をクリックしてチュートリアルを終了してね」
+				PRINTL 
+				PRINTL 
+				PRINTL 　　　　　　　　　　　　[0]前へ　　　　　　　　　　　　　　　[2]チュートリアルを終了する
+			CASEELSE
+
+		ENDSELECT
+	;PRINTL 
+	;PRINTL 
+	;PRINTL 
+	;PRINTL 
+	;PRINTL 
+	ALIGNMENT LEFT
+	IF REPEATCOUNT == ARG + 1
+		CALL RETURNLINE
+		GOTO START
+	ENDIF
+	TINPUT 100, -999, 0
+	IF RESULT == -999
+		REPEATCOUNT += 1
+		CALL RETURNLINE
+		GOTO REPEAT_LOOP
+	ELSE
+		IF RESULT == 0
+			IF LOCAL:5 > 0
+				LOCAL:5 -= 1
+				CALL RETURNLINE
+				GOTO START
+			ENDIF
+		ELSEIF RESULT == 1
+			IF LOCAL:5 < 4
+				LOCAL:5 += 1
+				CALL RETURNLINE
+				GOTO START
+			ENDIF
+		ELSEIF RESULT == 2 && LOCAL:5 == 3
+			RETURN 
+		ELSE
+			CALL RETURNLINE
+			GOTO START
+		ENDIF
+	ENDIF
+
+;最後にボルテージを0に
+@チュートリアルVO()
+	CALL PRINTCOLOR(SET_COLOR_FUNC("ボーカル"), "ボーカル")
+@チュートリアルVI()
+	CALL PRINTCOLOR(SET_COLOR_FUNC("ビジュアル"), "ビジュアル")
+@チュートリアルDA()
+	CALL PRINTCOLOR(SET_COLOR_FUNC("ダンス"), "ダンス")
+;ARG	0,興味	1,興味レート
+@チュートリアル興味(ARG)
+	CALL PRINTCOLOR(0Xffc400, \@ ARG ? 『興味レート』 # 『興味』 \@)
+;ARG	0,思い出	1,思い出アピール
+@チュートリアル思い出(ARG)
+	CALL PRINTCOLOR(0Xff00c4, \@ ARG ? 『思い出アピール』 # 『思い出』 \@)
+;ARG	0,ボルテージ	1,バーストアピール
+@チュートリアルVL(ARG)
+	CALL PRINTCOLOR(0X4bec50, \@ ARG ? 『バーストアピール』 # 『ボルテージ』 \@)
+	

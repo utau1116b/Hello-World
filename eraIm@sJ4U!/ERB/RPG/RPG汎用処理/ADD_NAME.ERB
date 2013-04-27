@@ -1,0 +1,26 @@
+;ñºëOÇ…ABCí«â¡
+;ARG:0	ëŒè€
+;ARG:1	ï∂éö
+@ADD_NAME(ARG:0, ARG:1)
+SELECTCASE ARG:1
+	CASE 0
+		CALLNAME:(ARG:0) += "Ç`"
+	CASE 1
+		CALLNAME:(ARG:0) += "Ça"
+	CASE 2
+		CALLNAME:(ARG:0) += "Çb"
+	CASE 3
+		CALLNAME:(ARG:0) += "Çc"
+	CASE 4
+		CALLNAME:(ARG:0) += "Çd"
+	CASE 5
+		CALLNAME:(ARG:0) += "Çe"
+	CASE 6
+		CALLNAME:(ARG:0) += "Çf"
+	CASE 7
+		CALLNAME:(ARG:0) += "Çg"
+	CASE 8
+		CALLNAME:(ARG:0) += "Çh"
+	CASEELSE
+		CALLNAME:(ARG:0) += "Çi"
+ENDSELECT

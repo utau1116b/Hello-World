@@ -1,0 +1,144 @@
+;特技一覧表示
+;ARG:0	対象キャラ登録番号
+@SHOW_SKILL_LIST(ARG:0)
+;LOCALリスト
+;0	現在のページ位置
+;1	現在選択中の特技
+;2	FOR文で使用
+;3	一時記憶に使用
+;4	ページ数管理に使用
+;5	表示上限フラグ
+;6	特技の順番管理
+;7	短縮登録中フラグ
+;8	短縮登録対象
+;9	短縮登録設定フラグ
+
+;初期化
+LOCAL:0 = 1
+LOCAL:1 = 0
+LOCAL:2 = 0
+LOCAL:3 = 0
+LOCAL:4 = 0
+LOCAL:5 = 0
+LOCAL:6 = 0
+LOCAL:7 = 0
+LOCAL:8 = 0
+LOCAL:9 = 0
+$START
+;特技の表示上限計算用
+LOCAL:4 = 20 * LOCAL:0
+LOCAL:6 = 0
+DRAWLINE
+PRINTFORML %CALLNAME:(ARG:0)%の特技
+DRAWLINE
+;全特技に対して、覚えているかチェック
+
+FOR LOCAL:2, 301, 601
+	IF ABL:(ARG:0):(LOCAL:2) >= 1
+		;覚えていたら、それを記憶
+		LOCAL:6 += 1
+		IF (LOCAL:6 <= LOCAL:4) && (LOCAL:6 > (LOCAL:4 - 20))
+			;表示対象となるページに収まるものだった場合、それを表示
+			LOCAL:3 = (CFLAG:(ARG:0):(LOCAL:2))
+			IF LOCAL:6 % 2 == 0
+				;偶数個目は改行つき
+				;レベルは無いので特技説明にする
+					SELECTCASE LOCAL:2
+						CASE 301 TO 400
+							CALL SET_COLOR(1)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASE 401 TO 500
+							CALL SET_COLOR(2)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASE 501 TO 600
+							CALL SET_COLOR(3)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASEELSE
+						
+					ENDSELECT
+				PRINTFORML [{LOCAL:2, 4}] Lv{ABL:(ARG:0):(LOCAL:2)} %ABLNAME:(LOCAL:2), 30, LEFT%%FUNC_SKILL_EXPLAIN(LOCAL:2)%
+			ELSE
+					SELECTCASE LOCAL:2
+						CASE 301 TO 400
+							CALL SET_COLOR(1)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASE 401 TO 500
+							CALL SET_COLOR(2)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASE 501 TO 600
+							CALL SET_COLOR(3)
+							PRINTFORM ♪
+							RESETCOLOR
+						CASEELSE
+						
+					ENDSELECT
+				PRINTFORML [{LOCAL:2, 4}] Lv{ABL:(ARG:0):(LOCAL:2)} %ABLNAME:(LOCAL:2), 30, LEFT%%FUNC_SKILL_EXPLAIN(LOCAL:2)%
+			ENDIF
+		ENDIF
+		IF LOCAL:6 > LOCAL:4
+			;次のページがあることを確認できたら、後はスキップ
+			BREAK
+		ENDIF
+	ENDIF
+NEXT
+
+IF LOCAL:6 == 0
+	PRINTL 覚えている特技はありません
+ENDIF
+IF (LOCAL:6 <= LOCAL:4) && (LOCAL:6 % 2 == 1)
+	;最後まで表示しきっており、その個数が奇数だった場合、改行しておく
+	PRINTL 
+ENDIF
+DRAWLINE
+IF LOCAL:0 > 1
+	PRINTLC [7] 前のページ
+ELSE
+	PRINTLC  
+ENDIF
+PRINTFORMLC             {LOCAL:0,3}Page
+IF LOCAL:6 > LOCAL:4
+	PRINTC [9] 次のページ   
+ENDIF
+PRINTL 
+
+PRINTL [0] 戻る
+
+$INPUT_LOOP
+
+INPUT
+IF RESULT == 0
+;戻る
+
+	RETURN
+ELSEIF RESULT == 7
+;前のページ
+	IF LOCAL:0 > 1
+		LOCAL:0 -= 1
+	ENDIF
+ELSEIF RESULT == 9
+;次のページ
+	IF LOCAL:6 > LOCAL:4
+		LOCAL:0 += 1
+	ENDIF
+ELSEIF (RESULT < 301) || (RESULT > 600)
+;アイドルマスター技や
+;特技以外指定
+	REUSELASTLINE 入力値が不正です。再入力してください
+	GOTO INPUT_LOOP
+ELSEIF ABL:(ARG:0):RESULT <= 0
+;覚えてない特技指定
+	REUSELASTLINE 入力値が不正です。再入力してください
+	GOTO INPUT_LOOP
+ELSE
+	;それ以外なら普通に表示
+	;使用できる場合は使用確認
+	CALL USE_SKILL_AT_MENU(ARG:0, RESULT)
+	
+ENDIF
+
+GOTO START

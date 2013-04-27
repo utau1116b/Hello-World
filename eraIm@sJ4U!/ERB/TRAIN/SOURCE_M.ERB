@@ -1,0 +1,347 @@
+;-------------------------------------------------
+;Ｍ感覚を設定している場合快Ｍソース等取得
+;-------------------------------------------------
+@SOURCE_M_COMMON
+;TALENT:恋慕をみる
+SIF TALENT:85
+	TIMES M:24 , 1.50
+;TALENT:恋人をみる
+SIF TALENT:153
+	TIMES M:24 , 1.50
+;TALENT:親愛をみる
+SIF TALENT:88
+	TIMES M:24 , 2.00
+;TALENT:相愛をみる
+SIF TALENT:89
+	TIMES M:24 , 2.00
+	
+;PLAYERの技巧を見る
+SIF ABL:PLAYER:2 >= 4
+	M:24 = M:24 * (100 + (ABL:PLAYER:2 / 4)) / 100
+
+;技巧を見る
+SIF ABL:TARGET:2 >= 4
+	M:24 = M:24 * (100 + (ABL:TARGET:2 / 4)) / 100
+
+;PALAM:欲情をみる
+IF PALAM:5 < PALAMLV:1
+	TIMES M:10 , 0.10
+ELSEIF PALAM:5 < PALAMLV:2
+	TIMES M:10 , 0.40
+ELSEIF PALAM:5 < PALAMLV:3
+	TIMES M:10 , 0.75
+ELSEIF PALAM:5 < PALAMLV:4
+	TIMES M:10 , 1.00
+ELSEIF PALAM:5 >= PALAMLV:4
+	TIMES M:10 , 1.20
+ENDIF
+
+;EXP:キス経験をみる
+IF EXP:96 < EXPLV:1
+	TIMES M:24 , 1.00
+ELSEIF EXP:96 < EXPLV:2
+	TIMES M:14 , 0.95
+	TIMES M:24 , 1.05
+ELSEIF EXP:96 < EXPLV:3
+	TIMES M:14 , 0.90
+	TIMES M:24 , 1.10
+ELSEIF EXP:96 < EXPLV:4
+	TIMES M:14 , 0.85
+	TIMES M:24 , 1.15
+ELSEIF EXP:96 < EXPLV:5
+	TIMES M:14 , 0.80
+	TIMES M:24 , 1.20
+ELSE
+	TIMES M:14 , 0.75
+	TIMES M:24 , 1.25
+ENDIF
+
+;反発感情をみる
+IF MARK:3 == 1
+	TIMES M:24 , 0.50
+	TIMES M:13 , 1.15
+ELSEIF MARK:3 == 2
+	TIMES M:24 , 0.25
+	TIMES M:13 , 1.45
+ELSEIF MARK:3 == 3
+	TIMES M:24 , 0.10
+	TIMES M:13 , 1.90
+ENDIF
+
+;TALENT:舌使いをみる
+SIF TALENT:52
+	TIMES M:24 , 2.00
+
+;成功をみる
+IF TFLAG:18 == -1
+	TIMES M:24 , 0.50
+ELSEIF TFLAG:18 == 0
+	TIMES M:24 , 1.00
+ELSE
+	TIMES M:24 , 2.00
+ENDIF
+
+RETURN
+
+;-------------------------------------------------
+;
+;			コマンド毎の処理
+;
+;-------------------------------------------------
+@SOURCE_M_COM0
+VARSET M
+M:24 = 100
+CALL SOURCE_M_COMMON
+
+SOURCE:24 += M:24
+
+@SOURCE_M_COM6
+VARSET M
+M:13 = 100
+M:14 = 10
+M:24 = 200
+CALL SOURCE_M_COMMON
+
+SOURCE:13 += M:13
+SOURCE:14 += M:14
+SOURCE:24 += M:24
+
+@SOURCE_M_COM31
+VARSET M
+M:10 = 250
+M:24 = 100
+CALL SOURCE_M_COMMON
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+;ABL:精液中毒をみる
+IF ABL:11 == 0
+	TIMES M:10 , 0.10
+	TIMES M:24 , 0.80
+ELSEIF ABL:11 == 1
+	TIMES M:10 , 0.20
+	TIMES M:24 , 1.00
+ELSEIF ABL:11 == 2
+	TIMES M:10 , 0.50
+	TIMES M:24 , 1.20
+ELSEIF ABL:11 == 3
+	TIMES M:10 , 1.00
+	TIMES M:24 , 1.40
+ELSEIF ABL:11 == 4
+	TIMES M:10 , 1.20
+	TIMES M:24 , 1.60
+ELSE
+	TIMES M:10 , 1.50
+	M:24 = M:24 * (80 + (ABL:11 * 20)) / 100
+ENDIF
+
+;ABL:奉仕精神をみる
+IF ABL:6 == 0
+	TIMES M:10 , 0.10
+	TIMES M:24 , 0.00
+ELSEIF ABL:6 == 1
+	TIMES M:10 , 0.20
+	TIMES M:24 , 0.00
+ELSEIF ABL:6 == 2
+	TIMES M:10 , 0.50
+	TIMES M:24 , 0.00
+ELSEIF ABL:6 == 3
+	TIMES M:10 , 1.00
+	TIMES M:24 , 0.85
+ELSEIF ABL:6 == 4
+	TIMES M:10 , 1.20
+	TIMES M:24 , 1.00
+ELSE
+	TIMES M:10 , 1.50
+	M:24 = M:24 * (100 + (ABL:6 * 3)) / 100
+ENDIF
+
+SOURCE:10 += M:10
+SOURCE:24 += M:24
+
+@SOURCE_M_COM60
+VARSET M
+M:13 = 100
+M:14 = 10
+M:24 = 200
+CALL SOURCE_M_COMMON
+
+SOURCE:13 += M:13
+SOURCE:14 += M:14
+SOURCE:24 += M:24
+
+@SOURCE_M_COM69
+VARSET M
+M:24 = 40
+CALL SOURCE_M_COMMON
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+;ABL:奉仕精神をみる
+IF ABL:6 == 0
+	TIMES M:24 , 0.00
+ELSEIF ABL:6 == 1
+	TIMES M:24 , 0.00
+ELSEIF ABL:6 == 2
+	TIMES M:24 , 0.00
+ELSEIF ABL:6 == 3
+	TIMES M:24 , 0.85
+ELSEIF ABL:6 == 4
+	TIMES M:24 , 1.00
+ELSE
+	TIMES M:24 , 1.15
+ENDIF
+
+SOURCE:24 += M:24
+
+@SOURCE_M_COM80
+VARSET M
+M:24 = 50
+M:10 = 250
+CALL SOURCE_M_COMMON
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+;ABL:奉仕精神をみる
+IF ABL:6 == 0
+	TIMES M:10 , 0.10
+ELSEIF ABL:6 == 1
+	TIMES M:10 , 0.20
+ELSEIF ABL:6 == 2
+	TIMES M:10 , 0.50
+ELSEIF ABL:6 == 3
+	TIMES M:10 , 1.00
+ELSEIF ABL:6 == 4
+	TIMES M:10 , 1.20
+ELSE
+	TIMES M:10 , 1.50
+ENDIF
+;ABL:マゾっ気をみる
+IF ABL:8 == 0
+	TIMES M:10 , 0.10
+	TIMES M:24 , 0.00
+ELSEIF ABL:8 == 1
+	TIMES M:10 , 0.20
+	TIMES M:24 , 0.00
+ELSEIF ABL:8 == 2
+	TIMES M:10 , 0.50
+	TIMES M:24 , 0.00
+ELSEIF ABL:8 == 3
+	TIMES M:10 , 1.00
+	TIMES M:24 , 0.70
+ELSEIF ABL:8 == 4
+	TIMES M:10 , 1.20
+	TIMES M:24 , 1.00
+ELSE
+	TIMES M:10 , 1.50
+	TIMES M:24 , 1.30
+ENDIF
+;ABL:精液中毒をみる
+IF ABL:11 == 0
+	TIMES M:10 , 0.10
+	TIMES M:24 , 0.80
+ELSEIF ABL:11 == 1
+	TIMES M:10 , 0.20
+	TIMES M:24 , 1.00
+ELSEIF ABL:11 == 2
+	TIMES M:10 , 0.50
+	TIMES M:24 , 1.20
+ELSEIF ABL:11 == 3
+	TIMES M:10 , 1.00
+	TIMES M:24 , 1.40
+ELSEIF ABL:11 == 4
+	TIMES M:10 , 1.20
+	TIMES M:24 , 1.60
+ELSE
+	TIMES M:10 , 1.50
+	TIMES M:24 , 1.80
+ENDIF
+
+SOURCE:10 += M:10
+SOURCE:24 += M:24
+
+@SOURCE_M_COM108
+VARSET M
+M:24 = 200
+CALL SOURCE_M_COMMON
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+;ABL:奉仕精神をみる
+IF ABL:6 == 0
+	TIMES M:24 , 0.25
+ELSEIF ABL:6 == 1
+	TIMES M:24 , 0.33
+ELSEIF ABL:6 == 2
+	TIMES M:24 , 0.75
+ELSEIF ABL:6 == 3
+	TIMES M:24 , 1.50
+ELSEIF ABL:6 == 4
+	TIMES M:24 , 3.00
+ELSE
+	TIMES M:24 , 6.00
+ENDIF
+
+SOURCE:24 += M:24
+
+@SOURCE_M_COM201
+VARSET M
+M:24 = 100
+CALL SOURCE_M_COMMON
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+;ABL:奉仕精神をみる
+IF ABL:6 == 0
+	TIMES M:24 , 0.00
+ELSEIF ABL:6 == 1
+	TIMES M:24 , 0.00
+ELSEIF ABL:6 == 2
+	TIMES M:24 , 0.00
+ELSEIF ABL:6 == 3
+	TIMES M:24 , 0.85
+ELSEIF ABL:6 == 4
+	TIMES M:24 , 1.00
+ELSE
+	TIMES M:24 , 1.15
+ENDIF
+
+SOURCE:24 += M:24
+
+@SOURCE_M_COM340
+VARSET M
+M:13 += 100
+M:14 += 10
+M:24 += 40
+CALL SOURCE_M_COMMON
+
+SOURCE:13 += M:13
+SOURCE:14 += M:14
+SOURCE:24 += M:24
+
+@SOURCE_M_COM341
+VARSET M
+M:13 += 100
+M:14 += 10
+M:24 += 100
+CALL SOURCE_M_COMMON
+
+SOURCE:13 += M:13
+SOURCE:14 += M:14
+SOURCE:24 += M:24
+
+@SOURCE_M_COM342
+VARSET M
+M:13 = 100
+M:14 = 10
+M:24 = 200
+CALL SOURCE_M_COMMON
+
+SOURCE:13 += M:13
+SOURCE:14 += M:14
+SOURCE:24 += M:24

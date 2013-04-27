@@ -1,0 +1,133 @@
+;-------------------------------------------------
+;願掛け
+;日常系コマンド　レベル1
+;-------------------------------------------------
+@COM313
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+CALL COM300_SUCCESS(90, 4)
+
+;てゐとかで成功補正有
+
+;元日の博麗神社、守矢神社(初詣)
+IF TIME:1 == 11 && (TEQUIP:2 == 2 || (TEQUIP:2 == 26 && TEQUIP:6 == 1))
+	TFLAG:コマンド内容 = 0
+;デート先に博麗神社、守矢神社を選択
+ELSEIF TEQUIP:2 == 2 || (TEQUIP:2 == 26 && TEQUIP:6 == 1)
+	TFLAG:コマンド内容 = 1
+;七夕
+ELSEIF TIME:1 == 22
+	TFLAG:コマンド内容 = 2
+;流星雨を観測中
+ELSEIF TIME:11 == 2
+	TFLAG:コマンド内容 = 3
+;流星を観測中
+ELSEIF TIME:11 == 1
+	TFLAG:コマンド内容 = 4
+ENDIF
+
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:体力 += 0
+DOWNBASE:気力 += 50
+
+;固定で獲得するソース
+SOURCE:達成 = 10
+
+;-------------------------------------------------
+;特殊分岐（気力最大値上昇）
+;-------------------------------------------------
+VARSET LOCAL
+;気力の成長限界(奉仕快楽経験、愛情経験、デート経験、キス経験)
+LOCAL:1 = 3000 + (EXP:奉仕快楽経験 / 3) + (EXP:愛情経験 / 2) + EXP:デート経験 + EXP:キス経験
+LOCAL:1 = LIMIT(LOCAL:1,0,9999)
+
+;元日の博麗神社、守矢神社(初詣)
+IF TFLAG:コマンド内容 == 0
+	LOCAL = 3 - TFLAG:成功判定
+	CALL COM313_気力成長(LOCAL,LOCAL:1,3)
+	SOURCE:達成 += 100 + LOCAL
+	SOURCE:歓楽 += 500 + LOCAL
+;デート先に博麗神社を選択
+ELSEIF TFLAG:コマンド内容 == 1 && TEQUIP:2 == 2
+	LOCAL = 5 - TFLAG:成功判定
+	CALL COM313_気力成長(LOCAL,LOCAL:1,3)
+	SOURCE:歓楽 += 10 + LOCAL
+	SOURCE:達成 += 100 + LOCAL
+;守矢神社を選択(TFLAGは初期化されるので判定不可)
+ELSEIF TFLAG:コマンド内容 == 1 && (TEQUIP:2 == 26 && TEQUIP:6 == 1)
+	LOCAL = 7 - TFLAG:成功判定
+	CALL COM313_気力成長(LOCAL,LOCAL:1,2)
+	SOURCE:歓楽 += 20 + LOCAL
+	SOURCE:達成 += 100 + LOCAL
+;七夕
+ELSEIF TFLAG:コマンド内容 == 2
+	LOCAL = 3 - TFLAG:成功判定
+	CALL COM313_気力成長(LOCAL,LOCAL:1,2)
+	SOURCE:達成 += 100 + LOCAL
+	SOURCE:歓楽 += 300 + LOCAL
+;流星雨を観測中
+ELSEIF TFLAG:コマンド内容 == 3
+	LOCAL = 3 - TFLAG:成功判定
+	CALL COM313_気力成長(LOCAL,LOCAL:1,3)
+	SOURCE:達成 += 200 + LOCAL
+	SOURCE:歓楽 += 400 + LOCAL
+;流星を観測中
+ELSEIF TFLAG:コマンド内容 == 4
+	LOCAL = 5 - TFLAG:成功判定
+	CALL COM313_気力成長(LOCAL,LOCAL:1,2)
+	SOURCE:達成 += 20 + LOCAL
+	SOURCE:歓楽 += 100 + LOCAL
+ENDIF
+
+;巫女ボーナス(神社でのみ有効)
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+IF TFLAG:SELECTCOM分岐 == -1
+	TIMES SOURCE:歓楽 , 0.10
+	TIMES SOURCE:達成 , 0.50
+ELSEIF TFLAG:SELECTCOM分岐 == 0
+
+ELSE
+	TIMES SOURCE:歓楽 , 2.00
+	TIMES SOURCE:達成 , 2.00
+ENDIF
+
+;-------------------------------------------------
+;汚れの処理
+;-------------------------------------------------
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+;同性愛　レズなら戻り値1ゲイなら戻り値2
+;IF HETEROSEX(TARGET,PLAYER)
+;	EXP:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;ENDIF
+
+RETURN 1
+
+;ARG 上昇確率
+;ARG:1 成長上限値
+;ARG:2 気力上昇補正
+@COM313_気力成長(ARG,ARG:1,ARG:2)
+LOCAL = ARG
+LOCAL:1 = ARG:1
+IF !RAND:LOCAL
+	LOCAL = RAND:LOCAL + (ABL:親密 * ARG:2) + 1
+	;成長限界と比較
+	IF MAXBASE:気力 > LOCAL:1
+		SIF (MAXBASE:1 + LOCAL) > LOCAL:1
+			LOCAL = 9999 - MAXBASE:気力
+		MAXBASE:1 += LOCAL
+		PRINTFORMW 気力の上限値が{LOCAL}上がった
+	ENDIF
+ENDIF

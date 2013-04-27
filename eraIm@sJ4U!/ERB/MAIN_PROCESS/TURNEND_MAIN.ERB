@@ -1,0 +1,289 @@
+@EVENTTURNEND
+#PRI
+#DIM 基礎回復力
+#DIM 補正回復力,2
+#DIM 回復力
+
+VARSET LOCAL, 0
+
+;恋慕等の陥落チェック
+FOR LOCAL,0,CHARANUM
+	;勧誘していないキャラは省く
+	SIF CFLAG:LOCAL:勧誘状況 != -1
+		CONTINUE
+	;純愛モードチェック
+	CALL EVENTCHECK_J_MODE
+	
+	;ベタ惚れモードチェック
+	CALL EVENTCHECK_TALENT_CHANGE
+
+	IF MARK:LOCAL:3 == 0
+		IF  ABL:LOCAL:親密 >= 15 && ABL:LOCAL:奉仕精神 >= 15 && TALENT:LOCAL:恋人 && TALENT:LOCAL:恋慕 && CFLAG:LOCAL:好感度 >= 10000 && (EXP:LOCAL:異常経験 - CFLAG:LOCAL:初期異常経験) <= 0 && TALENT:LOCAL:親愛 == 0
+				PRINTFORMW %CALLNAME:LOCAL%のこちらを見る目が変わった…
+;●友情パッチ用改変
+				IF IS_友情(LOCAL)
+					PRINTFORML %CALLNAME:LOCAL%は%CALLNAME:MASTER%の事を家族のように感じているようだ…
+				ELSE
+					PRINTFORML %CALLNAME:LOCAL%は%CALLNAME:MASTER%に心からの愛情を感じているようだ…
+				ENDIF
+;●ここまで
+				TFLAG:イベント口上 = 35
+				LOCAL:1 = TARGET
+				TARGET = LOCAL
+				CALL SELF_KOJO
+				TARGET = LOCAL:1
+				PRINTFORMW %CALLNAME:LOCAL%は【親愛】を得た
+				TALENT:LOCAL:親愛 = 1
+				IF TALENT:LOCAL:淫乱
+					PRINTFORMW 親愛＋淫乱を達成したので、特殊能力を１つ得る事ができます
+					CALL GET_FEAT
+				ENDIF
+		ENDIF
+		IF ABL:LOCAL:親密 >= 10 && CFLAG:LOCAL:好感度 >= 3000 && TALENT:LOCAL:恋慕 == 0
+			PRINTFORMW %CALLNAME:LOCAL%のこちらを見る目がおかしい…
+			;●友情パッチ用改変
+			IF IS_恋人(LOCAL) == 2
+				PRINTFORML %CALLNAME:LOCAL%は%CALLNAME:MASTER%への信頼をより強くしたようだ…
+			ELSEIF IS_恋人(LOCAL) == 1
+				PRINTFORML %CALLNAME:LOCAL%は%CALLNAME:MASTER%への恋心をついに自覚したようだ…
+			ELSE
+				IF IS_友情(LOCAL)
+					PRINTFORML %CALLNAME:LOCAL%は%CALLNAME:MASTER%への信頼を深めたようだ…
+				ELSE
+					PRINTFORML %CALLNAME:LOCAL%は%CALLNAME:MASTER%へと恋焦がれるようになった…
+				ENDIF
+			ENDIF
+			TFLAG:イベント口上 = 33
+			LOCAL:1 = TARGET
+			TARGET = LOCAL
+			CALL SELF_KOJO
+			TARGET = LOCAL:1
+			IF IS_友情(LOCAL)
+				PRINTFORMW %CALLNAME:LOCAL%は【信頼】を得た
+			ELSE
+				PRINTFORMW %CALLNAME:LOCAL%は【恋慕】を得た
+			ENDIF
+			;友情パッチ使用中でも陥落フラグ扱いで取得する事にしているので注意
+			TALENT:LOCAL:恋慕 = 1
+			SIF IS_友情(LOCAL)
+				TALENT:LOCAL:信頼 = 1
+;●ここまで
+			;堕とした人数＋１
+			FLAG:陥落人数 += 1
+		ENDIF
+		;●友情パッチ用改変(条件に友情パッチ非適応キャラである事を追加)
+		IF ABL:LOCAL:欲望 >= 10 && EXP:LOCAL:異常経験 >= 100 && (EXP:LOCAL:異常経験 - CFLAG:LOCAL:初期異常経験) >= 10 && TALENT:LOCAL:淫乱 == 0 && !IS_友情(LOCAL)
+
+			PRINTFORMW %CALLNAME:LOCAL%のこちらを見る目がおかしい…
+			PRINTFORML %CALLNAME:LOCAL%は%CALLNAME:MASTER%に与えられる快楽に溺れているようだ…
+			TFLAG:イベント口上 = 34
+			LOCAL:1 = TARGET
+			TARGET = LOCAL
+			CALL SELF_KOJO
+			TARGET = LOCAL:1
+			PRINTFORMW %CALLNAME:TARGET%は【淫乱】を得た
+			TALENT:LOCAL:淫乱 = 1
+			IF TALENT:LOCAL:親愛
+				PRINTFORMW 親愛＋淫乱を達成したので、特殊能力を１つ得る事ができます
+				CALL GET_FEAT
+			ENDIF
+			;堕とした人数は増やさない
+			
+			;売却や助手化が可能になったか
+			IF (ABL:LOCAL:親密 >= 10 && ABL:LOCAL:欲望 >= 8) || (ABL:LOCAL:親密 >= 5 && ABL:LOCAL:欲望 >= 5 && ABL:LOCAL:レズっ気 >= 3) || CFLAG:LOCAL:好感度 >= 1000 || TALENT:LOCAL:合意 || TALENT:LOCAL:恋人
+				IF CFLAG:LOCAL:助手可能 <= 1
+					TFLAG:イベント口上 = 31
+					LOCAL:1 = TARGET
+					TARGET = LOCAL
+					CALL SELF_KOJO
+					TARGET = LOCAL:1
+					PRINTFORMW %NAME:LOCAL%が助手可能になりました
+					CFLAG:LOCAL:助手可能 = 2
+				ENDIF
+			ENDIF
+		ENDIF
+	ENDIF
+NEXT
+
+;堕とした人数が5人以上で、謎の魅力が付く
+IF FLAG:陥落人数 >= 5 && TALENT:MASTER:謎の魅力 == 0
+	PRINTFORMW %CALLNAME:MASTER%は【謎の魅力】を身につけた
+	TALENT:MASTER:謎の魅力 = 1
+ENDIF
+
+IF TARGET > 0
+	;被写経験が200以上で、人気が付く
+	
+	;ほろ酔い値（TFLAG:47）が180以上で、酒豪が付く
+	IF TALENT:酒豪 == 0 && TFLAG:酩酊度 >= 180
+		PRINTFORMW %CALLNAME:TARGET%はアイドルの中でもトップクラスのお酒飲みとして評判になったようだ…
+		TFLAG:イベント口上 = 78
+		CALL SELF_KOJO
+		PRINTFORMW %CALLNAME:TARGET%は【酒豪】を得た
+		TALENT:酒豪 = 1
+	ENDIF
+ENDIF
+
+;耐力と魔力の成長を計算
+;主人公限定で、パートナーを絶頂させた回数で最大耐力増加
+;主人公限定で魔力＝気力の約3%を基準値として、射精経験で増加
+
+;体力・気力回復
+FOR LOCAL,0,CHARANUM
+	;勧誘していないキャラは省く
+	SIF CFLAG:LOCAL:勧誘状況 != -1
+		CONTINUE
+	VARSET 回復力
+	VARSET 基礎回復力
+	VARSET 補正回復力
+	LOCAL:1 = 1
+	SIF TIME == 1
+		LOCAL:1 = 5
+	基礎回復力 = MAXBASE:LOCAL:体力 / (20 / LOCAL:1)
+	補正回復力 = 0
+	補正回復力 += (TALENT:LOCAL:蓬莱人 * 30) * (TALENT:LOCAL:回復早い * 20) * (TALENT:LOCAL:吸血鬼 * 20 - TALENT:LOCAL:眷属 * 5)
+	SIF TALENT:LOCAL:回復遅い
+		補正回復力 /= 2
+		
+	;天気による回復力変化
+	;朝
+	IF TIME == 0
+		;晴れか狐の嫁入り
+		IF TIME:5 == 0 || TIME:5 == 7
+			補正回復力:1 += (TALENT:LOCAL:日光浴 * 200)
+		;快晴 
+		ELSEIF TIME:5 == 1
+			 補正回復力:1 += (TALENT:LOCAL:日光浴 * 400)
+		ENDIF
+	;夜
+	ELSE
+		;晴れ
+		IF TIME:5 == 0
+			補正回復力:1 += (TALENT:LOCAL:月光浴 * 200) + (TALENT:LOCAL:吸血鬼 * 200) - (TALENT:LOCAL:眷属 * 100)
+		;快晴
+		ELSEIF TIME:5 == 1
+			補正回復力:1 += (TALENT:LOCAL:月光浴 * 400) + (TALENT:LOCAL:吸血鬼 * 400) - (TALENT:LOCAL:眷属 * 200)
+		ENDIF
+	ENDIF
+	
+	;治療
+	SIF ((ASSI > 0 && TALENT:ASSI:治療) || TALENT:MASTER:治療)
+		補正回復力:1 += 100
+	
+	;休憩
+	IF FLAG:休憩
+		補正回復力:1 += 100
+		;純愛版休憩フラグ
+		IF LOCAL == MASTER
+			補正回復力 += 13
+			補正回復力:1 += 200
+		ELSEIF LOCAL == TARGET || LOCAL == ASSI
+			補正回復力 += 12
+			SIF TALENT:LOCAL:恋人
+				CFLAG:LOCAL:好感度 += 1
+		ENDIF
+	ENDIF
+	SIF 補正回復力 == 0
+		補正回復力 = 10
+	回復力 = 基礎回復力 * 補正回復力 / 10 + 補正回復力:1
+	DEBUGPRINTFORML 【回復力】= {回復力} 【基礎回復力】 = {基礎回復力} NO.{LOCAL} %CALLNAME:LOCAL%
+	;待機中指示コマンド実行はSHOP_COM_ACT.ERBに移動
+	;改装中（動作ごとに手に入る珠、経験以外は回復力にのみ関係）
+	CALL TURNEND_COM(LOCAL,回復力)
+	回復力 = RESULT
+	DEBUGPRINTFORML 【回復力】= {回復力}　待機動作後
+	;料理技能で回復力増加
+	回復力 += 回復力 * (ABL:LOCAL:料理技能 * 3) / 100
+	DEBUGPRINTFORML 【回復力】= {回復力}　回復前
+	;回復処理
+	BASE:LOCAL:体力 += 回復力
+	SIF BASE:LOCAL:体力 > MAXBASE:LOCAL:体力
+		BASE:LOCAL:体力 = MAXBASE:LOCAL:体力
+		
+	;気力の回復
+	BASE:LOCAL:気力 = MAXBASE:LOCAL:気力
+	
+	;RPG系
+	BASE:LOCAL:HP = MAXBASE:LOCAL:HP
+	BASE:LOCAL:MP = MAXBASE:LOCAL:MP
+	
+	;ついでに
+	;時間経過における陰毛成長処理
+	SIF CFLAG:LOCAL:毛の成長判定 == 2 && BASE:LOCAL:陰毛 < 1000
+		CALL CHECK_DAY_PUBIC_HAIR(LOCAL)
+
+NEXT
+
+
+
+;待機行動中に入手した経験や宝珠や好感度を表示する場合確認用に最後に1回だけWAIT
+SIF FLAG:23 & 1p25
+	WAIT
+	
+;待機中行動口上呼び出し
+FOR LOCAL, 0, CHARANUM
+	SIF LOCAL == MASTER || CFLAG:LOCAL:勧誘状況 != -1 || CFLAG:LOCAL:21
+		CONTINUE
+	TRYCALLFORM KOJO_EXIST_K{LOCAL}
+	SIF !RESULT
+		CONTINUE
+	LOCAL:1 = TARGET
+	TARGET = LOCAL
+	CALL KOJO_TAIKI
+	TARGET = LOCAL:1
+NEXT
+
+IF (FLAG:62 & 1)
+	;全体の妊娠判定
+	CALL IN_VAGINA_ALL
+	
+	;全体の妊娠時の処理
+	CALL GET_CHILD_ALL
+	
+ENDIF
+
+;吸血鬼化チェック
+CALL EVENTCHECK_V
+
+;キャラ独自イベント
+TRYCALL アフターコミュ
+
+;体力回復計算に使う休憩フラグを初期化
+FLAG:休憩 = 0
+
+@EVENTTURNEND
+#LATER
+
+IF ASSI >= 0
+	IF TALENT:ASSI:90 && ITEM:26 == 0
+		PRINTFORMW [%TALENTNAME:90%]の効果で媚薬を手に入れました。
+		ITEM:26 = 1
+	ENDIF
+ENDIF
+
+@EVENTTURNEND
+#LATER
+CALL 給料計算
+;午後なら次の日、午前なら午後にする
+;TIMEとTIME:12で判断
+;朝なら昼に(午前),昼なら夕に、夕なら夜に,夜なら次の日の朝に(午後)
+
+;夜なら次の日の朝に
+IF TIME == 1 && TIME:12 == 1
+	CALL TURNEND_夜
+	
+;夕なら夜に
+;ELSEIF TIME == 1 && TIME:12 == 0
+;	CALL TURNEND_夕
+
+;昼なら夜に
+ELSEIF TIME == 0 && TIME:12 == 1
+	CALL TURNEND_昼
+	
+;朝なら昼に
+ELSEIF TIME == 0 && TIME:12 == 0
+	CALL TURNEND_朝
+	
+ENDIF
+FLAG:ショップコマンド = 0
+BEGIN SHOP

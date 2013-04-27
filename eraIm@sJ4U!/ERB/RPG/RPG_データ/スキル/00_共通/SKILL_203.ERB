@@ -1,0 +1,60 @@
+;203	ガード
+
+;スキル説明を表示
+;ARG:0	スキルレベル
+;RETURN	0:レベルアップ不可能　1:レベルアップ可能
+@SHOW_SKILL_EXPLAIN_203(ARG:0)
+;説明なし＋Lvアップ不可
+RETURN 0
+
+
+;使用可能チェック
+;ARG:0	対象キャラ登録番号
+@COMABLE_203(ARG:0)
+;常にOK
+RETURN 1
+
+;スキル効果を設定
+;ARG:0	使用キャラ登録番号
+@SELECT_SKILL_TARGET_203(ARG:0)
+IF ARG:0 <= 10
+	CALL SELECT_TARGET_POSITION_ENEMY(ARG:0, 2)
+ELSE
+	;選ばせずに自分固定
+	RESULT = 30
+ENDIF
+
+IF RESULT == 0
+	RETURN 0
+ELSE
+	LOCAL:0 = RESULT
+	
+	;スキルID
+	CFLAG:(ARG:0):現在状態 = 203
+	;対象
+	CFLAG:(ARG:0):行動の対象 = LOCAL:0
+
+	RETURN 1
+ENDIF
+
+;スキル発動
+;ARG:0	使用キャラ
+;ARG:1	対象
+@USE_SKILL_203(ARG:0, ARG:1)
+CALL INIT_USE_SKILL_FLAG
+
+TFLAG:スキルID = 203
+TFLAG:使用キャラ = ARG:0
+TFLAG:対象キャラ = ARG:1
+TFLAG:スキル種別 = 0
+TFLAG:属性変化 = 0
+
+
+
+TFLAG:特殊状態変化 = 1076100
+TFLAG:特殊状態変化値 = 1
+
+CALL COMMON_SKILL_FIX
+
+
+

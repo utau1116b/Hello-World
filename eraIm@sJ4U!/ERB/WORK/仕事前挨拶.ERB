@@ -1,0 +1,231 @@
+@朝会話()
+CALL SAVELINE
+VARSET LOCAL
+PRINTL
+;１．えーと、誰かに話しかけてみようかな。なにか活動のヒントが得られるかもしれない
+;２．えーと、誰か１人に、代表して意気込みを語ってもらうとするか
+;３．さて、誰か１人に、かるく声をかけてみるとするか
+;４．さてと、今日は誰に、意気込みを語ってもらおうかな
+PRINTFORML さて、仕事前に誰かに意気込みを語ってもらおう
+PRINTL
+FOR LOCAL, 1080, 1085
+	IF FLAG:LOCAL > 0
+		CALL SET_COLOR(FLAG:LOCAL)
+		PRINTFORMLC [{LOCAL - 1079}] %CALLNAME:(FLAG:LOCAL)%
+		LOCAL:(LOCAL - 1079) = 1
+		RESETCOLOR
+	ENDIF
+NEXT
+$INPUT_LOOP
+INPUT
+IF RESULT < 1 || RESULT > 5
+	REUSELASTLINE 入力値が不正です。正しい値を入力して下さい
+	GOTO INPUT_LOOP
+ELSEIF LOCAL:RESULT == 1
+	LOCAL:6 = (RESULT + 1079)
+ELSE
+	REUSELASTLINE 入力値が不正です。正しい値を入力して下さい
+	GOTO INPUT_LOOP
+ENDIF
+BASE:(FLAG:(LOCAL:6)):親愛度++
+PRINTL
+PRINTFORMW %CALLNAME:(FLAG:(LOCAL:6))%に、今日の意気込みを語ってもらうことにした
+PRINTL 
+PRINTW ・・・・・
+PRINTL 
+PRINTW ・・・
+PRINTL 
+PRINTW ・
+;汎用でいいからなんか喋らせたい
+LOCAL:7 = RAND:6
+SELECTCASE LOCAL:7
+	CASE 0
+		PRINTFORML %CALLNAME:(FLAG:(LOCAL:6))%は、今日はオーディション100連戦でも楽勝だ！　と言った
+	CASE 1
+		PRINTFORML %CALLNAME:(FLAG:(LOCAL:6))%は、ユニットのみんなと一緒ならどんな仕事でも楽しい、と言った
+	CASE 2
+		PRINTFORML %CALLNAME:(FLAG:(LOCAL:6))%は、今の自分たちならどんな仕事でも大丈夫だ、と言った
+	CASE 3
+		PRINTFORML %CALLNAME:(FLAG:(LOCAL:6))%は、今日は仕事をするよりも遊びに行きたいと言った
+		LOCAL:8 = 1
+	CASE 4
+		PRINTFORML %CALLNAME:(FLAG:(LOCAL:6))%は、今日は一人になりたいと言った
+		LOCAL:8 = 1
+	CASE 5
+		;嫁がいるＰ殺し
+		PRINTFORML %CALLNAME:(FLAG:(LOCAL:6))%は、今日は%CALLNAME:MASTER%と二人で過ごしたい、と言った
+		LOCAL:8 = 1
+	CASEELSE
+		PRINTFORML %CALLNAME:(FLAG:(LOCAL:6))%は、今日はオーディション100連戦でも楽勝だ！　と言った
+ENDSELECT
+PRINTW 
+CALL SELECT_CHOICE("俺も同じ気持ちだよ", "えっ。そうなんだ…")
+
+;ネガティブ発言時
+;もうちょい他のメンバーの反応も分かるようにするといいかも
+IF LOCAL:8 > 0
+	IF RESULT == 1
+		BASE:(FLAG:(LOCAL:6)):親密度 -= 1
+		PRINTFORML %CALLNAME:MASTER%の答えに、%CALLNAME:(FLAG:(LOCAL:6))%は満足したようだ！
+		FOR LOCAL, 1080, 1085
+			SIF FLAG:LOCAL > 0
+				BASE:(FLAG:LOCAL):親愛度 -= 1
+		NEXT
+		BASE:(FLAG:(LOCAL:6)):親愛度 += 2
+	ELSE
+		BASE:(FLAG:(LOCAL:6)):親密度 += 1
+		PRINTFORML %CALLNAME:MASTER%の答えに、%CALLNAME:(FLAG:(LOCAL:6))%は不満そうだ…
+		FOR LOCAL, 1080, 1085
+			SIF FLAG:LOCAL > 0
+				BASE:(FLAG:LOCAL):親愛度 += 1
+		NEXT
+		BASE:(FLAG:(LOCAL:6)):親愛度 -= 2
+	ENDIF
+ELSE
+	IF RESULT == 1
+		BASE:(FLAG:(LOCAL:6)):親密度 += 1
+		PRINTFORML %CALLNAME:MASTER%の答えに、%CALLNAME:(FLAG:(LOCAL:6))%は満足したようだ！
+		FOR LOCAL, 1080, 1085
+			SIF FLAG:LOCAL > 0
+				BASE:(FLAG:LOCAL):親愛度 += 1
+		NEXT
+	ELSE
+		BASE:(FLAG:(LOCAL:6)):親密度 -= 1
+		PRINTFORML %CALLNAME:MASTER%の答えに、%CALLNAME:(FLAG:(LOCAL:6))%は不満そうだ…
+		FOR LOCAL, 1080, 1085
+			SIF FLAG:LOCAL > 0
+				BASE:(FLAG:LOCAL):親愛度 -= 1
+		NEXT
+	ENDIF
+ENDIF
+PRINTW 
+;@夜会話()
+CALL RETURNLINE
+@掛け声()
+VARSET LOCAL
+
+SELECTCASE TARGET
+	CASE 21
+		LOCALS = はいなのー！
+	CASE 30
+		LOCALS = はいデスッ！！
+	CASE 46
+		LOCALS = は～い
+	CASE 63
+		LOCALS = はイッ！
+	CASEELSE
+		LOCALS = はいっ！
+ENDSELECT
+
+SELECTCASE TARGET
+	CASE 12,15,16,38
+		LOCALS:1 = みんな、気合を入れていくわよっ！
+	CASE 14
+		LOCALS:1 = みなさん、気合を入れていきましょー！
+	CASE 17
+		LOCALS:1 = よーし、気合を入れて、ガンガンいきますよー！
+	CASE 18
+		LOCALS:1 = みなさん、気合を入れて頑張りましょう！
+	CASE 21
+		LOCALS:1 = みんな、気合を入れていくのー！
+	CASE 23
+		LOCALS:1 = みんな、気合を入れていくぞっ！
+	CASE 24
+		LOCALS:1 = それでは、気持ちを込めてまいりましょう！
+	CASE 25
+		LOCALS:1 = みなさーんっ！！気合を入れていくよー！！
+	CASE 27
+		LOCALS:1 = みんな、気合を入れていこう？
+	CASE 30
+		LOCALS:1 = みんな、気合を入れていきマスヨ！
+	CASE 33
+		LOCALS:1 = みなさん、気持ちを込めていきますよっ！
+	CASE 34,73
+		LOCALS:1 = 皆、気合を入れていくぞっ！
+	CASE 40
+		LOCALS:1 = ……きあいっ！
+	CASE 46
+		LOCALS:1 = みんなー、杏の分も頑張ってねー
+	CASE 52
+		LOCALS:1 = みんな、気合を入れていくにょわー☆
+	CASE 53
+		LOCALS:1 = みんな、気合を入れていきますよ！
+	CASE 57
+		LOCALS:1 = ククク、狂気の宴の幕開けよ！（みんな、気合を入れていきましょう！）
+	CASE 58
+		LOCALS:1 = みんな、気合を入れていくにゃっ☆
+	CASE 63
+		LOCALS:1 = みんな、気合を入れてくヨッ！
+	CASE 64
+		LOCALS:1 = みんなー、気合をいれてくヨー！
+	CASE 65
+		LOCALS:1 = みんな、気持ちを込めていくでぇ！
+	CASE 79
+		LOCALS:1 = みんな、気合を入れでくよ！
+	CASEELSE
+		LOCALS:1 = みんな、気合を入れていくよっ！
+ENDSELECT
+;LOCALS = うん！
+;LOCALS = みんな、気合を入れて～
+CALL MESSAGE, @"%CALLNAME:MASTER%", @"さあ、気を引き締めていこう！" , "/" , 0 , "LEFT", "", , 2
+CALL MESSAGE, @"%CALLNAME:TARGET%達", @"%LOCALS%" , "/" , 0 , "LEFT", "", , 2
+CALL MESSAGE, @"%CALLNAME:TARGET%", @"%LOCALS:1%" , "/" , 0 , "LEFT", "", , 2
+SIF FLAG:メンバー5 > 0
+	CALL MESSAGE, @"%CALLNAME:(FLAG:メンバー5)%", @"５！" , "/" , 0 , "LEFT", "", , 2
+SIF FLAG:メンバー4 > 0
+	CALL MESSAGE, @"%CALLNAME:(FLAG:メンバー4)%", @"４！" , "/" , 0 , "LEFT", "", , 2
+SIF FLAG:メンバー3 > 0
+	CALL MESSAGE, @"%CALLNAME:(FLAG:メンバー3)%", @"３！" , "/" , 0 , "LEFT", "", , 2
+SIF FLAG:メンバー2 > 0
+	CALL MESSAGE, @"%CALLNAME:(FLAG:メンバー2)%", @"２！" , "/" , 0 , "LEFT", "", , 2
+SIF FLAG:リーダー > 0
+	CALL MESSAGE, @"%CALLNAME:(FLAG:リーダー)%", @"１！" , "/" , 0 , "LEFT", "", , 2
+;トップアイドルって変な掛け声だ
+CALL SELECT_CHOICE("ターッチ", "えい！えい！おー！", "トップアイドル！", 0, 1)
+
+IF RESULT == 1
+	IF RAND(3) == 0
+		CALL MESSAGE, @"%CALLNAME:(FLAG:リーダー)%達", @"ターッチ！" , "/" , 0 , "LEFT", "", , 2
+		LOCAL:1 = 1
+	ELSE
+		IF RAND(2) == 0
+			CALL MESSAGE, @"%CALLNAME:(FLAG:リーダー)%達", @"ターッチ！" , "/" , 0 , "LEFT", "", , 2
+			LOCAL:1 = 1
+		ELSE
+			CALL MESSAGE, @"%CALLNAME:(FLAG:リーダー)%達", @"えい！えい！おー！" , "/" , 0 , "LEFT", "", , 2
+		ENDIF
+	ENDIF
+ELSEIF RESULT == 2
+	IF RAND(3) == 0
+		CALL MESSAGE, @"%CALLNAME:(FLAG:リーダー)%達", @"えい！えい！おー！" , "/" , 0 , "LEFT", "", , 2
+		LOCAL:1 = 1
+	ELSE
+		IF RAND(2) == 0
+			CALL MESSAGE, @"%CALLNAME:(FLAG:リーダー)%達", @"えい！えい！おー！" , "/" , 0 , "LEFT", "", , 2
+			LOCAL:1 = 1
+		ELSE
+			CALL MESSAGE, @"%CALLNAME:(FLAG:リーダー)%達", @"トップアイドルー！" , "/" , 0 , "LEFT", "", , 2
+		ENDIF
+	ENDIF
+ELSE
+	IF RAND(3) == 0
+			CALL MESSAGE, @"%CALLNAME:(FLAG:リーダー)%達", @"トップアイドルー！" , "/" , 0 , "LEFT", "", , 2
+		LOCAL:1 = 1
+	ELSE
+		IF RAND(2) == 0
+			CALL MESSAGE, @"%CALLNAME:(FLAG:リーダー)%達", @"トップアイドルー！" , "/" , 0 , "LEFT", "", , 2
+			LOCAL:1 = 1
+		ELSE
+			CALL MESSAGE, @"%CALLNAME:(FLAG:リーダー)%達", @"ターッチ！" , "/" , 0 , "LEFT", "", , 2
+		ENDIF
+	ENDIF
+ENDIF
+
+IF LOCAL:1
+	CALL MESSAGE, @"%CALLNAME:MASTER%", @"（よし、いい感じだ！/何だか今日は、絶好調の予感だぞ！）" , "/" , 0 , "LEFT", "", , 2
+	CALL 団結値上昇(2)
+	CALL RELATIONS_UP(1)
+ELSE
+	CALL MESSAGE, @"%CALLNAME:MASTER%", @"（がーん！　てんでバラバラだ……。/こんな調子で、今日は大丈夫かな……）" , "/" , 0 , "LEFT", "", , 2
+	CALL RELATIONS_UP(-1)
+ENDIF

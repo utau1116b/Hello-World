@@ -1,0 +1,751 @@
+;｢CALL EVENT_NEXTDAY_T｣｢CALL EVENTCHECK_M｣を追加
+;朝イベント回避用の仕掛けを追加
+@EVENTFIRST
+SAVESTR:0 = なし
+SAVESTR:199 = －－－
+TARGET = -1
+ASSI = -1
+IF !GLOBAL:初期設定
+	GLOBAL:メッセージ速度 = 1
+	GLOBAL:オート時ウェイト = 500
+	GLOBAL:右クリック時ウェイト = 1000
+	GLOBAL:メッセージアニメ利用 = 1
+	GLOBAL:初期設定 = 1
+ENDIF
+;所持可能アイテム数
+FLAG:最大所持可能アイテム数 = 999
+;最初からいくつかの服を持たせる
+CALL CLOTH_FIRST
+CALL SET_SONGNAME
+REPEAT 99
+	ITEMSALES:COUNT = 0
+REND
+;--------------------------------------
+;初期処理開始
+;--------------------------------------
+;キャラ登録番号メモ
+;0		プロデューサー
+;1～10	敵１～１０
+;11～	春香～　キャラ番号が登録番号になる
+;主人公加入
+;敵データ処理用キャラ加入
+FOR LOCAL:1, 990, 1000
+	ADDCHARA LOCAL:1
+	CFLAG:(LOCAL:1 - 989):パートナー選択可 = -1
+	;PRINTFORML {LOCAL:1}番%CALLNAME:(LOCAL:1)%を加える
+NEXT
+
+;全キャラ加入
+FOR LOCAL:1, 11, 100
+	ADDCHARA LOCAL:1
+	CFLAG:(LOCAL:1):パートナー選択可 = 0
+NEXT
+
+
+
+;追加キャラ加入
+FOR LOCAL:1, 100, 104
+	ADDCHARA LOCAL:1
+	CFLAG:COUNT:パートナー選択可 = 0
+NEXT
+
+;PTメンバー初期化
+FLAG:リーダー = -1
+FLAG:メンバー2 = -1
+FLAG:メンバー3 = -1
+FLAG:メンバー4 = -1
+FLAG:メンバー5 = -1
+
+;管理するキャラの人数設定
+;※最後のキャラ番号-10
+FLAG:キャラ数 = 80
+;0.04α
+;46
+
+
+PBAND = 4
+
+FLAG:6 = 1
+TIME:6 = 2
+
+PRINTFORML 「初めてプレイされる方へ」
+PRINTFORML 「このゲームは割と色んな要素が存在します」
+PRINTFORML 「付属の説明書や、ゲーム中のチュートリアルをよく確認しておく事をおススメします」
+PRINTL
+PRINTL
+PRINTFORML 「というわけで…チュートリアルをONにしますか？」
+PRINTFORML [0]はい
+PRINTFORML [1]いいえ
+$INPUT_LOOPチュートリアル
+INPUT
+IF RESULT == 0
+	FOR LOCAL, 700, 800
+		FLAG:LOCAL = 1
+	NEXT
+	PRINTFORMW チュートリアルを有効にしました
+	CALL チュートリアル("最初")
+ELSE
+	FOR LOCAL, 700, 800
+		FLAG:LOCAL = 0
+	NEXT
+ENDIF
+;昇格試験についてのチュートリアルはONにしておく
+FLAG:706 = 1
+;MISSION は別枠
+;モード選択
+CALL MMSTOP
+CALL BGM("イベント", "パートナー選択")
+PRINTL ★★モードを選択してください★★
+PRINTL [ 0]E@SY    （アイドルランク*15日期限、所持金50,000Ｇ）
+PRINTL [ 1]NORM@L  （アイドルランク*10日期限、所持金20,000Ｇ）
+PRINTL [ 2]H@RD    （アイドルランク*10日期限、所持金10,000Ｇ）
+PRINTL [ 3]M@STER  （アイドルランク*10日期限、所持金 5,000Ｇ）
+PRINTL [ 9]EXTR@   （期限なし、所持金100,000Ｇ）
+PRINTL 
+;P@RANOIAはPHANTASMに
+;PRINTL [10]P@RANOIA(期限なし、所持金$ 10000）※完璧で幸福なプロデュースが約束された難易度です
+;PRINTL [20]INVISIBLE　　　　　　　　　　　　 ※ステータスが見えない特殊モードです
+PRINTL [100]タイトルに戻る
+$INPUT_LOOP
+INPUT
+IF RESULT == 100
+	BEGIN TITLE
+ELSEIF RESULT == 998
+	PRINTW “DEBUG”モードを選択しました
+	TALENT:MASTER:240 = 1
+	TALENT:MASTER:998 = 1
+	RESULT = 1
+ELSEIF RESULT == 20
+	PRINTL ★★INVISIBLEモードの難易度を選択してください★★
+	PRINTL [11]I-EASY   （Stage数*15日期限、所持金$50000）
+	PRINTL [12]I-NORMAL （Stage数*10日期限、所持金$20000）
+	PRINTL [13]I-MISSION（Stage数* 8日期限、所持金$10000）
+	PRINTL [14]I-HYPER  （Stage数* 5日期限、所持金$ 5000）
+	PRINTL [100]タイトルに戻る
+	$INPUT_LOOP_I
+	INPUT
+	IF RESULT == 100
+		BEGIN TITLE
+	ELSEIF RESULT >= 11 && RESULT <= 15
+		;攻略ルート
+		FLAG:3 = RESULT
+		;I-LUNATICとI-S-LUNAは主人公組（I-LUNATICは神霊廟組にしたかったけれど未実装なので……）
+		IF RESULT == 14 || RESULT == 15
+			FLAG:3 = RESULT - 11
+		ENDIF
+		;難易度
+		FLAG:5 = RESULT - 11
+		;インビジブルモードON
+		FLAG:2 = 1
+	ELSE
+		PRINTFORML 正しい値を入力してください
+		GOTO INPUT_LOOP_I
+	ENDIF
+ELSEIF RESULT == 10
+		PRINTFORML このモードは未実装です
+		GOTO INPUT_LOOP
+ELSEIF (RESULT >= 0 && RESULT <= 4) || RESULT == 9
+
+	;攻略ルート（デフォルトでは難易度と同じ）
+	FLAG:3 = RESULT
+	;難易度
+	FLAG:5 = RESULT
+	;インビジブルモードは念のためOFF
+	FLAG:2 = 0
+ELSE
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP
+ENDIF
+
+;メッセージフラグ設定
+SIF !GLOBAL:メッセージ速度
+	GLOBAL:メッセージ速度 = 1
+SIF !GLOBAL:オート時ウェイト
+	GLOBAL:オート時ウェイト = 500
+SIF !GLOBAL:右クリック時ウェイト
+	GLOBAL:右クリック時ウェイト = 0
+SIF !GLOBAL:メッセージアニメ利用
+	GLOBAL:メッセージアニメ利用 = 1
+
+;ランダムイベント数
+FLAG:ランダムイベント数 = 4
+
+;攻略ルート選択(デフォルトでは選択不可能。選択可能にしたい場合はSYSTEM_DEBUG.ERBの該当関数参照。)
+SIF TALENT:MASTER:998 == 0
+	CALL EDIT_GAME_ROOT
+
+;日付を1日に設定
+DAY:1 = 1
+
+;この直後のIF,ENDIFを削除すると、全モードでキャラ選択可能
+IF FLAG:5 == 9 || FLAG:5 == 10
+	CALL MASTER_SELECT
+	SIF !RESULT
+		PRINTFORMW プレイヤーを「%CALLNAME:MASTER%」に設定しました
+	MASTER = RESULT
+ENDIF
+
+IF NO:MASTER == 0
+	PRINTFORML %CALLNAME:MASTER%の素質を設定できます
+	PRINTFORML どの方式で設定しますか？
+	PRINTL 
+	PRINTL [0]質問形式
+	PRINTL [1]一覧から選択形式
+	PRINTL [2]デフォルトのまま開始（オトコ・童貞・キス未経験）
+	$INPUT_LOOP_MTS
+	INPUT
+	IF RESULT == 0
+		;質問形式
+		CALL MASTER_TALENT_SET_Q
+		CALL BIRTHDAY
+		CALL TALENT_SET_J
+		CALL MASTER_TALENT_SET_400
+		CALL STORE_GLOBAL_TALENT_SET
+	ELSEIF RESULT == 1
+		;選択形式
+		CALL MASTER_TALENT_SET_DEFAULT
+		CALL MASTER_TALENT_SET
+	ELSEIF RESULT == 2
+		CALL MASTER_TALENT_SET_DEFAULT
+	ELSE
+		PRINTFORML 正しい値を入力してください
+		GOTO INPUT_LOOP_MTS
+	ENDIF
+ENDIF
+
+SIF TALENT:MASTER:122 == 0
+	ABL:MASTER:9 = 3
+
+;主人公のキャラID設定
+CFLAG:MASTER:81 = 1
+FLAG:キャラID用変数 = CHARANUM + 1
+
+;主人公を勧誘済みに
+CFLAG:MASTER:勧誘状況 = -1
+SIF MASTER != 0
+	CFLAG:0:勧誘状況 = -1
+	
+CALL START_PARTNER_SELECT
+CALL UNIT_NAME
+;パートナー選択画面終了フラグ
+TFLAG:汎用1 = 999
+;パートナーのキャラID設定
+CFLAG:TARGET:81 = FLAG:キャラID用変数
+FLAG:キャラID用変数 += 1
+
+SIF FLAG:5 == 0
+	MONEY = 50000
+SIF FLAG:5 == 1
+	MONEY = 20000
+SIF FLAG:5 == 2
+	MONEY = 10000
+SIF FLAG:5 == 3 || FLAG:5 == 4
+	MONEY = 5000
+SIF FLAG:5 == 9
+	MONEY = 100000
+SIF FLAG:5 == 10
+	MONEY = 10000
+
+;J用アイテムをいくつか所持させる
+CALL GET_ITEM(500)
+CALL GET_ITEM(503)
+CALL GET_ITEM(506)
+CALL GET_ITEM(510)
+CALL GET_ITEM(513)
+
+;現在のStageは0から
+FLAG:24 = 0
+;仕事ＬＶ１
+FLAG:仕事難易度 = 0
+
+;各地の初期注目度
+FOR LOCAL, 1017, 1023
+	FLAG:LOCAL = 54
+NEXT
+;サンプル楽曲
+FLAG:リリース中楽曲 = 201
+FLAG:リリース期間 = -1
+FLAG:発売期間 = -1
+;初期のオプション設定
+
+CALL CONFIGURE_ALL_DEFAULT
+
+;最初は１周目
+FLAG:26 = 1
+
+;仕事を初期化
+CALL RESET_WORK
+
+;スキットを検索
+CALL SEARCH_SKIT_ABLE
+
+;ボス選択初期化
+FLAG:25 = 0
+
+;初期の耐力と魔力を計算 
+REPEAT CHARANUM
+	IF COUNT == MASTER
+		;主人公限定で、パートナーを絶頂させた回数で最大耐力増加
+		;MAXBASE:COUNT:HP = MAXBASE:COUNT:0 * (100 + CFLAG:COUNT:2) / 100　ここ
+		;主人公限定で魔力＝気力の約3%を基準値として、射精経験で増加
+		;MAXBASE:COUNT:MP = MAXBASE:COUNT:1 / 30 * (50 + EXP:COUNT:3) / 50 ここ
+	ELSE
+		;耐力＝体力を基準値として、絶頂経験で増加
+		;MAXBASE:COUNT:HP = MAXBASE:COUNT:0 * (100 + EXP:COUNT:2) / 100
+		;魔力＝気力の10%を基準値として、精液経験で増加
+		;MAXBASE:COUNT:MP = MAXBASE:COUNT:1 / 10 * (50 + EXP:COUNT:20) / 50
+	ENDIF
+	BASE:COUNT:HP = MAXBASE:COUNT:HP
+	BASE:COUNT:MP = MAXBASE:COUNT:MP
+REND
+
+;種族設定
+TRYCALL GET_STRAINVALUE
+
+$OPENING_SELECT
+IF FLAG:5 == 10
+	PRINTFORML PHANTASMモードへようこそ。このモードには特にクリア目標が設定されていません
+	PRINTFORML Stage6のクリア、霊夢様を倒す、どのStageまで行けるかに挑戦する……
+	PRINTFORMW 好きな目標を自分で設定し、それに挑戦すると良いでしょう
+	PRINTL 
+	PRINTFORML 最初に、主人公に特殊能力を３つまで持たせることができます
+	PRINTFORMW 恋人が増えると持てる特殊能力も増えていくので、頑張ってください
+	CALL GET_FEAT
+	CALL GET_FEAT
+	CALL GET_FEAT
+	PRINTL 
+	PRINTFORMW それではPHANTASMモードを開始します
+ELSEIF FLAG:5 == 9
+	PRINTFORMW それではEXTRAモードを開始します
+ELSE
+	PRINTL オープニングストーリーを見ますか？
+	FLAG:ストーリー種別 = 1
+	PRINTL [0] はい
+	PRINTL [1] いいえ
+	$INPUT_LOOP_5
+	INPUT
+	IF RESULT < 0 || RESULT > 1
+		PRINTFORML 正しい値を入力してください
+		GOTO INPUT_LOOP_5
+	ELSEIF RESULT == 0
+		CALL MMSTOP()
+		TFLAG:純愛口上 = 28
+		CALL KOJO_MESSAGE_SEND("JUN")
+	ENDIF
+ENDIF
+
+;エクストラ構文の呼び出し
+TFLAG:純愛口上 = 0
+CALL KOJO_MESSAGE_SEND("JUN")
+
+CALL MMSTOP()
+
+CALL DAY_EFFECT
+
+BEGIN SHOP
+
+
+@EVENTCOM
+#PRI
+REPEAT 30
+	TFLAG:COUNT = 0
+REND
+TFLAG:100 = 0
+
+;主導権設定
+IF (FLAG:23 & 8) == 0
+	;主導権を毎回設定
+	PRINTL 今回はどちらが主導権を握りますか？
+	PRINTL [0] - 成り行きに任せる
+	SIF ABL:0 >= 3 || CFLAG:2 >= 300 || TALENT:13 || TALENT:14 || TALENT:17 || TALENT:153
+		PRINTL [1] - 自分で握る
+	SIF ABL:0 >= 3 || CFLAG:2 >= 300 || TALENT:83 || TALENT:153
+		PRINTFORML [2] - %CALLNAME:TARGET%に握らせる
+
+	INPUT
+	IF (RESULT < 0 || RESULT > 2)
+		RESTART
+	ELSEIF RESULT == 0
+		CFLAG:15 = 0
+	ELSEIF RESULT == 1 && (ABL:0 >= 3 || CFLAG:2 >= 300 || TALENT:13 || TALENT:14 || TALENT:17 || TALENT:153)
+		CFLAG:15 = 1
+		TFLAG:45 = 0
+	ELSEIF RESULT == 1
+		RESTART
+	ELSEIF RESULT == 2 && (ABL:0 >= 3 || CFLAG:2 >= 300 || TALENT:83 || TALENT:153)
+		CFLAG:15 = 2
+		TFLAG:45 = 1
+	ELSEIF RESULT == 2
+		RESTART
+	ENDIF
+ENDIF
+;成り行きに任せる場合の判定
+IF CFLAG:15 == 0
+	T = TARGET
+	CALL GET_INITIATIVE_RATE
+	A = RAND:101 - 50
+	IF A < R
+		;主人公側の主導権ポイントが低い場合、相手が握る
+		TFLAG:45 = 1
+	ELSE
+		;それ以外なら主人公が握る
+		TFLAG:45 = 0
+	ENDIF
+;自分で握る場合の判定
+ELSEIF CFLAG:15 == 1
+	TFLAG:45 = 0
+
+	T = TARGET
+	CALL GET_INITIATIVE_RATE
+	;相手の主導権ポイントが極端に高いと、たまに持っていかれる
+	IF R >= 50
+		A = R / 10
+		;霊夢様以外は確率に上限アリ
+		SIF A > 15 && TALENT:201 == 0
+			A = 15
+		IF A > RAND:100
+			;相手が握る
+			PRINTFORMW %CALLNAME:PLAYER%が主導権を握っていたはずが、気がつくと%CALLNAME:TARGET%に主導権を奪われていた……
+			TFLAG:45 = 1
+		ENDIF
+	ENDIF
+
+;相手に握らせる場合の判定
+ELSEIF CFLAG:15 == 2
+	TFLAG:45 = 1
+
+	T = TARGET
+	CALL GET_INITIATIVE_RATE
+	;相手の主導権ポイントが極端に低いと、たまに持ってきてしまう
+	IF R <= -50
+		R = R * -1
+		A = R / 10
+		SIF A > 15
+			A = 15
+		IF A > RAND:100
+			;主人公が握る
+			PRINTFORMW %CALLNAME:TARGET%に主導権を握らせていたはずが、気がつくと%CALLNAME:PLAYER%が主導権を握ってしまっていた……
+			TFLAG:45 = 0
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;セーブデータ互換処理
+;-------------------------------------------------
+@SAVEDATA_CONVERT
+;以下のセーブデータ互換処理は既に必要無さそうなので削除しました
+;異常経験保存フラグ互換
+;主人公の体力と耐力互換
+;星蓮船キャラ番号調整
+
+;FLAG:63をセーブデータ互換処理に使用（元は調合の互換処理に使用していたフラグ）
+;ニューゲーム時用
+IF FLAG:63 == 0
+	FLAG:63 = 14
+ENDIF
+
+;v1.01.1でFLAG:63 === 1使用
+;v1.01.4でFLAG:63 === 2使用
+IF FLAG:63 <= 2
+	FLAG:63 = 3
+ENDIF
+
+;v1.04.9でFLAG:63 == 3使用
+IF FLAG:63 == 3
+	;一部の口上と干渉する可能性のあるCFLAG(キャラID)を移動
+	REPEAT CHARANUM
+		CFLAG:COUNT:81 = CFLAG:COUNT:182
+		CFLAG:COUNT:182 = 0
+	REND
+	FLAG:63 = 4
+ENDIF
+
+;v1.05.7でFLAG:63 == 4使用
+IF FLAG:63 == 4
+	REPEAT CHARANUM
+		;響子のCSV変更に伴う調整
+		IF NO:COUNT == 101
+			IF MAXBASE:COUNT:0 <= 2000
+				MAXBASE:COUNT:0 = 2000
+				BASE:COUNT:0 = MAXBASE:COUNT:0
+			ENDIF
+			IF MAXBASE:COUNT:1 <= 1200
+				MAXBASE:COUNT:1 = 1200
+				BASE:COUNT:1 = MAXBASE:COUNT:1
+			ENDIF
+		;芳香のCSV変更に伴う調整
+		ELSEIF NO:COUNT == 102
+			MAXBASE:COUNT:0 = 2500
+			BASE:COUNT:0 = MAXBASE:COUNT:0
+			MAXBASE:COUNT:1 = 1000
+			BASE:COUNT:1 = MAXBASE:COUNT:1
+			TALENT:COUNT:86 = 0
+		ENDIF
+	REND
+	FLAG:63 = 5
+ENDIF
+
+;v1.05.9でFLAG:63 == 5使用
+IF FLAG:63 == 5
+	;コンフィグ整理
+	SIF FLAG:23 & 128
+		FLAG:23 -= 128
+	SIF FLAG:23 & 256
+		FLAG:23 -= 256
+	FLAG:63 = 6
+ENDIF
+
+;v1.06.0でFLAG:63 == 6使用
+IF FLAG:63 == 6
+	;コンフィグ整理
+	SIF FLAG:62 & 16
+		FLAG:62 -= 16
+	SIF FLAG:62 & 128
+		FLAG:62 -= 128
+	SIF FLAG:62 & 1024
+		FLAG:62 -= 1024
+	SIF FLAG:62 & 2097152
+		FLAG:62 -= 2097152
+	FLAG:63 = 7
+ENDIF
+
+;v1.06.3でFLAG:63 == 7使用
+IF FLAG:63 == 7
+	;J用アイテムをいくつか所持させる
+	ITEM:500 = 1
+	ITEM:503 = 1
+	ITEM:506 = 1
+	ITEM:510 = 1
+	ITEM:513 = 1
+	
+	;妊娠期間判定用のDAY:7設定
+	DAY:7 = DAY
+	FLAG:63 = 8
+ENDIF
+
+;v1.06.8(スペルいじるパッチ)でFLAG:63 == 8使用
+IF FLAG:63 == 8
+	;スペカを設定する
+	REPEAT CHARANUM
+		IF CFLAG:COUNT:0 == 0 && CSTR:COUNT:22 == ""
+			CSVCSTR NO:COUNT, 21, 0
+			CSTR:COUNT:21 = %RESULTS%
+			CSVCSTR NO:COUNT, 22, 0
+			CSTR:COUNT:22 = %RESULTS%
+			CSVCSTR NO:COUNT, 23, 0
+			CSTR:COUNT:23 = %RESULTS%
+			CSVCSTR NO:COUNT, 24, 0
+			CSTR:COUNT:24 = %RESULTS%
+		ELSEIF CFLAG:COUNT:0 && CSTR:COUNT:22 == ""
+			CSVCSTR NO:COUNT, 21, 1
+			CSTR:COUNT:21 = %RESULTS%
+			CSVCSTR NO:COUNT, 22, 1
+			CSTR:COUNT:22 = %RESULTS%
+			CSVCSTR NO:COUNT, 23, 1
+			CSTR:COUNT:23 = %RESULTS%
+			CSVCSTR NO:COUNT, 24, 1
+			CSTR:COUNT:24 = %RESULTS%
+		ENDIF
+	REND
+	FLAG:63 = 9
+ENDIF
+
+;v1.06.9でFLAG:63 == 9使用
+IF FLAG:63 == 9
+	;攻略ルートと難易度を同じに設定
+	FLAG:3 = FLAG:5
+	FLAG:63 = 10
+ENDIF
+
+;v1.07.2でFLAG:63 == 10使用
+IF FLAG:63 == 10
+	;コンフィグ整理
+	;グローバル変数読み込み
+	CALL LOAD_GLOBAL_CONFIGURE
+	;異常経験が付くコマンドを表示する
+	IF FLAG:23 & 1p11
+		FLAG:23 -= 1p11
+		SIF (FLAG:61 & 1) == 0
+			FLAG:61 |= 1
+	ENDIF
+
+	;パートナーが[親愛]を持っている場合、異常経験が付くコマンドを表示する
+	;FLAG:61 & 2は新規コンフィグなので互換なし
+
+	;挿入コマンドの派生追加
+	IF FLAG:62 & 1p5
+		FLAG:62 -= 1p5
+		SIF (FLAG:61 & 1p2) == 0
+			FLAG:61 |= 1p2
+	ENDIF
+
+	;以下の2つは今までのまとめだとONがデフォルトだったのでONにしておく
+	;ウフフモード時のコマンド拡張
+	SIF (FLAG:61 & 1p3) == 0
+		FLAG:61 |= 1p3
+	;通常モード（ウフフモード突入前）のコマンド拡張
+	SIF (FLAG:61 & 1p4) == 0
+		FLAG:61 |= 1p4
+
+	;Ａ系コマンド拡張
+	IF FLAG:62 & 1p6
+		FLAG:62 -= 1p6
+		SIF (FLAG:61 & 1p5) == 0
+			FLAG:61 |= 1p5
+	ENDIF
+	;着衣挿入コマンド拡張
+	IF FLAG:62 & 1p14
+		FLAG:62 -= 1p14
+		SIF (FLAG:61 & 1p6) == 0
+			FLAG:61 |= 1p6
+	ENDIF
+	;仲間にしたキャラのコマンドフィルタを共通設定にする
+	IF FLAG:62 & 1p20
+		FLAG:62 -= 1p20
+		SIF (FLAG:61 & 1p10) == 0
+			FLAG:61 |= 1p10
+	ENDIF
+	;共通コンフィグ自動保存
+	CALL STORE_GLOBAL_CONFIGURE
+	FLAG:63 = 11
+ENDIF
+
+;v1.07.5でFLAG:63 == 11使用
+IF FLAG:63 == 11
+	;コンフィグ整理 ステータスインビジブル廃止
+	SIF FLAG:62 & 1p18
+		FLAG:62 -= 1p18
+	FLAG:63 = 12
+ENDIF
+
+;v1.08.0でFLAG:63 == 12使用
+IF FLAG:63 == 12
+	;未設定のPALAMLVを設定
+	PALAMLV:10 = 1000000
+	PALAMLV:11 = 5000000
+	PALAMLV:12 = 30000000
+	PALAMLV:13 = 100000000
+
+	;素質関連互換
+	CALL TALENT_INTERCHANGE
+
+	;主人公のキャラIDがなければキャラIDを設定する
+	IF CFLAG:MASTER:81 == 0
+		CFLAG:MASTER:81 = 1
+		FLAG:キャラID用変数 = 2
+	ENDIF
+
+	;キャラIDがないキャラにはキャラIDを設定する
+	FOR LOCAL, 0, CHARANUM
+		IF CFLAG:LOCAL:81 == 0
+			;キャラID設定
+			;CFLAG:LOCAL:81 = FLAG:現在コスト
+			FLAG:キャラID用変数 += 1
+		ENDIF
+	NEXT
+	FLAG:63 = 13
+ENDIF
+;v1.08.2でFLAG:63 == 13使用
+IF FLAG:63 == 13
+	;素質関連互換
+	CALL TALENT_INTERCHANGE
+	FLAG:63 = 14
+ENDIF
+
+;-------------------------------------------------
+;素質関連互換
+;-------------------------------------------------
+@TALENT_INTERCHANGE
+REPEAT CHARANUM
+	;素質[淫具知識]を設定したため互換処理
+	;にとり
+	SIF NO:COUNT == 40
+		TALENT:COUNT:58 = 1
+
+	;NO参照から潜在能力参照へ変更のため潜在能力互換処理
+	;50,料理素質
+	;51,撮影素質
+	;52,歌唱素質
+	;53,探索素質
+	
+	;50,料理素質
+	;料理の達人(かなり主観入ってます)
+	;イメージで咲夜さん、藍様、ゆかりん、夢子辺り
+	SIF NO:COUNT == 9 || NO:COUNT == 21 || NO:COUNT == 22 || NO:COUNT == 61
+		ABL:COUNT:50 = 2
+	;料理上手(かなり主観入ってます)
+	;イメージで霊夢、大妖精、美鈴、妖夢、アリス、ミスティア、鈴仙、三月精辺り
+	SIF NO:COUNT == 1 || NO:COUNT == 4 || NO:COUNT == 6 || NO:COUNT == 14 || NO:COUNT == 19 || NO:COUNT == 25 || NO:COUNT == 28  || NO:COUNT == 45 || NO:COUNT == 46 || NO:COUNT == 47 || NO:COUNT == 198
+		ABL:COUNT:50 = 1
+	;不器用(かなり主観入ってます)
+	;イメージでルーミア、チルノ、橙、妹様、お嬢様、芳香
+	SIF NO:COUNT == 3 || NO:COUNT == 5 || NO:COUNT == 10 || NO:COUNT == 11 || NO:COUNT == 13 || NO:COUNT == 102
+		ABL:COUNT:50 = -1
+
+	;51,撮影素質
+	;あやや はたて
+	SIF NO:COUNT == 32 || NO:COUNT == 98
+		ABL:COUNT:51 = 2
+	;ゆかりん にとり 早苗さん
+	SIF NO:COUNT == 22 || NO:COUNT == 40 || NO:COUNT == 42
+		ABL:COUNT:51 = 1
+
+	;52,歌唱素質
+	;騒霊三姉妹、みすちー、yahoo!!
+	SIF NO:COUNT == 16 || NO:COUNT == 17 || NO:COUNT == 18 || NO:COUNT == 25 || NO:COUNT == 101
+		ABL:COUNT:52 = 3
+	;咲夜さん、りぐるん、早苗さん
+	SIF NO:COUNT == 9 || NO:COUNT == 24 || NO:COUNT == 42
+		ABL:COUNT:52 = 2
+	;ゆゆ様、輝夜、妹紅、神奈子様、ケロちゃん、華扇
+	SIF NO:COUNT == 20 || NO:COUNT == 30 || NO:COUNT == 31 || NO:COUNT == 39 || NO:COUNT == 43 || NO:COUNT == 44 || NO:COUNT == 100
+		ABL:COUNT:52 = 1
+	;歌うのが苦手そうな方(個人的主観入ってます)
+	;魔理沙、天子
+	SIF NO:COUNT == 2 || NO:COUNT == 63
+		ABL:COUNT:52 = -1
+	;パチュリー、阿求(体が弱い方々)
+	SIF NO:COUNT == 8 || NO:COUNT == 48
+		ABL:COUNT:52 = -2
+
+	;53,探索素質
+	;てゐ
+	SIF NO:COUNT == 27
+		ABL:COUNT:52 = 3
+	;ナズーリン
+	SIF NO:COUNT == 91
+		ABL:COUNT:52 = 2
+	;;魔理沙 星ちゃん
+	SIF NO:COUNT == 2 || NO:COUNT == 95
+		ABL:COUNT:52 = 1
+REND
+
+@EVENTSHOP
+#PRI
+
+IF FLAG:60
+	LOADGAME
+	IF FLAG:60
+		PRINTW データをロードしなかったので終了します
+		QUIT
+	ENDIF
+	RETURN 0
+ENDIF
+
+@EVENTSHOP
+#LATER
+
+IF !TIME && !TIME:12 && DAY
+	CALL EVENT_NEWDAY
+	DRAWLINE
+	IF TFLAG:121 == 0 && TARGET > -1
+		CALL EVENT_RING
+		DRAWLINE
+	ELSE
+		TFLAG:121 = 1
+	ENDIF
+	TFLAG:600 = 38
+	CALL KOJO_MESSAGE_SEND("JUN")
+ENDIF
+

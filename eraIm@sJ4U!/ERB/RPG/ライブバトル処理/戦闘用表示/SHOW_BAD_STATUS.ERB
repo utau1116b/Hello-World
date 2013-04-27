@@ -1,0 +1,200 @@
+
+;状態異常簡易表示
+;ARG:0	対象キャラ登録番号
+@SHOW_BAD_STATUS(ARG:0)
+SIF CFLAG:(ARG:0):スリップ状態
+	PRINT ス 
+SIF CFLAG:(ARG:0):スロウ状態
+	PRINT 遅 
+SIF CFLAG:(ARG:0):カース状態
+	PRINT 呪 
+SIF CFLAG:(ARG:0):ストップ状態
+	PRINT 停 
+SIF CFLAG:(ARG:0):スリープ状態
+	PRINT 眠 
+SIF CFLAG:(ARG:0):フィアー状態
+	PRINT 恐 
+SIF CFLAG:(ARG:0):シール状態
+	PRINT 封 
+SIF CFLAG:(ARG:0):ブライン状態
+	PRINT 暗 
+SIF CFLAG:(ARG:0):気絶状態
+	PRINT 気絶 
+
+FOR LOCAL:0, 41, 92
+	IF CFLAG:(ARG:0):(LOCAL:0 + 1000)
+		SELECTCASE LOCAL:0
+			CASE 41
+				PRINT EX
+			CASE 42
+				PRINT クリ
+			CASE 43
+				PRINT 独唱
+			CASE 44
+				PRINT 小夜
+			CASE 45
+				PRINT 協奏
+			CASE 46
+				PRINT 四分身
+			CASE 47
+				PRINT 攻増
+			CASE 48
+				PRINT 必中
+			CASE 49
+				PRINT 罠
+			CASE 50
+				PRINT 秘義
+			CASE 51
+				PRINT VO強
+			CASE 52
+				PRINT 団結
+			CASE 53
+				PRINT 健康
+			CASE 54
+				PRINT 強化
+			CASE 55
+				PRINT 半減
+			CASE 56
+				PRINT 無効
+			CASE 57
+				PRINT 反射
+			CASE 58
+				PRINT 不屈
+			CASE 59
+				PRINT 半減
+			CASE 60
+				PRINT 連続
+			CASE 61
+				PRINT 祝福
+			CASE 62
+				PRINT 石版
+			CASE 63
+				PRINT 被ダメ↑
+			CASE 64
+				PRINT 離脱
+			CASE 65
+				PRINT フォームアップ
+			CASE 66
+				PRINT 不屈
+			CASE 67
+				PRINT 半減
+			CASE 68
+				PRINT 四半減
+			CASE 69
+				PRINT リレイズ
+			CASE 70
+				PRINT Ａ・Ｆ
+			CASE 71
+				PRINT 無敵
+			CASE 72
+				CALL STARMARK_Y
+				PRINT 癒
+			CASE 73
+				CALL HEARTMARK_P
+				PRINT 癒
+			CASE 74
+				PRINT Kosmos
+			CASE 75
+				PRINT バースト
+			CASE 76
+				PRINT ガード
+			CASE 77
+				PRINT 強ガード
+			CASE 78
+				PRINT 身代
+			CASE 79
+				CALL STARMARK_Y
+				PRINT 減
+			CASE 80
+				PRINT ブースト
+			CASE 81
+				PRINT ダ無
+			CASE 82
+				PRINT ダ反
+			CASE 83
+				PRINT 不屈
+			CASE 84
+				PRINT 半減
+			CASE 85
+				PRINT Coda
+			CASE 86
+				PRINT リレ
+			CASE 87
+				PRINT ＡＦ
+			CASE 88
+				PRINT ダ反
+			CASE 89
+				PRINT 不屈
+			CASE 90
+				PRINT 半減
+			CASE 91
+				PRINT Coda
+			CASE 92
+				PRINT リレ
+			CASEELSE
+				CONTINUE
+		ENDSELECT
+		PRINT  
+	ENDIF
+NEXT
+
+FOR LOCAL:0, 130, 151
+	IF CFLAG:(ARG:0):(LOCAL:0 + 1000) >= 1000
+		SELECTCASE LOCAL:0
+			CASE 130
+				CALL STARMARK_Y
+			CASE 131
+				CALL HEARTMARK_P
+			CASE 132
+				PRINT POW
+			CASE 133
+				PRINT GUA
+			CASE 134
+				PRINT DEX
+			CASE 135
+				PRINT HIT
+			CASE 136
+				PRINT SPD
+			CASE 137
+				PRINT LUC
+			CASE 138
+				PRINT VO耐
+			CASE 139
+				PRINT DA耐
+			CASE 140
+				PRINT VI耐
+			CASE 141
+				PRINT EX耐
+			CASE 142
+				PRINT スリップ耐
+			CASE 143
+				PRINT スロウ耐
+			CASE 144
+				PRINT カース耐
+			CASE 145
+				PRINT ストップ耐
+			CASE 146
+				PRINT スリープ耐
+			CASE 147
+				PRINT フィアー耐
+			CASE 148
+				PRINT シール耐
+			CASE 149
+				PRINT ブライン耐
+			CASE 150
+				PRINT 気絶耐
+			CASEELSE
+				CONTINUE
+		ENDSELECT
+		LOCAL:1 = 0
+		IF (CFLAG:(ARG:0):(LOCAL:0 + 1000) % 1000) >= 100
+			PRINT ↑
+			LOCAL:1 = ((CFLAG:(ARG:0):(LOCAL:0 + 1000) % 1000) - 100) / 10
+		ELSE
+			PRINT ↓
+			LOCAL:1 = 10 - (CFLAG:(ARG:0):(LOCAL:0 + 1000) % 1000) / 10
+		ENDIF
+		PRINTFORM ({LOCAL:1}) 
+	ENDIF
+NEXT
+

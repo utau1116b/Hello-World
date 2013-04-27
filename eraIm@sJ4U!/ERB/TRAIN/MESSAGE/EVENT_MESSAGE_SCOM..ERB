@@ -1,0 +1,390 @@
+;-------------------------------------------------
+;,シックスナイン
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM1
+PRINTFORM %CALLNAME:TARGET%と
+;助手が調教中
+SIF ASSIPLAY
+	PRINTFORM %CALLNAME:ASSI%は
+PRINTL 互いの性器を舐めあった…
+
+;-------------------------------------------------
+;岩清水
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM2
+PRINTFORMW %CALLNAME:PLAYER%は%CALLNAME:TARGET%を顔の上に跨らせ、わざと音を立てながら秘唇を啜り上げた…
+
+;Gスポット刺激
+@TRAIN_MESSAGE_SCOM3
+IF TEQUIP:クスコ
+	PRINTFORMW %CALLNAME:PLAYER%は%CALLNAME:TARGET%の膣内のぷっくり膨らんだ上側を指で撫で上げた…
+ELSEIF TEQUIP:バイブ && PREVCOM == 8 && ABL:MASTER:2 >= 3
+	PRINTFORMW %CALLNAME:PLAYER%は巧みにバイブを操り、敏感な天井をなぶった…
+ELSEIF PREVCOM == 196 && ABL:MASTER:2 >= 3
+	PRINTFORMW %CALLNAME:PLAYER%は口に装着したペニスバンドを器用に動かし、敏感な天井を擦り上げた…
+ELSEIF PREVCOM == 8 && ABL:MASTER:2 >= 3
+	PRINTFORMW %CALLNAME:PLAYER%は%CALLNAME:TARGET%の膣の中で指を曲げ、ザラついた天井を刺激した…
+
+ELSEIF TEQUIP:バイブ && PALAM:欲情 >= PALAMLV:3 && ABL:Ｖ感覚 >= 2
+	PRINTFORMW %CALLNAME:TARGET%の膣は、蜜に濡れたバイブにねっとりと絡み付いている…
+ELSEIF TEQUIP:バイブ && PALAM:欲情 <= PALAMLV:3 && ABL:Ｖ感覚 >= 2
+	PRINTFORMW %CALLNAME:TARGET%はバイブの刺激に悶えている…
+ELSEIF TEQUIP:バイブ && PALAM:欲情 >= PALAMLV:3 && ABL:Ｖ感覚 <= 3
+	PRINTFORMW %CALLNAME:TARGET%は頬を染めて時折声を上げている…
+ELSEIF TEQUIP:バイブ && PALAM:欲情 <= PALAMLV:3 && ABL:Ｖ感覚 <= 3
+	PRINTFORMW %CALLNAME:TARGET%は少し苦しそうな表情をしている…
+
+ELSEIF PREVCOM == 84
+	IF EXP:Ｖ経験 <= 1
+		PRINTFORMW %CALLNAME:TARGET%は膣内の異物感に怯えている…
+	ELSEIF EXP:Ｖ経験 >= 1 && EXP:Ｖ経験 <= 30
+		PRINTFORMW %CALLNAME:TARGET%は指の感触に吐息を吐いて耐えている…
+	ELSEIF EXP:Ｖ経験 >= 31 && EXP:Ｖ経験 <= 50
+		PRINTFORMW %CALLNAME:TARGET%は指の感触を楽しんでいるようだ…
+	ELSEIF EXP:Ｖ経験 >= 51 && EXP:Ｖ経験 <= 80
+		PRINTFORMW %CALLNAME:TARGET%は指のうごめく感触にうっとりとしている…
+	ELSEIF EXP:Ｖ経験 >= 81 && EXP:Ｖ経験 <= 120
+		PRINTFORMW %CALLNAME:TARGET%はお腹の中をかき回される感覚に熱い吐息を吐いて悶えている…
+	ELSEIF EXP:Ｖ経験 >= 121
+		PRINTFORMW %CALLNAME:TARGET%は涎をたらし、自ら腰を振って快楽を貪っている…
+	ENDIF
+ENDIF
+
+
+
+;-------------------------------------------------
+;乱れ牡丹
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM4
+;背面座位のメッセージ呼び出し
+;CALL TRAIN_MESSAGE_COM25
+;連続
+IF SELECTCOM == PREVCOM && ASSIPLAY == TFLAG:710
+	PRINTFORML %CALLNAME:TARGET%の結合部と胸に再び手を這わせ、見せ付けるように腰を動かした…
+;抜かず
+ELSEIF TCVAR:100 == PLAYER
+	PRINTFORM %CALLNAME:TARGET%の身体を背後から挿入したまま抱き上げ脚を大きく開かせた…
+ELSE
+	PRINTFORM %CALLNAME:TARGET%の身体を抱き上げ、ゆっくりと
+	;潤滑LV4以上
+	SIF PALAM:潤滑 >= PALAMLV:4
+		PRINT 濡れそぼった
+	;小柄体型
+	IF TALENT:小柄体型
+		PRINT 幼いワレメ
+	ELSE
+		PRINT 秘裂
+	ENDIF
+	PRINTFORML に挿入すると、脚を大きく開かせた…
+ENDIF
+;露出癖
+IF ABL:露出癖 >= 5
+	PRINTFORML %CALLNAME:TARGET%は鏡に映る痴態を蕩けた目で見つめながら歓喜の声を上げている…
+ELSEIF ABL:露出癖 >= 4
+	PRINTFORML %CALLNAME:TARGET%は羞恥と快楽に溺れたような表情で鏡の中の痴態を凝視している…
+ELSEIF ABL:露出癖 >= 2
+	PRINTFORML %CALLNAME:TARGET%は顔を羞恥に染めながら時折艶っぽい声を上げている…
+ELSEIF ABL:露出癖 >= 1
+	PRINTFORML %CALLNAME:TARGET%は手で顔を覆い隠しながら羞恥に身体を震わせている…
+ENDIF
+
+;-------------------------------------------------
+;5,手淫フェラ
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM5
+
+IF TFLAG:SELECTCOM分岐2== 0
+	PRINTFORML %CALLNAME:TARGET%は%CALLNAME:PLAYER%のペニスの先端を咥えた状態で肉棒を握り、
+	PRINTL そのまま激しく茎の部分をしごきあげた…
+	SIF ABL:技巧 > 3
+		PRINTL さらに空いた手で陰嚢を優しく揉みほぐしてる…
+ELSE
+	PRINTFORML %CALLNAME:TARGET%は%CALLNAME:PLAYER%のペニスを手にとって先端を口で咥えると
+	PRINTL  茎の部分をしごきあげながら亀頭を舌でくすぐった…
+	SIF ABL:技巧 > 3
+		PRINTL さらに空いた手で陰嚢を優しく揉みほぐしてる…
+ENDIF
+
+;挿入Ｇスポ責め
+@TRAIN_MESSAGE_SCOM6
+;騎乗位
+IF PREVCOM == 34
+	PRINTFORMW %CALLNAME:TARGET%は上体を大きく逸らし、膣内の天井にペニスを擦り付けた…
+	IF EXP:Ｖ経験 <= 30
+		PRINTFORMW %CALLNAME:TARGET%は戸惑いながらもその行為を続けている…
+	ELSEIF EXP:Ｖ経験 >= 31 && EXP:Ｖ経験 <= 50
+		PRINTFORMW %CALLNAME:TARGET%は掴んだ快感を追って腰をくねらせている…
+	ELSEIF EXP:Ｖ経験 >= 51 && EXP:Ｖ経験 <= 80
+		PRINTFORMW %CALLNAME:TARGET%は尻をすぼめ、小刻みに腰をしゃくって嬌声を上げている…
+	ELSEIF EXP:Ｖ経験 >= 81 && EXP:Ｖ経験 <= 120
+		PRINTFORML %CALLNAME:TARGET%は後ろに手を衝いて、腰をガクガク揺らして快楽を貪っている…
+		PRINTFORMW 反り返ったペニスの先端が、鋭角にＧスポットを抉っている…
+	ELSEIF EXP:Ｖ経験 >= 121
+		PRINTFORML %CALLNAME:TARGET%は女の急所を、自らの腰の痙攣で思う存分刺激している…
+		PRINTFORMW ぐぽんと重い水音がするたび、鼻に抜けただらしのない声が漏れている…
+	ENDIF
+ELSE
+	;正常位
+	SIF PREVCOM == 20
+		PRINTFORMW 腰をしゃくり、%CALLNAME:TARGET%の膣内の天井を小刻みに擦りあげた…
+	;後背位
+	SIF PREVCOM == 21
+		PRINTFORMW 上体を屈め、%CALLNAME:TARGET%の膣内の天井を抉るように突き入れた…
+	;対面座位
+	SIF PREVCOM == 24
+		PRINTFORMW 上体を離し、%CALLNAME:TARGET%の下腹を押さえて膣内の天井を擦りあげた…
+	;背面座位・乱れ牡丹
+	SIF PREVCOM == 25 || PREVCOM == 88
+		PRINTFORMW %CALLNAME:TARGET%を持ち上げ、揺するように膣内の天井を執拗に刺激した…
+	IF EXP:Ｖ経験 <= 30
+		PRINTFORMW %CALLNAME:TARGET%はむずがるように腰を揺すっている…
+	ELSEIF EXP:Ｖ経験 >= 31 && EXP:Ｖ経験 <= 50
+		PRINTFORMW %CALLNAME:TARGET%は口を結んで不慣れな快楽を堪えている…
+	ELSEIF EXP:Ｖ経験 >= 51 && EXP:Ｖ経験 <= 80
+		PRINTFORMW %CALLNAME:TARGET%は弱点を責められ、あまりの快感に目をぱちぱちさせている…
+	ELSEIF EXP:Ｖ経験 >= 81 && EXP:Ｖ経験 <= 120
+		PRINTFORMW %CALLNAME:PLAYER%は腰に力を入れ、膣内でビクビクと震わせてやった…
+		PRINTFORMW %CALLNAME:TARGET%は過敏な天井を擦られる感触に熱い吐息を漏らしている…
+	ELSEIF EXP:Ｖ経験 >= 121
+		PRINTFORML %CALLNAME:TARGET%は喉を鳴らして涎を飲み、足指を丸めて頭を振って悶えている…
+		PRINTFORMW まともに呼吸もできず、口をぱくつかせて声にならない喘ぎを繰り返す…
+	ENDIF
+ENDIF
+
+;挿入子宮口責め
+@TRAIN_MESSAGE_SCOM7
+;騎乗位
+IF PREVCOM == 34
+	PRINTFORMW %CALLNAME:TARGET%は%CALLNAME:PLAYER%の胸に手を衝き、ペニスを根元まで飲み込んだ…
+	IF EXP:Ｖ経験 <= 30
+		PRINTFORMW %CALLNAME:TARGET%はそのまま腰を前後に揺すっている…
+	ELSEIF EXP:Ｖ経験 >= 31 && EXP:Ｖ経験 <= 50 && TALENT:ふたなり
+		PRINTFORMW %CALLNAME:TARGET%は%CALLNAME:PLAYER%の腹にペニスを押し付けている…
+	ELSEIF EXP:Ｖ経験 >= 31 && EXP:Ｖ経験 <= 50
+		PRINTFORMW %CALLNAME:TARGET%は%CALLNAME:PLAYER%の陰毛でクリトリスを刺激しているようだ…
+	ELSEIF EXP:Ｖ経験 >= 51 && EXP:Ｖ経験 <= 80
+		PRINTFORMW %CALLNAME:TARGET%は腰をくねらせ、挿入感を愉しんでは熱い息を吐いている…
+	ELSEIF EXP:Ｖ経験 >= 81 && EXP:Ｖ経験 <= 120
+		PRINTFORML %CALLNAME:TARGET%はクン、クンと腰を沈ませ、深奥を突く感触に酔っている…
+		PRINTFORMW コリコリした子宮口は綻び、法悦とともに仔を孕む用意を始めている…
+	ELSEIF EXP:Ｖ経験 >= 121
+		PRINTFORML %CALLNAME:TARGET%はリズミカルに腰を小さく縦に揺すり、牝そのものの顔で涎を垂らしている…
+		PRINTFORMW 子作りの快楽に理性は蕩け、牝の肉体は子種を求めて貪欲にひくついている…
+	ENDIF
+ELSE
+	;正常位
+	SIF PREVCOM == 20
+		PRINTFORMW 腰を掴んで深く突き、%CALLNAME:TARGET%の子宮をコツンと叩いた…
+	;後背位
+	SIF PREVCOM == 21
+		PRINTFORMW 尻を掴んで深く突き、%CALLNAME:TARGET%の子宮をコツンと叩いた…
+	;対面座位
+	SIF PREVCOM == 24
+		PRINTFORMW 腰の括れを深く抱いて、%CALLNAME:TARGET%の子宮をグリグリと刺激した…
+	;背面座位・乱れ牡丹
+	SIF PREVCOM == 25 || PREVCOM == 88
+		PRINTFORMW 腰を前に押すようにして、%CALLNAME:TARGET%の深奥まで突き上げた…
+	IF EXP:Ｖ経験 <= 30 || (EXP:Ｖ経験 >= 31 && EXP:Ｖ経験 <= 50 && (PREVCOM == 21 || PREVCOM == 25 || PREVCOM == 88))
+		PRINTFORMW %CALLNAME:TARGET%は異物感が強いのか、苦しそうにしている…
+	ELSEIF EXP:Ｖ経験 >= 31 && EXP:Ｖ経験 <= 50 && TALENT:ふたなり
+		PRINTFORMW %CALLNAME:TARGET%は陰毛と臍の窪みにペニスを嬲られ、鼻声を漏らしている…
+	ELSEIF EXP:Ｖ経験 >= 31 && EXP:Ｖ経験 <= 50
+		PRINTFORMW %CALLNAME:TARGET%は陰毛にクリトリスを擦られ、鼻声を漏らしている…
+	ELSEIF EXP:Ｖ経験 >= 51 && EXP:Ｖ経験 <= 80
+		PRINTFORMW %CALLNAME:TARGET%は長く甘い息を吐きながら、挿入感を噛み締めている…
+	ELSEIF EXP:Ｖ経験 >= 81 && EXP:Ｖ経験 <= 120
+		PRINTFORML 子宮が子種を受ける準備を済ませたらしく、先端のくびれが膣奥の窪みで引っかかる…
+		PRINTFORMW %CALLNAME:TARGET%の子宮をノックする度、口をパクパクさせて激しく震えている…
+	ELSEIF EXP:Ｖ経験 >= 121
+		PRINTFORML 低い位置に下りてきた%CALLNAME:TARGET%の子宮を突いて揺すってやると、
+		PRINTFORMW %CALLNAME:TARGET%は狂ったように悶え、牝として最高の快楽に溺れた…
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;8,６９パイズリ
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM8
+PRINTFORM %CALLNAME:TARGET%は
+;貧乳
+IF TALENT:貧乳
+	PRINTL 薄い胸でペニスを
+;巨乳
+ELSEIF TALENT:巨乳
+	PRINTL 豊満な胸でペニスを包み込んで
+;爆乳
+ELSEIF TALENT:爆乳
+	PRINTL 豊満すぎる程の胸でペニスを包み隠すようにして
+ELSE
+	PRINTL 胸でペニスをはさんで
+ENDIF
+PRINTFORML %CALLNAME:PLAYER%の舌がもたらす快感に翻弄されながらも懸命に擦りあげている…
+
+;-------------------------------------------------
+;9,ダブルフェラ
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM9
+PRINTFORM %CALLNAME:TARGET%と%CALLNAME:ASSI%は
+;奴隷と助手が恋慕か親愛
+SIF TALENT:恋慕 && TALENT:ASSI:恋慕
+	PRINTFORM うっとりした上目遣いで%CALLNAME:PLAYER%を見上げつつ、
+PRINTFORML %CALLNAME:PLAYER%のペニスに二人で舌を這わせている…
+
+;-------------------------------------------------
+;10,ダブル素股
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM10
+LOCAL = MASTER_POSE(2,1,1)
+PRINTFORML %CALLNAME:TARGET%と%CALLNAME:LOCAL%の性器でペニスを挟み、二人の間で扱きあげた…
+
+;-------------------------------------------------
+;11,ダブルパイズリ
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM11
+LOCAL = MASTER_POSE(5,1,1)
+PRINTFORM %CALLNAME:TARGET%と%CALLNAME:LOCAL%は
+;奴隷と助手が恋慕か親愛
+SIF TALENT:恋慕 && TALENT:LOCAL:恋慕
+	PRINTFORM うっとりした上目遣いで%CALLNAME:PLAYER%を見上げつつ、
+PRINT 互いの
+;奴隷と助手が巨乳か爆乳
+IF TALENT_LV(TARGET, "バストサイズ") > 0 && TALENT_LV(LOCAL, "バストサイズ") > 0
+	PRINT 豊満な
+;奴隷と助手が貧乳か絶壁
+ELSEIF TALENT_LV(TARGET, "バストサイズ") < 0 && TALENT_LV(LOCAL, "バストサイズ") < 0
+	PRINT 薄い
+ENDIF
+PRINTFORML 胸を重ね合わせて%CALLNAME:PLAYER%のペニスを扱きあげている…
+
+;-------------------------------------------------
+;12,パイズリフェラ
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM12
+PRINTFORM %CALLNAME:TARGET%は
+;恋慕か親愛
+SIF TALENT:恋慕
+	PRINT うっとりとした表情をしながら、
+;貧乳
+IF TALENT:貧乳
+	PRINTL 薄い胸だけでなく舌も使って懸命にペニス全体を刺激していた…
+;巨乳
+ELSEIF TALENT:巨乳
+	PRINTL ペニスを豊満な胸で包み込み、余った亀頭を舐めて刺激している…
+;爆乳
+ELSEIF TALENT:爆乳
+	PRINTL 豊満すぎる程の胸でペニスを包み隠してしまい、時折舌を入れて、懸命にペニスを舐め上げている…
+ELSE
+	PRINTL 胸でペニスをはさみ、余った部分を舌で、刺激している…
+ENDIF
+
+;-------------------------------------------------
+;13,交互挿入
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM13
+LOCAL = MASTER_POSE(6,1,1)
+
+;現在2人以上の処女を同ターンで奪うことは出来ないため、処女関連はここ一つにまとめる
+IF TALENT:処女
+	PRINTFORML %CALLNAME:LOCAL%の膣内に挿入したまま%CALLNAME:TARGET%を抱き寄せ、その男を知らない\@ TALENT_LV(TARGET, "体型") < 0 ? 幼いワレメ # 秘裂 \@も一緒に貫いた…
+;連続
+ELSEIF TFLAG:特殊COM == TFLAG:前回の特殊COM && TARGET == TFLAG:852
+	PRINTFORM %CALLNAME:TARGET%と%CALLNAME:LOCAL%
+	;正常位＋後背位
+	IF ((TEQUIP:体位 == 1 && TEQUIP:LOCAL:体位２ == 2) || (TEQUIP:体位 == 2 && TEQUIP:LOCAL:体位２ == 1))
+		PRINT の体を密着させ、
+	;正常位＋正常位
+	ELSEIF TEQUIP:体位 == 1 && TEQUIP:LOCAL:体位２ == 1
+		PRINT を仰向けに並べ、
+	ELSE
+		PRINT の尻をこちらに向けさせ、
+	ENDIF
+	SIF TALENT:MASTER:2 & 2
+		PRINT 二人の膣内の感触の違いを味わいながら
+	PRINTL 再び挿入を繰り返した…
+ELSE
+	IF RAND:2 == 0
+		PRINTFORM %CALLNAME:LOCAL%の膣内に挿入したまま%CALLNAME:TARGET%を抱き寄せ、
+		IF RAND:2 == 0
+			PRINT その
+			SIF PALAM:潤滑 >= PALAMLV:4
+				PRINT 濡れそぼった
+			PRINTFORM \@ ( TALENT_LV(TARGET, "体型") < 0 && TALENT_LV(LOCAL, "体型") < 0 ) ? 幼いワレメ # 秘裂 \@も
+		ELSE
+			IF TEQUIP:体位 == 2 && (TEQUIP:LOCAL:体位２ == 1 || TEQUIP:LOCAL:体位２ == 4)
+				PRINT 重ねられた
+			ELSE
+				PRINT 並んだ
+			ENDIF
+			PRINT 二つの
+			SIF PALAM:潤滑 >= PALAMLV:4 && PALAM:LOCAL:潤滑 >= PALAMLV:4
+				PRINT 濡れそぼった
+			PRINTFORM \@ ( TALENT_LV(TARGET, "体型") < 0 && TALENT_LV(LOCAL, "体型") < 0 ) ? 幼いワレメ # 秘裂 \@を
+		ENDIF
+	ELSE
+		IF TEQUIP:体位 == 2 && (TEQUIP:LOCAL:体位２ == 1 || TEQUIP:LOCAL:体位２ == 4)
+			IF RAND:2 == 0
+				PRINTFORM %CALLNAME:TARGET%と%CALLNAME:LOCAL%を抱き合わせて、その\@ ( TALENT_LV(TARGET, "体型") < 0 && TALENT_LV(LOCAL, "体型") < 0 ) ? 幼いワレメ # 秘裂 \@を
+			ELSE
+				PRINTFORM %CALLNAME:TARGET%の\@ TALENT_LV(TARGET, "体型") < 0 ? 幼いワレメ # 秘裂 \@と%CALLNAME:LOCAL%の\@ TALENT_LV(LOCAL, "体型") < 0 ? 幼いワレメ # 秘裂 \@を密着させると、
+			ENDIF
+		ELSE
+			PRINTFORM %CALLNAME:TARGET%の\@ TALENT_LV(TARGET, "体型") < 0 ? 幼いワレメ # 秘裂 \@と%CALLNAME:LOCAL%の\@ TALENT_LV(LOCAL, "体型") < 0 ? 幼いワレメ # 秘裂 \@を並べ、
+		ENDIF
+	ENDIF
+	PRINTL 交互に貫いた…
+ENDIF
+
+IF TALENT:恋慕 && TALENT:LOCAL:恋慕
+	WAIT
+	PRINTFORML %CALLNAME:TARGET%と%CALLNAME:LOCAL%は交互に挿入されながら、%CALLNAME:MASTER%のペニスをねだってきた…
+ELSEIF EXP:レズ経験 >= 1000 && EXP:LOCAL:レズ経験 >= 1000
+	WAIT
+	PRINTFORML %CALLNAME:TARGET%と%CALLNAME:LOCAL%は互いの舌を絡めあいながら、%CALLNAME:MASTER%のペニスを受け入れている…
+ENDIF
+
+;前回の共同参加者の保存
+TFLAG:852 = LOCAL
+
+;強制放尿
+@TRAIN_MESSAGE_SCOM14
+IF TEQUIP:野外プレイ
+	PRINTFORML %CALLNAME:PLAYER%は%CALLNAME:TARGET%の足を持ち上げ、尿道口を刺激した
+	PRINTFORMW %CALLNAME:TARGET%は我慢できずに、犬のような格好で尿を迸らせてしまった…
+ELSEIF TEQUIP:羞恥プレイ
+	PRINTFORML %CALLNAME:PLAYER%は%CALLNAME:TARGET%の性器に口付け、尿道口をすすりあげた
+	PRINTFORMW %CALLNAME:TARGET%は我慢できず%CALLNAME:PLAYER%の目の前で水流を迸らせてしまった…
+ELSEIF TALENT:小柄体型 && TALENT:貧乳
+	PRINTFORML %CALLNAME:PLAYER%は%CALLNAME:TARGET%の両足を抱え上げ、おしっこの穴を指先でくすぐった
+	PRINTFORMW %CALLNAME:TARGET%は小さな身体を震わせて尿を迸らせてしまった…
+ELSE
+	PRINTFORML %CALLNAME:PLAYER%は%CALLNAME:TARGET%の尿道口を指先で刺激した
+	PRINTFORMW %CALLNAME:TARGET%は我慢できずに尿を迸らせてしまった…
+ENDIF
+
+;Ｗフェラ
+@TRAIN_MESSAGE_SCOM15
+PRINTFORMW %CALLNAME:TARGET%に%CALLNAME:MASTER%と%CALLNAME:ASSI%のペニスに同時に奉仕させた…
+
+;-------------------------------------------------
+;60,耳かき
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM60
+PRINTFORML %CALLNAME:PLAYER%は%CALLNAME:TARGET%に耳かきをしてもらった
+IF TFLAG:SELECTCOM分岐 == 1
+	PRINTFORML %CALLNAME:TARGET%は優しい手つきで%CALLNAME:PLAYER%の耳掃除をしている…
+ELSEIF TFLAG:SELECTCOM分岐 == -1
+	PRINTFORML %CALLNAME:TARGET%は手を滑らせ慌てている…
+ENDIF
+
+;-------------------------------------------------
+;62,デコちゅー
+;-------------------------------------------------
+@TRAIN_MESSAGE_SCOM62
+PRINTFORMW %CALLNAME:PLAYER%は%CALLNAME:TARGET%のおでこに軽くキスした…
+IF ABL:欲望 >= 5
+	PRINTFORML %CALLNAME:TARGET%は物足りなそうに%CALLNAME:PLAYER%を見つめている…
+ELSEIF ABL:親密 >= 5
+	PRINTFORML %CALLNAME:TARGET%は顔を真っ赤にして照れている…
+ELSE
+	PRINTFORML %CALLNAME:TARGET%は突然の事に驚いているようだ…
+ENDIF

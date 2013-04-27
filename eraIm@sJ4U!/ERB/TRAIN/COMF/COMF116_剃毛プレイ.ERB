@@ -1,0 +1,76 @@
+;-------------------------------------------------
+;剃毛プレイ
+;-------------------------------------------------
+@COM116
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+IF !TFLAG:45
+	TCVAR:116 = PLAYER
+ELSE
+	TCVAR:116 = TARGET
+ENDIF
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;プレイヤー主導
+IF !TFLAG:45
+	;消費体力、気力
+	DOWNBASE:体力 += 50
+	DOWNBASE:気力 += 100
+	
+	SOURCE:痛み = 100
+	SOURCE:中毒 = 150
+	SOURCE:欲情 = 150
+	SOURCE:露出 = 150
+	SOURCE:逸脱 = 500
+;ターゲット主導
+ELSE
+	;消費体力、気力
+	DOWNBASE:体力 += 25
+	DOWNBASE:気力 += 50
+	
+	SOURCE:PLAYER:痛み = 100
+	SOURCE:PLAYER:中毒 = 150
+	SOURCE:PLAYER:欲情 = 150
+	SOURCE:PLAYER:露出 = 150
+	SOURCE:PLAYER:逸脱 = 500
+	
+	SOURCE:征服 = 800
+ENDIF
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+;抑圧、抵抗持ちには、抑鬱ソース追加
+SIF TALENT:抑圧 || TALENT:抵抗
+	SOURCE:反感 += 600
+	
+IF !TFLAG:45
+	LOCAL = TARGET
+ELSE
+	LOCAL = PLAYER
+ENDIF
+	
+IF TALENT:LOCAL:65 == 0
+	PRINTL 
+	PRINTFORML %CALLNAME:LOCAL%は[%TALENTNAME:65%]になった
+	TALENT:LOCAL:65 = 1
+ENDIF
+
+BASE:LOCAL:9 = 0
+MAXBASE:LOCAL:9 = 1000
+;脱毛状態以外の場合は後から生えてくるようになる
+SIF CFLAG:LOCAL:毛の成長判定 != 1
+	CFLAG:LOCAL:毛の成長判定 = 2
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+;同性愛　レズなら戻り値1ゲイなら戻り値2
+IF HETEROSEX(TARGET,PLAYER)
+	EXP:(39 + HETEROSEX(TARGET,PLAYER)) += 2
+	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 2
+ENDIF
+
+RETURN 1

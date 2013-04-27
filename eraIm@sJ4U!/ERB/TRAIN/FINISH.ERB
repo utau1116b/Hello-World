@@ -1,0 +1,53 @@
+;îÑãpÇ∆èïéËâªÇÃèàóùÇçÌèú(SHOPÇ≈Ç‹Ç∆ÇﬂÇƒçsÇ§)
+@ASSI_CHANGE
+;[åœ]Ç≈Ç†ÇÈ
+IF TALENT:ASSI:93
+	;ãZçILV5ÅAÇbä¥äoLV5Ç≈èàèó
+	IF ABL:ASSI:2 >= 5 && ABL:ASSI:3 >= 5 && TALENT:ASSI:0
+		DRAWLINE
+		PRINTFORML %NAME:ASSI%ÇÕ[ódåœ]Ç∆Ç»Ç¡ÇΩÅB
+		DRAWLINE
+		WAIT
+		TALENT:ASSI:93 = 0
+		TALENT:ASSI:90 = 1
+	ENDIF
+ENDIF
+;[ïsévãcÇ»ç™]Ç≈Ç†ÇÈ
+IF TALENT:ASSI:120
+	;Çbä¥äoLV5ÅAê∏âtíÜì≈LV3à»è„
+	IF ABL:ASSI:3 >= 5 && ABL:ASSI:11 >= 3
+		DRAWLINE
+		TFLAG:13 = 48
+		LOCAL = TARGET
+		TARGET = ASSI
+		CALL SELF_KOJO
+		TARGET = LOCAL
+		PRINTFORML %NAME:ASSI%ÇÕ[Ç”ÇΩÇ»ÇË]Ç∆Ç»Ç¡ÇΩÅB
+		DRAWLINE
+		WAIT
+		;TALENT:ASSI:120 = 0
+		TALENT:ASSI:121 = 1
+	ENDIF
+;[ãÔåª]Ç≈Ç†ÇÈ
+ELSEIF TALENT:ASSI:127
+	;ó~ñ]LV5Ç©ÉåÉYÇ¡ãCLV4à»è„
+	IF ABL:ASSI:1 >= 5 || ABL:ASSI:9 >= 4
+		DRAWLINE
+		TFLAG:13 = 48
+		LOCAL = TARGET
+		TARGET = ASSI
+		CALL SELF_KOJO
+		TARGET = LOCAL
+		PRINTFORML %NAME:ASSI%ÇÕ[Ç”ÇΩÇ»ÇË]Ç∆Ç»Ç¡ÇΩÅB
+		DRAWLINE
+		WAIT
+		;TALENT:ASSI:127 = 0
+		TALENT:ASSI:121 = 1
+	ENDIF
+ENDIF
+
+
+ISASSI:ASSI = 1
+;TARGET = -1
+
+RETURN 0

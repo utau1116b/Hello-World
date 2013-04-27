@@ -1,0 +1,97 @@
+;-------------------------------------------------
+;ワカメ酒
+;系コマンド、レベル
+;-------------------------------------------------
+@COM202
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+
+SIF TALENT:110 || (STAIN:5 & 14 && TALENT:PLAYER:64)
+	PRINTL [0] 胸で
+PRINTL [1] 正座させて
+PRINTL [2] 仰向けで
+$INPUT_LOOP
+INPUT
+IF (!RESULT && RESULT != 1 && RESULT != 2) || (!RESULT && !TALENT:110) || (!RESULT && STAIN:5 & 14 && !TALENT:PLAYER:64)
+	CALL 再入力
+	GOTO INPUT_LOOP
+ELSE
+	TFLAG:17 = RESULT
+ENDIF
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:体力 += 20
+DOWNBASE:気力 += 70
+
+SOURCE:欲情 = 1000
+SOURCE:露出 = 500
+SOURCE:屈従 = 500
+SOURCE:逸脱 = 800
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+IF !TFLAG:17
+	;胸の場合液体が減る
+	SOURCE:液体 = 900
+	SOURCE:快Ｂ = 180
+	;Ｂ敏感、鈍感をみる
+	IF TALENT:107
+		TIMES SOURCE:17 , 0.50
+		TIMES SOURCE:10 , 0.40
+	ELSEIF TALENT:108
+		TIMES SOURCE:17 , 1.40
+		TIMES SOURCE:10 , 1.20
+	ENDIF
+ELSE
+	SOURCE:液体 = 2000
+	SOURCE:快Ｃ = 180
+	;Ｃ敏感、鈍感をみる
+	IF TALENT:101
+		TIMES SOURCE:0 , 0.60
+		TIMES SOURCE:10 , 0.50
+	ELSEIF TALENT:102
+		TIMES SOURCE:0 , 1.50
+		TIMES SOURCE:10 , 1.20
+	ENDIF
+ENDIF
+
+;調教者のTALENT:舌使いをみる
+IF TALENT:PLAYER:52
+	IF TFLAG:17
+		TIMES SOURCE:0 , 2.00
+	ELSE
+		TIMES SOURCE:6 , 2.00
+	ENDIF
+	SOURCE:16 += SOURCE:0/20
+ENDIF
+
+;-------------------------------------------------
+;汚れの処理
+;-------------------------------------------------
+;汚れ移動
+IF !TFLAG:17
+	;パートナーのB⇔調教者の口の汚れが移動
+	STAIN:5 |= STAIN:PLAYER:0
+	STAIN:PLAYER:0 |= STAIN:5
+ELSE
+	;パートナーのＶ⇔調教者の口の汚れが移動
+	STAIN:3 |= STAIN:PLAYER:0
+	STAIN:PLAYER:0 |= STAIN:3
+ENDIF
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+;同性愛　レズなら戻り値1ゲイなら戻り値2
+IF HETEROSEX(TARGET,PLAYER)
+	EXP:(39 + HETEROSEX(TARGET,PLAYER)) += 1
+	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 1
+ENDIF
+
+RETURN 1

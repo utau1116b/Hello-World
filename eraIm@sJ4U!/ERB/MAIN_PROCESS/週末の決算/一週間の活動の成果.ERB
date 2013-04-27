@@ -1,0 +1,79 @@
+@楽しい週末
+#DIM 初期MONEY
+CALL BGM("週末","決算スタート")
+VARSET LOCAL
+;仲間の勧誘用
+VARSET N
+初期MONEY = MONEY
+CALL CD管理("リリース管理")
+IF 楽曲売上() > 0 && FLAG:リリース管理 == 1
+	CALL CDセールス(楽曲売上())
+	LOCAL += 楽曲売上()
+ENDIF
+IF FLAG:借金 == -1
+	CALL 借金返済
+	FLAG:ローン--
+	SIF !FLAG:ローン
+		FLAG:借金 = 1
+	LOCAL:10 -= FLAG:一週間の返済額
+ENDIF
+CALL 給料支払い
+LOCAL:19 = -RESULT
+;PRINTFORMW {LOCAL:19}
+; 給料()
+CALL 活動成果(LOCAL,LOCAL:1,LOCAL:2,LOCAL:3,LOCAL:4,LOCAL:5,LOCAL:6,LOCAL:7,LOCAL:8,LOCAL:9,LOCAL:10,LOCAL:11,LOCAL:12,LOCAL:13,LOCAL:14,LOCAL:15,LOCAL:16,LOCAL:17,LOCAL:18,LOCAL:19)
+PRINTFORM %"\n"*10%
+CALL BGM("週末", "コマンド")
+DO 
+	REDRAW 0
+	CALL SAVELINE
+	PRINTL 
+	DRAWLINE
+	PRINTL 何かしますか？
+	PRINTL 
+	PRINTFORMLC [100] - 活動報告
+	PRINTFORMLC [101] - 施設拡張
+	PRINTFORMLC [102] - 仲間を勧誘する
+	SIF !FLAG:リリース管理
+		PRINTFORMLC [103] - CDをリリースする(5000Ｇ必要です)
+	;強力過ぎるなら1月に一回でも
+	;PRINTFORMLC [104] - コネクション使用
+	;PRINTFORMLC [105] - 投資する
+	PRINTFORMLC [106] - お金を借りる
+	PRINTFORMLC [107] - 給料の詳細確認
+	SIF !LINEISEMPTY()
+		PRINTL 
+	PRINTFORML [999] - 終了する
+	INPUT
+	SELECTCASE RESULT
+		CASE 100
+			IF CAN_PRANK_UP()
+				CALL P_RANK_UP
+			ELSE
+				PRINTFORMW Ptが足りません
+			ENDIF
+		CASE 101
+			CALL HOME_EXTEND
+		CASE 102
+			CALL 仲間の勧誘
+		CASE 103
+			SIF FLAG:リリース管理 == 0
+				CALL 新曲リリース
+		CASE 104
+		
+		CASE 105
+			;CALL ７６５投資
+		CASE 106
+			CALL 黒井ローン
+		CASE 107
+			CALL 給料明細
+		CASE 999
+			BREAK
+		CASEELSE
+	ENDSELECT
+	CALL RETURNLINE
+LOOP 1
+;給料リセット
+CVARSET CFLAG, 29, 0
+;CDリリース管理
+
