@@ -186,15 +186,16 @@ SELECTCASE TEQUIP:デート中
 		;オムツ解除
 		TEQUIP:オムツ = 0
 	;花畑
-	CASE 3
-		SELECTCASE RAND:3
-			CASE 0
-				PRINTFORMW %CALLNAME:PLAYER%達は花畑へと向かいました
-			CASE 1
-				PRINTFORMW %CALLNAME:PLAYER%達は太陽の畑へと向かいました
-			CASE 2
-				PRINTFORMW %CALLNAME:PLAYER%達は無名の丘へと向かいました
-		ENDSELECT
+	;CASE 3
+	;	SELECTCASE RAND:3
+	;		CASE 0
+	;		;ここはコメントアウト外すと～へ向かいましたが二回表示される
+	;			PRINTFORMW %CALLNAME:PLAYER%達は花畑へと向かいました
+	;		CASE 1
+	;			PRINTFORMW %CALLNAME:PLAYER%達は太陽の畑へと向かいました
+	;		CASE 2
+	;			PRINTFORMW %CALLNAME:PLAYER%達は無名の丘へと向かいました
+	;	ENDSELECT
 	;温泉
 	CASE 6
 		;オムツ解除

@@ -48,12 +48,6 @@ RETURNF -1
 ;-------------------------------------------------
 @HETEROSEX(ARG,ARG:1)
 #FUNCTION
-;IF GETBIT(TALENT:ARG:2,0) == GETBIT(TALENT:(ARG:1):2,0)
-;	IF GETBIT(TALENT:ARG:2,0)
-;		RETURNF 1
-;	ELSE
-;		RETURNF 2
-;	ENDIF
 IF TALENT:ARG:オトコ && TALENT:(ARG:1):オトコ
 	RETURNF 2
 ELSEIF !TALENT:ARG:オトコ && !TALENT:(ARG:1):オトコ

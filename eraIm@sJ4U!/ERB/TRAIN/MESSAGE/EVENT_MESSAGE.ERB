@@ -180,10 +180,6 @@ ELSEIF TFLAG:快楽依存 == 2
 ELSEIF TFLAG:快楽依存 == 3
 	PRINTFORML %CALLNAME:TARGET%は強烈な快楽に身も心も焦がしているようだ……
 	PRINTFORML %CALLNAME:TARGET%は快楽依存LV3を得た
-	;IF TFLAG:刻印取得時の親密の変化 == 1 && M:1 == 0
-	;	PRINTFORML そして親密がLV{ABL:親密}になった
-	;	M:1 = 1
-	;ENDIF
 ENDIF
 IF TFLAG:刻印取得時の親密の変化 == 1 && M:1 == 0
 	PRINTFORML そして親密がLV{ABL:親密}になった
