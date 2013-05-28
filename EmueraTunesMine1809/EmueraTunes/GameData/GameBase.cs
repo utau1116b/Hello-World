@@ -105,7 +105,7 @@ namespace MinorShift.Emuera.GameData
 								if (ScriptUniqueCode == 0L)
 									ParserMediator.Warn("コード:0のセーブデータはいかなるコードのスクリプトからも読めるデータとして扱われます", pos, 0);
 							}
-							
+
 							break;
 						case "バージョン":
 							ScriptVersionDefined = tryatoi(tokens[1], out ScriptVersion);

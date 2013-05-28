@@ -47,7 +47,7 @@ namespace Utau.Eramakerview.Sub
 		{
 			string line = null;
 			StringStream st = null;
-			while (true) 
+			while (true)
 			{
 				line = reader.ReadLine();
 				lineNo++;
@@ -61,12 +61,12 @@ namespace Utau.Eramakerview.Sub
 				return st;
 			}
 		}
-		
 
+		public void Close() { this.Dispose(); }
 		bool disposed = false;
 		#region Idisposableメンバ
 
-		public void Dispose() 
+		public void Dispose()
 		{
 			if (disposed)
 				return;

@@ -236,7 +236,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				//    }
 				//}
 
-				
+
 				if ((code & VariableCode.__LOCAL__) == VariableCode.__LOCAL__)
 					localvarNameDic.Add(key, code);
 				if ((code & VariableCode.__SAVE_EXTENDED__) == VariableCode.__SAVE_EXTENDED__)

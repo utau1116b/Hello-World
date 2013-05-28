@@ -5,7 +5,7 @@ using System.Text;
 namespace MinorShift.Emuera.GameData.Variable
 {
 	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
-	[global::System.Reflection.Obfuscation(Exclude=true)]
+	[global::System.Reflection.Obfuscation(Exclude = true)]
 	internal enum VariableCode
 	{
 		__NULL__ = 0x00000000,
@@ -20,9 +20,9 @@ namespace MinorShift.Emuera.GameData.Variable
 		__GLOBAL__ = 0x04000000,//グローバル変数。
 		__ARRAY_2D__ = 0x08000000,//二次元配列。キャラクタ変数フラグと排他
 		__SAVE_EXTENDED__ = 0x10000000,//拡張セーブ機能によってセーブするべき変数。
-							//このフラグを立てておけば勝手にセーブされる(はず)。名前を変えると正常にロードできなくなるので注意。
-        __ARRAY_3D__ = 0x20000000,//三次元配列
-        __CONSTANT__ = 0x40000000,//完全定数CSVから読み込まれる～NAME系がこれに該当
+		//このフラグを立てておけば勝手にセーブされる(はず)。名前を変えると正常にロードできなくなるので注意。
+		__ARRAY_3D__ = 0x20000000,//三次元配列
+		__CONSTANT__ = 0x40000000,//完全定数CSVから読み込まれる～NAME系がこれに該当
 
 		__UPPERCASE__ = 0x7FFF0000,
 		__LOWERCASE__ = 0x0000FFFF,
@@ -110,7 +110,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		LOCALS = 0x03 | __STRING__ | __ARRAY_1D__ | __LOCAL__ | __EXTENDED__, //ローカル文字列変数
 		ARGS = 0x04 | __STRING__ | __ARRAY_1D__ | __LOCAL__ | __EXTENDED__,//関数の引数用
 		GLOBALS = 0x05 | __STRING__ | __ARRAY_1D__ | __GLOBAL__ | __EXTENDED__, //グローバル文字列変数
-        TSTR = 0x06 | __STRING__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__,
+		TSTR = 0x06 | __STRING__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__,
 
 		__COUNT_STRING_ARRAY__ = 0x07,
 
@@ -148,10 +148,10 @@ namespace MinorShift.Emuera.GameData.Variable
 		STAIN = 0x0E | __INTEGER__ | __CHARACTER_DATA__ | __ARRAY_1D__,//調教中パラメータ。汚れ
 		GOTJUEL = 0x0F | __INTEGER__ | __CHARACTER_DATA__ | __ARRAY_1D__,//調教中パラメータ。今回獲得した珠。PALAM.CSV
 		NOWEX = 0x10 | __INTEGER__ | __CHARACTER_DATA__ | __ARRAY_1D__,//調教中パラメータ。直前のコマンドでどこで何回絶頂したか。
-        DOWNBASE = 0x11 | __INTEGER__ | __CHARACTER_DATA__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__, //調教中パラメータ。LOSEBASEのキャラクタ変数版
-        CUP = 0x12 | __INTEGER__ | __CHARACTER_DATA__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__,//調教中パラメータ。UPのキャラクタ変数版
-        CDOWN = 0x13 | __INTEGER__ | __CHARACTER_DATA__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__,//調教中パラメータ。DOWNのキャラクタ変数版
-        TCVAR = 0x14 | __INTEGER__ | __CHARACTER_DATA__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__,//キャラクタ変数での一時変数
+		DOWNBASE = 0x11 | __INTEGER__ | __CHARACTER_DATA__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__, //調教中パラメータ。LOSEBASEのキャラクタ変数版
+		CUP = 0x12 | __INTEGER__ | __CHARACTER_DATA__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__,//調教中パラメータ。UPのキャラクタ変数版
+		CDOWN = 0x13 | __INTEGER__ | __CHARACTER_DATA__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__,//調教中パラメータ。DOWNのキャラクタ変数版
+		TCVAR = 0x14 | __INTEGER__ | __CHARACTER_DATA__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__,//キャラクタ変数での一時変数
 
 
 		__COUNT_SAVE_CHARACTER_INTEGER_ARRAY__ = 0x11,
@@ -183,19 +183,19 @@ namespace MinorShift.Emuera.GameData.Variable
 		DC = 0x03 | __INTEGER__ | __ARRAY_2D__ | __SAVE_EXTENDED__ | __EXTENDED__,
 		DD = 0x04 | __INTEGER__ | __ARRAY_2D__ | __SAVE_EXTENDED__ | __EXTENDED__,
 		DE = 0x05 | __INTEGER__ | __ARRAY_2D__ | __SAVE_EXTENDED__ | __EXTENDED__,
-        __COUNT_INTEGER_ARRAY_2D__ = 0x06,
+		__COUNT_INTEGER_ARRAY_2D__ = 0x06,
 
 		__COUNT_STRING_ARRAY_2D__ = 0x00,
 
-        TA = 0x00 | __INTEGER__ | __ARRAY_3D__ | __SAVE_EXTENDED__ | __EXTENDED__,
-        TB = 0x01 | __INTEGER__ | __ARRAY_3D__ | __SAVE_EXTENDED__ | __EXTENDED__,
-        __COUNT_INTEGER_ARRAY_3D__ = 0x02,
+		TA = 0x00 | __INTEGER__ | __ARRAY_3D__ | __SAVE_EXTENDED__ | __EXTENDED__,
+		TB = 0x01 | __INTEGER__ | __ARRAY_3D__ | __SAVE_EXTENDED__ | __EXTENDED__,
+		__COUNT_INTEGER_ARRAY_3D__ = 0x02,
 
-        __COUNT_STRING_ARRAY_3D__ = 0x00,
+		__COUNT_STRING_ARRAY_3D__ = 0x00,
 
 		//CALCな変数については番号順はどうでもいい。
 		//1803beta004 ～～NAME系については番号順をConstantDataが使用するので重要
-		
+
 		RAND = 0x00 | __INTEGER__ | __ARRAY_1D__ | __CALC__ | __UNCHANGEABLE__,//乱数。０～引数-1までの値を返す。
 		CHARANUM = 0x01 | __INTEGER__ | __CALC__ | __UNCHANGEABLE__,//キャラクタ数。キャラクタ登録数を返す。
 
@@ -227,7 +227,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		GLOBALNAME = 0x18 | __STRING__ | __ARRAY_1D__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__ | __CONSTANT__,
 		GLOBALSNAME = 0x19 | __STRING__ | __ARRAY_1D__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__ | __CONSTANT__,
 
-        __COUNT_CSV_STRING_ARRAY_1D__ = 0x1A,
+		__COUNT_CSV_STRING_ARRAY_1D__ = 0x1A,
 
 
 		GAMEBASE_AUTHER = 0x04 | __STRING__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//文字列型。作者。綴りを間違えていたが互換性のため残す。
@@ -238,8 +238,8 @@ namespace MinorShift.Emuera.GameData.Variable
 		WINDOW_TITLE = 0x05 | __STRING__ | __CALC__ | __EXTENDED__,//文字列型。ウインドウのタイトル。変更可能。
 		__FILE__ = 0x06 | __STRING__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//現在実行中のファイル名
 		__FUNCTION__ = 0x07 | __STRING__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//現在実行中の関数名
-        MONEYLABEL = 0x08 | __STRING__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//お金のラベル
-        DRAWLINESTR = 0x09 | __STRING__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//DRAWLINEの描画文字列
+		MONEYLABEL = 0x08 | __STRING__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//お金のラベル
+		DRAWLINESTR = 0x09 | __STRING__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//DRAWLINEの描画文字列
 		//アンダースコア2つで囲まれた変数を追加したらVariableTokenに特別な処理が必要。
 
 		LASTLOAD_TEXT = 0x05 | __STRING__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//数値型。
@@ -254,10 +254,10 @@ namespace MinorShift.Emuera.GameData.Variable
 		LASTLOAD_NO = 0x06 | __INTEGER__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//数値型。
 		__LINE__ = 0x07 | __INTEGER__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//現在実行中の行番号
 		LINECOUNT = 0x08 | __INTEGER__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//描画した行の総数。CLEARで減少
-        ISTIMEOUT = 0x0B | __INT_MAX__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//TINPUT系等がTIMEOUTしたか？
+		ISTIMEOUT = 0x0B | __INT_MAX__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//TINPUT系等がTIMEOUTしたか？
 
-        __INT_MAX__ = 0x09 | __INTEGER__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//Int64最大値
-        __INT_MIN__ = 0x0A | __INTEGER__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//Int64最小値
+		__INT_MAX__ = 0x09 | __INTEGER__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//Int64最大値
+		__INT_MIN__ = 0x0A | __INTEGER__ | __CALC__ | __UNCHANGEABLE__ | __EXTENDED__,//Int64最小値
 
 		REF = 0xFD | __INTEGER__ | __ARRAY_1D__ | __EXTENDED__,//参照型・1808予約だけ
 		REFS = 0xFD | __STRING__ | __ARRAY_1D__ | __EXTENDED__,

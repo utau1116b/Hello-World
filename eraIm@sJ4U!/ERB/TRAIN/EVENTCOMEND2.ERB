@@ -1,4 +1,3 @@
-
 @EVENTCOMEND
 ;ウフフ中、勝手にムードアップする
 IF TFLAG:44 == 1
@@ -56,7 +55,7 @@ ELSEIF TFLAG:44 == 0 && BASE:1 <= 0
 	IF ASSIPLAY == 0 && (ABL:欲望 >= 7 || PALAM:潤滑 >= 3000 || PALAM:欲情 >= 3000 || CFLAG:好感度 >= 10000)
 		CALL PUSH_OVER
 		SIF RESULT
-		RETURN 1
+			RETURN 1
 	ENDIF
 	IF TIME == 0
 		PRINTFORMW （そろそろ夜になります。%CALLNAME:MASTER%は%CALLNAME:TARGET%と一旦別れました）

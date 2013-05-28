@@ -107,19 +107,19 @@ namespace MinorShift.Emuera
 			SystemSaveInBinary = instance.GetConfigValue<bool>(ConfigCode.SystemSaveInBinary);
 			CompatiFuncArgAutoConvert = instance.GetConfigValue<bool>(ConfigCode.CompatiFuncArgAutoConvert);
 			CompatiFuncArgOptional = instance.GetConfigValue<bool>(ConfigCode.CompatiFuncArgOptional);
-			
-            UseLanguage lang = instance.GetConfigValue<UseLanguage>(ConfigCode.useLanguage);
-            switch (lang)
-            {
-                case UseLanguage.JAPANESE:
-                    Language = 0x0411; LangManager.setEncode(932); break;
-                case UseLanguage.KOREAN:
-                    Language = 0x0412; LangManager.setEncode(949);  break;
-                case UseLanguage.CHINESE_HANS:
-                    Language = 0x0804; LangManager.setEncode(936); break;
-                case UseLanguage.CHINESE_HANT:
-                    Language = 0x0404; LangManager.setEncode(950); break;
-            }
+
+			UseLanguage lang = instance.GetConfigValue<UseLanguage>(ConfigCode.useLanguage);
+			switch (lang)
+			{
+				case UseLanguage.JAPANESE:
+					Language = 0x0411; LangManager.setEncode(932); break;
+				case UseLanguage.KOREAN:
+					Language = 0x0412; LangManager.setEncode(949); break;
+				case UseLanguage.CHINESE_HANS:
+					Language = 0x0804; LangManager.setEncode(936); break;
+				case UseLanguage.CHINESE_HANT:
+					Language = 0x0404; LangManager.setEncode(950); break;
+			}
 
 			if (FontSize < 8)
 			{
@@ -348,7 +348,7 @@ namespace MinorShift.Emuera
 		/// </summary>
 		private static bool IgnoreCase { get; set; }
 		private static bool CompatiFunctionNoignoreCase { get; set; }
-		
+
 
 		/// <summary>
 		/// 関数名・属性名的な名前のIgnoreCaseフラグ
@@ -356,7 +356,7 @@ namespace MinorShift.Emuera
 		/// どうせeramaker用の互換処理なのでEmuera専用構文については適当に。
 		/// </summary>
 		public static bool ICFunction { get; private set; }
-		
+
 		/// <summary>
 		/// 変数名、命令名的な名前のIgnoreCaseフラグ 
 		/// 変数・命令・$ラベル名、GOTOの引数 
@@ -449,8 +449,8 @@ namespace MinorShift.Emuera
 		public static bool CompatiFuncArgAutoConvert { get; private set; }
 		public static bool CompatiFuncArgOptional { get; private set; }
 
-        public static int Language { get; private set; }
-		
+		public static int Language { get; private set; }
+
 		public static string SavDir { get; private set; }
 
 		public static bool NeedReduceArgumentOnLoad { get; private set; }
@@ -497,7 +497,7 @@ namespace MinorShift.Emuera
 			ExpLvDef = instance.GetConfigValue<List<Int64>>(ConfigCode.ExpLvDef);
 			PalamLvDef = instance.GetConfigValue<List<Int64>>(ConfigCode.PalamLvDef);
 			PbandDef = instance.GetConfigValue<Int64>(ConfigCode.pbandDef);
-            RelationDef = instance.GetConfigValue<Int64>(ConfigCode.RelationDef);
+			RelationDef = instance.GetConfigValue<Int64>(ConfigCode.RelationDef);
 		}
 
 		public static string MoneyLabel { get; private set; }
@@ -515,10 +515,10 @@ namespace MinorShift.Emuera
 		public static List<Int64> ExpLvDef { get; private set; }
 		public static List<Int64> PalamLvDef { get; private set; }
 		public static Int64 PbandDef { get; private set; }
-        public static Int64 RelationDef { get; private set; }
+		public static Int64 RelationDef { get; private set; }
 		#endregion
-		
-		
-		
+
+
+
 	}
 }

@@ -94,9 +94,9 @@ namespace MinorShift.Emuera
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemAllowFullSpace, "全角スペースをホワイトスペースに含める", false);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemSaveInUTF8, "セーブデータをUTF-8で保存する", false);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiLinefeedAs1739, "ver1739以前の非ボタン折り返しを再現する", false);
-            configArray[i++] = new ConfigItem<UseLanguage>(ConfigCode.useLanguage, "内部で使用する東アジア言語", UseLanguage.JAPANESE);
-			
-			
+			configArray[i++] = new ConfigItem<UseLanguage>(ConfigCode.useLanguage, "内部で使用する東アジア言語", UseLanguage.JAPANESE);
+
+
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemSaveInBinary, "セーブデータをバイナリ形式で保存する", false);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiFuncArgOptional, "ユーザー関数の全ての引数の省略を許可する", false);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiFuncArgAutoConvert, "ユーザー関数の引数に自動的にTOSTRを補完する", false);
@@ -127,9 +127,9 @@ namespace MinorShift.Emuera
 			replaceArray[i++] = new ConfigItem<List<Int64>>(ConfigCode.ExpLvDef, "EXPLVの初期値", new List<long>(new Int64[] { 0, 1, 4, 20, 50, 200 }));
 			replaceArray[i++] = new ConfigItem<List<Int64>>(ConfigCode.PalamLvDef, "PALAMLVの初期値", new List<long>(new Int64[] { 0, 100, 500, 3000, 10000, 30000, 60000, 100000, 150000, 250000 }));
 			replaceArray[i++] = new ConfigItem<Int64>(ConfigCode.pbandDef, "PBANDの初期値", 4);
-            replaceArray[i++] = new ConfigItem<Int64>(ConfigCode.RelationDef, "RELATIONの初期値", 0);
+			replaceArray[i++] = new ConfigItem<Int64>(ConfigCode.RelationDef, "RELATIONの初期値", 0);
 		}
-        
+
 		public ConfigData Copy()
 		{
 			ConfigData config = new ConfigData();
@@ -148,23 +148,23 @@ namespace MinorShift.Emuera
 		public T GetConfigValue<T>(ConfigCode code)
 		{
 			AConfigItem item = GetItem(code);
-            //if ((item != null) && (item is ConfigItem<T>))
-				return ((ConfigItem<T>)item).Value;
-            //throw new ExeEE("GetConfigValueのCodeまたは型が不適切");
+			//if ((item != null) && (item is ConfigItem<T>))
+			return ((ConfigItem<T>)item).Value;
+			//throw new ExeEE("GetConfigValueのCodeまたは型が不適切");
 		}
 
-#region getitem
+		#region getitem
 		public AConfigItem GetItem(ConfigCode code)
 		{
 			AConfigItem item = GetConfigItem(code);
-            if (item == null)
-            {
-                item = GetReplaceItem(code);
-	            if (item == null)
-	            {
-	                item = GetDebugItem(code);
-	            }
-            }
+			if (item == null)
+			{
+				item = GetReplaceItem(code);
+				if (item == null)
+				{
+					item = GetDebugItem(code);
+				}
+			}
 			return item;
 		}
 		public AConfigItem GetItem(string key)
@@ -173,11 +173,11 @@ namespace MinorShift.Emuera
 			if (item == null)
 			{
 				item = GetReplaceItem(key);
-	            if (item == null)
-	            {
+				if (item == null)
+				{
 					item = GetDebugItem(key);
-	            }
-	        }
+				}
+			}
 			return item;
 		}
 
@@ -230,7 +230,7 @@ namespace MinorShift.Emuera
 			}
 			return null;
 		}
-		
+
 		public AConfigItem GetDebugItem(ConfigCode code)
 		{
 			foreach (AConfigItem item in debugArray)
@@ -255,7 +255,7 @@ namespace MinorShift.Emuera
 			}
 			return null;
 		}
-#endregion
+		#endregion
 
 
 		public bool SaveConfig()
@@ -270,7 +270,7 @@ namespace MinorShift.Emuera
 					AConfigItem item = configArray[i];
 					if (item == null)
 						continue;
-					
+
 					//1806beta001 CompatiDRAWLINEの廃止、CompatiLinefeedAs1739へ移行
 					if (item.Code == ConfigCode.CompatiDRAWLINE)
 						continue;
@@ -306,7 +306,7 @@ namespace MinorShift.Emuera
 			Config.ClearFont();
 			string defaultConfigPath = Program.CsvDir + "_default.config";
 			string fixedConfigPath = Program.CsvDir + "_fixed.config";
-			if(!File.Exists(defaultConfigPath))
+			if (!File.Exists(defaultConfigPath))
 				defaultConfigPath = Program.CsvDir + "default.config";
 			if (!File.Exists(fixedConfigPath))
 				fixedConfigPath = Program.CsvDir + "fixed.config";
@@ -314,7 +314,7 @@ namespace MinorShift.Emuera
 			loadConfig(defaultConfigPath, false);
 			loadConfig(configPath, false);
 			loadConfig(fixedConfigPath, true);
-			
+
 			Config.SetConfig(this);
 			bool needSave = false;
 			if (!File.Exists(configPath))
@@ -326,7 +326,7 @@ namespace MinorShift.Emuera
 			}
 			if (needSave)
 				SaveConfig();
-            return true;
+			return true;
 		}
 
 		private bool loadConfig(string confPath, bool fix)
@@ -353,7 +353,7 @@ namespace MinorShift.Emuera
 					if (item != null)
 					{
 						//1806beta001 CompatiDRAWLINEの廃止、CompatiLinefeedAs1739へ移行
-						if(item.Code == ConfigCode.CompatiDRAWLINE)
+						if (item.Code == ConfigCode.CompatiDRAWLINE)
 						{
 							item = GetConfigItem(ConfigCode.CompatiLinefeedAs1739);
 						}
@@ -365,7 +365,7 @@ namespace MinorShift.Emuera
 						//    if ((item.Fixed) && (fix))
 						//        item.Fixed = false;
 						//}
-						
+
 						if (item.Code == ConfigCode.TextEditor)
 						{
 							//パスの関係上tokens[2]は使わないといけない
@@ -409,7 +409,7 @@ namespace MinorShift.Emuera
 			return true;
 		}
 
-#region replace
+		#region replace
 		// 1.52a改変部分　（単位の差し替えおよび前置、後置のためのコンフィグ処理）
 		public void LoadReplaceFile(string filename)
 		{
@@ -425,16 +425,16 @@ namespace MinorShift.Emuera
 					if ((line.Length == 0) || (line[0] == ';'))
 						continue;
 					pos = new ScriptPosition(eReader.Filename, eReader.LineNo, line);
-                    string[] tokens = line.Split(new char[] { ',', ':' });
+					string[] tokens = line.Split(new char[] { ',', ':' });
 					if (tokens.Length < 2)
 						continue;
-                    string itemName = tokens[0].Trim();
-                    tokens[1] = line.Substring(tokens[0].Length + 1);
-                    if (string.IsNullOrEmpty(tokens[1].Trim()))
-                        continue;
-                    AConfigItem item = GetReplaceItem(itemName);
-                    if (item != null)
-                        item.TryParse(tokens[1]);
+					string itemName = tokens[0].Trim();
+					tokens[1] = line.Substring(tokens[0].Length + 1);
+					if (string.IsNullOrEmpty(tokens[1].Trim()))
+						continue;
+					AConfigItem item = GetReplaceItem(itemName);
+					if (item != null)
+						item.TryParse(tokens[1]);
 				}
 			}
 			catch (EmueraException ee)
@@ -448,9 +448,9 @@ namespace MinorShift.Emuera
 			finally { eReader.Dispose(); }
 		}
 
-#endregion 
+		#endregion
 
-#region debug
+		#region debug
 
 
 		public bool SaveDebugConfig()
@@ -478,7 +478,7 @@ namespace MinorShift.Emuera
 			}
 			return true;
 		}
-		
+
 		public bool LoadDebugConfig()
 		{
 			if (!File.Exists(configdebugPath))
@@ -521,12 +521,12 @@ namespace MinorShift.Emuera
 			}
 			finally { eReader.Dispose(); }
 			Config.SetDebugConfig(this);
-            return true;
+			return true;
 		err:
 			Config.SetDebugConfig(this);
 			return false;
 		}
 
-#endregion
+		#endregion
 	}
 }

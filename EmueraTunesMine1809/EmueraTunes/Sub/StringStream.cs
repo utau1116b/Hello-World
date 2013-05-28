@@ -90,10 +90,10 @@ namespace MinorShift.Emuera.Sub
 			pointer++;
 		}
 
-        public void Jump(int skip)
-        {
-            pointer += skip;
-        }
+		public void Jump(int skip)
+		{
+			pointer += skip;
+		}
 
 		/// <summary>
 		/// 検索文字列の相対位置を返す。見つからない場合、負の値。
@@ -116,7 +116,7 @@ namespace MinorShift.Emuera.Sub
 			if (pointer + rother.Length > source.Length)
 				return false;
 
-			for (int i = 0;  i < rother.Length;i++)
+			for (int i = 0; i < rother.Length; i++)
 			{
 				if (source[pointer + i] != rother[i])
 					return false;

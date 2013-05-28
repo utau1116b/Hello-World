@@ -20,18 +20,18 @@ namespace MinorShift.Emuera.Sub
 
 		public bool Open(string path, string name)
 		{
-            //そんなお行儀の悪いことはしていない
-            //if (disposed)
-            //    throw new ExeEE("破棄したオブジェクトを再利用しようとした");
-            //if ((reader != null) || (stream != null) || (filepath != null))
-            //    throw new ExeEE("使用中のオブジェクトを別用途に再利用しようとした");
+			//そんなお行儀の悪いことはしていない
+			//if (disposed)
+			//    throw new ExeEE("破棄したオブジェクトを再利用しようとした");
+			//if ((reader != null) || (stream != null) || (filepath != null))
+			//    throw new ExeEE("使用中のオブジェクトを別用途に再利用しようとした");
 			filepath = path;
 			filename = name;
 			lineNo = 0;
 			try
 			{
-                stream = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                reader = new StreamReader(stream, Config.Encode);
+				stream = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+				reader = new StreamReader(stream, Config.Encode);
 			}
 			catch
 			{
@@ -54,13 +54,13 @@ namespace MinorShift.Emuera.Sub
 		{
 			string line = null;
 			StringStream st = null;
-			while(true)
+			while (true)
 			{
 				line = reader.ReadLine();
 				lineNo++;
-				if(line == null)
+				if (line == null)
 					return null;
-				if(line.Length == 0)
+				if (line.Length == 0)
 					continue;
 				st = new StringStream(line);
 				LexicalAnalyzer.SkipWhiteSpace(st);
@@ -82,13 +82,13 @@ namespace MinorShift.Emuera.Sub
 				return filename;
 			}
 		}
-        //public string Filepath
-        //{
-        //    get
-        //    {
-        //        return filepath;
-        //    }
-        //}
+		//public string Filepath
+		//{
+		//    get
+		//    {
+		//        return filepath;
+		//    }
+		//}
 
 		public void Close() { this.Dispose(); }
 		bool disposed = false;
@@ -103,7 +103,7 @@ namespace MinorShift.Emuera.Sub
 			else if (stream != null)
 				stream.Close();
 			filepath = null;
-            filename = null;
+			filename = null;
 			reader = null;
 			stream = null;
 			disposed = true;

@@ -32,9 +32,9 @@ namespace MinorShift.Emuera.GameData
 		CFLAG = 6,
 		EQUIP = 7,
 		JUEL = 8,
-		
+
 	}
-	
+
 	internal sealed class ConstantData
 	{
 
@@ -65,10 +65,10 @@ namespace MinorShift.Emuera.GameData
 		private const int globalIndex = (int)(VariableCode.GLOBALNAME & VariableCode.__LOWERCASE__);
 		private const int globalsIndex = (int)(VariableCode.GLOBALSNAME & VariableCode.__LOWERCASE__);
 		private const int countNameCsv = (int)VariableCode.__COUNT_CSV_STRING_ARRAY_1D__;
-		
-		public int[] MaxDataList = new int[countNameCsv];
+
+		public int[] MaxDataList = new int[countNameCsv];//
 		List<VariableCode> changedCode = new List<VariableCode>();
-		
+
 		public int[] VariableIntArrayLength;
 		public int[] VariableStrArrayLength;
 		public Int64[] VariableIntArray2DLength;
@@ -90,10 +90,10 @@ namespace MinorShift.Emuera.GameData
 		}
 
 		public Int64[] ItemPrice;
-		
+
 		private readonly List<CharacterTemplate> CharacterTmplList;
 		private EmueraConsole output;
-		
+
 		public ConstantData(GameBase gamebase)
 		{
 			this.gamebase = gamebase;
@@ -252,10 +252,10 @@ namespace MinorShift.Emuera.GameData
 			//__CALC__は弾かないと変更できないエラーが表示できない
 			if (id.IsArray1D && !id.IsCalc)
 			{
-                if (tokens.Length > 2 && tokens[2].Length > 0 && tokens[2].Trim().Length > 0 && char.IsDigit((tokens[2].Trim())[0]))
-                {
-                    ParserMediator.Warn("一次元配列のサイズ指定に不必要なデータは無視されます", position, 0);
-                }
+				if (tokens.Length > 2 && tokens[2].Length > 0 && tokens[2].Trim().Length > 0 && char.IsDigit((tokens[2].Trim())[0]))
+				{
+					ParserMediator.Warn("一次元配列のサイズ指定に不必要なデータは無視されます", position, 0);
+				}
 				if (id.IsLocal && length < 1)
 				{
 					ParserMediator.Warn("ローカル変数のサイズを1未満にはできません", position, 1);
@@ -279,11 +279,11 @@ namespace MinorShift.Emuera.GameData
 					ParserMediator.Warn("二次元配列のサイズ指定には2つの数値が必要です", position, 1);
 					return;
 				}
-                if (tokens.Length > 3 && tokens[3].Length > 0 && tokens[3].Trim().Length > 0 && char.IsDigit((tokens[3].Trim())[0]))
-                {
-                    ParserMediator.Warn("二次元配列のサイズ指定に不必要なデータは無視されます", position, 0);
-                }
-                if (!int.TryParse(tokens[2], out length2))
+				if (tokens.Length > 3 && tokens[3].Length > 0 && tokens[3].Trim().Length > 0 && char.IsDigit((tokens[3].Trim())[0]))
+				{
+					ParserMediator.Warn("二次元配列のサイズ指定に不必要なデータは無視されます", position, 0);
+				}
+				if (!int.TryParse(tokens[2], out length2))
 				{
 					ParserMediator.Warn("三つ目の値を整数値として認識できません", position, 1);
 					return;
@@ -311,11 +311,11 @@ namespace MinorShift.Emuera.GameData
 					ParserMediator.Warn("三次元配列のサイズ指定には3つの数値が必要です", position, 1);
 					return;
 				}
-                if (tokens.Length > 4 && tokens[4].Length > 0 && tokens[4].Trim().Length > 0 && char.IsDigit((tokens[4].Trim())[0]))
-                {
-                    ParserMediator.Warn("三次元配列のサイズ指定に不必要なデータは無視されます", position, 0);
-                }
-                if (!int.TryParse(tokens[2], out length2))
+				if (tokens.Length > 4 && tokens[4].Length > 0 && tokens[4].Trim().Length > 0 && char.IsDigit((tokens[4].Trim())[0]))
+				{
+					ParserMediator.Warn("三次元配列のサイズ指定に不必要なデータは無視されます", position, 0);
+				}
+				if (!int.TryParse(tokens[2], out length2))
 				{
 					ParserMediator.Warn("三つ目の値を整数値として認識できません", position, 1);
 					return;
@@ -452,7 +452,7 @@ namespace MinorShift.Emuera.GameData
 					arraylength[mainLengthIndex] = i;
 					MaxDataList[nameIndex] = i;
 					//1803beta004 不適切な指定として警告Lv1の対象にする
-					ParserMediator.Warn(mainCode.ToString() +"と" + nameCode.ToString() + "の要素数が異なります（大きい方に合わせます）", position, 1);
+					ParserMediator.Warn(mainCode.ToString() + "と" + nameCode.ToString() + "の要素数が異なります（大きい方に合わせます）", position, 1);
 				}
 			}
 			else if (changedCode.Contains(nameCode) && !changedCode.Contains(mainCode))
@@ -460,7 +460,7 @@ namespace MinorShift.Emuera.GameData
 			else if (!changedCode.Contains(nameCode) && changedCode.Contains(mainCode))
 				MaxDataList[nameIndex] = arraylength[mainLengthIndex];
 		}
-		
+
 		private void decideActualArraySize(ScriptPosition position)
 		{
 			_decideActualArraySize_sub(VariableCode.ABL, VariableCode.ABLNAME, CharacterIntArrayLength, position);
@@ -468,7 +468,7 @@ namespace MinorShift.Emuera.GameData
 			_decideActualArraySize_sub(VariableCode.EXP, VariableCode.EXPNAME, CharacterIntArrayLength, position);
 			_decideActualArraySize_sub(VariableCode.MARK, VariableCode.MARKNAME, CharacterIntArrayLength, position);
 			_decideActualArraySize_sub(VariableCode.BASE, VariableCode.BASENAME, CharacterIntArrayLength, position);
-            _decideActualArraySize_sub(VariableCode.SOURCE, VariableCode.SOURCENAME, CharacterIntArrayLength, position);
+			_decideActualArraySize_sub(VariableCode.SOURCE, VariableCode.SOURCENAME, CharacterIntArrayLength, position);
 			_decideActualArraySize_sub(VariableCode.EX, VariableCode.EXNAME, CharacterIntArrayLength, position);
 			_decideActualArraySize_sub(VariableCode.EQUIP, VariableCode.EQUIPNAME, CharacterIntArrayLength, position);
 			_decideActualArraySize_sub(VariableCode.TEQUIP, VariableCode.TEQUIPNAME, CharacterIntArrayLength, position);
@@ -491,7 +491,7 @@ namespace MinorShift.Emuera.GameData
 			{
 				int palamJuelMax = Math.Max(CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.PALAM)]
 						, CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.JUEL)]);
-			
+
 			}
 			//PALAMかJUELが変わっていれば、そのうち大きい方にPALAMNAMEをあわせる
 			if (changedCode.Contains(VariableCode.PALAM) || changedCode.Contains(VariableCode.JUEL))
@@ -499,15 +499,15 @@ namespace MinorShift.Emuera.GameData
 				int palamJuelMax = Math.Max(CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.PALAM)]
 						, CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.JUEL)]);
 				//PALAMNAMEが変わっている
-				if(changedCode.Contains(VariableCode.PALAMNAME))
+				if (changedCode.Contains(VariableCode.PALAMNAME))
 				{
 					if (MaxDataList[paramIndex] != palamJuelMax)
 					{
 						int i = Math.Max(MaxDataList[paramIndex], palamJuelMax);
 						MaxDataList[paramIndex] = i;
-						if(CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.PALAM)] == palamJuelMax)
+						if (CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.PALAM)] == palamJuelMax)
 							CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.PALAM)] = i;
-						if(CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.JUEL)] == palamJuelMax)
+						if (CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.JUEL)] == palamJuelMax)
 							CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.JUEL)] = i;
 						//1803beta004 不適切な指定として警告Lv1の対象にする
 						ParserMediator.Warn("PALAMとJUELとPALAMNAMEの要素数が不適切です", position, 1);
@@ -566,7 +566,7 @@ namespace MinorShift.Emuera.GameData
 		{
 			output = console;
 			loadVariableSizeData(csvDir + "VariableSize.CSV", disp);
-			for(int i = 0; i< countNameCsv;i++)
+			for (int i = 0; i < countNameCsv; i++)
 			{
 				names[i] = new string[MaxDataList[i]];
 				nameToIntDics[i] = new Dictionary<string, int>();
@@ -593,7 +593,7 @@ namespace MinorShift.Emuera.GameData
 			loadDataTo(csvDir + "STAIN.CSV", stainIndex, null, disp);
 			loadDataTo(csvDir + "CDFLAG1.CSV", cdflag1Index, null, disp);
 			loadDataTo(csvDir + "CDFLAG2.CSV", cdflag2Index, null, disp);
-			
+
 			loadDataTo(csvDir + "STRNAME.CSV", strnameIndex, null, disp);
 			loadDataTo(csvDir + "TSTR.CSV", tstrnameIndex, null, disp);
 			loadDataTo(csvDir + "SAVESTR.CSV", savestrnameIndex, null, disp);
@@ -621,9 +621,9 @@ namespace MinorShift.Emuera.GameData
 				if (!string.IsNullOrEmpty(tmpl.Name) && !relationDic.ContainsKey(tmpl.Name))
 					relationDic.Add(tmpl.Name, (int)tmpl.No);
 				if (!string.IsNullOrEmpty(tmpl.Callname) && !relationDic.ContainsKey(tmpl.Callname))
-                    relationDic.Add(tmpl.Callname, (int)tmpl.No);
+					relationDic.Add(tmpl.Callname, (int)tmpl.No);
 				if (!string.IsNullOrEmpty(tmpl.Nickname) && !relationDic.ContainsKey(tmpl.Nickname))
-                    relationDic.Add(tmpl.Nickname, (int)tmpl.No);
+					relationDic.Add(tmpl.Nickname, (int)tmpl.No);
 			}
 		}
 
@@ -636,7 +636,7 @@ namespace MinorShift.Emuera.GameData
 			if (varCode == VariableCode.CDFLAG)
 			{
 				dic = GetKeywordDictionary(out errPos, VariableCode.CDFLAGNAME1, -1);
-				if ((dic == null)||(!dic.ContainsKey(str)))
+				if ((dic == null) || (!dic.ContainsKey(str)))
 					dic = GetKeywordDictionary(out errPos, VariableCode.CDFLAGNAME2, -1);
 				if (dic == null)
 					return false;
@@ -796,23 +796,23 @@ namespace MinorShift.Emuera.GameData
 					allowIndex = 0;
 					break;
 				case VariableCode.CDFLAG:
-				{
-					if (index == 1)
 					{
-						ret = nameToIntDics[cdflag1Index];//CDFlagName1
-						errPos = "cdflag1.csv";
+						if (index == 1)
+						{
+							ret = nameToIntDics[cdflag1Index];//CDFlagName1
+							errPos = "cdflag1.csv";
+						}
+						else if (index == 2)
+						{
+							ret = nameToIntDics[cdflag2Index];//CDFlagName2
+							errPos = "cdflag2.csv";
+						}
+						else if (index >= 0)
+							throw new CodeEE("配列変数" + code.ToString() + "の" + (index + 1).ToString() + "番目の要素を文字列で指定することはできません");
+						else
+							throw new CodeEE("CDFLAGの要素の取得にはCDFLAGNAME1又はCDFLAGNAME2を使用します");
+						return ret;
 					}
-					else if (index == 2)
-					{
-						ret = nameToIntDics[cdflag2Index];//CDFlagName2
-						errPos = "cdflag2.csv";
-					}
-					else if (index >= 0)
-						throw new CodeEE("配列変数" + code.ToString() + "の" + (index + 1).ToString() + "番目の要素を文字列で指定することはできません");
-					else
-						throw new CodeEE("CDFLAGの要素の取得にはCDFLAGNAME1又はCDFLAGNAME2を使用します");
-					return ret;
-				}
 				case VariableCode.STR:
 					ret = nameToIntDics[strnameIndex];
 					errPos = "strname.csv";
@@ -882,12 +882,12 @@ namespace MinorShift.Emuera.GameData
 			return new CharacterTemplate(0, this);
 		}
 
-        private CharacterData dummyChara = null;
-        public CharacterData DummyChara
-        {
-            get { if (dummyChara == null) dummyChara = new CharacterData(GlobalStatic.VEvaluator.Constant, GetPseudoChara()); return dummyChara; }
-            set { dummyChara = value; }
-        }
+		private CharacterData dummyChara = null;
+		public CharacterData DummyChara
+		{
+			get { if (dummyChara == null) dummyChara = new CharacterData(GlobalStatic.VEvaluator.Constant, GetPseudoChara()); return dummyChara; }
+			set { dummyChara = value; }
+		}
 
 		private void loadCharacterData(string csvDir, bool disp)
 		{
@@ -963,7 +963,7 @@ namespace MinorShift.Emuera.GameData
 							tmpl.csvNo = Convert.ToInt64(sb.ToString());
 						else
 							tmpl.csvNo = 0;
-							//tmpl.csvNo = index;
+						//tmpl.csvNo = index;
 						CharacterTmplList.Add(tmpl);
 						continue;
 					}
@@ -1200,7 +1200,7 @@ namespace MinorShift.Emuera.GameData
 			if (!File.Exists(csvPath))
 				return;
 			string[] target = names[targetIndex];
-            List<int> defined = new List<int>();
+			List<int> defined = new List<int>();
 			EraStreamReader eReader = new EraStreamReader();
 			if (!eReader.Open(csvPath))
 			{
@@ -1234,10 +1234,10 @@ namespace MinorShift.Emuera.GameData
 						ParserMediator.Warn(index.ToString() + "は配列の範囲外です", position, 1);
 						continue;
 					}
-                    if (defined.Contains(index))
-                        ParserMediator.Warn(index.ToString() + "番目の要素はすでに定義されています（新しい値で上書きされます）", position, 1);
-                    else
-                        defined.Add(index);
+					if (defined.Contains(index))
+						ParserMediator.Warn(index.ToString() + "番目の要素はすでに定義されています（新しい値で上書きされます）", position, 1);
+					else
+						defined.Add(index);
 					target[index] = tokens[1];
 					if ((targetI != null) && (tokens.Length >= 3))
 					{
@@ -1293,7 +1293,7 @@ namespace MinorShift.Emuera.GameData
 		public readonly Dictionary<Int32, string> CStr = new Dictionary<Int32, string>();
 		public Int64 csvNo;
 		public bool IsSpchara { get; private set; }
-		
+
 		public CharacterTemplate(Int64 index, ConstantData constant)
 		{
 			arraySize = constant.CharacterIntArrayLength;

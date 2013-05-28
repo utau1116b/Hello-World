@@ -18,6 +18,24 @@ namespace Utau.Eramakerview.Sub
 		string source;
 		int pointer;
 
+		public string Substring()
+		{
+			if (pointer >= source.Length)
+				return "";
+			else if (pointer == 0)
+				return source;
+			return source.Substring(pointer);
+		}
+
+		public string Substring(int start, int length)
+		{
+			if (start >= source.Length || length == 0)
+				return "";
+			if (start + length > source.Length)
+				length = source.Length - start;
+			return source.Substring(start, length);
+		}
+
 		public bool EOS { get { return pointer >= source.Length; } }
 	}
 }
