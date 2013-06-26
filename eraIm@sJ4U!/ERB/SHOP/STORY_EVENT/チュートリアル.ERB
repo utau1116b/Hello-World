@@ -1,0 +1,159 @@
+@チュートリアル(ARGS="")
+CALL BGM("イベント", "チュートリアル")
+SELECTCASE ARGS
+	CASE "最初"
+		PRINTL 
+		PRINTFORMW 「ようこそ、eraIm@sJ4U!の世界へ………」
+		PRINTFORMW 「ここからは私がチュートリアルを務めさせて頂くわ」
+		PRINTFORMW 「私？今は私について知る必要は無いわ。　すぐにまた会いますもの」
+		PRINTFORMW 「今からゲームの概要を説明するけど、読むのが面倒くさくなったら、何時でも右クリックでスキップしなさい」
+		PRINTL
+		PRINTFORMW 「このゲームは、アイドルユニットをプロデュースして、トップアイドルを育成するのがゲームの目標よ」
+		PRINTL 
+		PRINTFORMW 「ゲーム内ではまず一日の最初にスケジュールを組み、そのスケジュールに従って行動を行うわ」
+		PRINTFORMW 「[パートナーと過ごす]で親密を上げる、[レッスン]でステージ技術を磨く、[営業]でユニットを売り込む、[Ｏ]（オーディション）[Ｌ]（ライブ）[Ｆ]（フェス）でステージの仕事をする」
+		PRINTFORMW 「この辺りが主な行動になるかしら？」
+		PRINTFORMW 「アイドルに仕事をさせると、ファン数とお金が溜まっていくわ」
+		PRINTFORMW 「ファン数が一定に達すると、次のユニットランクに昇格するための、[昇格試験]が受けられるから、それに合格していくことがトップアイドルへの道のりよ」
+		PRINTFORMW 「ただし、この昇格試験は期限内に合格する必要があるから注意なさい」
+		PRINTL
+		PRINTFORMW 「ランクが上がると、よりレベルの高く、報酬の大きな仕事が受けられようになるけど、当然レベルが上がるにつれて、要求される能力も高くなるわ」
+		PRINTFORMW 「[1]レッスンをこなしたり、良い衣装を身に付けることで、ボーカル力、ビジュアル力、ダンス力を底上げする」
+		PRINTFORMW 「[2]パートナーと過ごし、好感度を稼いで親交を深める」
+		PRINTFORMW 「この2つが能力を底上げする基本ね」
+		PRINTFORMW 「プラス、アイドルと親交を深めていくと、プロデューサーランクを上げるのに必要な、PP(プロデューサーポイント)が手に入るわ」
+		PRINTFORMW 「このポイントは、有益な効果をもたらす様々な施設を建設するのにも必要だから、有効活用なさい」
+		PRINTL 
+		PRINTFORMW 「……さて、今はこの位にしておきましょうか。　あまりたくさん喋っても、忘れちゃうもの」
+		PRINTFORMW 「分からない部分があれば、付属の説明書を参照してもらえると助かるわ」
+		PRINTL 
+		PRINTFORMW 「それでは、eraIm@sJ4U!スタートよ！」
+		PRINTFORM 「
+		;SPLIT "M/a/y/ /T/h/e/ /L/u/c/k/ /B/e/ /W/i/t/h/ /Y/o/u/(/幸/運/と/共/に/あ/ら/ん/こ/と/を/)/」", "/", TSTR
+		SPLIT "「/G/o/o/d/ /L/u/c/k/ /T/o/ /Y/o/u/ /!/」", "/", TSTR
+		REPEAT 50
+			IF STRLENS(TSTR:COUNT) > 0
+				LOCALS += TSTR:COUNT
+				;PRINTFORM 「それでは、
+				CALL SET_COLOR("真美")
+				PRINTFORM %LOCALS%
+				TWAIT 100, 0
+				IF TSTR:COUNT == "」"
+					WAIT
+					BREAK
+				ENDIF
+				CLEARLINE 1
+				RESETCOLOR
+			ELSE
+				CONTINUE
+			ENDIF
+		REND
+		CLEARLINE 1
+		CALL SET_COLOR("真美")
+		;CALL FADEOUT(, "「それでは、" + LOCALS)
+		CALL FADEOUT(,LOCALS)
+		;good luck to you
+		RESETCOLOR
+		PRINTL 
+		PRINTFORMW そう言い終えた時、目の前の少女はまるで最初から居なかったかのように消えていた……
+		PRINTL
+	CASE "スケジュール選択"
+		PRINTFORM 「スケジュールを組むことで、1日につき、朝、昼、夜の
+		CALL PRINTCOLOR(0Xffc400, "3回")
+		PRINTL まで行動を行えるわ」
+		PRINTFORMW 「ただし自由にって訳にはいかないわ。　スケジュールにはそれぞれ『行動コスト』というものが付いてて……」
+		PRINTL 
+		PRINTFORM 「行動コストって言うのは
+		SETCOLOR 0xfd81bf
+		PRINTFORM ■
+		RESETCOLOR
+		PRINTFORML ←のことね」
+		PRINTFORM 「
+		SETCOLOR 0xfd81bf
+		PRINTFORM ■
+		RESETCOLOR
+		PRINTFORM 一つで行動コスト1、
+		SETCOLOR 0xfd81bf
+		PRINTFORM ■■■
+		RESETCOLOR
+		PRINTFORML で行動コスト3よ」
+		PRINTFORMW 「一日の行動が、行動コストが3以内に収まるようにスケジュールを組まなくてはいけないわ」
+		PRINTL 
+		PRINTFORMW 「まあ、こればかりは言ってもしょうがないから、スケジュールの組み方については実際に組んで慣れなさい」
+		PRINTL
+		PRINTFORM 「今は表示されていないけど、プロデュース活動が始まれば、
+		SETCOLOR COLOR("light-gray")
+		PRINTFORM [？]EMPTY
+		RESETCOLOR
+		PRINTFORML と表示されている枠に、『お仕事』が表示されるようになるわ。今説明しても忘れてしまうでしょうから、これについてはまた後日よ」
+		;PRINTFORMW 「[Ｏ]がオーディション、[Ｌ]がライブ、[Ｆ]がフェス、[営]が営業を表すから覚えておいてね」
+		PRINTL
+		PRINTFORML 「後は……画面下の方に「ファン数」、「注目度」というのが見えるわね？」
+		PRINTFORML 「これらはそれぞれ、各地域のファン数と注目度を表していて、どちらもその地域で活動することで上昇するわ」
+		PRINTFORM 「注目度は、最高、高、普通、低、無関心、の5段階があって、
+		CALL PRINTCOLOR(0xEE1010, "普通以下だとファン数が減っていく")
+		PRINTW から注意しなさい」
+		;PRINTL 
+		;PRINTFORMW 「他にも条件を満たしていれば、アイドル達との「Ｓ」シナリオ、「Ｅ」サブイベントが表示されることもあるわ」
+		PRINTL 
+		PRINTFORMW 「スケジュール選択については以上よ。　それでは……」
+		PRINTL 
+	CASE "スケジュール選択２"
+		PRINTL 
+		PRINTL 
+		PRINTFORMW 「さあ、いよいよプロデュース活動スタートね」
+		PRINTFORMW 「といっても、まだアイドル"候補生"に過ぎない%CALLNAME:TARGET%達はアイドルの仕事を受けられないわ」
+		PRINTL 
+		PRINTFORMW 「だからまずは『昇格試験』を受けて、"候補生"から"Fランクアイドル"になりましょう」
+		PRINTFORMW 「"Fランク"は知名度のとーーっても低い最低のランクだけど、千里の道も一歩からだわ」
+		PRINTL 
+		PRINTFORMW 「準備が整ったら[ランク昇格試験]を選択して試験会場に来なさい。私は先に行って待ってるわ」
+		PRINTL 
+		PRINTW ・・・・・
+		PRINTL 
+		PRINTW ・・・
+		PRINTL 
+		PRINTW ・
+		PRINTL 
+		PRINTFORM 「…ああ、言い忘れたけど、
+		CALL PRINTCOLOR(0xEE1010, "[ランク昇格試験]の下のコマンドは選ばないことをおススメするわ")
+		PRINTW 」
+		PRINTFORMW 「私の忠告を無視することはないと思うけど、万が一"手が滑ったり"して選んでしまった時は……」
+		PRINTFORMW 「あはっ！　それも一興かもね」
+		PRINTL
+	CASE "楽曲について"
+		PRINTFORML 「リリースする楽曲は、%CALLNAME:TARGET%達のイメージをアップさせる効果があるわ」
+		PRINTFORMW 「VOはボーカル、VIはビジュアル、DAはダンスイメージを上昇させる、というのは分かるわね？」
+		PRINTL 
+		PRINTFORML 「その横にBPMという見慣れない表示があるでしょう？」
+		PRINTFORML 「それはBeats Per Minute。　曲のテンポの早さを表しているわ」
+		PRINTFORMW 「BPMの大きい曲程、オーディションなどでアピールできる時間が長くなると思いなさい」
+		PRINTL 
+		PRINTFORMW 「末尾についてる色つきの星は、その楽曲で主に上がるイメージを表すわ」
+		PRINTFORM 「
+		CALL PRINTCOLOR(SET_COLOR_FUNC("ボーカル"), "★")
+		PRINTFORM がボーカル、
+		CALL PRINTCOLOR(SET_COLOR_FUNC("ビジュアル"), "★")
+		PRINTFORM がビジュアル、
+		CALL PRINTCOLOR( SET_COLOR_FUNC("ダンス"), "★")
+		PRINTFORMW がダンスね」
+		PRINTL
+		PRINTFORMW 「さて、楽曲についての説明は以上よ」
+		PRINTL 
+	CASE "ＣＤリリースについて"
+		PRINTFORML 「CDはリリース準備をしてから一週間後にリリースになるわ」
+		PRINTFORMW 「基本的には発売初日が一番売り上げが大きく、日を重ねると段々と売り上げは落ちていくの」
+		PRINTL 
+		PRINTFORML 「CDの売り上げには各地域のファン数、注目度、そしてリリース中の楽曲のハイスコアが影響するわ」
+		PRINTFORMW 「どれだけファンや注目度が多くても、一度もその曲で仕事をしていなければ、売り上げは0に等しくなるから注意してね」
+		PRINTL 
+		PRINTFORML 「また、CDは1回目にリリースしたCDより2回目にリリースしたCDが。2回目にリリースしたCDより3回目にリリースしたCDが」
+		PRINTFORML 「と、回数を重ねるごとにCDの売り上げは基本的に大きくなっていくわ。　知名度が高まるんだから当然よね？」
+		PRINTFORMW 「今回はタダでリリースできるけど、次回からは5000Ｇの経費が必要になるから、そのつもりでね」
+		PRINTL 
+		PRINTFORMW 「以上でCDセールスについての説明はお終いよ。　それじゃあ早速リリースする楽曲を選びましょう」
+	CASEELSE
+		PRINTFORML 「これが表示されたらエラーだわさ」
+		PRINTFORML 「報告してあげたら本体作者が喜ぶわさ」
+ENDSELECT
+CALL MMSTOP()

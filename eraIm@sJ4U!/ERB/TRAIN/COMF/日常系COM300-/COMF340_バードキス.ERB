@@ -1,0 +1,249 @@
+;-------------------------------------------------
+;バードキス
+;日常系コマンド　レベル1
+;-------------------------------------------------
+@COM340
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+CALL COM300_SUCCESS(90, 9)
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:体力 += 0
+;キス経験で気力消費軽減（何度もキスしたがる、の再現だとでも脳内補完）
+IF EXP:キス経験 < 100
+	DOWNBASE:気力 += 50
+ELSEIF EXP:キス経験 < 500
+	DOWNBASE:気力 += 40
+ELSE
+	DOWNBASE:気力 += 25
+ENDIF
+
+;固定で獲得するソース
+SOURCE:歓楽 = 650
+SOURCE:接触 = 600
+SOURCE:征服 = 300
+SOURCE:受動 = 600
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+IF TFLAG:SELECTCOM分岐 == -1
+	TIMES SOURCE:歓楽 , 0.10
+	TIMES SOURCE:接触 , 0.50
+	TIMES SOURCE:征服 , 0.50
+	TIMES SOURCE:受動 , 0.50
+ELSEIF TFLAG:SELECTCOM分岐 == 0
+
+ELSE
+	TIMES SOURCE:歓楽 , 2.00
+	TIMES SOURCE:接触 , 2.00
+	TIMES SOURCE:征服 , 2.00
+	TIMES SOURCE:受動 , 2.00
+ENDIF
+
+;Ｍ感覚を設定している場合快Ｍソース等取得
+SIF GETBIT(FLAG:62 ,22)
+	CALL SOURCE_M_COM340
+
+;-------------------------------------------------
+;汚れの処理
+;-------------------------------------------------
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+;同性愛　レズなら戻り値1ゲイなら戻り値2
+IF HETEROSEX(TARGET,PLAYER)
+	EXP:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+ENDIF
+
+EXP:キス経験++
+EXP:PLAYER:キス経験++
+
+RETURN 1
+
+
+@CAN_COM340(ARG)
+;-------------------------------------------------
+;実行判定処理
+;-------------------------------------------------
+SKIPDISP ARG
+PRINTL バードキス
+A = 0
+S = 0
+V = 40
+
+;すべての命令に共通の要素を考慮
+;(従順が高いと命令に従いやすいなど)
+CALL COM_ORDER
+
+	;男嫌い
+	IF TALENT:82 && TALENT:PLAYER:122
+		PRINT  - 
+		PRINTS TALENTNAME:82
+		PRINTV '(,7,')
+		S = 1
+		A -= 7
+	ENDIF
+	;ABL:奉仕精神
+	IF ABL:6
+		SIF S
+			PRINT  + 
+		PRINTS ABLNAME:6
+		PRINTV 'LV,ABL:6,'(,ABL:6 * 1,')
+		S = 1
+		A += (ABL:6)
+	ENDIF
+	;恥じらい
+	IF TALENT:35
+		PRINT  - 
+		PRINTS TALENTNAME:35
+		PRINTV '(,5,')
+		S = 1
+		A -= 5
+	ENDIF
+	;献身的
+	IF TALENT:63
+		SIF S
+			PRINT  + 
+		PRINTS TALENTNAME:63
+		PRINTV '(,6,')
+		S = 1
+		A += 6
+	ENDIF
+	;快感の否定
+	IF TALENT:71
+		PRINT  - 
+		PRINTS TALENTNAME:71
+		PRINTV '(,1,')
+		S = 1
+		A --
+	ENDIF
+	;恋慕
+	IF TALENT:85 && ASSIPLAY == 0
+		SIF S
+			PRINT  + 
+		PRINTS TALENTNAME:85
+		PRINTV '(,5,')
+		S = 5
+		A += 5
+	ENDIF
+
+	;キス未経験
+	IF TALENT:151
+		PRINT  - 
+		PRINTS TALENTNAME:151
+		PRINTV '(,10,')
+		S = 1
+		A -= 10
+	ENDIF
+
+	;一線越えない（キス未経験時のみ）
+	IF TALENT:151 && TALENT:27
+		PRINT  - 
+		PRINTS TALENTNAME:27
+		PRINTV '(,10,')
+		S = 1
+		A -= 10
+	ENDIF
+
+	;デート中
+	IF TEQUIP:2
+		PRINT  + 
+		PRINT デート中
+		PRINTV '(,3,')
+		S = 1
+		A += 3
+	ENDIF
+
+	;ムードボーナス
+	B = 0
+	IF TFLAG:37 < 10
+		B -= 10
+	ELSEIF TFLAG:37 < 30
+		B -= 1
+	ELSEIF TFLAG:37 < 50
+		B += 1
+	ELSEIF TFLAG:37 < 100
+		B += TFLAG:37 / 10
+	ELSEIF TFLAG:37 < 300
+		B += TFLAG:37 / 5
+	ELSE
+		B += TFLAG:37 / 4
+	ENDIF
+	IF B < 0
+		B = B * -1
+		PRINT  - 
+		PRINT ムード悪い
+		PRINTV '(,B,')
+		S = 1
+		A -= B
+	ELSE
+		PRINT  + 
+		PRINT ムード良い
+		PRINTV '(,B,')
+		S = 1
+		A += B
+	ENDIF
+
+
+	;好感度
+	IF CFLAG:2 < 400
+		B = 0
+		PRINT  - 
+		IF CFLAG:2 < 100
+			B = 20
+		ELSEIF CFLAG:2 < 250
+			B = 10
+		ELSE
+			B = 5
+		ENDIF
+		PRINT 好感度不足
+		PRINTV '(,B,')
+		S = 1
+		A -= B
+	ENDIF
+
+	;好感度
+	IF CFLAG:2 >= 500
+		B = 0
+		SIF S
+			PRINT  + 
+		B = CFLAG:2 / 60
+		PRINT 好感度
+		PRINTV '(,B,')
+		S = 1
+		A += B
+	ENDIF
+
+	;合計を表示(40以上で実行)
+	PRINT  = 
+	PRINTV A
+
+	IF A < V
+		PRINT  < 
+		PRINT 実行値
+		PRINTV V
+	ELSEIF A == V
+		PRINT  = 
+		PRINT 実行値
+		PRINTV V
+	ELSEIF A > V
+		PRINT  > 
+		PRINT 実行値
+		PRINTV V
+	ENDIF
+
+	WAIT
+
+	SKIPDISP 0
+	;実行できない
+	SIF A < V
+		RETURN 0
+
+RETURN 1

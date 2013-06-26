@@ -1,0 +1,1961 @@
+;---------------------------------------------------------
+;このファイルの中に入っている関数一覧
+;GET_INITIATIVE_RATE		Tで指定されたキャラの主導権基準値をRに入れて返す
+;				勝手に使う変数	A、I
+;GET_BATTLE_POWER		Tで指定されたキャラの戦闘力をPに入れて返す
+;	REPEAT使用アリ		勝手に使う変数	A
+;GET_BATTLE_PRICE		Tで指定されたキャラの戦闘訓練に必要な金額をPに入れて返す
+;				勝手に使う変数	Q
+;GET_STUFF			Tで指定されたキャラ番号のキャラの、戦闘素質をSに入れて返す
+;				勝手に使う変数	A
+;GET_EXISTANCE			Tで指定されたキャラ番号のキャラが仲間にいる場合、Eに加入番号+1を入れて返す。居なければ0を返す
+;	REPEAT使用アリ		勝手に使う変数	なし
+;GET_EXISTANCE2			Tで指定されたキャラ番号のキャラが仲間にいる場合、Eに加入番号+1を入れて返す。居なければ0を返す。CFLAG:21が立っている、一時離別中キャラを居る扱いとする
+;	REPEAT使用アリ		勝手に使う変数	なし
+;GET_BOSS_NO			次のボスのNoを取得して、Bに入れて返す
+;	REPEAT使用アリ		勝手に使う変数	A、C、D、E、F、G、T
+;GET_CHARA_NAME			Tで指定されたキャラ番号のキャラの名前をSTR:Nに入れて返す
+;				勝手に使う変数	A
+;GET_JUN_VALUE			純愛系のコマンド実行値をAに入れて返す
+;				勝手に使う変数	L、R
+;ADD_REIMUSAMA			霊夢様加入処理
+;	REPEAT使用アリ		勝手に使う変数	A、E、P、T
+;ADD_NEW_CHARA			倒したキャラの加入処理
+;				勝手に使う変数	A、E、T
+;PUSH_OVER			押し倒し判定。判定成功時はRESULT = 1
+;				勝手に使う変数	A、B、L、R
+;GET_FEAT			特殊能力の習得
+;				勝手に使う変数	A
+;GET_LOST_CHARA			霧に飲まれかけているキャラの番号をランダムで取得し、Cに入れて返す。誰もいなければ０を返す
+;	REPEAT使用アリ		勝手に使う変数	A、B、C、D
+;---------------------------------------------------------
+
+
+@GET_INITIATIVE_RATE
+;加筆開始
+;TとPLAYERに対して元々の@GET_INITIATIVE_RATEを実行し、Tに対するRからPLAYERに対するRを引いた値をRとする
+;よって、T=PLAYERの時は自動的に0になる
+
+CALL GET_SUB_INITIATIVE_RATE
+I = R
+T = PLAYER
+CALL GET_SUB_INITIATIVE_RATE
+R = I - R
+
+@GET_SUB_INITIATIVE_RATE
+;加筆終了
+;Tで指定されたキャラの主導権基準値をRに入れて返す
+
+;大元の基準値を取得
+A = CFLAG:T:12
+
+;ABL:マゾっ気による影響
+A -= ABL:T:8 * 5
+
+;ABL:サドっ気による影響
+A += ABL:T:15 * 5
+
+;臆病　主人公側に片寄りやすい
+IF TALENT:T:10
+	IF A < 0
+		TIMES A , 1.20
+	ELSE
+		TIMES A , 0.80
+	ENDIF
+ENDIF
+
+;反抗的　相手側に片寄りやすい
+IF TALENT:T:11
+	IF A < 0
+		TIMES A , 0.80
+	ELSE
+		TIMES A , 1.20
+	ENDIF
+ENDIF
+
+;素直　どちらの影響も強くなる
+IF TALENT:T:13
+	IF A < 0
+		TIMES A , 1.20
+	ELSE
+		TIMES A , 1.20
+	ENDIF
+ENDIF
+
+;大人しい　主人公側に片寄りやすい
+IF TALENT:T:14
+	IF A < 0
+		TIMES A , 1.20
+	ELSE
+		TIMES A , 0.60
+	ENDIF
+ENDIF
+
+;プライド高い　相手側に片寄りやすい
+IF TALENT:T:15
+	IF A < 0
+		TIMES A , 0.70
+	ELSE
+		TIMES A , 1.30
+	ENDIF
+ENDIF
+
+;生意気　相手側に片寄りやすい
+IF TALENT:T:16
+	IF A < 0
+		TIMES A , 0.90
+	ELSE
+		TIMES A , 1.30
+	ENDIF
+ENDIF
+
+;プライド低い　主人公側に片寄りやすい
+IF TALENT:T:17
+	IF A < 0
+		TIMES A , 1.30
+	ELSE
+		TIMES A , 0.70
+	ENDIF
+ENDIF
+
+;自制心　主人公側に片寄りやすい
+IF TALENT:T:20
+	IF A < 0
+		TIMES A , 1.20
+	ELSE
+		TIMES A , 0.80
+	ENDIF
+ENDIF
+
+;無関心　どちらの影響も弱くなる
+IF TALENT:T:21
+	IF A < 0
+		TIMES A , 0.80
+	ELSE
+		TIMES A , 0.80
+	ENDIF
+ENDIF
+
+;感情乏しい　どちらの影響も弱くなる
+IF TALENT:T:22
+	IF A < 0
+		TIMES A , 0.80
+	ELSE
+		TIMES A , 0.80
+	ENDIF
+ENDIF
+
+;好奇心　相手側に片寄りやすい
+IF TALENT:T:23
+	IF A < 0
+		TIMES A , 0.70
+	ELSE
+		TIMES A , 1.20
+	ENDIF
+ENDIF
+
+;保守的　主人公側に片寄りやすい
+IF TALENT:T:24
+	IF A < 0
+		TIMES A , 1.30
+	ELSE
+		TIMES A , 0.70
+	ENDIF
+ENDIF
+
+;目立ちたがり　相手側に非常に片寄りやすい
+IF TALENT:T:28
+	IF A < 0
+		TIMES A , 0.60
+	ELSE
+		TIMES A , 1.40
+	ENDIF
+ENDIF
+
+;恥じらい　主人公側に片寄りやすい
+IF TALENT:T:35
+	IF A < 0
+		TIMES A , 1.20
+	ELSE
+		TIMES A , 0.80
+	ENDIF
+ENDIF
+
+;サド　相手側に非常に片寄りやすい
+IF TALENT:T:83
+	IF A < 0
+		TIMES A , 0.50
+	ELSE
+		TIMES A , 2.00
+	ENDIF
+ENDIF
+
+;マゾ　主人公側に非常に片寄りやすい
+IF TALENT:T:79
+	IF A < 0
+		TIMES A , 2.00
+	ELSE
+		TIMES A , 0.50
+	ENDIF
+ENDIF
+
+;小悪魔　相手側に片寄りやすい
+IF TALENT:T:87
+	IF A < 0
+		TIMES A , 0.80
+	ELSE
+		TIMES A , 1.20
+	ENDIF
+ENDIF
+
+;妖狐　相手側に片寄りやすい
+IF TALENT:T:90
+	IF A < 0
+		TIMES A , 0.80
+	ELSE
+		TIMES A , 1.20
+	ENDIF
+ENDIF
+
+;魅惑　どちらの影響も強くなる
+IF TALENT:T:91
+	IF A < 0
+		TIMES A , 1.10
+	ELSE
+		TIMES A , 1.10
+	ENDIF
+ENDIF
+
+;謎の魅力　どちらの影響も強くなる
+IF TALENT:T:92
+	IF A < 0
+		TIMES A , 1.20
+	ELSE
+		TIMES A , 1.20
+	ENDIF
+ENDIF
+
+;魅力　どちらの影響も強くなる
+IF TALENT:T:113
+	IF A < 0
+		TIMES A , 1.10
+	ELSE
+		TIMES A , 1.10
+	ENDIF
+ENDIF
+
+;鼓舞　特に主人公側に片寄りやすい
+IF TALENT:T:118
+	IF A < 0
+		TIMES A , 1.50
+	ELSE
+		TIMES A , 0.80
+	ENDIF
+ENDIF
+
+;服従　ほぼ主人公側になる
+IF TALENT:T:180
+	IF A < 0
+		TIMES A , 2.00
+	ELSE
+		TIMES A , 0.01
+	ENDIF
+ENDIF
+
+R = A
+
+RETURN 1
+
+
+@GET_BATTLE_POWER
+;Tで指定されたキャラの戦闘力をPに入れて返す
+P = 0
+
+;好感度
+IF CFLAG:T:2 <= 50
+	P = CFLAG:T:2
+ELSEIF CFLAG:T:2 <= 500
+	P = 50 + (CFLAG:T:2 - 50) / 2
+ELSEIF CFLAG:T:2 <= 5000
+	P = 300 + (CFLAG:T:2 - 500) / 3
+ELSEIF CFLAG:T:2 <= 50000
+	P = 2000 + (CFLAG:T:2 - 5000) / 4
+ELSE
+	P = 15000 + (CFLAG:T:2 - 50000) / 5
+ENDIF
+;素質の無いキャラほど、好感度の影響を大きくする。愛だよ、愛
+IF ABL:T:98 == 0
+	;素質未設定はLv50とみなす＝倍率３倍
+	TIMES P , 3.00
+ELSEIF ABL:T:98 <= 10
+	;最弱
+	TIMES P , 10.00
+ELSEIF ABL:T:98 <= 20
+	;最弱クラス
+	TIMES P , 7.00
+ELSEIF ABL:T:98 <= 30
+	;弱い方
+	TIMES P , 5.00
+ELSEIF ABL:T:98 <= 50
+	;弱い方
+	TIMES P , 3.00
+ENDIF
+
+
+;戦闘技能レベル
+IF ABL:T:88 <= 1
+	P += 50 + 50 * ABL:T:88
+ELSEIF ABL:T:88 <= 3
+	P += 100 + 75 * ABL:T:88
+ELSEIF ABL:T:88 <= 5
+	P += 300 + 100 * ABL:T:88
+ELSEIF ABL:T:88 <= 8
+	P += 500 + 120 * ABL:T:88
+ELSEIF ABL:T:88 <= 11
+	P += 800 + 150 * ABL:T:88
+ELSEIF ABL:T:88 <= 25
+	P += 800 + 200 * ABL:T:88
+ELSE
+	P += 1000 + 300 * ABL:T:88
+ENDIF
+
+
+
+;戦闘素質
+IF ABL:T:98 == 0
+	;素質未設定はLv50とみなす＝倍率55/25倍
+	IF P < 10000000
+		P = P * 55 / 25
+	ELSE
+		P = P / 25 * 55
+	ENDIF
+ELSEIF ABL:T:98 <= 20
+	;最弱クラス
+	IF P < 10000000
+		P = P * (ABL:T:98 + 10) / 30
+	ELSE
+		P = P / 30 * (ABL:T:98 + 10)
+	ENDIF
+ELSEIF ABL:T:98 <= 50
+	;弱い方
+	IF P < 10000000
+		P = P * (ABL:T:98 + 5) / 25
+	ELSE
+		P = P / 25 * (ABL:T:98 + 5)
+	ENDIF
+ELSEIF ABL:T:98 < 80
+	;強い方
+	IF P < 10000000
+		P = P * ABL:T:98 / 20
+	ELSE
+		P = P / 20 * ABL:T:98
+	ENDIF
+ELSE
+	;最強クラス
+	IF P < 1000000
+		P = P * ABL:T:98 / 15
+	ELSE
+		P = P / 15 * ABL:T:98
+	ENDIF
+ENDIF
+
+
+;魔力(魔力による戦闘力は素質の影響を受けない)
+IF BASE:T:MP <= 100
+	P += BASE:T:MP
+ELSEIF BASE:T:MP <= 200
+	P += BASE:T:MP * 3
+ELSEIF BASE:T:MP <= 100
+	P += BASE:T:MP * 5
+ELSEIF BASE:T:MP <= 800
+	P += BASE:T:MP * 8
+ELSEIF BASE:T:MP <= 5000
+	P += BASE:T:MP * 12
+ELSE
+	P += BASE:T:MP * 17
+ENDIF
+
+
+
+;サドい人は戦闘力1.2倍
+SIF TALENT:T:83
+	TIMES P , 1.20
+
+;生理中はイラだって戦闘力1.2倍
+SIF TALENT:T:138 && (FLAG:62 & 1)
+	TIMES P , 1.20
+
+;母は強し
+SIF TALENT:T:136
+	TIMES P , 1.20
+
+;アクセサリ関係
+IF FLAG:62 & 4
+	;主人公のアクセサリで1%補正
+	SIF CFLAG:MASTER:24 == NO:T
+		TIMES P , 1.01
+	
+	;キャラが装備中のアクセサリで補正
+	;アクセサリから戦闘素質を算出
+	IF CFLAG:T:23 > 0
+		CSVABL CFLAG:T:23, 98, 0
+		LOCAL = RESULT
+		;例えば戦闘素質が50のキャラのアクセサリを付けていた場合1.050倍になる
+		P = P * (1000 + LOCAL) / 1000
+	ENDIF
+	IF CFLAG:T:24 > 0
+		CSVABL CFLAG:T:24, 98, 0
+		LOCAL = RESULT
+		;例えば戦闘素質が50のキャラのアクセサリを付けていた場合1.050倍になる
+		P = P * (1000 + LOCAL) / 1000
+	ENDIF
+ENDIF
+
+;Ph限定の恋人ボーナス
+IF FLAG:5 == 10
+	A = 0
+	FOR LOCAL, 0, CHARANUM
+		SIF TALENT:LOCAL:153
+			A += 1
+	NEXT
+	SIF TALENT:MASTER:203
+		TIMES A , 1.50
+	P = P / 10 * (10 + A)
+ENDIF
+
+;Ph限定の親愛ボーナス
+IF FLAG:5 == 10
+	A = 0
+	FOR LOCAL, 0, CHARANUM
+		SIF TALENT:LOCAL:88
+			A += 1
+	NEXT
+	SIF TALENT:MASTER:205
+		TIMES A , 3.00
+	IF P / 500 * (5 + A) > 10000000000000000
+		P = 1000000000000000000
+	ELSE
+		P = P / 5 * (5 + A)
+	ENDIF
+ENDIF
+
+;戦闘技能レベルによる倍率
+IF P < 1000000
+	IF ABL:T:88 <= 1
+		P = P * (ABL:T:88 * 10 + 50) / 100
+	ELSEIF ABL:T:88 <= 3
+		P = P * (ABL:T:88 * 10 + 50) / 100
+	ELSEIF ABL:T:88 <= 5
+		P = P * (ABL:T:88 * 7 + 60) / 100
+	ELSEIF ABL:T:88 <= 8
+		P = P * (ABL:T:88 * 5 + 70) / 100
+	ELSEIF ABL:T:88 <= 11
+		P = P * (ABL:T:88 * 4 + 80) / 100
+	ELSEIF ABL:T:88 <= 25
+		P = P * (ABL:T:88 * 4 + 90) / 100
+	ELSE
+		P = P * (ABL:T:88 * 5 + 70) / 100
+	ENDIF
+;この時点でPが20000000000000000以上だと、カンストの可能性アリ
+ELSEIF P > 20000000000000000
+	V = P / 100
+
+	V /= 200
+	IF ABL:T:88 <= 1
+		V = V * (ABL:T:88 * 20 + 100)
+	ELSEIF ABL:T:88 <= 3
+		V = V * (ABL:T:88 * 20 + 100)
+	ELSEIF ABL:T:88 <= 5
+		V = V * (ABL:T:88 * 14 + 120)
+	ELSEIF ABL:T:88 <= 8
+		V = V * (ABL:T:88 * 10 + 140)
+	ELSEIF ABL:T:88 <= 11
+		V = V * (ABL:T:88 * 8 + 160)
+	ELSEIF ABL:T:88 <= 25
+		V = V * (ABL:T:88 * 8 + 180)
+	ELSEIF ABL:T:88 <= 100
+		V = V * (ABL:T:88 * 6 + 230)
+	ELSEIF ABL:T:88 <= 1000
+		V = V * (ABL:T:88 * 4 + 430)
+	ELSE
+		V = V * (ABL:T:88 + 3430)
+	ENDIF
+
+	;カンストする場合
+	IF V >= 10000000000000000
+		P = 999999999999999999
+	;そうでなければ普通に処理
+	ELSE
+		P /= 200
+		IF ABL:T:88 <= 1
+			P = P * (ABL:T:88 * 20 + 100)
+		ELSEIF ABL:T:88 <= 3
+			P = P * (ABL:T:88 * 20 + 100)
+		ELSEIF ABL:T:88 <= 5
+			P = P * (ABL:T:88 * 14 + 120)
+		ELSEIF ABL:T:88 <= 8
+			P = P * (ABL:T:88 * 10 + 140)
+		ELSEIF ABL:T:88 <= 11
+			P = P * (ABL:T:88 * 8 + 160)
+		ELSEIF ABL:T:88 <= 25
+			P = P * (ABL:T:88 * 8 + 180)
+		ELSEIF ABL:T:88 <= 100
+			P = P * (ABL:T:88 * 6 + 230)
+		ELSEIF ABL:T:88 <= 1000
+			P = P * (ABL:T:88 * 4 + 430)
+		ELSE
+			P = P * (ABL:T:88 + 3430)
+		ENDIF
+	ENDIF
+
+ELSE
+	P /= 200
+	IF ABL:T:88 <= 1
+		P = P * (ABL:T:88 * 20 + 100)
+	ELSEIF ABL:T:88 <= 3
+		P = P * (ABL:T:88 * 20 + 100)
+	ELSEIF ABL:T:88 <= 5
+		P = P * (ABL:T:88 * 14 + 120)
+	ELSEIF ABL:T:88 <= 8
+		P = P * (ABL:T:88 * 10 + 140)
+	ELSEIF ABL:T:88 <= 11
+		P = P * (ABL:T:88 * 8 + 160)
+	ELSEIF ABL:T:88 <= 25
+		P = P * (ABL:T:88 * 8 + 180)
+	ELSEIF ABL:T:88 <= 100
+		P = P * (ABL:T:88 * 6 + 230)
+	ELSEIF ABL:T:88 <= 1000
+		P = P * (ABL:T:88 * 4 + 430)
+	ELSE
+		P = P * (ABL:T:88 + 3430)
+	ENDIF
+ENDIF
+
+;カンストする場合。Emuera専用になったのでカンスト値上昇
+SIF P >= 999999999999999999
+	P = 999999999999999999
+
+SIF TALENT:T:134
+	P = P * (CFLAG:T:110 - DAY) / 20
+
+SIF P < 1
+	P = 1
+
+RETURN 1
+
+
+@GET_BATTLE_PRICE
+;Tで指定されたキャラの戦闘訓練に必要な金額をPに入れて返す
+P = 0
+Q = 0
+
+;戦闘技能レベル
+IF ABL:T:88 <= 1
+	P += 2000 + 2000 * ABL:T:88
+	Q = 5
+	IF EXP:T:95 >= (20 + 20 * ABL:T:88)
+		P /= 2
+	ELSEIF EXP:T:95 >= (15 + 15 * ABL:T:88)
+		P = P * 3 / 4
+	ENDIF
+ELSEIF ABL:T:88 <= 3
+	P += 4000 * ABL:T:88
+	Q = 6
+	IF EXP:T:95 >= (35 * ABL:T:88)
+		P /= 2
+	ELSEIF EXP:T:95 >= (25 * ABL:T:88)
+		P = P * 3 / 4
+	ENDIF
+ELSEIF ABL:T:88 <= 5
+	P += 8000 * ABL:T:88
+	Q = 7
+	IF EXP:T:95 >= (50 * ABL:T:88)
+		P /= 2
+	ELSEIF EXP:T:95 >= (35 * ABL:T:88)
+		P = P * 3 / 4
+	ENDIF
+ELSEIF ABL:T:88 <= 8
+	P += 12000 * ABL:T:88
+	Q = 8
+	IF EXP:T:95 >= (65 * ABL:T:88)
+		P /= 2
+	ELSEIF EXP:T:95 >= (45 * ABL:T:88)
+		P = P * 3 / 4
+	ENDIF
+ELSEIF ABL:T:88 <= 11
+	P += 18000 * ABL:T:88
+	Q = 9
+	IF EXP:T:95 >= (80 * ABL:T:88)
+		P /= 2
+	ELSEIF EXP:T:95 >= (55 * ABL:T:88)
+		P = P * 3 / 4
+	ENDIF
+ELSEIF ABL:T:88 <= 25
+	P += 30000 * ABL:T:88
+	Q = 10
+	IF EXP:T:95 >= (90 * ABL:T:88)
+		P /= 2
+	ELSEIF EXP:T:95 >= (65 * ABL:T:88)
+		P = P * 3 / 4
+	ENDIF
+ELSE
+	P += 50000 * ABL:T:88
+	Q = 12
+	IF EXP:T:95 >= (100 * ABL:T:88)
+		P /= 2
+	ELSEIF EXP:T:95 >= (80 * ABL:T:88)
+		P = P * 3 / 4
+	ENDIF
+ENDIF
+
+
+;戦闘経験で値引き
+IF EXP:T:95 <= 100
+	P -= EXP:T:95 * 3 * Q
+ELSEIF EXP:T:95 <= 300
+	P -= EXP:T:95 * 4 * Q
+ELSEIF EXP:T:95 <= 500
+	P -= EXP:T:95 * 5 * Q
+ELSEIF EXP:T:95 <= 1000
+	P -= EXP:T:95 * 6 * Q
+ELSEIF EXP:T:95 <= 2000
+	P -= EXP:T:95 * 7 * Q
+ELSE
+	P -= EXP:T:95 * 8 * Q
+ENDIF
+
+;戦闘素質で割引
+IF ABL:T:98 == 0
+	;Lv0＝未設定はLv50扱い＝１倍
+ELSEIF ABL:T:98 <= 20
+	;最弱級キャラは半額
+	TIMES P , 0.50
+ELSEIF ABL:T:98 <= 50
+	;弱め～普通のキャラは１倍
+ELSEIF ABL:T:98 < 80
+	;強めのキャラは1.5倍
+	TIMES P , 1.50
+ELSE
+	;強いキャラは２倍
+	TIMES P , 2.00
+ENDIF
+
+SIF P < 10
+	P = 10
+
+RETURN 1
+
+
+@BATTLE_PRICE_I
+;使うお金が$11以上になるまで一気にレベルを上げる
+M = 0
+K = 0
+L = 9999 - ABL:T:88
+REPEAT L
+	M += P
+	K += 1
+	ABL:T:88 += 1
+	CALL GET_BATTLE_PRICE
+	SIF P > 10
+		BREAK
+REND
+
+RETURN 1
+
+@BATTLE_PRICE_G
+;お金の限界までレベルを上げる
+M = 0
+K = 0
+L = 9999 - ABL:T:88
+REPEAT L
+	M += P
+	K += 1
+	ABL:T:88 += 1
+	CALL GET_BATTLE_PRICE
+	SIF M + P > MONEY
+		BREAK
+REND
+
+RETURN 1
+
+
+@GET_STUFF
+;Tで指定されたキャラ番号のキャラの、戦闘素質をSに入れて返す。こっそりS:1に浪費癖、S:2に主導権基準値も入れる。→eraM@sではS3,S4,S5がVoViDa
+
+S:0 = ABL:T:歌唱適性
+S:1 = ABL:T:被写適性
+S:2 = ABL:T:舞踊適性
+S:3 = ABL:T:97
+S:4 = CFLAG:T:12
+;レベル0＝未設定はレベル50扱い
+SIF S == 0
+	S = 50
+SIF S:1 == 0
+	S:1 = 50
+SIF S:2 == 0
+	S:2 = 50
+RETURN 1
+
+
+@GET_EXISTANCE
+;Tで指定されたキャラ番号のキャラが仲間にいる場合、Eにキャラの加入番号+1を入れて返す。居なければ0を返す
+;例えば、主人公がそのキャラなら0+1＝1を返すし、最初のパートナーなら1+1＝2を返す
+
+E = 0
+FOR LOCAL, 0, CHARANUM
+	SIF CFLAG:LOCAL:21 == 1
+		CONTINUE
+	SIF NO:LOCAL == T
+		E = LOCAL + 1
+NEXT
+
+RETURN 1
+
+@GET_EXISTANCE2
+;Tで指定されたキャラ番号のキャラが仲間にいる場合、Eにキャラの加入番号+1を入れて返す。居なければ0を返す
+;例えば、主人公がそのキャラなら0+1＝1を返すし、最初のパートナーなら1+1＝2を返す
+;CFLAG:21が立っている一時離別中のキャラも居る扱いにする
+
+E = 0
+FOR LOCAL, 0, CHARANUM
+	SIF NO:LOCAL == T
+		E = LOCAL + 1
+NEXT
+
+RETURN 1
+
+
+@GET_BOSS_NO
+;次のボスのNoを取得して、Bに入れて返す
+A = 0
+B = 0
+D = 0
+
+;!!!
+;ボスになる可能性のあるキャラを全部チェックし、F配列に追加していく
+;ボスのランダム選択(完全にランダムで選ぶ)変更。変数Gを追加で使用。
+FOR LOCAL, 0, 200
+	;今のところあなたがボスになる予定は無し
+	SIF LOCAL == 0
+		CONTINUE
+	
+	;CSVが存在しない番号（存在すればRESULT = 1）は選択しない
+	EXISTCSV LOCAL,0
+	SIF RESULT == 0
+		CONTINUE
+
+	;追加キャラcsvは除外
+	SIF LOCAL >= 87 && LOCAL <= 89
+		CONTINUE
+	
+	;ひまわり妖精（汎用キャラ）はクリア済みの場合出てくる（クリア後のオマケみたいなもの）
+	IF LOCAL == 99
+		SIF (FLAG:28 & 1) == 0
+			CONTINUE
+	ENDIF
+	
+	;ランダム決定用に出現する可能性があるキャラを保存
+	G:D = LOCAL
+	D += 1
+	
+	;各モードのラスボスは出現させない
+	;EASY（紅魔館組）の場合
+	IF FLAG:3 == 0
+		;レミリアは出さない
+		SIF LOCAL == 10
+			CONTINUE
+
+		T = 10
+		CALL GET_EXISTANCE
+		;レミリアが既に居る(＝パートナー)場合、フランは出さない
+		SIF E && LOCAL == 11
+			CONTINUE
+	ENDIF
+	;NORMAL（永遠亭組）の場合
+	IF FLAG:3 == 1
+		;永琳は出さない
+		SIF LOCAL == 29
+			CONTINUE
+
+		T = 29
+		CALL GET_EXISTANCE
+		;永琳が既に居る(＝パートナー)場合、輝夜は出さない
+		SIF E && LOCAL == 30
+			CONTINUE
+	ENDIF
+	;HARD（妖々夢組）の場合
+	IF FLAG:3 == 2
+		;紫は出さない
+		SIF LOCAL == 22
+			CONTINUE
+
+		T = 22
+		CALL GET_EXISTANCE
+		;紫が既に居る(＝パートナー)場合、幽々子は出さない
+		SIF E && LOCAL == 20
+			CONTINUE
+	ENDIF
+	;LUNATIC（主人公組）の場合
+	IF FLAG:3 == 3
+		;霊夢は出さない
+		SIF LOCAL == 1
+			CONTINUE
+
+		T = 1
+		CALL GET_EXISTANCE
+		;霊夢が既に居る(＝パートナー)場合、魔理沙は出さない
+		SIF E && LOCAL == 2
+			CONTINUE
+	ENDIF
+	;風神ルートの場合
+	IF FLAG:3 == 11
+		;神奈子は出さない
+		SIF LOCAL == 43
+			CONTINUE
+		
+		T = 43
+		CALL GET_EXISTANCE
+		;神奈子が既に居る(＝パートナー)場合、諏訪子は出さない
+		SIF E && LOCAL == 44
+			CONTINUE
+	ENDIF
+	;地霊ルートの場合
+	IF FLAG:3 == 12
+		;さとりは出さない
+		SIF LOCAL == 81
+			CONTINUE
+			
+		T = 81
+		CALL GET_EXISTANCE
+		;さとりが既に居る(＝パートナー)場合、こいしは出さない
+		SIF E && LOCAL == 84
+			CONTINUE
+	ENDIF
+	;星蓮/魔界ルートの場合
+	IF FLAG:3 == 13
+		;白蓮は出さない
+		SIF LOCAL == 96
+			CONTINUE
+			
+		T = 96
+		CALL GET_EXISTANCE
+		;白蓮が既に居る(＝パートナー)場合、神綺は出さない
+		IF E
+			IF LOCAL == 52
+				CONTINUE
+			ELSEIF LOCAL == 51
+				T = 52
+				CALL GET_EXISTANCE
+				;…とみせかけて神綺も仲間にいる場合は魅魔様は出さない
+				SIF E > 0
+					CONTINUE
+			ENDIF
+		ENDIF
+	ENDIF
+	;神霊ルートの場合
+	;IF FLAG:3 == 14
+	;	;霊夢
+	;	SIF LOCAL == 1
+	;		CONTINUE
+	
+	;	T = 1
+	;	CALL GET_EXISTANCE
+	;	;霊夢が既に居る(＝パートナー)場合、魔理沙
+	;	SIF E && LOCAL == 2
+	;		CONTINUE
+	;ENDIF
+
+	T = LOCAL
+	CALL GET_EXISTANCE
+	;既に仲間になっているキャラは出さない
+	SIF E
+		CONTINUE
+
+
+	;ここまで残ったキャラはボス候補
+	F:A = LOCAL
+	A += 1
+NEXT
+
+;ボス候補が誰も居ない場合
+IF A == 0 && RAND:20 == 0
+	;5%で霊夢様の幻影が出てくる
+	F:0 = 666
+	A += 1
+ENDIF
+
+;ボス候補が誰もいない場合
+IF A == 0
+	;完全にランダムで選ぶ（幻影登場）
+	A = RAND:D
+	B = G:A
+ELSE
+	;誰か候補がいる場合
+	;候補キャラの中からランダムで選ぶ
+	D = RAND:A
+	B = F:D
+ENDIF
+
+RETURN 1
+
+
+
+@GET_CHARA_NAME
+;Tで指定されたキャラ番号のキャラの名前をSTR:Nに入れて返す
+;EXISTCSVは対応するキャラが定義されているかどうかをチェックし定義されていればRESULTに1、されていなければ0を返します
+EXISTCSV T,0
+IF RESULT == 1
+	CSVCALLNAME T, 0
+	STR:N = %RESULTS%
+ELSE
+	STR:N = 誰かの幻影
+ENDIF
+
+;RETURN 1
+RETURN 0
+
+
+@GET_JUN_VALUE
+#FUNCTION
+;純愛系のコマンド実行値をAに入れて返す
+;COM_ORDERと違って詳細は表示しない。あくまで隠しコマンド用
+
+;従順
+A = ABL:0 * 5
+
+;PALAM:恭順
+IF PALAM:4 < PALAMLV:1
+	L = 0
+ELSEIF PALAM:4 < PALAMLV:2
+	L = 1
+ELSEIF PALAM:4 < PALAMLV:3
+	L = 2
+ELSEIF PALAM:4 < PALAMLV:4
+	L = 3
+ELSEIF PALAM:4 < PALAMLV:5
+	L = 4
+ELSE
+	L = 5
+ENDIF
+SIF L
+	A += L * 3
+
+;反抗的
+SIF TALENT:11
+	A -= 5
+
+;気丈
+SIF TALENT:12
+	A -= 5
+
+;素直
+SIF TALENT:13
+	A += 5
+
+;プライド高い
+SIF TALENT:15
+	A -= 15
+
+;プライド低い
+SIF TALENT:17
+	A += 5
+
+;目立ちたがり
+SIF TALENT:28
+	A += 2
+
+;抑圧
+SIF TALENT:32
+	A -= 10
+
+;抵抗
+SIF TALENT:34
+	A -= 10
+
+;即落ち
+SIF TALENT:73
+	A += 10
+
+;男嫌い
+SIF TALENT:82 && TALENT:PLAYER:122
+	A -= 7
+
+;調教者の素質
+;魅惑
+SIF TALENT:PLAYER:91
+	A += 6
+;謎の魅力
+SIF TALENT:PLAYER:92
+	A += 6
+
+;相性チェック
+R = NO:PLAYER
+IF RELATION:R > 0 && RELATION:R < 30
+	A -= 10
+ELSEIF RELATION:R > 0 && RELATION:R < 70
+	A -= 6
+ELSEIF RELATION:R > 0 && RELATION:R < 100
+	A -= 3
+ELSEIF RELATION:R >= 100 && RELATION:R < 130
+	A += 3
+ELSEIF RELATION:R >= 100 && RELATION:R < 170
+	A += 6
+ELSEIF RELATION:R >= 100 && RELATION:R >= 170
+	A += 10
+ENDIF
+
+
+;ほろ酔いボーナス
+IF TFLAG:47 > 0
+	A += TFLAG:47 / 5
+ENDIF
+
+
+RETURNF A
+
+;-------------------------------------------------
+;押し倒され判定
+;-------------------------------------------------
+@PUSH_OVER
+;IF ASSIPLAY == 0 && (ABL:1 >= 7 || PALAM:3 >= 3000 || PALAM:5 >= 3000 || CFLAG:2 >= 10000)
+;この条件で呼び出されているため、助手プレイ中は押し倒されない
+;また、欲望Lv7以上、潤滑3000以上、欲情3000以上、好感度10000以上のどれかを満たす必要あり
+
+;既に押し倒されてたら無視
+;TFLAG:48は酔ってるお陰で服脱がせが成功したら１になるフラグ
+;	または酔ってる勢いで押し倒されたら１になるフラグ
+;TFLAG:51は押し倒されたら（押し倒され判定をクリアしたら）１になるフラグ
+SIF TFLAG:48 || TFLAG:51
+	RETURN 0
+
+;既に脱いでたら無視
+SIF TFLAG:44
+	RETURN 0
+
+;パートナーに主導権が無かったら無視
+SIF TFLAG:45 == 0
+	RETURN 0
+	
+;●友情パッチ用追加
+;友情パッチ適用キャラなら無視
+SIF IS_友情(TARGET)
+	RETURN 0
+;●ここまで
+
+
+;押し倒され数値判定。Aを使用
+CALL PUSH_OVER_RATE
+
+;合意有
+IF TALENT:TARGET:152
+	IF TEQUIP:28 == 0
+		;ただし主人公に[虜]、パートナーに[主人]がある場合は使用していなくても押し倒される
+		IF (TALENT:MASTER:219 && TALENT:TARGET:220)
+			;桃色の秘薬使わなくてもOK
+		ELSE
+			RETURN 0
+		ENDIF
+	ENDIF
+	;220突破で襲われる
+	IF A >= 220
+		;合意なしでの押し倒されると区別するため番号変更
+		TFLAG:600 = 45
+		;現状だと口上を導入している場合呼ばれない口上がほとんどなので地の文は常に表示
+		CALL COMMON_PLANE_TEXT
+		CALL KOJO_MESSAGE_SEND("JUN")
+		
+		;気力半分回復
+		BASE:1 += MAXBASE:1 / 2
+		SIF BASE:1 > MAXBASE:1
+			BASE:1 = MAXBASE:1
+		
+		;ウフフ開始
+		TFLAG:44 = 1
+		;映画館から追い出される
+		CALL GET_OUT_MOVIE
+		;押し倒されフラグON
+		TFLAG:51 = 1
+		RETURN 1
+	ENDIF
+;合意なし
+ELSE
+	;220突破で襲われる
+	IF A >= 220
+		TFLAG:48 = 0
+		TFLAG:600 = 27
+		CALL KOJO_MESSAGE_SEND("JUN")
+		PRINTL  
+
+		IF ASSIPLAY == 0 && TALENT:152 == 0
+			PRINTFORMW %CALLNAME:TARGET%の【合意】を得た
+			TALENT:152 = 1
+		ENDIF
+		;気力全快
+		BASE:1 = MAXBASE:1
+
+		TFLAG:44 = 1
+
+		;映画館から追い出される
+		CALL GET_OUT_MOVIE
+		;既成事実２に相当
+		TFLAG:200 = 2
+		CALL MARK_GOT_CHECK
+		RETURN 1
+	;酔った勢いで襲われる
+	ELSEIF A >= 220 - TFLAG:47 / 2
+		TFLAG:48 = 1
+		TFLAG:600 = 27
+		CALL KOJO_MESSAGE_SEND("JUN")
+		PRINTL  
+
+		;気力半分回復
+		BASE:1 += MAXBASE:1 / 2
+		SIF BASE:1 > MAXBASE:1
+			BASE:1 = MAXBASE:1
+
+		TFLAG:44 = 1
+		;映画館から追い出される
+		CALL GET_OUT_MOVIE
+		;既成事実２に相当
+		TFLAG:200 = 2
+		CALL MARK_GOT_CHECK
+		RETURN 1
+	ENDIF
+ENDIF
+
+RETURN 0
+
+;-------------------------------------------------
+;押し倒され数値判定
+;-------------------------------------------------
+@PUSH_OVER_RATE
+A = 0
+A = GET_JUN_VALUE()
+
+;ABL:欲望
+IF ABL:1
+	A += ABL:1 * 4
+ENDIF
+
+;PALAM:潤滑
+IF PALAM:3 >= 3000
+	A += PALAM:3 / 1000
+ENDIF
+
+;PALAM:欲情
+IF PALAM:5 >= 3000
+	A += PALAM:5 / 1000
+ENDIF
+
+;ABL:奉仕精神
+IF ABL:6
+	A += ABL:6 * 3
+ENDIF
+;男嫌い
+IF TALENT:82 && TALENT:PLAYER:122
+	A -= 7
+ENDIF
+;貞操観念
+IF TALENT:TARGET:30
+	A -= 10
+ENDIF
+;恥じらい
+IF TALENT:TARGET:35
+	A -= 10
+ENDIF
+;献身的
+IF TALENT:TARGET:63
+	A += 10
+ENDIF
+
+;合意と恋慕がある場合
+IF TALENT:TARGET:152 && TALENT:TARGET:85
+	;相手にサド
+	IF TALENT:TARGET:83
+		A += 1
+	ENDIF
+	;親愛&淫乱　取得順序を間違えると最初からやり直さないといけないので達成時に補正多め
+	IF TALENT:TARGET:88 && TALENT:TARGET:76
+		;相愛がある場合
+		IF TALENT:TARGET:89
+			A += 22
+		;相愛がない場合
+		ELSE
+			A += 13
+		ENDIF
+	ENDIF
+	;親愛と淫乱がなく、相愛のみある場合
+	IF TALENT:TARGET:88 == 0 && TALENT:TARGET:76 == 0 && TALENT:TARGET:89
+		A += 9
+	ENDIF
+;合意がある
+ELSEIF TALENT:TARGET:152
+	;恋慕と恋人を両方持つ
+	IF TALENT:TARGET:85 && TALENT:TARGET:153
+		A += 22
+	;恋慕か恋人がある
+	ELSEIF TALENT:TARGET:85 || TALENT:TARGET:153
+		A += 10
+	;どちらもない
+	ELSE
+		A += 1
+	ENDIF
+	;素直
+	IF TALENT:TARGET:13
+		;ツンデレがあると更に補正あり
+		IF TALENT:TARGET:18
+			A += 2
+		ELSE
+			A += 1
+		ENDIF
+	ENDIF
+;合意がない
+ELSEIF TALENT:TARGET:152 == 0
+	;恋慕と恋人を両方持つ
+	IF TALENT:TARGET:85 && TALENT:TARGET:153
+		A += 2
+	;恋慕か恋人がある
+	ELSEIF TALENT:TARGET:85 || TALENT:TARGET:153
+		A += 1
+	ENDIF
+	;素直
+	IF TALENT:TARGET:13
+		A += 1
+	ENDIF
+ENDIF
+
+;ムードボーナス
+B = 0
+IF TFLAG:37 < 10
+	B -= 20
+ELSEIF TFLAG:37 < 30
+	B -= 5
+ELSEIF TFLAG:37 < 50
+	B -= 1
+ELSEIF TFLAG:37 < 100
+	B += TFLAG:37 / 10
+ELSEIF TFLAG:37 < 300
+	B += TFLAG:37 / 7
+ELSE
+	B += TFLAG:37 / 5
+ENDIF
+A += B
+
+;好感度
+IF CFLAG:2 >= 3000
+	B = CFLAG:2 / 1000
+	A += B
+ENDIF
+;キス未経験
+IF TALENT:151
+	A -= 20
+ENDIF
+
+;一線越えない
+IF TALENT:27
+	A -= 20
+ENDIF
+
+;相手が主導権
+IF TFLAG:45
+	A += 5
+ENDIF
+
+;相手が非処女で、こちらが童貞
+IF TALENT:0 == 0 && TALENT:MASTER:154
+	A += 5
+ENDIF
+
+;桃色の秘薬使用中（既に合意有の場合押し倒されるためには桃色の秘薬使用は必須）
+IF TEQUIP:28 >= 5
+	A += 5
+ELSEIF TEQUIP:28
+	A += TEQUIP:28
+ENDIF
+
+;-------------------------------------------------
+;特殊能力の取得判定
+;-------------------------------------------------
+@GET_FEAT
+;特殊能力の取得
+
+;初期化
+VARSET A, 0
+
+PRINTL 
+PRINTFORML 好きな特殊能力を身に付けることが出来ます。選んでください
+IF ABL:MASTER:81 < 3
+	PRINTFORML [0] 好感度ボーナス Lv{ABL:MASTER:81 + 1}
+	A:0 = 1
+ENDIF
+IF TALENT:MASTER:113 == 0
+	PRINTFORML [1] 【魅力】追加
+	A:1 = 1
+ENDIF
+IF TALENT:MASTER:202 == 0
+	PRINTFORML [2] 脱衣制限解除
+	A:2 = 1
+ENDIF
+IF ABL:MASTER:82 < 2
+	PRINTFORML [3] 生活費軽減 Lv{ABL:MASTER:82 + 1}
+	A:3 = 1
+ENDIF
+IF ABL:MASTER:83 < 3
+	PRINTFORML [4] 戦闘経験ボーナス Lv{ABL:MASTER:83 + 1}
+	A:4 = 1
+ENDIF
+IF ABL:MASTER:84 < 99 && FLAG:5 == 10
+	PRINTFORML [5] 霧無効化能力強化 Lv{ABL:MASTER:84 + 1}
+	A:5 = 1
+ENDIF
+IF ABL:MASTER:85 < 99 && FLAG:5 == 10
+	PRINTFORML [6] 霧浄化能力強化 Lv{ABL:MASTER:85 + 1}
+	A:6 = 1
+ENDIF
+IF TALENT:MASTER:203 == 0 && FLAG:5 == 10
+	PRINTFORML [7] 恋人ボーナス強化
+	A:7 = 1
+ENDIF
+IF TALENT:MASTER:204 == 0 && FLAG:5 == 10
+	PRINTFORML [8] 恋慕ボーナス強化
+	A:8 = 1
+ENDIF
+IF TALENT:MASTER:205 == 0 && FLAG:5 == 10
+	PRINTFORML [9] 親愛ボーナス強化
+	A:9 = 1
+ENDIF
+IF TALENT:MASTER:206 == 0 && FLAG:5 == 10
+	PRINTFORML [10] 淫乱ボーナス強化
+	A:10 = 1
+ENDIF
+IF ABL:MASTER:86 < 3
+	PRINTFORML [11] 獲得資金増加 Lv{ABL:MASTER:86 + 1}
+	A:11 = 1
+ENDIF
+IF ABL:MASTER:87 < 3
+	PRINTFORML [12] 戦闘能力強化 Lv{ABL:MASTER:87 + 1}
+	A:12 = 1
+ENDIF
+IF TALENT:MASTER:207 == 0
+	PRINTFORML [13] 逃走能力強化
+	A:13 = 1
+ENDIF
+IF TALENT:MASTER:208 == 0 && FLAG:5 == 10
+	PRINTFORML [14] 後戻りできる程度の能力
+	A:14 = 1
+ENDIF
+IF TALENT:MASTER:209 == 0 && NO:MASTER == 0 && FLAG:5 == 10
+	PRINTFORML [15] 野菜を育てる程度の能力
+	A:15 = 1
+ENDIF
+IF TALENT:MASTER:52 == 0 && FLAG:62 & 256
+	PRINTFORML [16] 【舌使い】追加
+	A:16 = 1
+ENDIF
+IF TALENT:MASTER:53 == 0 && FLAG:62 & 256
+	PRINTFORML [17] 【針さばき】追加
+	A:17 = 1
+ENDIF
+IF TALENT:MASTER:55 == 0 && FLAG:62 & 256
+	PRINTFORML [18] 【調合知識】追加
+	A:18 = 1
+ENDIF
+IF TALENT:MASTER:87 == 0 && FLAG:62 & 256
+	PRINTFORML [19] 【小悪魔】追加
+	A:19 = 1
+ENDIF
+IF TALENT:MASTER:91 == 0 && FLAG:62 & 256
+	PRINTFORML [20] 【魅惑】追加
+	A:20 = 1
+ENDIF
+IF TALENT:MASTER:111 == 0 && FLAG:62 & 256
+	PRINTFORML [21] 【回復早い】追加
+	A:21 = 1
+ENDIF
+IF TALENT:MASTER:115 == 0 && FLAG:62 & 256
+	PRINTFORML [22] 【日光浴】追加
+	A:22 = 1
+ENDIF
+IF TALENT:MASTER:116 == 0 && FLAG:62 & 256
+	PRINTFORML [23] 【月光浴】追加
+	A:23 = 1
+ENDIF
+IF TALENT:MASTER:117 == 0 && FLAG:62 & 256
+	PRINTFORML [24] 【治療】追加
+	A:24 = 1
+ENDIF
+IF TALENT:MASTER:118 == 0 && FLAG:62 & 256
+	PRINTFORML [25] 【鼓舞】追加
+	A:25 = 1
+ENDIF
+IF TALENT:MASTER:217 == 0 && FLAG:62 & 256
+	PRINTFORML [26] 【酒豪】追加
+	A:26 = 1
+ENDIF
+IF TALENT:MASTER:240 == 0 && FLAG:62 & 256
+	PRINTFORML [27] 【千里眼】追加
+	A:27 = 1
+ENDIF
+IF TALENT:MASTER:58 == 0 && FLAG:62 & 256
+	PRINTFORML [28] 【淫具知識】追加
+	A:28 = 1
+ENDIF
+IF ABL:MASTER:Ｃ感覚 < 99 && FLAG:62 & 256
+	PRINTFORML [29] Ｃ感覚 Lv{ABL:MASTER:Ｃ感覚 + 1}
+	A:29 = 1
+ENDIF
+IF ABL:MASTER:Ｖ感覚 < 99 && TALENT:122 == 0 && FLAG:62 & 256
+	PRINTFORML [30] Ｖ感覚 Lv{ABL:MASTER:Ｖ感覚 + 1}
+	A:30 = 1
+ENDIF
+IF ABL:MASTER:Ａ感覚 < 99 && FLAG:62 & 256
+	PRINTFORML [31] Ａ感覚 Lv{ABL:MASTER:Ａ感覚 + 1}
+	A:31 = 1
+ENDIF
+IF ABL:MASTER:Ｂ感覚 < 99 && FLAG:62 & 256
+	PRINTFORML [32] Ｂ感覚 Lv{ABL:MASTER:Ｂ感覚 + 1}
+	A:32 = 1
+ENDIF
+IF ABL:MASTER:Ｍ感覚 < 99 && FLAG:62 & 256
+	PRINTFORML [33] Ｍ感覚 Lv{ABL:MASTER:Ｍ感覚 + 1}
+	A:33 = 1
+ENDIF
+IF ABL:MASTER:料理技能 < 99 && FLAG:62 & 256
+	PRINTFORML [34] 料理技能 Lv{ABL:MASTER:料理技能 + 1}
+	A:34 = 1
+ENDIF
+IF ABL:MASTER:撮影技能 < 99 && FLAG:62 & 256
+	PRINTFORML [35] 撮影技能 Lv{ABL:MASTER:撮影技能 + 1}
+	A:35 = 1
+ENDIF
+PRINTFORML [100] 何も取得しない
+
+$INPUT_LOOP
+INPUT
+B = RESULT
+
+IF RESULT == 100
+	PRINTFORMW 何も取得しませんでした
+	RETURN 1
+ELSEIF A:RESULT == 0
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP
+ELSEIF RESULT == 0
+	IF ABL:MASTER:81 == 0
+		PRINTFORML コマンド実行時の好感度上昇量が1.5倍になります
+	ELSEIF ABL:MASTER:81 == 1
+		PRINTFORML コマンド実行時の好感度上昇量が2倍になります
+	ELSE
+		PRINTFORML コマンド実行時の好感度上昇量が3倍になります
+	ENDIF
+ELSEIF RESULT == 1
+	PRINTFORML コマンド実行時のムード上昇量が+1されます
+ELSEIF RESULT == 2
+	PRINTFORML 「服を脱がせる」が必ず成功するようになり、戦闘中は最初から服を脱ぐようになります
+ELSEIF RESULT == 3
+	IF ABL:MASTER:82 == 0
+		PRINTFORML 生活費が20％引きになります
+	ELSE
+		PRINTFORML 生活費が半額になります
+	ENDIF
+ELSEIF RESULT == 4
+	IF ABL:MASTER:83 == 0
+		PRINTFORML Stage攻略の際に得られる戦闘経験が1.5倍になります
+	ELSEIF ABL:MASTER:83 == 1
+		PRINTFORML Stage攻略の際に得られる戦闘経験が2倍になります
+	ELSE
+		PRINTFORML Stage攻略の際に得られる戦闘経験が3倍になります
+	ENDIF
+ELSEIF RESULT == 5
+	PRINTFORML 仲間が霧に飲まれかけるまでの期限が約{(ABL:MASTER:84 + 1) * 2}日伸びます
+ELSEIF RESULT == 6
+	PRINTFORML 仲間が霧に飲まれかけても大丈夫な回数が{ABL:MASTER:85 + 1}回増えます
+ELSEIF RESULT == 7
+	PRINTFORML 恋人の人数に応じて得られる戦闘能力ボーナスが1.5倍になります
+ELSEIF RESULT == 8
+	PRINTFORML 恋人の人数に応じて得られる防御力ボーナスが2倍になります
+ELSEIF RESULT == 9
+	PRINTFORML 親愛の人数に応じて得られる戦闘能力ボーナスが3倍になります
+ELSEIF RESULT == 10
+	PRINTFORML 淫乱の人数に応じて得られる耐力・魔力ボーナスが3倍になります
+ELSEIF RESULT == 11
+	IF ABL:MASTER:86 == 0
+		PRINTFORML アルバイトや妖怪退治で得られる資金が1.2倍になります
+	ELSEIF ABL:MASTER:86 == 1
+		PRINTFORML アルバイトや妖怪退治で得られる資金が1.5倍になります
+	ELSE
+		PRINTFORML アルバイトや妖怪退治で得られる資金が2倍になります
+	ENDIF
+ELSEIF RESULT == 12
+	IF ABL:MASTER:82 == 0
+		PRINTFORML %CALLNAME:MASTER%の戦闘能力が1.5倍になります
+	ELSEIF ABL:MASTER:82 == 1
+		PRINTFORML %CALLNAME:MASTER%の戦闘能力が2倍になります
+	ELSE
+		PRINTFORML %CALLNAME:MASTER%の戦闘能力が3倍になります
+	ENDIF
+ELSEIF RESULT == 13
+	PRINTFORML 撤退が一部の例外を除いて必ず成功します
+ELSEIF RESULT == 14
+	PRINTFORML 前のStageに戻れるようになります
+ELSEIF RESULT == 15
+	PRINTFORML 畑仕事で得られる資金が増加します
+ELSEIF RESULT == 16
+	PRINTFORML フェラ系調教の効果が高くなります
+ELSEIF RESULT == 17
+	PRINTFORML 「針」の効果が高くなります
+ELSEIF RESULT == 18
+	PRINTFORML 特殊なアイテムを購入でき、コマンド「媚薬」の体力と気力の消費が少なくなります
+ELSEIF RESULT == 19
+	PRINTFORML コマンドを実行しやすくなります
+ELSEIF RESULT == 20
+	PRINTFORML コマンドを実行しやすくなり、パラメータを全体的に上げやすくなります
+ELSEIF RESULT == 21
+	PRINTFORML 体力の回復量が上昇します
+ELSEIF RESULT == 22
+	PRINTFORML 昼休憩時に体力の回復量が上昇します
+ELSEIF RESULT == 23
+	PRINTFORML 夜休憩時に体力の回復量が上昇します
+ELSEIF RESULT == 24
+	PRINTFORML 仲間の体力の回復量が上昇します
+ELSEIF RESULT == 25
+	PRINTFORML コマンドを実行しやすくなり、調教終了後の自慰回数が増加します
+ELSEIF RESULT == 26
+	PRINTFORML お酒大好き幻想郷の中でもトップクラスのお酒飲みになります
+ELSEIF RESULT == 27
+	PRINTFORML Stage攻略中に常に中ボス・ボスの居場所が分かるようになります
+ELSEIF RESULT == 28
+	PRINTFORML 道具を使ったコマンドの効果が上昇します
+ELSEIF RESULT == 29
+	PRINTFORML %CALLNAME:MASTER%のＣ感覚が関係するコマンドの効果が上昇します
+ELSEIF RESULT == 30
+	PRINTFORML %CALLNAME:MASTER%のＶ感覚が関係するコマンドの効果が上昇します
+ELSEIF RESULT == 31
+	PRINTFORML %CALLNAME:MASTER%のＡ感覚が関係するコマンドの効果が上昇します
+ELSEIF RESULT == 32
+	PRINTFORML %CALLNAME:MASTER%のＢ感覚が関係するコマンドの効果が上昇します
+ELSEIF RESULT == 33
+	PRINTFORML %CALLNAME:MASTER%のＭ感覚が関係するコマンドの効果が上昇します
+ELSEIF RESULT == 34
+	PRINTFORML %CALLNAME:MASTER%が作る料理の効果が上昇します
+ELSEIF RESULT == 35
+	PRINTFORML 撮影コマンドの効果が上昇します
+ELSE
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP
+ENDIF
+
+PRINTFORML この能力を取得して良いですか？
+PRINTFORML [0] はい
+PRINTFORML [1] いいえ
+
+$INPUT_LOOP_2
+INPUT
+
+IF (RESULT < 0 || RESULT > 1)
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP_2
+ELSEIF RESULT == 1
+	RESTART
+ELSEIF B == 0
+	ABL:MASTER:81 += 1
+	PRINTFORMW 好感度ボーナス Lv{ABL:MASTER:81} を取得しました
+ELSEIF B == 1
+	TALENT:MASTER:113 = 1
+	PRINTFORMW 【魅力】を取得しました
+ELSEIF B == 2
+	TALENT:MASTER:202 = 1
+	PRINTFORMW 脱衣制限解除 を取得しました
+ELSEIF B == 3
+	ABL:MASTER:82 += 1
+	PRINTFORMW 生活費軽減 Lv{ABL:MASTER:82} を取得しました
+ELSEIF B == 4
+	ABL:MASTER:83 += 1
+	PRINTFORMW 戦闘経験ボーナス Lv{ABL:MASTER:83} を取得しました
+ELSEIF B == 5
+	ABL:MASTER:84 += 1
+	PRINTFORMW 霧無効化能力強化 Lv{ABL:MASTER:84} を取得しました
+ELSEIF B == 6
+	ABL:MASTER:85 += 1
+	PRINTFORMW 霧浄化能力強化 Lv{ABL:MASTER:85} を取得しました
+ELSEIF B == 7
+	TALENT:MASTER:203 = 1
+	PRINTFORMW 恋人ボーナス強化 を取得しました
+ELSEIF B == 8
+	TALENT:MASTER:204 = 1
+	PRINTFORMW 恋慕ボーナス強化 を取得しました
+ELSEIF B == 9
+	TALENT:MASTER:205 = 1
+	PRINTFORMW 親愛ボーナス強化 を取得しました
+ELSEIF B == 10
+	TALENT:MASTER:206 = 1
+	PRINTFORMW 淫乱ボーナス強化 を取得しました
+ELSEIF B == 11
+	ABL:MASTER:86 += 1
+	PRINTFORMW 獲得資金増加 Lv{ABL:MASTER:86} を取得しました
+ELSEIF B == 12
+	ABL:MASTER:87 += 1
+	PRINTFORMW 戦闘能力強化 Lv{ABL:MASTER:87} を取得しました
+ELSEIF B == 13
+	TALENT:MASTER:207 = 1
+	PRINTFORMW 逃走能力強化 を取得しました
+ELSEIF B == 14
+	TALENT:MASTER:208 = 1
+	PRINTFORMW 後戻りできる程度の能力 を取得しました
+ELSEIF B == 15
+	TALENT:MASTER:209 = 1
+	PRINTFORMW 野菜を育てる程度の能力 を取得しました
+ELSEIF B == 16
+	TALENT:MASTER:52 = 1
+	PRINTFORMW 【舌使い】を取得しました
+ELSEIF B == 17
+	TALENT:MASTER:53 = 1
+	PRINTFORMW 【針さばき】を取得しました
+ELSEIF B == 18
+	TALENT:MASTER:55 = 1
+	PRINTFORMW 【調合知識】を取得しました
+ELSEIF B == 19
+	TALENT:MASTER:87 = 1
+	PRINTFORMW 【小悪魔】を取得しました
+ELSEIF B == 20
+	TALENT:MASTER:91 = 1
+	PRINTFORMW 【魅惑】を取得しました
+ELSEIF B == 21
+	TALENT:MASTER:111 = 1
+	PRINTFORMW 【回復早い】を取得しました
+ELSEIF B == 22
+	TALENT:MASTER:115 = 1
+	PRINTFORMW 【日光浴】を取得しました
+ELSEIF B == 23
+	TALENT:MASTER:116 = 1
+	PRINTFORMW 【月光浴】を取得しました
+ELSEIF B == 24
+	TALENT:MASTER:117 = 1
+	PRINTFORMW 【治療】を取得しました
+ELSEIF B == 25
+	TALENT:MASTER:118 = 1
+	PRINTFORMW 【鼓舞】を取得しました
+ELSEIF B == 26
+	TALENT:MASTER:217 = 1
+	PRINTFORMW 【酒豪】を取得しました
+ELSEIF B == 27
+	TALENT:MASTER:240 = 1
+	PRINTFORMW 【千里眼】を取得しました
+ELSEIF B == 28
+	TALENT:MASTER:58 = 1
+	PRINTFORMW 【淫具知識】を取得しました
+ELSEIF B == 29
+	ABL:MASTER:Ｃ感覚 += 1
+	PRINTFORMW Ｃ感覚 Lv{ABL:MASTER:Ｃ感覚} を取得しました
+ELSEIF B == 30
+	ABL:MASTER:Ｖ感覚 += 1
+	PRINTFORMW Ｖ感覚 Lv{ABL:MASTER:Ｖ感覚} を取得しました
+ELSEIF B == 31
+	ABL:MASTER:Ａ感覚 += 1
+	PRINTFORMW Ａ感覚 Lv{ABL:MASTER:Ａ感覚} を取得しました
+ELSEIF B == 32
+	ABL:MASTER:Ｂ感覚 += 1
+	PRINTFORMW Ｂ感覚 Lv{ABL:MASTER:Ｂ感覚} を取得しました
+ELSEIF B == 33
+	ABL:MASTER:Ｍ感覚 += 1
+	PRINTFORMW Ｍ感覚 Lv{ABL:MASTER:Ｍ感覚} を取得しました
+ELSEIF B == 34
+	ABL:MASTER:料理技能 += 1
+	PRINTFORMW 料理技能 Lv{ABL:MASTER:料理技能} を取得しました
+ELSEIF B == 35
+	ABL:MASTER:撮影技能 += 1
+	PRINTFORMW 撮影技能 Lv{ABL:MASTER:撮影技能} を取得しました
+ENDIF
+
+RETURN 0
+
+
+@GET_LOST_CHARA
+;霧に飲まれかけているキャラの番号をランダムで取得し、Cに入れて返す。誰もいなければ０を返す
+
+A = 0
+B = 0
+C = 0
+D = 0
+
+FOR LOCAL, 0, CHARANUM
+	IF LOCAL == 0
+		CONTINUE
+	ELSEIF CFLAG:LOCAL:17
+		A:B = LOCAL
+		B += 1
+	ENDIF
+NEXT
+
+IF B == 0
+	C = 0
+ELSE
+	D = RAND:B
+	C = A:D
+ENDIF
+
+RETURN 0
+
+
+@SET_TMP_PARTNER
+;暫定パートナーを選択
+;好感度が一番高いキャラを暫定パートナーに
+;臨月、育児中のキャラは回避
+;別れているキャラは回避
+
+A = 0
+B = 0
+FOR LOCAL, 0, CHARANUM
+	SIF LOCAL == NO:MASTER
+		CONTINUE
+	SIF (FLAG:62 & 1) && (MARK:LOCAL:90 == 1)
+		CONTINUE
+	SIF CFLAG:LOCAL:21
+		CONTINUE
+	IF CFLAG:LOCAL:17 == 0
+		IF CFLAG:LOCAL:2 > A
+			A = CFLAG:LOCAL:2
+			B = LOCAL
+		ENDIF
+	ENDIF
+NEXT
+
+IF B != 0
+	SIF ASSI == B
+		ASSI = -1
+	TARGET = B
+	SIF CFLAG:16 == 1
+		CFLAG:16 = 0
+	PRINTFORMW %CALLNAME:TARGET%をパートナーに選びました
+	RETURN 1
+ENDIF
+
+RETURN 0
+
+
+@CHECK_FEAT
+;特殊能力獲得
+
+;Phモード以外は無視
+SIF FLAG:5 != 10
+	RETURN 0
+
+IF FLAG:48 == 1 || FLAG:48 == 3 || FLAG:48 == 5 || FLAG:48 == 8 || FLAG:48 == 11 || (FLAG:48 >= 15 && (FLAG:48 % 5 == 0))
+	PRINTFORMW 恋人の延べ人数が{FLAG:48}人を超えたので、特殊能力を１つ得る事ができます
+	CALL GET_FEAT
+ENDIF
+
+RETURN 0
+
+;-------------------------------------------------
+;主人公の戦闘技能レベルアップ
+;-------------------------------------------------
+@MASTER_ABLUP88
+SIF ABL:MASTER:88 >= 9999
+	RETURN 0
+
+VARSET LOCAL, 0
+;現在の戦闘技能を記録し、上昇したら文章表示
+LOCAL:1 = ABL:MASTER:88
+FOR LOCAL, 0, 9999
+	SIF ABL:MASTER:88 >= 9999
+		BREAK
+	IF ABL:MASTER:88 < 5 && EXP:MASTER:95 >= 30 * (ABL:MASTER:88 + 1)
+		ABL:MASTER:88 += 1
+	ELSEIF ABL:MASTER:88 < 20 && EXP:MASTER:95 >= 50 * (ABL:MASTER:88 + 1)
+		ABL:MASTER:88 += 1
+	ELSEIF ABL:MASTER:88 < 50 && EXP:MASTER:95 >= 100 * (ABL:MASTER:88 + 1)
+		ABL:MASTER:88 += 1
+	ELSEIF ABL:MASTER:88 < 60 && EXP:MASTER:95 >= 150 * (ABL:MASTER:88 + 1)
+		ABL:MASTER:88 += 1
+	ELSEIF ABL:MASTER:88 < 70 && EXP:MASTER:95 >= 250 * (ABL:MASTER:88 + 1)
+		ABL:MASTER:88 += 1
+	ELSEIF ABL:MASTER:88 < 90 && EXP:MASTER:95 >= 500 * (ABL:MASTER:88 + 1)
+		ABL:MASTER:88 += 1
+	ELSEIF ABL:MASTER:88 >= 90 && EXP:MASTER:95 >= 1000 * (ABL:MASTER:88 + 1)
+		ABL:MASTER:88 += 1
+	ELSE
+		BREAK
+	ENDIF
+NEXT
+IF LOCAL:1 < ABL:MASTER:88
+	PRINTL 
+	PRINTFORMW ＜%CALLNAME:MASTER%の戦闘技能が{ABL:MASTER:88}になった＞
+	PRINTL 
+ENDIF
+
+;-------------------------------------------------
+;【恋人】取得
+;-------------------------------------------------
+@GET_LOVERS
+;TにMASTERと恋人になる人
+;●友情パッチ用改変
+IF IS_友情(TARGET)
+	PRINTFORMW %CALLNAME:T%と【親友】になりました
+ELSE
+	PRINTFORMW %CALLNAME:T%と【恋人】になりました
+ENDIF
+;●ここまで
+FLAG:48 += 1
+CALL CHECK_FEAT
+TFLAG:39 = 1
+
+;既成事実LV2
+TFLAG:200 = 2
+
+;-------------------------------------------------
+;キャラ加入時の共通設定
+;AはCHARANUM - 1
+;-------------------------------------------------
+@NEWCHARA_INIT(ARG:0)
+A = ARG:0
+;キス未経験付加
+TALENT:A:151 = 1
+;初期異常経験を記憶
+CFLAG:A:22 = EXP:A:50
+;初期噴乳経験を記録
+SIF TALENT:A:130 == 0
+	CFLAG:A:25 = EXP:A:54
+;初期好感度を決定
+CFLAG:A:2 = RAND:50 - 40
+;初期戦闘技術を決定
+;ABL:A:88 += FLAG:24 / 2
+;仲間になった日
+CFLAG:A:75 = DAY:1
+CFLAG:A:76 = DAY:2
+
+;ストレス設定
+MAXBASE:A:ストレス = 100
+BASE:A:ストレス = 0
+
+;経験からVO,VI,DAの技能アップ
+FOR LOCAL, 0, 99
+	IF ABL:ARG:Ｖｏ技能 <= 99 && ARG != MASTER
+		IF EXP:ARG:歌唱経験 >= ABLLVUP_EXP(ABL:ARG:Ｖｏ技能)
+			ABL:ARG:Ｖｏ技能++
+			BASE:ARG:VO倍率 += STATUSUP_VOVIDA(ARG, 1)
+		ENDIF
+	ENDIF
+	IF ABL:ARG:Ｖｉ技能 <= 99 && ARG != MASTER
+		IF EXP:ARG:被写経験 >= ABLLVUP_EXP(ABL:ARG:Ｖｉ技能)
+			ABL:ARG:Ｖｉ技能++
+			BASE:ARG:VI倍率 += STATUSUP_VOVIDA(ARG, 2)
+		ENDIF
+	ENDIF
+	IF ABL:ARG:Ｄａ技能 <= 99 && ARG != MASTER
+		IF EXP:ARG:舞踊経験 >= ABLLVUP_EXP(ABL:ARG:Ｄａ技能)
+			ABL:ARG:Ｄａ技能++
+			BASE:ARG:DA倍率 += STATUSUP_VOVIDA(ARG, 3)
+		ENDIF
+	ENDIF
+NEXT
+
+;パートナーのキャラID設定
+;CFLAG:A:81 = FLAG:現在コスト
+FLAG:998 += 1
+
+;種族設定
+L = NO:A
+CALL GET_STRAINNAME
+CFLAG:A:14 = RESULT
+
+;初期月経周期を設定
+L = A
+CALL EVENT_ADD_CHARA_MENSTRUATION
+CALL ADD_NEWCHARA(A)
+
+;汎用キャラのランダム素質付加処理
+;SIF NO:A == 99
+;	CALL CHARA_RANDOM_STATE
+
+;デフォルトのコマンドを指示
+CFLAG:A:13 = CFLAG:MASTER:13
+
+;初期の耐力と魔力を計算
+;耐力＝体力を基準値として、絶頂経験で増加  だったが　ますで計算式変更
+;MAXBASE:A:HP = MAXBASE:A:0 * (100 + EXP:A:2) / 100
+;魔力＝気力の10%を基準値として、精液経験で増加
+;MAXBASE:A:MP = MAXBASE:A:1 / 10 * (50 + EXP:A:20) / 50
+;BASE:A:HP = MAXBASE:A:HP
+;BASE:A:MP = MAXBASE:A:MP
+BASE:A:0 = MAXBASE:A:0
+BASE:A:1 = MAXBASE:A:1
+
+;SPキャラ加入時、通常状態のSPキャラにエンゲージリングを贈っていた場合、
+;SPキャラとして加入後エンゲージリングが贈れなくなってしまう為初期化
+IF CFLAG:A:0 && FLAG:29 == NO:A
+	FLAG:29 = 0
+	TIME:9 = 0
+	TIME:10 = 0
+ENDIF
+
+@ADD_NEWCHARA(ARG:0)
+
+;CFLAG:(ARG:0):7340 = 3
+
+;加入時の共通設定
+CALL ADD_NEW_CHARA_COMMON(ARG:0)
+CFLAG:(ARG:0):勧誘状況 = -1
+FOR LOCAL:0, 0, 6
+	IF LOCAL:0 == 5
+		CFLAG:(ARG:0):メンバー内位置 = 0
+	ELSEIF FLAG:(LOCAL:0 + 1080) <= 0
+		CFLAG:(ARG:0):メンバー内位置 = LOCAL:0 + 1
+		FLAG:(LOCAL:0 + 1080) = ARG:0
+		BREAK
+	ENDIF
+NEXT
+;TSフラグ
+CFLAG:ARG:41 = 0
+;各種適正をフラグに置き換え
+BASE:ARG:VO倍率 = ABL:ARG:歌唱適性
+BASE:ARG:VI倍率 = ABL:ARG:被写適性
+BASE:ARG:DA倍率 = ABL:ARG:舞踊適性
+;各種データを設定
+MAXBASE:ARG:団結値 = 499
+BASE:ARG:団結値 = 25
+MAXBASE:ARG:親密度 = 99
+BASE:ARG:親密度 = 0
+MAXBASE:ARG:親愛度 = 99
+BASE:ARG:親愛度 = 0
+MAXBASE:ARG:戦闘レベル = 200
+;加入時口上表示
+FLAG:フェス中口上 = 2
+CALL KOJO(ARG:0)
+
+
+@ADD_NEW_CHARA_COMMON(ARG:0)
+;FLAG:25のキャラを追加
+;T = FLAG:25
+;CALL GET_EXISTANCE
+
+CFLAG:(ARG:0):21 = 0
+;TFLAG:600 = 36
+;口上の条件はTFLAG:600 == 36にしてください
+;CALL KOJO_MESSAGE_SEND("JUN")
+;エクストラ構文呼び出し
+TFLAG:600 = 0
+CALL KOJO_MESSAGE_SEND("JUN")
+;一度仲間になった判定をFLAG:1000から管理していたが、eraIm@sJではCFLAG:勧誘状況で管理
+;仲間にしたキャラのコマンドフィルタを自動的に共通設定にする
+SIF FLAG:61 & 1p10
+	CALL INVERT_COM_FILTERING(1001, ARG:0)
+
+RETURN 1
+
+
+
+;-------------------------------------------------
+;CSVの名前取得関数
+;-------------------------------------------------
+@NAME_CSV(ARG, ARG:1)
+#FUNCTIONS
+;CSVが存在するか判定
+;CSVが存在しない場合（存在すればRESULT = 1）は空白
+EXISTCSV ARG, ARG:1
+SIF RESULT == 0
+	RETURNF ""
+
+CSVNAME ARG, ARG:1
+RETURNF RESULTS
+

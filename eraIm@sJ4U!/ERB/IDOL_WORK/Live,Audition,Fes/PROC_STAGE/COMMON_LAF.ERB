@@ -1,0 +1,839 @@
+@PRINT_LAF_MAIN
+CUSTOMDRAWLINE =
+ALIGNMENT CENTER
+;%\t%でタブを使うという手も
+TSTR = %" "%
+SELECTCASE TFLAG:戦闘中
+	;フェス
+	CASE 4
+		PRINTFORM ┏━━━━━━━━━━━━━━━━━━━━━━┓
+		PRINTFORM (TIME：
+		CALL BAR_LAF_TIME
+		PRINTFORM )
+		PRINTFORM ┏━━━━━━━━━━━━━━━━━━━━━━┓
+		PRINTL
+		PRINTFORM ┃%CSTR:0:22, 44, LEFT%┃
+		PRINTFORM %TSTR, 24%
+		PRINTFORM ┃%CALLNAME:1, 44, LEFT%┃
+		PRINTL
+		PRINTFORM ┗━━━━━━━━━━━━━━━━━━━━━━┛
+		PRINTFORM %TSTR, 24%
+		PRINTFORM ┗━━━━━━━━━━━━━━━━━━━━━━┛
+		PRINTL
+		PRINTFORM SCORE：
+		FONTBOLD
+		PRINTFORM {TFLAG:味方スコア}
+		FONTREGULAR
+		PRINTFORM %TSTR, 96%
+		FONTBOLD
+		PRINTFORM {TFLAG:敵スコア}
+		RESETCOLOR
+		FONTREGULAR
+		PRINTFORM ：SCORE
+		PRINTL
+		PRINTFORM VL 
+		CALL BAR_ボルテージ(0)
+		PRINTFORM %TSTR, 46%
+		CALL BAR_ボルテージ(1)
+		PRINTFORM  VL
+		PRINTL 
+		CALL 思い出表示(11)
+		PRINTFORM %TSTR, 50%
+		CALL 思い出表示(1)
+		PRINTL 
+	;ライブ
+	CASE 3
+		ALIGNMENT LEFT
+		PRINTFORM 　　　┏━━━━━━━━━━━━━━━━━━━━━━┓
+		PRINTFORM (TIME：
+		CALL BAR_LAF_TIME
+		PRINTFORM )
+		PRINTFORM 　　　　　　　　　　　　　　　　　　ハコユレ震度
+		PRINTL
+		PRINTFORM 　　　┃%CSTR:0:22, 44, LEFT%┃
+		PRINTFORM %TSTR, 33%
+		;48
+		SIF TFLAG:合格フラグ
+			SETCOLOR 0Xffc400
+		PRINTFORM %ハコユレ震度(), 39, RIGHT%
+		RESETCOLOR
+		PRINTL
+		PRINTFORM 　　　┗━━━━━━━━━━━━━━━━━━━━━━┛
+		PRINTFORM %TSTR, 24%
+		PRINTFORM ┏━━━━━━━━━━━━━━━━━━━━━━┓
+		PRINTL
+		PRINTFORM 　　　　SCORE：
+		PRINTFORM {TFLAG:味方スコア, 7, LEFT}
+		PRINTFORM %TSTR, 45%
+		PRINTFORM 　　　　　 ┃%コメント_ライブ(), 44, LEFT%┃
+		PRINTL
+		PRINTFORM 　　VL 
+		CALL BAR_ボルテージ(0)
+		PRINTFORM %TSTR, 32%
+		PRINTFORM  　┗━━━━━━━━━━━━━━━━━━━━━━┛
+		PRINTL 
+		PRINTFORM %TSTR, 34%
+		CALL 思い出表示(11)
+		PRINTFORM %TSTR, 48%
+		PRINTFORM 　　　　　　　　　　　　　　　AUDIENCE
+		PRINTL 
+		ALIGNMENT CENTER
+	;オーディション
+	CASE 2
+		PRINTFORM ┏━━━━━━━━━━━━━━━━━━━━━━┓
+		PRINTFORM (TIME：
+		CALL BAR_LAF_TIME
+		PRINTFORM )
+		PRINTFORM 　　　　　　　　　　　　　　　　　　　ランキング
+		PRINTL
+		PRINTFORM ┃%CSTR:0:22, 44, LEFT%┃
+		PRINTFORM %TSTR, 33%
+		;48
+		SIF TFLAG:合格フラグ
+			SETCOLOR 0Xffc400
+		PRINTFORM %オーディション順位(), 39, RIGHT%
+		RESETCOLOR
+		PRINTL
+		PRINTFORM ┗━━━━━━━━━━━━━━━━━━━━━━┛
+		PRINTFORM %TSTR, 24%
+		PRINTFORM ┏━━━━━━━━━━━━━━━━━━━━━━┓
+		PRINTL
+		PRINTFORM SCORE：
+		PRINTFORM {TFLAG:味方スコア, 7, LEFT}
+		PRINTFORM %TSTR, 50%
+		PRINTFORM 　　　　┃%コメント_オーディション(), 44, LEFT%┃
+		PRINTL
+		PRINTFORM VL 
+		CALL BAR_ボルテージ(0)
+		PRINTFORM %TSTR, 32%
+		PRINTFORM  ┗━━━━━━━━━━━━━━━━━━━━━━┛
+		;CALL BAR_ボルテージ(1)
+		;PRINTFORM  VL
+		PRINTL 
+		ALIGNMENT LEFT
+		PRINTFORM %TSTR, 36%
+		CALL 思い出表示(11)
+		PRINTFORM %TSTR, 48%
+		PRINTFORM 　　　　　　　　　　　　　　DIRECTOR
+		PRINTL 
+		ALIGNMENT CENTER
+	CASE 1
+	
+	CASEELSE
+	
+ENDSELECT
+IF TFLAG:チェイン数 > 1
+	TSTR = %TOSTR(TFLAG:チェイン数)%
+	TSTR = %TSTR%CHAIN
+	PRINTFORM %TSTR, 10, RIGHT%
+	TSTR = %" "%
+	PRINTFORM %TSTR, 62%
+	PRINTFORM %TSTR, 48%
+	PRINTL 
+	PRINTFORM ￣￣￣￣￣
+	TSTR = %" "%
+	PRINTFORM %TSTR, 62%
+	PRINTFORM %TSTR, 48%
+	PRINTL 
+	PRINTFORM BONUS+
+	TSTR = %TOSTR(5 + (TFLAG:チェイン数 - 2) * 1)%
+	PRINTFORM %TSTR, 4, RIGHT%
+	TSTR = %" "%
+	PRINTFORM %TSTR, 62%
+	PRINTFORM %TSTR, 48%
+	PRINTL 
+ELSE
+	PRINTL 
+	PRINTL 
+	PRINTL
+ENDIF
+ALIGNMENT LEFT
+
+;ARG 存在しなければ通常表示、存在すれば行動キャラに印をつける
+@PRINT_PT_STATUS_LAF(ARG)
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		PRINTFORM ┏━━━━━━━━━┓
+	ENDIF
+NEXT
+PRINTL
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		LOCAL:1 = FLAG:(LOCAL:0)
+		PRINTFORM ┃
+		CALL SET_COLOR(LOCAL:1)
+		PRINTFORM %(CALLNAME:(LOCAL:1)), 16, LEFT%
+		RESETCOLOR
+		IF LOCAL:1 == ARG
+			CALL SET_COLOR(20)
+			PRINTFORM ★
+			RESETCOLOR
+			PRINTFORM ┃
+		ELSE
+			PRINTFORM 　┃
+		ENDIF
+	ENDIF
+NEXT
+PRINTL
+
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		LOCAL:1 = FLAG:(LOCAL:0)
+		PRINTFORM ┃
+		;長さは18
+		CALL BAR_待機時間(FLAG:LOCAL)
+		PRINTFORM ┃
+	ENDIF
+NEXT
+PRINTL
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		PRINTFORM ┗━━━━━━━━━┛
+	ENDIF
+NEXT
+PRINTL
+;ARG	対象
+@思い出表示(ARG)
+VARSET LOCAL
+TSTR = %""%
+GETFONT
+CHKFONT "Times New Roman"
+SIF RESULT
+	SETFONT "Times New Roman"
+LOCAL:2 = GETBGCOLOR()
+LOCAL:1 = TFLAG:味方思い出
+FOR LOCAL, 0, 6
+	IF ARG >= 11
+		IF LOCAL:1 > 0
+			LOCAL:1 --
+			CALL SET_COLOR(16)
+		ELSE
+			SETCOLOR LOCAL:2
+		ENDIF
+	ELSE
+		SETCOLOR LOCAL:2
+	ENDIF
+	PRINTFORM %UNICODE(0x2665)%
+NEXT
+SETFONT RESULTS
+RESETCOLOR
+
+@バースト順代入(ARG)
+VARSET LOCAL
+;現在は適当に代入
+FOR LOCAL, 1, 11
+	R:LOCAL = (RAND:3 + 1)
+NEXT
+
+;アピール時間を取得
+@MUSIC_TIME(ARG = 0)
+VARSET LOCAL
+SIF ARG == 0
+	ARG = FLAG:リリース中楽曲
+TRYCALLFORM BPM_{ARG}
+LOCAL = RESULT
+LOCAL *= 10000
+TIMES LOCAL, 0.5
+LOCAL = LOCAL + (60 * 10000)
+TIMES LOCAL, 0.586
+;手動プレイ時とのスコア差があり過ぎるので、更に7/10
+;(これで6000:3500くらい)
+TIMES LOCAL, 0.700
+LOCAL /= 100
+;PRINTFORML アピールタイム{LOCAL}
+RETURN LOCAL
+
+@リザルト画面
+ALIGNMENT CENTER
+CUSTOMDRAWLINE =
+FONTBOLD
+PRINTFORML STAGE RESULT
+DRAWLINE
+IF TFLAG:味方スコア > FLAG:ハイスコア
+	CALL PRINTCOLOR(GETBGCOLOR(), " NEW RECORD!!")
+ENDIF
+PRINTFORM TOTAL SCORE%UNICODE(0X2023)%%UNICODE(0X2023)% {TFLAG:味方スコア, 6}
+FONTREGULAR
+PRINTFORM pts
+IF TFLAG:味方スコア > FLAG:ハイスコア
+	CALL PRINTCOLOR(0Xffb6c1, " NEW RECORD!!")
+ENDIF
+PRINTL 
+PRINTL 
+PRINTFORML TOTAL BURST SCORE%UNICODE(0X2023)%%UNICODE(0X2023)% {TFLAG:トータルバースト, 6}pts
+PRINTFORML TOTAL CHAIN BONUS%UNICODE(0X2023)%%UNICODE(0X2023)% {TFLAG:トータルチェイン, 6}pts
+PRINTFORML 　　　　MAX CHAIN%UNICODE(0X2023)%%UNICODE(0X2023)% {TFLAG:MAXチェイン数, 6}pts
+DRAWLINE
+ALIGNMENT LEFT
+
+@LAF終了メッセージ
+IF TFLAG:戦闘中 == 2
+	IF TFLAG:合格フラグ == 1
+		CALL MESSAGE, "", @"審査員の口から%CSTR:0:22%の合格が告げられた" , "/" , 0 , "LEFT", "", , 2
+		CALL MESSAGE, "", @"%CALLNAME:TARGET%達は見事オーディションに合格できたようだ！" , "/" , 0 , "LEFT", "", , 2
+		CALL SE("お仕事","ステージ","成功")
+		;PRINTFORMW 審査員の口から%CSTR:0:22%の合格が告げられた
+		;PRINTFORMW %CALLNAME:TARGET%達は見事オーディションに合格できたようだ！
+	ELSE
+		CALL MESSAGE, "", @"審査員の口から%CSTR:0:22%の名前が告げられることは無かった……" , "/" , 0 , "LEFT", "", , 2
+		CALL MESSAGE, "", @"どうやら%CALLNAME:TARGET%達はオーディションに落ちてしまったようだ……" , "/" , 0 , "LEFT", "", , 2
+		CALL SE("お仕事","ステージ","成功")
+		;PRINTFORMW 審査員の口から%CSTR:0:22%の名前が告げられることは無かった……
+		;PRINTFORMW どうやら%CALLNAME:TARGET%達はオーディションに落ちてしまったようだ……
+	ENDIF
+	
+ELSEIF TFLAG:戦闘中 == 3
+		IF TFLAG:合格フラグ == 1
+			CALL SE("お仕事","ステージ","歓声")
+			CALL MESSAGE, "", @"会場の熱気は最大まで達し、/アンコールを求める声が鳴りやまない" , "/" , 0 , "LEFT", "", , 2
+			CALL MESSAGE, "", @"%CALLNAME:TARGET%達は見事にライブを盛り上げることが出来たようだ!!" , "/" , 0 , "LEFT", "", , 2
+			CALL SE("お仕事","ステージ","成功")
+		ELSE
+			CALL MESSAGE, "", @"会場は今一つ盛り上がりに欠け、/観客は白け切っている" , "/" , 0 , "LEFT", "", , 2
+			CALL MESSAGE, "", @"%CSTR:0:22%のライブは失敗に終わったようだ……" , "/" , 0 , "LEFT", "", , 2
+			CALL SE("お仕事","ステージ","失敗")
+		ENDIF
+ELSEIF TFLAG:戦闘中 == 4
+	IF TFLAG:合格フラグ == 1
+		CALL SE("お仕事","ステージ","歓声")
+		CALL MESSAGE, "", @"%CSTR:0:22%は%CALLNAME:1%に勝利した!!" , "/" , 0 , "LEFT", "", , 2
+		CALL SE("お仕事","ステージ","成功")
+	ELSE
+		CALL MESSAGE, "", @"%CSTR:0:22%は%CALLNAME:1%に敗北してしまった…" , "/" , 0 , "LEFT", "", , 2
+		CALL SE("お仕事","ステージ","失敗")
+		
+	ENDIF
+ENDIF
+
+;ライブ、オーディション、フェスクリア後
+;それぞれの仕事クリア報酬を受け取る
+;ARG	0,失敗 1, 成功
+@LAFクリア(ARG)
+;地域ごとに分ける
+;LOCAL:0	ループ用
+;LOCAL:1	TEMP
+;LOCAL:2	総計交友値
+;LOCAL:4	獲得ファン人数
+;LOCAL:5	獲得ギャランティー
+;LOCAL:6	増加注目度
+;LOCAL:7	仕事がフェスだった
+#DIM PREV_FAN, 9
+#DIM PREV_PRF, 9
+#DIM NOW_FAN, 9
+#DIM NOW_PRF, 9
+#DIM PREV_FAN_G, 9
+#DIM NOW_FAN_G, 9
+#DIM PREV_MNY
+#DIM PREV_SUM_FAN
+#DIM NOW_MNY
+#DIM NOW_SUM_FAN
+#DIM PREV_MNY_G
+#DIM NOW_MNY_G
+#DIM 時間
+
+
+VARSET LOCAL
+
+
+FOR LOCAL, 0, 6
+	PREV_FAN:LOCAL = 地方ファン数(LOCAL)
+	PREV_PRF:LOCAL = 地方注目度(LOCAL)
+NEXT
+;合計ファン数
+PREV_SUM_FAN = SUM_ファン数()
+;合計マニー
+PREV_MNY = MONEY
+
+;仕事番号を取得
+LOCAL:1 = FLAG:現在挑戦中仕事
+CALL GET_WORK_FAN(LOCAL:1)
+LOCAL:4 = RESULT
+
+;記者ブースト
+IF (FLAG:記者 % 10) == 2
+	LOCAL:4 *= 10000
+	TIMES LOCAL:4, 1.40
+	LOCAL:4 /= 10000
+ELSEIF (FLAG:記者 % 10) == 5
+	LOCAL:4 *= 10000
+	TIMES LOCAL:4, 1.20
+	LOCAL:4 /= 10000
+ENDIF
+
+CALL GET_WORK_GUARANTEE(LOCAL:1)
+LOCAL:5 = RESULT
+
+;記者ブースト
+IF (FLAG:記者 % 10) == 4
+	LOCAL:5 *= 10000
+	TIMES LOCAL:5, 1.40
+	LOCAL:5 /= 10000
+ELSEIF (FLAG:記者 % 10) == 5
+	LOCAL:5 *= 10000
+	TIMES LOCAL:5, 1.20
+	LOCAL:5 /= 10000
+ENDIF
+
+;注目度増加量
+SELECTCASE FLAG:現在挑戦中仕事
+	;オーディション
+	CASE 1000 TO 1099
+		IF ARG > 0
+			LOCAL:6 = 70
+		ENDIF
+	;ライブ
+	;クインテットなら40
+	CASE 1100 TO 1199
+		IF ARG > 0
+			LOCAL:6 = 38
+			SIF FLAG:1084 > 0
+				LOCAL:6 += 2
+		ENDIF
+	;フェス
+	;失敗時は15＆ファン数60%,報酬は満額
+	CASE 1200 TO 1299
+		IF ARG > 0
+			LOCAL:6 = 25
+		ELSE
+			LOCAL:6 = 15
+			LOCAL:4 *= 10000
+			TIMES LOCAL:4, 0.6
+			LOCAL:4 /= 10000
+		ENDIF
+		LOCAL:7 = 1
+	CASEELSE
+ENDSELECT
+LOCAL:1 = 0
+;フェス以外は失敗時に報酬貰えない
+IF ARG == 0 && !LOCAL:7
+
+ELSE
+	FOR LOCAL:0, 1080, 1085
+		SIF FLAG:(LOCAL:0) > 0
+			LOCAL:1 += 1
+	NEXT
+
+	FOR LOCAL:0, 1080, 1085
+		IF FLAG:(LOCAL:0) > 0
+
+			LOCAL:2 += (ABL:(FLAG:(LOCAL:0)):親密 + 1)
+		ENDIF
+	NEXT
+
+	A = LOCAL:4 * (100 + LOCAL:2) / 100 / LOCAL:1
+	FOR LOCAL:0, 1080, 1085
+		IF FLAG:(LOCAL:0) > 0
+			;PRINTFORML %CALLNAME:(FLAG:(LOCAL:0))%のファン数+{A}人
+			SELECTCASE FLAG:仕事地方
+				CASE 0
+					ABL:(FLAG:(LOCAL)):首都ファン数 += A
+					PREV_FAN_G:0 += A
+				CASE 1
+					ABL:(FLAG:(LOCAL)):北東ファン数 += A
+					PREV_FAN_G:1 += A
+				CASE 2
+					ABL:(FLAG:(LOCAL)):中央ファン数 += A
+					PREV_FAN_G:2 += A
+				CASE 3
+					ABL:(FLAG:(LOCAL)):上方ファン数 += A
+					PREV_FAN_G:3 += A
+				CASE 4
+					ABL:(FLAG:(LOCAL)):西ファン数 += A
+					PREV_FAN_G:4 += A
+				CASE 5
+					ABL:(FLAG:(LOCAL)):南ファン数 += A
+					PREV_FAN_G:5 += A
+				CASEELSE
+				;	PRINTFORMW エラー！不明な地方{FLAG:仕事地方}が選ばれました!(LAFクリア)
+			ENDSELECT
+		ENDIF
+	NEXT
+
+	MONEY:0 += LOCAL:5
+	PREV_MNY_G = LOCAL:5
+
+	;注目度加算
+
+	SELECTCASE FLAG:仕事地方
+		CASE 0
+			FLAG:首都注目度 += LOCAL:6
+		CASE 1
+			FLAG:北東注目度 += LOCAL:6
+		CASE 2
+			FLAG:中央注目度 += LOCAL:6
+		CASE 3
+			FLAG:上方注目度 += LOCAL:6
+		CASE 4
+			FLAG:西注目度 += LOCAL:6
+		CASE 5
+			FLAG:南注目度 += LOCAL:6
+		CASEELSE
+
+	ENDSELECT
+ENDIF
+FOR LOCAL, 0, 6
+	NOW_FAN:LOCAL = 地方ファン数(LOCAL)
+	NOW_PRF:LOCAL = 地方注目度(LOCAL)
+NEXT
+
+;変化後は0になるもの
+FOR LOCAL, 0 ,6
+	NOW_FAN_G:LOCAL = 0
+NEXT
+NOW_MNY_G = 0
+
+;合計ファン数
+NOW_SUM_FAN = SUM_ファン数()
+;合計マニー
+NOW_MNY = MONEY
+
+;ループ変数初期化
+LOCAL = 0
+LOCAL:1 = 0
+
+;ループ時間設定
+時間 = 32
+
+REDRAW 0
+
+;///お仕事結果表示///
+
+$REPEAT_LOOP
+
+CALL SAVELINE
+ALIGNMENT LEFT
+IF LOCAL:1 == 時間
+	FOR LOCAL, 0 ,6
+		LOCAL:(LOCAL + 10) = NOW_FAN:LOCAL
+		LOCAL:(LOCAL + 20) = NOW_FAN_G:LOCAL
+		FLAG:(LOCAL + 1017) = NOW_PRF:LOCAL
+	NEXT
+	FLAG:1017 = NOW_PRF:1
+	FLAG:1018 = NOW_PRF:0
+	LOCAL:16 = NOW_SUM_FAN
+	LOCAL:17 = NOW_MNY
+	LOCAL:18 = NOW_MNY_G
+ELSE
+	FOR LOCAL, 0, 6
+		LOCAL:(LOCAL + 10) = (NOW_FAN:LOCAL * LOCAL:1 + PREV_FAN:LOCAL * (時間 - LOCAL:1)) / 時間
+		LOCAL:(LOCAL + 20) = (NOW_FAN_G:LOCAL * LOCAL:1 + PREV_FAN_G:LOCAL * (時間 - LOCAL:1)) / 時間
+		FLAG:(LOCAL + 1017)= (NOW_PRF:LOCAL * LOCAL:1 + PREV_PRF:LOCAL * (時間 - LOCAL:1)) / 時間
+	NEXT
+	FLAG:1017 = (NOW_PRF:1 * LOCAL:1 + PREV_PRF:1 * (時間 - LOCAL:1)) / 時間
+	FLAG:1018 =(NOW_PRF:0 * LOCAL:1 + PREV_PRF:0 * (時間 - LOCAL:1)) / 時間
+	LOCAL:16 = (NOW_SUM_FAN * LOCAL:1 + PREV_SUM_FAN * (時間 - LOCAL:1)) / 時間
+	LOCAL:17 = (NOW_MNY * LOCAL:1 + PREV_MNY * (時間 - LOCAL:1)) / 時間
+	LOCAL:18 = (NOW_MNY_G * LOCAL:1 + PREV_MNY_G * (時間 - LOCAL:1)) / 時間
+ENDIF
+CUSTOMDRAWLINE =
+CALL PRINTCOLORL(0XEA70BF, "お仕事結果")
+DRAWLINE
+PRINTFORML FAN
+
+PRINTFORM 北東エリア{LOCAL:11, 8}
+LOCALS = +{LOCAL:21, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(1, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+
+PRINTFORM 首都エリア{LOCAL:10, 8}
+LOCALS = +{LOCAL:20, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(0, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+	
+PRINTFORM 中央エリア{LOCAL:12, 8}
+LOCALS = +{LOCAL:22, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(2, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+	
+PRINTFORM 上方エリア{LOCAL:13, 8}
+LOCALS = +{LOCAL:23, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(3, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+	
+PRINTFORM 西エリア{LOCAL:14, 10}
+LOCALS = +{LOCAL:24, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(4, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+	
+PRINTFORM 南エリア{LOCAL:15, 10}
+LOCALS = +{LOCAL:25, 6, LEFT}
+CALL PRINTCOLOR(0XEA70BF, LOCALS)
+CALL 注目度表示(5, , "LEFT")
+PRINTL 
+PRINTFORML ￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+	
+PRINTFORM 合計 {LOCAL:16, 12} 
+SETCOLOR 0XEA70BF
+PRINTFORML +{(LOCAL:20 + LOCAL:21 + LOCAL:22 + LOCAL:23 + LOCAL:24 + LOCAL:25)}
+RESETCOLOR
+DRAWLINE
+
+PRINTL MONEY
+PRINTFORM %ADD_COMMA(LOCAL:17), 18%
+SETCOLOR 0XEA70BF
+PRINTFORML +%ADD_COMMA(LOCAL:18)%
+RESETCOLOR
+
+ALIGNMENT LEFT
+
+SIF LOCAL:1 == 時間
+	GOTO END_LOOP
+	
+TINPUT 100, -999, 0
+
+IF RESULT == -999
+	LOCAL:1 += 1
+	CALL RETURNLINE
+	GOTO REPEAT_LOOP
+ELSE
+	LOCAL:1 = 時間
+	GOTO REPEAT_LOOP
+ENDIF
+
+$END_LOOP
+PRINTW 
+;///表示終了///
+
+;済んだ仕事はリストから消す
+FOR LOCAL:0, 0, 100
+	FOR LOCAL:1, 0, 100
+		FOR LOCAL:2, 0, 100
+			SIF TA:(LOCAL:0):(LOCAL:1):(LOCAL:2) == FLAG:現在挑戦中仕事
+				TA:(LOCAL:0):(LOCAL:1):(LOCAL:2) = 0
+		NEXT
+	NEXT
+NEXT
+
+;ARG	0, 通常仕事 1, 昇格試験
+@PRINT_クリア目標(ARG)
+
+;フェス
+IF TFLAG:戦闘中 == 4
+	IF ARG
+		LOCALS = 　　　　昇格試験
+	ELSE
+		LOCALS = %GET_WORK_NAME(FLAG:現在挑戦中仕事)%
+	ENDIF
+	LOCALS:1 = 　　　　　　　　%CALLNAME:1%
+	CALL FULLCUTIN2(40, 17, @"%LOCALS%", "　", @"%CSTR:0:22%", " ", "　　　　　　　　VS", " ", @"%LOCALS:1%")
+;ライブ
+ELSEIF TFLAG:戦闘中 == 3
+	LOCALS = 　　　　%GET_WORK_NAME(FLAG:現在挑戦中仕事)%
+	ABS TFLAG:合格ハコユレ震度
+	LOCAL = TFLAG:合格ハコユレ震度 % 10
+	LOCAL:1 = TFLAG:合格ハコユレ震度 - LOCAL
+	LOCAL = ABS(LOCAL)
+	LOCAL:1 = ABS(LOCAL:1 / 10)
+	IF TFLAG:合格ハコユレ震度 < 0
+		LOCALS:1 = －
+	ELSEIF TFLAG:合格ハコユレ震度 == 0
+		LOCALS:1 = ±
+	ELSE
+		LOCALS:1 = ＋
+	ENDIF
+	LOCALS:1 = %LOCALS:1%%TOSTR(LOCAL:1)%.%TOSTR(LOCAL)%
+	LOCALS:1 = めざせ！　ハコユレ %LOCALS:1%
+	CALL FULLCUTIN2(40, 17, @"%LOCALS%", "　", @"%LOCALS:1%")
+;オデ
+ELSEIF TFLAG:戦闘中 == 2
+	LOCALS = 　　　　%GET_WORK_NAME(FLAG:現在挑戦中仕事)%
+	LOCALS:1 = 参加ユニット：100組
+	LOCALS:2 = 　　　合格枠：{TFLAG:合格人数, 3}組
+	CALL FULLCUTIN2(40, 17, @"%LOCALS%", "　", @"%LOCALS:1%", @"%LOCALS:2%")
+ENDIF
+
+RETURN RESULT
+
+@コメント_オーディション
+#FUNCTIONS
+#LOCALSIZE 1
+#LOCALSSIZE 1
+;19文字（全角）
+;最初
+IF TFLAG:コメント == 0
+	LOCALS = 合格は{TFLAG:合格人数}組だ！よろしくちゃーん！
+ELSE
+	IF TFLAG:現在順位 >= 70
+		LOCAL = RAND(2)
+		SELECTCASE LOCAL
+			CASE 0
+				LOCALS = う～ん、まだまだ物たりないなぁ～
+			CASE 1
+				LOCALS = こんなもんじゃ視聴率はかせげないよぉ
+		ENDSELECT
+	ELSEIF TFLAG:現在順位 >= 50
+		LOCAL = RAND(6)
+		SELECTCASE LOCAL
+			CASE 0
+				LOCALS = う～ん、まだまだ物たりないなぁ～
+			CASE 1
+				LOCALS = こんなもんじゃ視聴率はかせげないよぉ
+			CASE 2
+				LOCALS = %CSTR:0:22%ちゃん、キワドクね！
+			CASE 3
+				LOCALS = キミの魅力で視聴率ゲットだ！
+			CASE 4
+				LOCALS = もっと過激に！もっともっとちょうだい！
+			CASE 5
+				LOCALS = 上位{TFLAG:合格人数}組が合格だからね～！
+		ENDSELECT
+	ELSE
+		SELECTCASE (TFLAG:現在順位 - TFLAG:合格人数)
+			CASE 1 TO 8
+					LOCAL = RAND(3)
+					SELECTCASE LOCAL
+						CASE 0
+							LOCALS = キタキタ－ッ！もうちょっとだね！
+						CASE 1
+							LOCALS = ぶっ飛びそうだよ。後少しー、みたいな？
+						CASE 2
+							LOCALS = キタキタキターッ！もうちょっとだね！
+					ENDSELECT
+			CASEELSE
+				LOCAL = RAND(4)
+				SELECTCASE LOCAL
+					CASE 0
+						LOCALS = %CSTR:0:22%ちゃん、キワドクね！
+					CASE 1
+						LOCALS = キミの魅力で視聴率ゲットだ！
+					CASE 2
+						LOCALS = もっと過激に！もっともっとちょうだい！
+					CASE 3
+						LOCALS = 上位{TFLAG:合格人数}組が合格だからね～！
+				ENDSELECT
+		ENDSELECT
+	ENDIF
+ENDIF
+
+SIF !TFLAG:コメント
+	TFLAG:コメント = 1
+RETURNF LOCALS
+
+;合格フラグ立ってたら文字が輝く
+
+@コメント_ライブ
+#FUNCTIONS
+#LOCALSIZE 1
+#LOCALSSIZE 1
+;最初
+IF TFLAG:コメント == 0
+	LOCALS = 今日もノッてくぜー！！
+ELSE
+	SELECTCASE (TFLAG:現在ハコユレ - TFLAG:合格ハコユレ震度)
+		;合格済み
+		CASE 0 TO 99
+			LOCAL = RAND(4)
+			SELECTCASE LOCAL
+				CASE 0
+					LOCALS = ライブにこられて、幸せ―！！
+				CASE 1
+					LOCALS = チケットとれて良かったー！
+				CASE 2
+					LOCALS = ノッてきた！
+				CASE 3
+					LOCALS = やっぱ、歌は生できかないとね！
+			ENDSELECT
+		;もう少し
+		CASE -20 TO -1
+			LOCAL = RAND(4)
+			SELECTCASE LOCAL
+				CASE 0
+					LOCALS = ライブにこられて、幸せ―！！
+				CASE 1
+					LOCALS = チケットとれて良かったー！
+				CASE 2
+					LOCALS = ノッてきた！
+				CASE 3
+					LOCALS = ユレてきた！！
+			ENDSELECT
+		;その他
+		CASEELSE
+			LOCAL = RAND(2)
+			SELECTCASE LOCAL
+				CASE 0
+					LOCALS = 全然ユレがたんないよ！！
+				CASE 1
+					LOCALS = もっとノッてこー！
+			ENDSELECT
+	ENDSELECT
+ENDIF
+
+SIF !TFLAG:コメント
+	TFLAG:コメント = 1
+	
+RETURNF LOCALS
+
+;オーディションで何番かを返す関数
+@オーディション順位()
+;LOCAL
+;LOCAL1
+#FUNCTIONS
+#LOCALSIZE 3
+#LOCALSSIZE 1
+;初回は0点なので、代わりに1を代入しておく
+;SIF TFLAG:味方スコア == 0
+;	TFLAG:味方スコア = 1
+LOCAL:1 = TFLAG:オーディション合格点 / 100
+LOCAL:2 = TFLAG:味方スコア / LOCAL:1
+LOCAL:1 = (100 - LOCAL:2)
+SIF LOCAL:1 <= 1
+	LOCAL:1 = 1
+
+;オーディション1位なら記者が付く可能性
+SIF LOCAL:1 <= 1
+	TFLAG:記者判定 = 1
+	
+SIF LOCAL:1 >= 100
+	LOCAL:1 = 100
+
+TFLAG:現在順位 = LOCAL:1
+
+LOCALS = {LOCAL:1, 3} / 100
+;合格フラグ
+SIF (LOCAL:1 <= TFLAG:合格人数) && TFLAG:合格フラグ != 1
+	TFLAG:合格フラグ = 1
+	
+RETURNF LOCALS
+
+@ハコユレ震度()
+#FUNCTIONS
+#LOCALSIZE 5
+VARSET LOCAL
+FOR LOCAL, 0, 100
+	IF TFLAG:味方スコア >= TFLAG:ハコユレ上昇値 * LOCAL
+		LOCAL:1 ++
+	ENDIF
+NEXT
+LOCAL:2 = -20 + LOCAL:1
+SIF LOCAL:2 > 99
+	LOCAL:2 = 99
+
+TFLAG:現在ハコユレ = LOCAL:2
+
+SIF (LOCAL:2 >= TFLAG:合格ハコユレ震度) && TFLAG:合格フラグ != 1
+	TFLAG:合格フラグ = 1
+
+ABS LOCAL:2
+LOCAL:3 = LOCAL:2 % 10
+LOCAL:4 = LOCAL:2 - LOCAL:3
+LOCAL:3 = ABS(LOCAL:3)
+LOCAL:4 = ABS(LOCAL:4 / 10)
+IF LOCAL:2 < 0
+	LOCALS = －
+ELSEIF LOCAL:2 == 0
+	LOCALS = ±
+ELSE
+	LOCALS = ＋
+ENDIF
+LOCALS = %LOCALS%%TOSTR(LOCAL:4)%.%TOSTR(LOCAL:3)%
+RETURNF LOCALS

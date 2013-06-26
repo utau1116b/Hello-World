@@ -1,0 +1,89 @@
+;スケジュール実行
+@DO_SCHEDULE
+VARSET LOCAL
+CALL MMSTOP()
+;朝
+IF TIME == 0 && TIME:12 == 0
+	LOCAL = FLAG:午前の予定
+
+;夕
+ELSEIF TIME == 1 && TIME:12 == 0
+	LOCAL = FLAG:午後の予定
+
+;昼
+ELSEIF TIME == 0 && TIME:12 == 1
+	LOCAL = FLAG:午前の予定2
+
+;夜
+ELSEIF TIME == 1 && TIME:12 == 1
+	LOCAL = FLAG:午後の予定2
+ENDIF
+FLAG:ショップコマンド = LOCAL
+FLAG:現在挑戦中仕事 = LOCAL
+SELECTCASE FLAG:ショップコマンド
+	CASE 100
+		BASE:親愛度 += 3
+		CALL ACCESSORY_EQUIP
+		BEGIN TRAIN
+	CASE 101
+		PRINTFORM エラー！未実装の行動が実行されました(仲間を勧誘する)
+		BEGIN TURNEND
+	CASE 102
+		PRINTFORM エラー！未実装の行動が実行されました(情報を集める)
+		BEGIN TURNEND
+	CASE 103
+		TFLAG:600 = 21
+		CALL KOJO_MESSAGE_SEND("JUN")
+		;IF CFLAG:20 > 0
+		;	CFLAG:20 -= 10
+		;	SIF CFLAG:20 < 0
+		;		CFLAG:20 = 0
+		;ENDIF
+		;休憩フラグを立てる
+		FLAG:0 = 1
+		CALL DAILY_LIFE
+		BEGIN TURNEND
+	;閣下戦
+	CASE 105
+		CALL STORY_FES_TEMPO
+		BEGIN TURNEND
+		RETURN 1
+	;ランクアップ等ストーリー系
+	CASE 106
+		CALL 昇格試験
+		BEGIN TURNEND
+	;レッスン
+	CASE 130
+		CALL LESSON
+		BEGIN TURNEND
+	;サブイベント
+	CASE 140
+		CALL SUB_EVENT
+		BEGIN TURNEND
+	;専用イベント
+	CASE 150
+		CALL SCENARIO
+		BEGIN TURNEND
+	;オーディション
+	CASE 1000 TO 1099
+		;PRINTFORM エラー！未実装の行動が実行されました(オーディション)
+		CALL ステージ前準備(FLAG:ショップコマンド)
+		BEGIN TURNEND
+	;Live
+	CASE 1100 TO 1199
+		CALL ステージ前準備(FLAG:ショップコマンド)
+		;PRINTFORM エラー！未実装の行動が実行されました(Live)
+		BEGIN TURNEND
+	;フェス
+	CASE 1200 TO 1299
+		CALL ステージ前準備(FLAG:ショップコマンド)
+		BEGIN TURNEND
+	;営業
+	CASE 1300 TO 1399
+		CALL EIGYO(FLAG:ショップコマンド)
+		;PRINTFORM エラー！未実装の行動が実行されました(営業)
+		BEGIN TURNEND
+	CASEELSE
+		BEGIN TURNEND
+ENDSELECT
+RETURN 1

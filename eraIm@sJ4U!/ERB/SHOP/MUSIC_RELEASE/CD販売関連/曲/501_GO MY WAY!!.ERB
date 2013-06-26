@@ -1,0 +1,33 @@
+;501,GO MY WAY!!	
+
+;1, VO	2, VI	3, DA
+@曲タイプ_201
+
+RETURN 3
+
+;曲説明を表示
+@曲説明_201
+DRAWLINE
+PRINTFORML %SONGNAME:201%
+DRAWLINE
+
+;VOの上昇値
+@VO_201
+
+RETURN 2 * 5 * 100
+
+;VIの上昇値
+@VI_201
+
+RETURN 0 * 5 * 100
+
+;DAの上昇値
+@DA_201
+
+RETURN 8 * 5 * 100
+
+;曲のBMP
+@BPM_201
+
+RETURN 180
+

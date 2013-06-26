@@ -1,0 +1,33 @@
+;403	目が逢う瞬間
+
+;1, VO2, VI3, DA
+@曲タイプ_103
+
+RETURN 2
+
+;曲説明を表示
+@曲説明_103
+DRAWLINE
+PRINTFORML %SONGNAME:103%
+DRAWLINE
+
+;VOの上昇値
+@VO_103
+
+RETURN 6 * 5 * 100
+
+;VIの上昇値
+@VI_103
+
+RETURN 8 * 5 * 100
+
+;DAの上昇値
+@DA_103
+
+RETURN 4 * 5 * 100
+
+;曲のBMP
+@BPM_103
+
+RETURN 145
+

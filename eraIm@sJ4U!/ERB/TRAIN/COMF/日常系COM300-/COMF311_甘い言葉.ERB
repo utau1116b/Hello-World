@@ -1,0 +1,278 @@
+;-------------------------------------------------
+;甘い言葉
+;日常系コマンド　レベル1
+;-------------------------------------------------
+@COM311
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+CALL COM300_SUCCESS(90, 9)
+
+;-------------------------------------------------
+;特殊判定
+;-------------------------------------------------
+LOCAL = 0
+LOCAL:1 = -100
+;ランダムボーナス
+IF TFLAG:成功判定 == -1
+	LOCAL:1 -= 50
+ELSEIF TFLAG:成功判定 == 1
+	LOCAL += 50
+ELSE
+	LOCAL += RAND:16
+	LOCAL:1 -= RAND:16
+ENDIF
+
+;好感度ボーナス
+IF CFLAG:2 > 3000
+	LOCAL += 24 + (CFLAG:2 / 500)
+ELSEIF CFLAG:2 > 1000
+	LOCAL += 30
+ELSEIF CFLAG:2 > 500
+	LOCAL += 10
+ELSE
+	LOCAL:1 -= 30
+ENDIF
+
+;好意
+IF PALAM:15 > PALAMLV:9
+	LOCAL += 50
+ELSEIF PALAM:15 > PALAMLV:7
+	LOCAL += 30
+ELSEIF PALAM:15 > PALAMLV:5
+	LOCAL += 20
+ELSEIF PALAM:15 > PALAMLV:4
+	LOCAL += 10
+ELSEIF PALAM:15 > PALAMLV:3
+	LOCAL += 5
+ELSEIF PALAM:15 > PALAMLV:2
+	LOCAL:1 -= 5
+ELSEIF PALAM:15 > PALAMLV:1
+	LOCAL:1 -= 15
+ELSE
+	LOCAL:1 -= 30
+ENDIF
+;相愛
+SIF TALENT:89
+	LOCAL += 25
+;親愛
+SIF TALENT:88
+	LOCAL += 25
+;恋慕
+SIF TALENT:85
+	LOCAL += 25
+;恋人
+SIF TALENT:153
+	LOCAL += 25
+;パートナー
+SIF TALENT:150
+	LOCAL += 10
+;既成事実
+SIF MARK:2
+	LOCAL += MARK:2 * 10
+;デート中
+SIF TEQUIP:2
+	LOCAL += 25
+
+;連続実行ペナルティー
+TFLAG:甘い言葉ペナ += 1
+LOCAL -= (LOCAL:1 / 5) * (TFLAG:甘い言葉ペナ - 1)
+SIF LOCAL < 0
+	LOCAL = 0
+
+;狂気
+IF TALENT:123
+	LOCAL += RAND:50
+	LOCAL:1 -= RAND:50
+ENDIF
+
+;謎の魅力
+SIF TALENT:PLAYER:92
+	TIMES LOCAL , 1.20
+;素直
+SIF TALENT:13
+	TIMES LOCAL , 1.10
+;解放
+SIF TALENT:33
+	TIMES LOCAL , 1.10
+;抑圧
+SIF TALENT:32
+	TIMES LOCAL , 0.90
+;抵抗
+SIF TALENT:34
+	TIMES LOCAL:1 , 1.10
+;感情乏しい
+IF TALENT:22
+	TIMES LOCAL , 0.80
+	TIMES LOCAL:1 , 0.80
+ENDIF
+;無関心
+IF TALENT:21
+	TIMES LOCAL , 0.90
+	TIMES LOCAL:1 , 0.90
+ENDIF
+;貞操観念
+IF TALENT:30
+	TIMES LOCAL , 1.10
+	TIMES LOCAL:1 , 1.10
+ENDIF
+;貞操無頓着
+IF TALENT:31
+	TIMES LOCAL , 0.90
+	TIMES LOCAL:1 , 0.90
+ENDIF
+;ツンデレ
+IF TALENT:18
+	TIMES LOCAL , 1.20
+	TIMES LOCAL:1 , 1.20
+ENDIF
+;恥じらい
+IF TALENT:35
+	TIMES LOCAL , 1.10
+	TIMES LOCAL:1 , 1.10
+ENDIF
+;恥薄い
+IF TALENT:36
+	TIMES LOCAL , 0.90
+	TIMES LOCAL:1 , 0.90
+ENDIF
+;処女
+IF EXP:0 == 0
+	TIMES LOCAL , 1.50
+	TIMES LOCAL:1 , 1.50
+ENDIF
+;一線超えない
+SIF TALENT:27
+	TIMES LOCAL:1 , 1.20
+
+;ムードボーナス
+IF TFLAG:ムード < 10
+	LOCAL:1 -= 100
+ELSEIF TFLAG:ムード < 30
+	LOCAL:1 -= 50
+ELSEIF TFLAG:ムード < 50
+	LOCAL:1 += 25
+ELSEIF TFLAG:ムード < 100
+	LOCAL:1 += 100
+ELSEIF TFLAG:ムード < 150
+	LOCAL:1 += 150
+ELSEIF TFLAG:ムード < 300
+	LOCAL:1 += 200
+ELSE
+	LOCAL:1 += (220 + TFLAG:ムード / 10)
+ENDIF
+
+;効果判定
+IF (LOCAL + LOCAL:1) > 300
+	TFLAG:成功判定 = 4
+ELSEIF (LOCAL + LOCAL:1) > 200
+	TFLAG:成功判定 = 3
+ELSEIF (LOCAL + LOCAL:1) > 100
+	TFLAG:成功判定 = 2
+ELSEIF (LOCAL + LOCAL:1) > 50
+	TFLAG:成功判定 = 1
+ELSEIF (LOCAL + LOCAL:1) > 0
+	TFLAG:成功判定 = 0
+ELSEIF (LOCAL + LOCAL:1) > -50
+	TFLAG:成功判定 = -1
+ELSE
+	TFLAG:成功判定 = -2
+ENDIF
+
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:体力 += 0
+DOWNBASE:気力 += 60
+
+;固定で獲得するソース
+SOURCE:歓楽 = 200
+
+;LOCALをみる
+IF LOCAL > 200
+	SOURCE:情愛 = 800 + (CFLAG:2 / 10)
+	SIF SOURCE:情愛 > 10000
+		SOURCE:情愛 = 10000
+	SIF SOURCE:情愛 < 0
+		SOURCE:情愛 = 0
+ELSEIF LOCAL > 150
+	SOURCE:情愛 = 500
+ELSEIF LOCAL > 100
+	SOURCE:情愛 = 300
+ELSEIF LOCAL >50
+	SOURCE:情愛 = 200
+ELSEIF LOCAL >30
+	SOURCE:情愛 = 150
+ELSE
+	SOURCE:情愛 = 100
+ENDIF
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+;成功度によって変化
+IF TFLAG:成功判定 == 4
+	TIMES SOURCE:情愛 , 1.20
+	TIMES SOURCE:歓楽 , 1.20
+	TIMES SOURCE:征服 , 1.50
+	TIMES SOURCE:受動 , 1.50
+ELSEIF TFLAG:成功判定 == 3
+	TIMES SOURCE:情愛 , 0.90
+	TIMES SOURCE:歓楽 , 0.90
+	TIMES SOURCE:征服 , 1.30
+	TIMES SOURCE:受動 , 1.30
+ELSEIF TFLAG:成功判定 == 2
+	TIMES SOURCE:情愛 , 0.75
+	TIMES SOURCE:歓楽 , 0.75
+	TIMES SOURCE:征服 , 1.20
+	TIMES SOURCE:受動 , 1.20
+ELSEIF TFLAG:成功判定 == 1
+	TIMES SOURCE:情愛 , 0.60
+	TIMES SOURCE:歓楽 , 0.60
+	TIMES SOURCE:征服 , 1.00
+	TIMES SOURCE:受動 , 1.00
+ELSEIF TFLAG:成功判定 == 0
+	TIMES SOURCE:情愛 , 0.50
+	TIMES SOURCE:歓楽 , 0.50
+	TIMES SOURCE:征服 , 0.80
+	TIMES SOURCE:受動 , 0.80
+ELSEIF TFLAG:成功判定 == -1
+	TIMES SOURCE:情愛 , 0.30
+	TIMES SOURCE:歓楽 , 0.30
+	TIMES SOURCE:征服 , 0.50
+	TIMES SOURCE:受動 , 0.50
+ELSE
+	TIMES SOURCE:情愛 , 0.10
+	TIMES SOURCE:歓楽 , 0.10
+	TIMES SOURCE:征服 , 0.30
+	TIMES SOURCE:受動 , 0.30
+ENDIF
+;LOCALが低い場合懐疑が発生し、さらにムードと好感度にもマイナスが
+IF LOCAL < 100
+	SOURCE:懐疑 += 100
+ELSEIF LOCAL < 50
+	SOURCE:懐疑 += 200
+ENDIF
+;失敗してても懐疑が発生
+IF TFLAG:成功判定 == -1
+	SOURCE:懐疑 += 800
+ELSEIF TFLAG:成功判定 == -2
+	SOURCE:懐疑 += 2000
+ENDIF
+
+;-------------------------------------------------
+;汚れの処理
+;-------------------------------------------------
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+;同性愛　レズなら戻り値1ゲイなら戻り値2
+;IF HETEROSEX(TARGET,PLAYER)
+;	EXP:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;ENDIF
+
+RETURN 1

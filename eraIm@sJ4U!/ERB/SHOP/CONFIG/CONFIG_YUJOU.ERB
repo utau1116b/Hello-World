@@ -1,0 +1,213 @@
+;---------------------------------------------
+;コンフィグから呼び出し
+;コンフィグＯＮなら男の娘除外をチェック
+;	男の娘除外ＯＮならフラグに2代入
+;	男の娘除外ＯＦＦならフラグに1代入
+;コンフィグＯＦＦならフラグに0代入
+;CALL YUJOU_TALENT_SET
+;---------------------------------------------
+@YUJOU_CONFIG_SET
+IF FLAG:62 & 16777216
+	IF FLAG:62 & 33554432
+		FLAG:621 = 2
+	ELSE
+		FLAG:621 = 1
+	ENDIF
+ELSE
+	FLAG:621 = 0
+	SIF FLAG:62 & 33554432
+		FLAG:62 -= 33554432
+ENDIF
+CALL YUJOU_TALENT_SET
+;---------------------------------------------
+;YUJOU_CONFIG_SETから呼び出し
+;全員の素質：オトコを検索
+;	友情パッチ管理フラグが2なら
+;		素質：男の娘をチェック
+;		ＯＮならＣＦＬＡＧ：適用外にＯＮ、信頼･親友ＯＦＦ
+;		ＯＦＦならＣＦＬＡＧ：適用外にＯＦＦ、信頼･親友ＯＮ
+;	友情パッチ管理フラグが1なら
+;		ＣＦＬＡＧ：適用外にＯＦＦ、信頼･親友ＯＮ
+;	友情パッチ管理フラグが0なら
+;		ＣＦＬＡＧ：適用外にＯＦＦ、信頼･親友ＯＦＦ
+;---------------------------------------------
+@YUJOU_TALENT_SET
+REPEAT 94
+	IF !TALENT:(COUNT + 10):122
+		CONTINUE
+	ENDIF
+	IF FLAG:621 == 2
+		IF TALENT:(COUNT + 10):94
+			CFLAG:(COUNT + 10):800 = 1
+			SIF TALENT:(COUNT + 10):85 == 1
+				TALENT:(COUNT + 10):156 = 0
+			SIF TALENT:(COUNT + 10):153 == 1
+				TALENT:(COUNT + 10):157 = 0
+		ELSE
+			CFLAG:(COUNT + 10):800 = 0
+			SIF TALENT:(COUNT + 10):85 == 1
+				TALENT:(COUNT + 10):156 = 1
+			SIF TALENT:(COUNT + 10):153 == 1
+				TALENT:(COUNT + 10):157 = 1
+		ENDIF
+	ELSEIF  FLAG:621 == 1
+		CFLAG:(COUNT + 10):800 = 0
+		SIF TALENT:(COUNT + 10):85 == 1
+			TALENT:(COUNT + 10):156 = 1
+		SIF TALENT:(COUNT + 10):153 == 1
+			TALENT:(COUNT + 10):157 = 1
+	ELSE
+		CFLAG:(COUNT + 10):800 = 0
+		TALENT:(COUNT + 10):156 = 0
+		TALENT:(COUNT + 10):157 = 0
+	ENDIF
+REND
+
+;---------------------------------------------
+;友情パッチ適用中かどうかを取得する
+;ARGは対象のキャラ番号
+;---------------------------------------------
+@IS_友情(ARG = -1)
+#FUNCTION
+ARG:0 = ARG:0 == -1 ? TARGET # ARG:0
+IF TALENT:ARG:オトコ
+
+	SIF FLAG:621 == 0
+		RETURNF 0
+		
+	SIF CFLAG:ARG:800
+		RETURNF 0
+		
+	RETURNF 1
+	
+ELSE
+
+	RETURNF 0
+
+ENDIF
+
+;---------------------------------------------
+;恋慕・信頼かどうかを取得する
+;ARGは対象のキャラ番号
+;
+;戻り値は
+;0 恋慕・信頼でない 1 恋慕あり 2 信頼あり（友情パッチ適用中）です
+;---------------------------------------------
+@IS_恋慕(ARG = -1)
+#FUNCTION
+ARG:0 = ARG:0 == -1 ? TARGET # ARG:0
+IF TALENT:ARG:オトコ
+	SIF IS_信頼(ARG)
+		RETURNF 2
+	
+	SIF IS_RENBO(ARG)
+		RETURNF 1
+	
+	RETURNF 0
+ELSE
+	SIF IS_RENBO(ARG)
+		RETURNF 1
+	
+	RETURNF 0
+ENDIF
+;---------------------------------------------
+;恋慕かどうかを取得する
+;ARGは対象のキャラ番号
+;
+;ちなみにCFLAG:喧嘩中などを追加して、
+;恋慕が恋慕として機能しない状態を作ったりもできます
+;---------------------------------------------
+@IS_RENBO(ARG)
+#FUNCTION
+SIF !TALENT:ARG:恋慕
+	RETURNF 0
+SIF FLAG:621 != 0 && TALENT:ARG:オトコ && !CFLAG:ARG:800
+	RETURNF 0
+RETURNF 1
+;---------------------------------------------
+;信頼かどうかを取得する
+;ARGは対象のキャラ番号
+;---------------------------------------------
+@IS_信頼(ARG)
+#FUNCTION
+SIF !TALENT:ARG:恋慕
+	RETURNF 0
+SIF FLAG:621 == 0 && TALENT:ARG:オトコ
+	RETURNF 0
+;キャラ個別設定を有効にする場合
+SIF CFLAG:ARG:800
+	RETURNF 0
+RETURNF 1
+
+;------------------------------------------------
+;実際の記述は
+;IF IS_恋慕(TARGET)
+;ELSEIF IS_友情(TARGET)
+;ELSE
+;ENDIF
+;------------------------------------------------
+
+
+;---------------------------------------------
+;恋人・親友かどうかを取得する
+;ARGは対象のキャラ番号
+;
+;戻り値は
+;0 恋人・親友でない 1 恋人あり 2 親友あり（友情パッチ適用中）です
+;---------------------------------------------
+@IS_恋人(ARG = -1)
+#FUNCTION
+ARG:0 = ARG:0 == -1 ? TARGET # ARG:0
+IF TALENT:ARG:オトコ
+	SIF IS_親友(ARG)
+		RETURNF 2
+	
+	SIF IS_KOIBITO(ARG)
+		RETURNF 1
+	
+	RETURNF 0
+ELSE
+	SIF IS_KOIBITO(ARG)
+		RETURNF 1
+	
+	RETURNF 0
+ENDIF
+
+;---------------------------------------------
+;恋慕かどうかを取得する
+;ARGは対象のキャラ番号
+;
+;ちなみにCFLAG:喧嘩中などを追加して、
+;恋慕が恋慕として機能しない状態を作ったりもできます
+;---------------------------------------------
+@IS_KOIBITO(ARG)
+#FUNCTION
+SIF !TALENT:ARG:恋人
+	RETURNF 0
+SIF FLAG:621 != 0 && TALENT:ARG:オトコ && !CFLAG:ARG:800
+	RETURNF 0
+RETURNF 1
+
+;---------------------------------------------
+;信頼かどうかを取得する
+;ARGは対象のキャラ番号
+;---------------------------------------------
+@IS_親友(ARG)
+#FUNCTION
+SIF !TALENT:ARG:恋人
+	RETURNF 0
+SIF FLAG:621 == 0 && TALENT:ARG:オトコ
+	RETURNF 0
+;キャラ個別設定を有効にする場合
+SIF CFLAG:ARG:800
+	RETURNF 0
+RETURNF 1
+
+;------------------------------------------------
+;実際の記述は
+;IF IS_恋人(TARGET)
+;ELSEIF IS_友情(TARGET)
+;ELSE
+;ENDIF
+;------------------------------------------------
+

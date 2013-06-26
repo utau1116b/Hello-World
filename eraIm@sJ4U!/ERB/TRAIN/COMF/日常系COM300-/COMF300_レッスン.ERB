@@ -1,0 +1,223 @@
+;-------------------------------------------------
+;レッスン
+;日常系コマンド　レベル1
+;-------------------------------------------------
+@COM300
+VARSET LOCAL
+;自主トレはいつでもできる
+LOCAL = 1
+PRINTL どのレッスンをしますか？
+PRINTFORML [0] 自主トレ(タダ)
+IF MONEY >= 500
+	PRINTFORML [1] Vo.レッスン(500Ｇ)
+	LOCAL:1 = 1
+	PRINTFORML [2] Vi.レッスン(500Ｇ)
+	LOCAL:2 = 1
+	PRINTFORML [3] Da.レッスン(500Ｇ)
+	LOCAL:3 = 1
+ENDIF
+IF MONEY >= 5000
+	PRINTFORML [4] ちょーVo.レッスン(%ADD_COMMA(5000)%Ｇ)
+	LOCAL:4 = 1
+	PRINTFORML [5] ちょーVi.レッスン(%ADD_COMMA(5000)%Ｇ)
+	LOCAL:5 = 1
+	PRINTFORML [6] ちょーDa.レッスン(%ADD_COMMA(5000)%Ｇ)
+	LOCAL:6 = 1
+ENDIF
+;Ｐランクなどで解放してもいいかも
+IF MONEY >= 50000
+	PRINTFORML [7] 地獄の特訓(%ADD_COMMA(50000)%Ｇ)
+	LOCAL:7 = 1
+ENDIF
+PRINTFORML [100] やっぱりやめる
+$INPUT_LOOP
+INPUT
+IF RESULT == 100
+	PRINTFORMW レッスンを中止しました
+	RETURN -1
+ELSEIF RESULT < 0 || RESULT > 7 || LOCAL:RESULT == 0
+	REUSELASTLINE 正しい値を入力して下さい
+	GOTO INPUT_LOOP
+ELSE
+	TFLAG:コマンド内容 = RESULT
+	SELECTCASE RESULT
+		CASE 1,2,3
+			MONEY -= 500
+		CASE 4,5,6
+			MONEY -= 5000
+		CASE 7
+			MONEY -= 50000
+	ENDSELECT
+ENDIF
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+CALL COM300_SUCCESS(95, 9)
+;地獄の特訓は絶対に大成功
+IF TFLAG:コマンド内容 == 7
+	TFLAG:SELECTCOM分岐 = 1
+	TFLAG:成功判定 = 1
+ENDIF
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+VARSET LOCAL
+;消費体力、気力
+DOWNBASE:体力 += 50
+DOWNBASE:気力 += 50
+;レッスン経験で気力消費軽減
+SIF EXP:歌唱経験 < 100 || EXP:被写経験 < 100 || EXP:舞踊経験 < 100
+		DOWNBASE:気力 += 20
+SIF EXP:歌唱経験 < 500 || EXP:被写経験 < 500 || EXP:舞踊経験 < 500
+		DOWNBASE:気力 += 30
+
+;固定で獲得するソース
+SOURCE:歓楽 = 150
+SOURCE:達成 = 100
+SOURCE:歌唱 = 500
+SOURCE:被写 = 500
+SOURCE:舞踊 = 500
+;獲得経験値
+LOCAL:1 = 3
+LOCAL:2 = 3
+LOCAL:3 = 3
+IF TFLAG:コマンド内容 == 1 || TFLAG:コマンド内容 == 4
+	SOURCE:被写 = 0
+	SOURCE:舞踊 = 0
+	LOCAL:2 = 0
+	LOCAL:3 = 0
+ELSEIF TFLAG:コマンド内容 == 2 || TFLAG:コマンド内容 == 5
+	SOURCE:歌唱 = 0
+	SOURCE:舞踊 = 0
+	LOCAL:1 = 0
+	LOCAL:3 = 0
+ELSEIF TFLAG:コマンド内容 == 3 || TFLAG:コマンド内容 == 6
+	SOURCE:被写 = 0
+	SOURCE:歌唱 = 0
+	LOCAL:1 = 0
+	LOCAL:2 = 0
+ENDIF
+
+;コマンドによるソース、経験変動
+SELECTCASE TFLAG:コマンド内容
+	CASE 0
+		SOURCE:歓楽 /= 2
+		SOURCE:家務 /= 2
+		SOURCE:達成 /= 2
+		SOURCE:歌唱 /= 2
+		SOURCE:被写 /= 2
+		SOURCE:舞踊 /= 2
+		REPEAT 3
+			LOCAL:(COUNT+1) /= 3
+		REND
+	CASE 1,2,3
+
+	CASE 4,5,6
+		DOWNBASE:体力 += 50
+		SOURCE:歓楽 *= 3
+		SOURCE:家務 *= 2
+		SOURCE:達成 *= 3
+		SOURCE:歌唱 *= 3
+		SOURCE:被写 *= 3
+		SOURCE:舞踊 *= 3
+		REPEAT 3
+			LOCAL:(COUNT+1) *= 3
+		REND
+	CASE 7
+		DOWNBASE:体力 += 100
+		SOURCE:歓楽 *= 7
+		SOURCE:家務 *= 5
+		SOURCE:達成 *= 7
+		SOURCE:歌唱 *= 10
+		SOURCE:被写 *= 10
+		SOURCE:舞踊 *= 10
+		REPEAT 3
+			LOCAL:(COUNT+1) *= 10
+		REND
+ENDSELECT
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+IF TFLAG:SELECTCOM分岐 == -1
+	TIMES SOURCE:歓楽 , 0.10
+	TIMES SOURCE:家務 , 0.50
+	TIMES SOURCE:達成 , 0.50
+	TIMES SOURCE:歌唱 , 0.50
+	TIMES SOURCE:被写 , 0.50
+	TIMES SOURCE:舞踊 , 0.50
+	TIMES LOCAL:1 , 0.50
+	TIMES LOCAL:2 , 0.50
+	TIMES LOCAL:3 , 0.50
+ELSEIF TFLAG:SELECTCOM分岐 == 0
+
+ELSE
+	TIMES SOURCE:歓楽 , 2.00
+	TIMES SOURCE:家務 , 2.00
+	TIMES SOURCE:達成 , 2.00
+	TIMES SOURCE:歌唱 , 2.00
+	TIMES SOURCE:被写 , 2.00
+	TIMES SOURCE:舞踊 , 2.00
+	TIMES LOCAL:1 , 2.00
+	TIMES LOCAL:2 , 2.00
+	TIMES LOCAL:3 , 2.00
+ENDIF
+
+;記者ブースト
+;小柴
+IF (FLAG:記者 % 10) == 3
+	TIMES SOURCE:歓楽 , 1.40
+	TIMES SOURCE:家務 , 1.40
+	TIMES SOURCE:達成 , 1.40
+	TIMES SOURCE:歌唱 , 1.40
+	TIMES SOURCE:被写 , 1.40
+	TIMES SOURCE:舞踊 , 1.40
+	TIMES LOCAL:1 , 1.40
+	TIMES LOCAL:2 , 1.40
+	TIMES LOCAL:3 , 1.40
+;山原
+ELSEIF (FLAG:記者 % 10) == 5
+	TIMES SOURCE:歓楽 , 1.20
+	TIMES SOURCE:家務 , 1.20
+	TIMES SOURCE:達成 , 1.20
+	TIMES SOURCE:歌唱 , 1.20
+	TIMES SOURCE:被写 , 1.20
+	TIMES SOURCE:舞踊 , 1.20
+	TIMES LOCAL:1 , 1.20
+	TIMES LOCAL:2 , 1.20
+	TIMES LOCAL:3 , 1.20
+ENDIF
+;-------------------------------------------------
+;汚れの処理
+;-------------------------------------------------
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+;同性愛　レズなら戻り値1ゲイなら戻り値2
+;IF HETEROSEX(TARGET,PLAYER)
+;	EXP:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;ENDIF
+
+IF LOCAL:1
+	EXP:歌唱経験 += LOCAL:1
+	BASE:VO倍率 += LOCAL:1
+ENDIF
+IF LOCAL:2
+	EXP:被写経験 += LOCAL:1
+	BASE:VI倍率 += LOCAL:1
+ENDIF
+IF LOCAL:3
+	EXP:舞踊経験 += LOCAL:1
+	BASE:DA倍率 += LOCAL:1
+ENDIF
+
+LOCAL:4 = (LOCAL:1 + LOCAL:2 + LOCAL:3) / 3
+SIF LOCAL:4 < 1
+	LOCAL:4 = 1
+EXP:PLAYER:指導経験 += LOCAL:4
+
+RETURN 1

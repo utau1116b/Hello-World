@@ -1,0 +1,91 @@
+;ここでゲームの初期設定を行う
+;基本的にはキャラクターなどを追加した時はこの関数内の変数を弄る
+@CONSTRUCT_GAME()
+
+SAVESTR:0 = なし
+SAVESTR:199 = －－－
+TARGET = -1
+ASSI = -1
+
+;PTメンバー初期化
+FLAG:リーダー = -1
+FLAG:メンバー2 = -1
+FLAG:メンバー3 = -1
+FLAG:メンバー4 = -1
+FLAG:メンバー5 = -1
+
+;管理するキャラの人数設定(最後のキャラ番号-10)
+FLAG:キャラ数 = 80
+
+PBAND = 4
+FLAG:6 = 1
+TIME:6 = 2
+;日付を1日に設定
+DAY:1 = 1
+
+;現在のStageは0から
+FLAG:24 = 0
+;最初は１周目
+FLAG:26 = 1
+;仕事Lv1
+FLAG:仕事難易度 = 0
+;ボス選択初期化
+FLAG:25 = 0
+
+;サンプル楽曲
+FLAG:リリース中楽曲 = 201
+FLAG:リリース期間 = -1
+FLAG:発売期間 = -1
+
+IF !GLOBAL:初期設定
+	GLOBAL:メッセージ速度 = 1
+	GLOBAL:オート時ウェイト = 500
+	GLOBAL:右クリック時ウェイト = 1000
+	GLOBAL:メッセージアニメ利用 = 1
+	GLOBAL:初期設定 = 1
+ENDIF
+
+;初期注目度を設定
+FOR LOCAL, 1017, 1023
+	FLAG:LOCAL = 54
+NEXT
+
+CALL CONFIGURE_ALL_DEFAULT();オプションをデフォルトに設定
+
+;FLAG:ランダムイベント数 = 4
+
+;所持可能アイテム数
+FLAG:最大所持可能アイテム数 = 999
+
+;最初からいくつかの服を持たせる
+CALL CLOTH_FIRST
+CALL SET_SONGNAME
+
+REPEAT 99
+	ITEMSALES:COUNT = 0
+REND
+
+;初期加入処理
+;キャラ登録番号メモ
+;0		プロデューサー
+;1～10	敵１～１０
+;11～	春香～　キャラ番号が登録番号になる
+;主人公加入
+;敵データ処理用キャラ加入
+FOR LOCAL:1, 990, 1000
+	ADDCHARA LOCAL:1
+	CFLAG:(LOCAL:1 - 989):パートナー選択可 = -1
+	;PRINTFORML {LOCAL:1}番%CALLNAME:(LOCAL:1)%を加える
+NEXT
+
+;全キャラ加入
+FOR LOCAL:1, 11, 100
+	ADDCHARA LOCAL:1
+	CFLAG:(LOCAL:1):パートナー選択可 = 0
+NEXT
+
+;追加キャラ加入
+FOR LOCAL:1, 100, 104
+	ADDCHARA LOCAL:1
+	CFLAG:COUNT:パートナー選択可 = 0
+NEXT

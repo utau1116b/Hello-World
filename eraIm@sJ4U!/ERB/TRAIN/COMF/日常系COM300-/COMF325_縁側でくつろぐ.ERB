@@ -1,0 +1,198 @@
+;-------------------------------------------------
+;縁側でくつろぐ(歌鈴専用？)
+;日常系コマンド　レベル1
+;-------------------------------------------------
+@COM325
+;-------------------------------------------------
+;COM別FLAGの設定
+;-------------------------------------------------
+;行為者
+TCVAR:116 = PLAYER
+CALL COM300_SUCCESS(90, 9)
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:体力 += 0
+DOWNBASE:気力 += 50
+
+;固定で獲得するソース
+SOURCE:歓楽 = 500
+SOURCE:家務 = 150
+SOURCE:逸脱 = 50
+SOURCE:受動 = 100
+SOURCE:征服 = 200
+SOURCE:不安 = 300
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+IF TFLAG:SELECTCOM分岐 == -1
+	TIMES SOURCE:歓楽 , 0.10
+	TIMES SOURCE:家務 , 0.50
+	TIMES SOURCE:逸脱 , 2.00
+	TIMES SOURCE:不安 , 2.00
+	TIMES SOURCE:征服 , 0.50
+	TIMES SOURCE:受動 , 0.50
+ELSEIF TFLAG:SELECTCOM分岐 == 0
+
+ELSE
+	TIMES SOURCE:歓楽 , 2.00
+	TIMES SOURCE:家務 , 2.00
+	TIMES SOURCE:家務 , 2.00
+	TIMES SOURCE:不安 , 0.50
+	TIMES SOURCE:征服 , 0.50
+	TIMES SOURCE:受動 , 0.50
+ENDIF
+
+;-------------------------------------------------
+;汚れの処理
+;-------------------------------------------------
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+;同性愛　レズなら戻り値1ゲイなら戻り値2
+;IF HETEROSEX(TARGET,PLAYER)
+;	EXP:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 3
+;ENDIF
+
+RETURN 1
+
+@CAN_COM325(ARG)
+;-------------------------------------------------
+;実行判定処理
+;-------------------------------------------------
+SKIPDISP ARG
+PRINTL 縁側でくつろぐ
+A = 0
+B = 0
+S = 0
+V = 50
+
+;すべての命令に共通の要素を考慮
+;(従順が高いと命令に従いやすいなど)
+CALL COM_ORDER
+
+;男嫌い
+IF TALENT:82 && TALENT:MASTER:122
+	A -= 7
+ENDIF
+;恥じらい
+IF TALENT:35
+	A -= 5
+ENDIF
+;献身的
+IF TALENT:63
+	A += 6
+ENDIF
+;恋慕
+IF TALENT:85
+	A += 5
+ENDIF
+
+;好感度不足
+IF CFLAG:2 < 400
+	IF CFLAG:2 < 50
+		B = 40
+	ELSEIF CFLAG:2 < 150
+		B = 20
+	ELSEIF CFLAG:2 < 300
+		B = 10
+	ELSE
+		B = 5
+	ENDIF
+	A -= B
+;好感度ボーナス
+ELSEIF CFLAG:2 >= 500
+	B = CFLAG:2 / 75
+	A += B
+ENDIF
+
+IF ((FLAG:23 & 1p27) == 0) && FLAG:2 != 1
+	;男嫌い
+	IF TALENT:82 && TALENT:MASTER:122
+		PRINT  - 
+		PRINTS TALENTNAME:82
+		PRINTV '(,7,')
+		S = 1
+	ENDIF
+	;恥じらい
+	IF TALENT:35
+		PRINT  - 
+		PRINTS TALENTNAME:35
+		PRINTV '(,5,')
+		S = 1
+	ENDIF
+	;献身的
+	IF TALENT:63
+		SIF S
+			PRINT  + 
+		PRINTS TALENTNAME:63
+		PRINTV '(,6,')
+		S = 1
+	ENDIF
+	;恋慕
+	IF TALENT:85
+		SIF S
+			PRINT  + 
+		PRINTS TALENTNAME:85
+		PRINTV '(,5,')
+		S = 1
+	ENDIF
+
+	;好感度
+	IF CFLAG:2 < 400
+		B = 0
+		PRINT  - 
+		IF CFLAG:2 < 50
+			B = 40
+		ELSEIF CFLAG:2 < 150
+			B = 20
+		ELSEIF CFLAG:2 < 300
+			B = 10
+		ELSE
+			B = 5
+		ENDIF
+		PRINT 好感度不足
+		PRINTV '(,B,')
+		S = 1
+	ENDIF
+
+	;好感度
+	IF CFLAG:2 >= 500
+		B = 0
+		SIF S
+			PRINT  + 
+		B = CFLAG:2 / 75
+		PRINT 好感度
+		PRINTV '(,B,')
+		S = 1
+	ENDIF
+
+	;合計を表示(50以上で実行)
+	PRINT  = 
+	PRINTV A
+
+	IF A < V
+		PRINT  < 
+		PRINT 実行値
+		PRINTV V
+	ELSEIF A == V
+		PRINT  = 
+		PRINT 実行値
+		PRINTV V
+	ELSEIF A > V
+		PRINT  > 
+		PRINT 実行値
+		PRINTV V
+	ENDIF
+
+	WAIT
+
+	SKIPDISP 0
+	;実行できない
+	SIF A < V
+		RETURN 0
+ENDIF
+RETURN 1

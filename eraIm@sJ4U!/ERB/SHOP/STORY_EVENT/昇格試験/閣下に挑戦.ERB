@@ -1,0 +1,90 @@
+@STORY_FES_TEMPO
+FLAG:現在挑戦中仕事 = 34
+IF CFLAG:100:勧誘状況 == 0
+	IF FLAG:ストーリー種別 == 1
+		PRINTFORMW 「私とやるの？　えっ、マジで？」
+		PRINTFORMW 閣下は本気で訳が分からない、といった表情をしている
+		PRINTFORMW よく考えれば、至極簡単なことだ。　アイドル神の閣下に勝てば、%CALLNAME:TARGET%達の実力は本物という事になる
+		PRINTFORMW その時こそ、%CALLNAME:TARGET%達は国民的アイドル…いや、それすら超越した"アイドルマスター"だと証明された事になるだろう
+		PRINTFORMW 「ふーん……そうか。私、神様なのに人間に舐められちゃってるんだ」
+		PRINTFORMW 閣下の額に青筋が浮かび上がり、口元にはひくひくと引き攣った笑みを浮かべている
+		PRINTFORMW 「ぶち殺すわよ？ヒューマン、……今日の私はちょいとばかしマジよ」
+		CFLAG:100:勧誘状況 = 1
+	ELSE
+		PRINTFORMW 「あら？私に挑んでくるの？」
+		PRINTFORMW 「ふふ、あなた達がどれ程身の程知らずかその身に教えてあげるわ…」
+		CFLAG:100:勧誘状況 = 1
+	ENDIF
+ELSE
+	IF FLAG:ストーリー種別 == 1
+		PRINTFORMW 「流石にしつこいわよ……」
+		PRINTFORMW 「私に勝つだなんて邪道を使わないで、大人しく%CALLNAME:TARGET%達を正攻法でプロデュースしなさいな」
+		PRINTFORMW 「何？これがトップアイドルへの一番の近道だ？」
+		;PRINTFORMW 「IDOL(偶像)と言うよりもIDLE(怠惰)ね、あなた達……」
+		PRINTFORMW 「……あなた達は水面に映る月に手を伸ばしているだけの愚か者よ」
+		PRINTFORMW 「どれだけ手を伸ばしても、月に手は届かないという事を教えてあげるわ！」
+	ELSE
+		PRINTFORMW 「またやる気？」
+		PRINTFORMW 「あはは、精々私を退屈させないでね……」
+	ENDIF
+ENDIF
+FLAG:ボスID保存場所 = 100
+CALL CHECK_ENEMY_RANK
+;Lv補正は、Stage1から順に、0,1,0,1, 0,1,2,0,1, 0,1,2,0,1, 0,1,2…
+;ランク補正は、Stage3,5,8,10,13,15…で1つ増える
+LOCAL:2 = (FLAG:現在フロア * 2 % 5) / 2
+LOCAL:3 = FLAG:現在フロア * 2 / 5
+;ボス戦開始
+CALL BGM("戦闘", "閣下に挑戦")
+CALL SET_ENEMY_STATUS(21100,0,3,0)
+CALL BATTLE_START(FLAG:ボスID保存場所, LOCAL:2, (FLAG:敵レベル + LOCAL:3))
+IF RESULT == 0
+CALL MMSTOP
+	;PRINTFORML 「チートよ！チート！チート使ったわね、%CALLNAME:MASTER%！！」
+	;PRINTFORML な、何を馬鹿なことを……
+	;PRINTFORML 「くそう、これで勝ったと思うなよ」
+	;勝利
+	CALL GAME_CONTINUE
+	;クリアフラグをビットで管理
+	SIF FLAG:5 != 9 && (FLAG:28 & 1) == 0
+		FLAG:28 |= 1
+	FLAG:27 = 0
+	FLAG:24 += 1
+	PRINTFORML クリアおめでとうございます
+	PRINTFORML エンディングがでなかった方、ごめんなさい。まだ作れてないです
+	PRINTFORML とりあえずストーリーはここまでです
+	PRINTFORML クリア後の要素もいずれ用意すると思います
+	PRINTFORML あとは、延々とアイドル達とイチャイチャして下さい
+	PRINTFORMW TH@NK YOU FOR YOUR PL@YNG !!
+	IF CALLNAME:MASTER == "イカサマ"
+		PRINTL
+		PRINTW ・・・・・・
+		PRINTL
+		PRINTW ・・・
+		PRINTL 
+		PRINTW ・
+		PRINTL
+		PRINTW ？
+		PRINTL 
+		SETCOLOR 0XFF0000
+		PRINTFORMW 「ふふふ・・・チートを使ったわね・・・？」
+		PRINTFORMW 「ズルする子にはお仕置きよ・・・」
+		PRINTFORML 閣下のラストワード！
+		PRINTFORMW 「禁忌『Emuera強制終了！！』」
+		QUIT
+	ENDIF
+	RETURN 0
+ELSE
+	CALL MMSTOP
+	IF FLAG:ストーリー種別 == 1
+		PRINTFORMW 「はいはい、これに懲りたらまじめにこつこつトップアイドルを目指しなさい」
+		PRINTFORMW 流石にアイドル神というだけあり、%CALLNAME:TARGET%達は閣下に全く歯が立たなかった……
+	ELSE
+		PRINTFORMW 「あら、もうお終い？」
+		PRINTFORMW 「こうもあっけないと、つまらないを通り越して呆れるわね…」
+		;斬刑に処す…
+		PRINTFORMW 「あなた達、来世からやり直しなさい……」
+		;敗北か逃走
+		RETURN 1
+	ENDIF
+ENDIF

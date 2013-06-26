@@ -1,0 +1,122 @@
+@SELECT_アイドルにお任せ
+;コンフィグONなら自動的にお任せ
+SIF FLAG:23 & 1p5
+	RETURN 1
+
+
+SELECTCASE FLAG:現在挑戦中仕事
+	;オーディション
+	CASE 1000 TO 1099
+		LOCALS = オーディション
+	;ライブ
+	CASE 1100 TO 1199
+		LOCALS = ライブ
+	;フェス
+	CASE 1200 TO 1299
+		LOCALS = フェス
+	CASEELSE
+	
+ENDSELECT
+CALL MESSAGE, @"%CALLNAME:MASTER%", @"（さて、今日の%LOCALS%はどうしようかな？）" , "/" , 0 , "LEFT", "", , 2
+CALL SELECT_CHOICE("俺が指示する", "アイドルにお任せ", "", 1, 1)
+IF RESULT == 1
+	CALL MESSAGE, @"%CALLNAME:MASTER%", "（やはり、ここは俺が指導しよう）" , "/" , 0 , "LEFT", "", , 2
+	RETURN 0
+ELSEIF RESULT == 2
+	CALL MESSAGE, @"%CALLNAME:MASTER%", @"（よし、今日は%CALLNAME:TARGET%達に任せよう！）" , "/" , 0 , "LEFT", "", , 2
+	RETURN 1
+ENDIF
+
+@アイドルにお任せ
+VARSET LOCAL
+VARSET TFLAG
+CALL お任せ時スコア
+LOCAL = RESULT
+TFLAG:味方スコア = RESULT
+SELECTCASE FLAG:現在挑戦中仕事
+	;オーディション
+	CASE 1000 TO 1099
+		CALL SET_AUDITION(FLAG:現在挑戦中仕事)
+		TFLAG:戦闘中 = 2
+		SIF LOCAL >= TFLAG:オーディション合格点
+			TFLAG:合格フラグ = 1
+	;ライブ
+	CASE 1100 TO 1199
+		CALL SET_LIVE(FLAG:現在挑戦中仕事)
+		TFLAG:戦闘中 = 3
+		SIF LOCAL >= (TFLAG:合格ハコユレ震度 + 20) * TFLAG:ハコユレ上昇値
+			TFLAG:合格フラグ = 1
+	CASE 1200 TO 1299
+	;フェス
+		CALL SET_FES(FLAG:現在挑戦中仕事)
+		TFLAG:戦闘中 = 4
+		SIF LOCAL >= TFLAG:お任せ時合格点
+			TFLAG:合格フラグ = 1
+	CASEELSE
+		PRINTFORMW エラー！不明な仕事{FLAG:現在挑戦中仕事}が選ばれました(@アイドルにお任せ)
+ENDSELECT
+
+DEBUGPRINTFORML 仕事番号{FLAG:現在挑戦中仕事}
+DEBUGPRINTFORML 合格フラグ{TFLAG:合格フラグ}
+
+PRINTL 
+PRINTFORMW ・
+PRINTFORMW ・
+PRINTFORMW ・
+PRINTL 
+PRINTFORMW ！
+PRINTL 
+CALL LAF終了メッセージ
+CALL リザルト画面
+
+;ハイスコア更新
+IF TFLAG:味方スコア > FLAG:リリース中ハイスコア
+	FLAG:リリース中ハイスコア = TFLAG:味方スコア
+	SONG:(FLAG:リリース中楽曲):0 = TFLAG:味方スコア
+	IF TFLAG:味方スコア > FLAG:ハイスコア
+		FLAG:ハイスコア = TFLAG:味方スコア
+	ENDIF
+ENDIF
+
+
+DEBUGPRINTFORML 仕事番号{FLAG:現在挑戦中仕事}２
+DEBUGPRINTFORML 合格フラグ{TFLAG:合格フラグ}２
+
+IF TFLAG:合格フラグ == 1
+	CALL LAFクリア(1)
+ELSE
+	CALL LAFクリア(0)
+ENDIF
+
+FOR LOCAL, 1080, 1085
+	SIF FLAG:LOCAL <= 0
+		CONTINUE
+	;3? 1? 2?回数が多いとストレスになるし
+	BASE:(FLAG:LOCAL):ストレス += 3
+NEXT
+
+@お任せ時スコア
+;（能力値＋補正）×650/6 ＋ 団結値×何か（推定35）
+LOCAL = 10000 * ((SUM_VO(11) + SUM_VI(11) + SUM_DA(11)) * 650 / 6 + SUM_団結値() * 35)
+;今の所はバランス未調整なので最大スコア99999に
+;今後の予定：
+;精液経験等も加味
+;とことん親密度などを稼いだキャラクターは、99999を超えるスコアを出せるように
+;魔装備のような
+LOCAL += SUM_親密() * 49999 / 495
+;ユニット状態適用
+SIF FLAG:ユニット状態 == 1
+	TIMES LOCAL , 1.50
+LOCAL /= 10000
+RETURN LOCAL
+;個人がお任せ時に出せるスコア
+@PERSONAL_アイドル力(ARG)
+#FUNCTION
+#LOCALSIZE 1
+LOCAL = 一億() * ((BASE:ARG:ベースボーカル + BASE:ARG:ベースビジュアル + BASE:ARG:ベースダンス) * 650 / 6 + SUM_団結値() * 35)
+LOCAL += ABL:ARG:親密  * 49999 / 495
+SIF FLAG:ユニット状態 == 1
+	TIMES LOCAL, 1.50
+LOCAL /= 一億()
+LOCAL /= 5
+RETURNF LOCAL

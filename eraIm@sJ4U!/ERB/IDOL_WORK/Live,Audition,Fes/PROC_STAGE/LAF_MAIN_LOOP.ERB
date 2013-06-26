@@ -1,0 +1,115 @@
+;ライブ、オーディション用ループ関数
+;ARG:0	
+@LAF_MAIN_LOOP(ARG:0)
+;LOCAL
+;0	ループカウンタ1
+;1	ループカウンタ2
+;2	経過させる時間
+
+;アピール時間終了で終了
+SIF TFLAG:アピールタイム <= 0
+	RETURN 
+
+
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(LA_MAIN_LOOP GET_MIN_COUNTER直前)
+ENDIF
+
+
+;カウンタ最小値を取得
+CALL GET_MIN_COUNTER
+LOCAL:2 = RESULT
+;PRINTFORMW タイマー最小値{RESULT}
+
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(LA_MAIN_LOOP GET_MIN_COUNTER直後)
+ENDIF
+
+
+;カウンターを減らす
+TFLAG:カウントタイマー -= LOCAL:2
+
+;アピール時間を減らす
+TFLAG:アピールタイム -= LOCAL:2
+
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(LA_MAIN_LOOP 時間経過後)
+ENDIF
+
+
+;待機時間を減らす
+;敵
+SIF TFLAG:戦闘中 == 4
+	CFLAG:1:残り待機時間 -= LOCAL:2
+;味方
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		CFLAG:(FLAG:(LOCAL:0)):残り待機時間 -= LOCAL:2
+		;PRINTFORMW %CALLNAME:(FLAG:(LOCAL:0))%{CFLAG:(FLAG:(LOCAL:0)):残り待機時間}
+	ENDIF
+NEXT
+
+
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(LA_MAIN_LOOP メインタイマーチェック直前)
+ENDIF
+
+
+;メインタイマーチェック
+IF TFLAG:カウントタイマー == 0
+	TFLAG:ループカウント += 1
+	TFLAG:カウントタイマー = 10
+ENDIF
+
+
+
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(LA_MAIN_LOOP メインタイマーチェック直後)
+ENDIF
+
+IF TFLAG:ループカウント == 10
+	TFLAG:ループカウント = 0
+ENDIF
+
+;敵アピールタイム
+
+IF CFLAG:1:残り待機時間 <= 0 && TFLAG:戦闘中 == 4
+	IF CFLAG:1:現在状態 == 0
+		CALL ENEMY_TURN_LAF(1)
+	ENDIF
+	PRINTL 
+	;行動を起こした後は、一旦ループを回しなおす
+	GOTO LOOP_FINISH
+ELSE
+
+ENDIF
+;PRINTFORML 味方{CFLAG:11:残り待機時間}
+;PRINTFORMW 敵{CFLAG:1:残り待機時間}
+;味方アピールタイム
+FOR LOCAL:0, 1080, 1085
+	IF FLAG:(LOCAL:0) > 0
+		IF CFLAG:(FLAG:(LOCAL:0)):残り待機時間 <= 0
+			IF CFLAG:(FLAG:(LOCAL:0)):現在状態 == 0
+				CALL NAKAMA_TURN_LAF(FLAG:(LOCAL:0))
+			ENDIF
+			PRINTL 
+			;行動を起こした後は、一旦ループを回しなおす
+			GOTO LOOP_FINISH
+		ELSE
+		
+		ENDIF
+	ENDIF
+NEXT
+
+
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(LA_MAIN_LOOP $LOOP_FINISH直前)
+ENDIF
+
+$LOOP_FINISH
+
+IF TFLAG:カウントタイマー < 0 || TFLAG:カウントタイマー > 10 || TFLAG:ループカウント < 0 || TFLAG:ループカウント > 10
+	PRINTFORMW エラー！無限ループの疑いがあります(LA_MAIN_LOOP $LOOP_FINISH)
+ENDIF
+;ループ
+RESTART

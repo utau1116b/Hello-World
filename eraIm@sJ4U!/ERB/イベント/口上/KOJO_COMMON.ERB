@@ -1,0 +1,192 @@
+;口上共通処理
+;ARG:0	ターゲットキャラ登録番号(春香なら11、千早なら12……)
+;ARG:1	付加情報
+@KOJO(ARG:0, ARG:1)
+
+
+;FLAG:800 == 1以外は、コンフィグで切られていると表示しない
+;IF FLAG:フェス中口上 != 1 && FLAG:戦闘口上表示 == 1
+;	RETURN
+;ENDIF
+
+;リーダーを一時避難
+LOCAL:0 = TARGET
+;口上用にTARGETを設定
+TARGET = ARG:0
+
+;口上呼び出し　口上側で処理を行った場合、必ずRETURN 1しておくこと(0が帰ってきた場合デフォルトを表示する)
+TRYCCALLFORM KOJO_{ARG:0}(ARG:1)
+CATCH
+	CALL KOJO_DEFAULT(ARG:1)
+ENDCATCH
+
+;口上が呼べても、RESULTが0ならデフォルト口上を呼んでおく
+IF RESULT == 0
+	CALL KOJO_DEFAULT(ARG:1)
+ENDIF
+
+;リーダーをもとに戻す
+TARGET = LOCAL:0
+
+;共通口上	今の所特になし
+;ARG:0	付加情報
+@KOJO_DEFAULT(ARG:0)
+;シチュエーションはFLAG:800で分岐
+;	0	初期値(何も表示しない)
+;	1	能力説明時の『特徴』
+;	2	加入時口上
+;	3	ＨＰ０		ARGに強度
+;	4	絶頂		ARGに強度
+;	5	気絶(ＨＰ０)
+;	6	気絶(絶頂)
+;	7	スキル使用	ARGにスキルID
+;	8	HPダメージ	ARGにダメージ量
+;	9	EPダメージ	ARGにダメージ量
+;	10	HP回復		ARGに回復量
+;	11	MP回復		ARGに回復量
+;	12	EP回復		ARGに回復量
+;	13	スキル確定	スキルの対象や効果が確定してから呼び出し　詳細はTFLAGで参照可能
+;	14	雑魚戦前	PTメンバー全員実行　EX敵や固有敵も含む　以下同様
+;	15	雑魚戦撤退	PTメンバー全員実行　EX敵や固有敵も含む　以下同様
+;	16	雑魚戦敗北	PTメンバー全員実行
+;	17	雑魚戦勝利	PTメンバー全員実行
+;	18	ボス戦前	ARGにボスID　PTメンバー全員実行
+;	19	ボス戦撤退	ARGにボスID　PTメンバー全員実行
+;	20	ボス戦敗北	ARGにボスID　PTメンバー全員実行
+;	21	ボス戦勝利	ARGにボスID　PTメンバー全員実行
+;	22	帰還時		PTメンバー全員実行
+;	23	戦闘PT加入	編成前に居なかったキャラのみ実行
+;	24	戦闘PT離脱	編成前に居て、編成後に居なくなったキャラのみ実行
+;	25	休憩時		PTメンバー全員実行
+;	26	探索イベント	ARGにイベントID　詳細は後述　対象キャラのみ実行
+;	27	宝箱罠		ARGに罠ID　詳細は後述　対象キャラのみ実行
+;	28	冒険開始	ARGにダンジョンID　数値はFLAG:60と同じで、10～50　PTメンバー全員実行
+
+SELECTCASE FLAG:フェス中口上
+	CASE 0
+		;何もなしでOK
+	CASE 1
+		;PRINTFORML 特　　徴　？？？
+	CASEELSE
+		;デフォルト口上なので何もなしでOK
+		;普通の口上ならここでRETURN 0
+ENDSELECT
+
+RETURN 1
+
+
+;敵用口上
+@KOJO_ENEMY(ARG:0)
+LOCAL:1 = TFLAG:(TARGET + 1000)
+
+IF LOCAL:1 < 10000 || LOCAL:1 > 20000
+	;個人キャラでなければ除外（とりあえずそうしておく）
+	RETURN
+ENDIF
+
+TRYCCALLFORM KOJO_{(LOCAL:1 % 1000)}(ARG:0)
+CATCH
+	CALL KOJO_DEFAULT(ARG:0)
+ENDCATCH
+
+;口上が呼べても、RESULTが0ならデフォルト口上を呼んでおく
+IF RESULT == 0
+	CALL KOJO_DEFAULT(ARG:0)
+ENDIF
+
+;-------------------------------------------------
+;口上色設定@KOJO_COLOR
+;口上の色設定を行います。色設定関数が無い場合はやや灰色になります
+;ついでに、フラグ管理のため口上表示の設定を無視する口上をここで判断します
+;-------------------------------------------------
+@KOJO_COLOR(ARG)
+;引数が負なら処理しない
+SIF ARG < 0
+	RETURN 0
+;返り値初期化
+RESULT = 0
+;TARGET待避
+LOCAL = TARGET
+;TARGETに引数を代入
+TARGET = ARG
+;口上から色指定を引き出し、設定する
+;指定がなければデフォルトカラー
+TRYCCALLFORM KOJO_COLOR_K{NO:ARG}
+CATCH
+	SETCOLOR 160, 160, 160
+ENDCATCH
+;TARGET指定を戻す
+TARGET = LOCAL
+;口上強制呼び出しの指定を返す
+TRYCCALLFORM KOJO_ON_K{NO:(ARG)}
+	RETURN RESULT
+CATCH
+	RETURN 0
+ENDCATCH
+
+
+@KOJO_1(ARG:0)
+CALL KOJO_ENEMY(ARG:0)
+
+@KOJO_2(ARG:0)
+CALL KOJO_ENEMY(ARG:0)
+
+@KOJO_3(ARG:0)
+CALL KOJO_ENEMY(ARG:0)
+
+@KOJO_4(ARG:0)
+CALL KOJO_ENEMY(ARG:0)
+
+@KOJO_5(ARG:0)
+CALL KOJO_ENEMY(ARG:0)
+
+@KOJO_6(ARG:0)
+CALL KOJO_ENEMY(ARG:0)
+
+@KOJO_7(ARG:0)
+CALL KOJO_ENEMY(ARG:0)
+
+@KOJO_8(ARG:0)
+CALL KOJO_ENEMY(ARG:0)
+
+@KOJO_9(ARG:0)
+CALL KOJO_ENEMY(ARG:0)
+
+@KOJO_10(ARG:0)
+CALL KOJO_ENEMY(ARG:0)
+
+;-------------------------------------------------------------
+;口上があるキャラ強調表示判定
+;キャラ強調表示用の関数を用意する代わりに@SELF_KOJO_K関数で判定
+;-------------------------------------------------------------
+@KOJO_EXIST, ARG
+VARSET LOCAL, 0
+;現在のTARGET保存
+LOCAL:1 = TARGET
+
+;キャラの素質等の判定時にエラーが出るため一時的にあなたをTARGETにする
+ADDCHARA 0
+TARGET = CHARANUM - 1
+
+;念のため非表示
+SKIPDISP 1
+;TFLAG:13に設定されていない数値を入れた上で呼び出す
+TFLAG:13 = 999
+
+TRYCCALLFORM SELF_KOJO_K{ARG}
+	;口上がある場合
+	LOCAL = 1
+CATCH
+	;口上がない場合
+	LOCAL = 0
+ENDCATCH
+
+;非表示解除
+SKIPDISP 0
+DELCHARA TARGET
+
+;TARGETを戻す
+TARGET = LOCAL:1
+
+;口上があれば1、なければ0でRETURN
+RETURN LOCAL

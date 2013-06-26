@@ -1,0 +1,104 @@
+;強制放尿
+@SCOM14
+;行為者
+TCVAR:116 = TARGET
+;既成事実２に相当
+TFLAG:200 = 2
+TEQUIP:利尿剤 = 0
+SELECTCOM = 86
+;-------------------------------------------------
+;ソース追加処理
+;-------------------------------------------------
+;消費体力、気力
+DOWNBASE:体力 += 10
+DOWNBASE:気力 += 200
+;DOWNBASE:疲労 += 30
+
+SOURCE:露出 = 2400
+SOURCE:情愛 = 100
+SOURCE:快Ｃ = 500
+SOURCE:達成 = 3000
+SOURCE:逸脱 = 5000
+SOURCE:性行動 = 400
+SOURCE:不潔 = 600
+SOURCE:屈従 = 4000
+SOURCE:欲情 = 300
+SOURCE:液体 = 400
+SOURCE:反感 = 500
+
+;-------------------------------------------------
+;特殊ソース処理
+;-------------------------------------------------
+
+;場所をみる
+IF TEQUIP:野外プレイ
+	TIMES SOURCE:逸脱 , 2.50
+ELSEIF TEQUIP:羞恥プレイ
+	TIMES SOURCE:逸脱 , 1.50
+ELSEIF TEQUIP:風呂場プレイ
+	TIMES SOURCE:逸脱 , 0.50
+ENDIF
+
+LOCAL = 100
+	;臆病
+	SIF TALENT:10
+		TIMES LOCAL , 1.20
+
+	;反抗的
+	SIF TALENT:11
+		TIMES LOCAL , 2.00
+
+	;プライド高い
+	SIF TALENT:15
+		TIMES LOCAL , 2.00
+
+	;プライド低い
+	SIF TALENT:17
+		TIMES LOCAL , 0.80
+
+	;自制心
+	SIF TALENT:20
+		TIMES LOCAL , 1.50
+
+	;感情乏しい
+	SIF TALENT:22
+		TIMES LOCAL , 0.60
+
+	;目立ちたがり
+	SIF TALENT:28
+		TIMES LOCAL , 0.80
+
+	;抑圧
+	SIF TALENT:32
+		TIMES LOCAL , 3.00
+
+	;抵抗
+	SIF TALENT:34
+		TIMES LOCAL , 3.00
+
+	;恥じらい
+	SIF TALENT:35
+		TIMES LOCAL , 3.50
+
+	;恥薄い
+	SIF TALENT:36
+		TIMES LOCAL , 0.50
+
+	CUP:10 += LOCAL * 3
+	CUP:11 += LOCAL * 2
+	SOURCE:14 += LOCAL * 5
+;-------------------------------------------------
+;汚れの処理
+;-------------------------------------------------
+
+;-------------------------------------------------
+;経験の処理
+;-------------------------------------------------
+EXP:放尿経験 += 2
+;同性愛　レズなら戻り値1ゲイなら戻り値2
+IF HETEROSEX(TARGET,PLAYER)
+	EXP:(39 + HETEROSEX(TARGET,PLAYER)) += 4
+	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 4
+ENDIF
+
+RETURN 1
