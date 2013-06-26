@@ -263,6 +263,9 @@ ENDIF
 
 @EVENTTURNEND
 #LATER
+
+LOCAL = 0;バグ取り用
+
 CALL 給料計算
 ;午後なら次の日、午前なら午後にする
 ;TIMEとTIME:12で判断
@@ -271,19 +274,23 @@ CALL 給料計算
 ;夜なら次の日の朝に
 IF TIME == 1 && TIME:12 == 1
 	CALL TURNEND_夜
-	
+	LOCAL = 1
 ;夕なら夜に
 ;ELSEIF TIME == 1 && TIME:12 == 0
 ;	CALL TURNEND_夕
-
 ;昼なら夜に
 ELSEIF TIME == 0 && TIME:12 == 1
 	CALL TURNEND_昼
-	
+	LOCAL = 2
 ;朝なら昼に
 ELSEIF TIME == 0 && TIME:12 == 0
 	CALL TURNEND_朝
-	
+	LOCAL = 3
 ENDIF
+
 FLAG:ショップコマンド = 0
+
+SIF LOCAL == 0
+	PRINTFORML エラー！　@TURENEND内にて不明なエラー{LOCAL}が発生しました！(TIME = {TIME}　TIME:12 = {TIME:12})
+
 BEGIN SHOP

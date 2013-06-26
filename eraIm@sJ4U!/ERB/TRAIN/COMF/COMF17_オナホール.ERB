@@ -4,7 +4,7 @@
 ;-------------------------------------------------
 @COM17
 ;着脱の処理
-TEQUIP:オナホール = TEQUIP:オナホール
+TEQUIP:オナホール = !TEQUIP:オナホール
 
 ;-------------------------------------------------
 ;COM別FLAGの設定
@@ -46,8 +46,6 @@ IF HETEROSEX(TARGET,PLAYER)
 	EXP:PLAYER:(39 + HETEROSEX(TARGET,PLAYER)) += 1
 ENDIF
 
-;EXP:PLAYER:道具使用経験 ++
-
 RETURN 1
 ;-------------------------------------------------
 ;装着継続の処理
@@ -60,7 +58,6 @@ PRINTL ＜オナホール装備中＞
 ;	（1=TARGET 2=PLAYER 3=MASTER 4=ASSI 5=TARGET+ASSI 6=MASTER+ASSI -1=触手 -2=その他）
 ;TCVAR:2 射精箇所フラグ（-1=コンドーム 1=膣内 2=アナル 3=手淫 4=口淫 5=パイズリ 6=素股 7=足コキ 8=体表 ）
 ;TCVAR:4 射精快感強度
-
 SETBIT TCVAR:TARGET:0, 5
 ;強度
 TCVAR:ARG:4 = 1000

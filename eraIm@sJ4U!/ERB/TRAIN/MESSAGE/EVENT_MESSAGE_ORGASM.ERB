@@ -23,9 +23,9 @@ SIF !(LOCAL + NOWEX:12)
 	RETURN 0
 ;絶頂
 PRINTFORM %CALLNAME:TARGET%は
-SIF NOWEX:10
+SIF NOWEX:10 && !TALENT:オトコ
 	PRINT 胸の先端から母乳を垂らし
-SIF LOCAL >= 5
+SIF LOCAL >= 5 && !TALENT:オトコ
 	PRINT 陰唇から透明な潮を噴き出し
 SIF NOWEX:11
 	PRINT ペニスから精液を噴き出し
@@ -36,7 +36,7 @@ PRINTL ながら、全身を震わせて絶頂に達した
 	;絶頂
 	SIF LOCAL >= 3
 		PRINTS CALLNAME:TARGET
-	IF LOCAL >= 5 && TEQUIP:50 > 0
+	IF LOCAL >= 5 && TEQUIP:50 > 0  && !TALENT:オトコ
 		PRINTL の肉襞は粘つく液体を滴らせ、喘ぐように開閉を繰り返している…
 	ELSEIF LOCAL >= 5
 		PRINTL は断続的に絶頂を繰り返しながら、ぐったりと脱力している…
@@ -63,11 +63,11 @@ ELSEIF LOCAL >= 3 && TEQUIP:利尿剤 && TALENT:おもらし癖
 	PRINTFORML 震える%CALLNAME:TARGET%の尿道口から勢い良く水流が迸り、弧を描いた…
 ELSEIF LOCAL >= 3 && TEQUIP:利尿剤
 	PRINTFORML 震える%CALLNAME:TARGET%の尿道口から水流が滴り、水溜りを作った…
-ELSEIF LOCAL >= 3 && TALENT:おもらし癖
+ELSEIF LOCAL >= 3 && TALENT:おもらし癖 && !TALENT:オトコ
 	PRINTFORML 震える%CALLNAME:TARGET%の陰唇から尿がちょろちょろと漏れ出ている…
 ELSEIF LOCAL >= 1 && TEQUIP:利尿剤 && TALENT:おもらし癖
 	PRINTFORML %CALLNAME:TARGET%の尿道口から水流が滴り、水溜りを作った…
-ELSEIF LOCAL >= 1 && TEQUIP:利尿剤
+ELSEIF LOCAL >= 1 && TEQUIP:利尿剤  && !TALENT:オトコ
 	PRINTFORML %CALLNAME:TARGET%の陰唇から尿がちょろちょろと漏れ出ている…
 ENDIF
 
@@ -168,11 +168,6 @@ ELSEIF GETBIT(TFLAG:射精箇所,2)
 	PRINTFORMW 精液で溢れている腸内は細かく震え、ペニスをきつく締めつけている…
 ;手淫
 ELSEIF GETBIT(TFLAG:射精箇所,3)
-	;IF TFLAG:うふふ == 2
-	;	PRINTFORML 射精が始まると%CALLNAME:TARGET%は一層激しくペニスをしごきたて
-	;	PRINTFORML \@ NOWEX:PLAYER:11 > 1 ? 大量に噴き上がる # 吐き出される \@精液を満足げに眺めながら
-	;	PRINTFORMW %CALLNAME:MASTER%のペニスの脈動が止まるまで愛撫を続けた…
-	;ELSE
 		IF ABL:精液中毒 > 2 && ABL:技巧 > 2
 			PRINTFORML %CALLNAME:TARGET%は恍惚の表情で舌を突き出しながら%CALLNAME:PLAYER%の精液を浴びている…
 		ELSEIF NOWEX:PLAYER:11 == 1
@@ -183,13 +178,6 @@ ELSEIF GETBIT(TFLAG:射精箇所,3)
 	;ENDIF
 ;フェラチオ
 ELSEIF GETBIT(TFLAG:射精箇所,4)
-	;IF TFLAG:うふふ == 2
-	;	PRINTFORML %CALLNAME:MASTER%は%CALLNAME:TARGET%の口内に射精した…
-	;	PRINTFORMW %CALLNAME:TARGET%は口内で精液をうけながら舌で亀頭を刺激し、さらなる射精を促している…
-	;ELSEIF SELECTCOM == 140
-	;	PRINTFORML %CALLNAME:PLAYER%は%CALLNAME:TARGET%の喉の奥までペニスを挿入したまま射精し
-	;	PRINTFORMW 精液を食道に送り込んだ…
-	;ELSE
 		PRINTFORMW %CALLNAME:PLAYER%は%CALLNAME:TARGET%の口内に射精した
 		;精飲
 		IF EXP_UP(130) == NOWEX:PLAYER:11 * 3

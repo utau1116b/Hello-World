@@ -7,7 +7,8 @@
 ;-----------------------------------------------------------
 @CALL_COM(ARG)
 DEBUGPRINTFORML SELECTCOM = {SELECTCOM}　PREVCOM = {PREVCOM}
-;=== ウフフ系コンボ ===
+LOCALS = 0
+;=== ウフフ系派生コマンド ===
 IF TFLAG:うふふ
 	;シックスナイン
 	IF (GET_INSERT_CHARA(ARG,"M","P") == PLAYER || GET_INSERT_CHARA(ARG,"M","C") == PLAYER) && (GET_INSERT_CHARA(ARG,"P","M") == PLAYER || GET_INSERT_CHARA(ARG,"C","M") == PLAYER) && (SELECTCOM == [[調教:クンニ]] || SELECTCOM == [[調教:フェラチオ]])
@@ -82,7 +83,7 @@ IF TFLAG:うふふ
 	ENDIF
 ENDIF
 
-;=== 日常系 ===
+;=== 日常系派生コマンド ===
 IF !TFLAG:うふふ
 	;耳かき
 	IF SELECTCOM == [[調教:スキンシップ]] && PREVCOM == [[調教:膝枕して貰う]]
@@ -94,15 +95,7 @@ IF !TFLAG:うふふ
 ENDIF
 
 ;=== デート系 ===
-;IF CFLAG:MASTER:デート中
-;	;手を引く
-;	IF SELECTCOM == [[調教:正常位]]3 && PREVCOM == 603
-;		TFLAG:特殊COM = 80
-
-;ENDIF
 DEBUGPRINTFORML 【CALLCOM】TFLAG={TFLAG:特殊COM}, SELECTCOM={SELECTCOM}
-;PRINTFORML SELECTCOM = {SELECTCOM} TFLAG:SELECTCOM保存 = {TFLAG:SELECTCOM保存}
-;PRINTFORML 【CALLCOM】TFLAG={TFLAG:特殊COM}, SELECTCOM={SELECTCOM}
 RESULT = 0
 IF TFLAG:特殊COM
 	CALLFORM COM_ABLE{500 + TFLAG:特殊COM}
@@ -113,10 +106,8 @@ IF TFLAG:特殊COM
 			CATCH
 				PRINTFORML %コマンド名(TFLAG:特殊COM, 1)%
 				TFLAG:派生COM番号 = 0
-				;%STR:(1500 + TFLAG:特殊COM)%
 			ENDCATCH
 			STR:0 = %コマンド名(TFLAG:特殊COM, 1)%
-			;%STR:(1500 + TFLAG:特殊COM)%
 			TRYCALLFORM SCOM{TFLAG:特殊COM}
 		ENDIF
 	ELSE
@@ -131,12 +122,10 @@ IF TFLAG:特殊COM
 		ENDIF
 	ENDIF
 ENDIF
-;DEBUGPRINTFORML 【CALLCOM】RESULT={RESULT}
+
 SIF RESULT
 	RETURN RESULT
-TFLAG:特殊COM = 0
-;LOCALS = %TRAINNAME:SELECTCOM%
-;%STR:(1000 + SELECTCOM)%
+
 TRYCCALLFORM CAN_COM{SELECTCOM}
 CATCH
 	PRINTFORML %コマンド名(SELECTCOM)%
@@ -156,3 +145,104 @@ ENDIF
 STR:0 = %コマンド名(SELECTCOM)%
 TRYCALLFORM COM{SELECTCOM}
 RETURN RESULT
+
+;ARG	コマンド番号or特殊COM番号
+;ARG:1	0,通常,1,派生COM
+@コマンド名(ARG, ARG:1)
+#FUNCTIONS
+IF ARG:1
+	SELECTCASE ARG
+		CASE 1
+			RETURNF "シックスナイン"
+		CASE 2
+			RETURNF "岩清水"
+		CASE 3
+			RETURNF "Gスポット刺激"
+		CASE 4
+			RETURNF "乱れ牡丹"
+		CASE 5
+			RETURNF "手淫フェラ"
+		CASE 6
+			RETURNF "挿入Ｇスポット責め"
+		CASE 7
+			RETURNF "挿入子宮口責め"
+		CASE 8
+			RETURNF "６９パイズリ"
+		CASE 9
+			RETURNF "ダブルフェラ"
+		CASE 10
+			RETURNF "ダブル素股"
+		CASE 11
+			RETURNF "ダブルパイズリ"
+		CASE 12
+			RETURNF "パイズリフェラ"
+		CASE 13
+			RETURNF "交互挿入"
+		CASE 14
+			RETURNF "強制放尿"
+		CASE 15
+			RETURNF "Ｗフェラ"
+		CASE 60
+			RETURNF "耳かき"
+		CASE 62
+			RETURNF "デコちゅー"
+	ENDSELECT
+ELSE
+	SELECTCASE ARG
+			CASE 11
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手挿入"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能バイブ"
+			CASE 13
+				SIF TEQUIP:触手プレイ
+					RETURNF "アナル触手"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能アナルバイブ"
+			CASE 14
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手クリキャップ"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能電動クリキャップ"
+				RETURNF "電動クリキャップ"
+			CASE 15
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手乳首責め"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能二プルキャップ"
+				RETURNF "二プルキャップ"
+			CASE 16
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手搾乳"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能搾乳機"
+			CASE 17
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手ペニス責め"
+				SIF TALENT:PLAYER:淫具知識
+					RETURNF "高性能オナホール"
+			CASE 44
+				SIF TEQUIP:触手プレイ
+					RETURNF "触手緊縛"
+			CASE 116
+				SIF TFLAG:45
+					RETURNF "剃毛される"
+			CASE 173
+				SIF TFLAG:45
+					RETURNF "腹パンされる"
+			CASE 280 TO 284
+				RETURNF CSTR:(ARG - 200)
+			CASE 323
+				SIF TEQUIP:デート中 && IS_友情(TARGET)
+					RETURNF "遠出する(5,000Ｇを消費)"
+				SIF TEQUIP:デート中
+					RETURNF "デート(5,000Ｇを消費)"
+				RETURNF "デート終了"
+		CASEELSE
+			RETURNF TRAINNAME:ARG
+	ENDSELECT
+ENDIF
+
+SIF STRLENS(TRAINNAME:ARG) > 0
+	RETURNF TRAINNAME:ARG
+RETURNF ""

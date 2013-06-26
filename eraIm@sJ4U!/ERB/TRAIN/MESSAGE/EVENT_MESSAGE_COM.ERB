@@ -186,6 +186,7 @@ ELSE
 	ENDIF
 	WAIT
 ENDIF
+
 ;フェラする
 @TRAIN_MESSAGE_COM4
 ;猫舌フェラする
@@ -202,6 +203,7 @@ ELSE
 		PRINT 硬くそそり勃った
 	PRINTW ペニスを口に咥えて舐めまわした…
 ENDIF
+
 ;胸愛撫
 @TRAIN_MESSAGE_COM5
 IF TEQUIP:コスプレ
@@ -241,18 +243,6 @@ ELSE
 	ELSE
 		PRINTFORM %CALLNAME:TARGET%の%OPPAI_DESCRIPTION(TARGET)%
 	ENDIF
-	;PRINTFORM %CALLNAME:TARGET%の
-	;IF TALENT:絶壁
-	;	PRINT ほぼ無に等しい
-	;ELSEIF TALENT:小柄体型 && TALENT:貧乳
-	;	PRINT 僅かに膨らみが感じられる程度の
-	;ELSEIF TALENT:貧乳
-	;	PRINT 標準よりやや小さめの
-	;ELSEIF TALENT:巨乳
-	;	PRINT 手から溢れそうなほどの
-	;ELSEIF TALENT:爆乳
-	;	PRINT 手に余るほど大きな
-	;ENDIF
 		IF TEQUIP:触手プレイ
 			PRINTW を絞り上げるように、幾本もの触手が絡みついた…
 		ELSEIF PALAM:欲情 > PALAMLV:3 && TEQUIP:搾乳機 == 0 && TEQUIP:クリップローター == 0
@@ -344,6 +334,7 @@ ELSE
 		PRINTFORML %CALLNAME:TARGET%も自然に受け入れた…
 	ENDIF
 ENDIF
+
 ;指挿入れ
 @TRAIN_MESSAGE_COM8
 ;下半身着衣
@@ -460,7 +451,7 @@ IF TEQUIP:触手プレイ
 	ENDIF
 ELSE
 	;解除時
-	IF TEQUIP:バイブ
+	IF !TEQUIP:バイブ
 		PRINTFORML %CALLNAME:TARGET%から蠢くバイブをゆっくりと引き抜いた。
 		;Ｖ経験200以上＋恋慕か親愛
 		IF EXP:Ｖ経験 >= 201 && TALENT:恋慕
@@ -602,7 +593,7 @@ ELSEIF ABL:Ｃ感覚 >= 3 && PALAM:欲情 >= PALAMLV:5
 ENDIF
 PRINTW だ…
 
-
+;アナルバイブ
 @TRAIN_MESSAGE_COM13
 ;アナルバイブの着脱
 IF TEQUIP:触手プレイ
@@ -613,7 +604,7 @@ IF TEQUIP:触手プレイ
 	ENDIF
 ELSE
 	;解除時
-	IF TEQUIP:アナルバイブ
+	IF !TEQUIP:アナルバイブ
 		PRINTFORML %CALLNAME:TARGET%のアヌスからアナルバイブを抜いた
 		PRINTFORM %CALLNAME:TARGET%は
 		;Ａ経験180以上
@@ -687,7 +678,7 @@ IF TEQUIP:触手プレイ
 		PRINTFORML 細かく枝分かれした触手が%CALLNAME:TARGET%のクリトリスを責めはじめた
 	ENDIF
 ELSE
-	IF TEQUIP:クリキャップ
+	IF !TEQUIP:クリキャップ
 		PRINTFORML %CALLNAME:TARGET%から電動クリキャップを外した
 	ELSE
 		PRINTFORML %CALLNAME:TARGET%に電動クリキャップを取り付けた
@@ -870,7 +861,7 @@ ELSE
 		PRINTFORML の最奥まで突き入れた…
 	ENDIF
 ENDIF
-;@j
+
 ;アナルセックス
 ;@TRAIN_MESSAGE_COM22
 
@@ -939,8 +930,7 @@ ELSE
 		PRINT 口付けをしつつ
 	PRINTW 腰を揺り動かした…
 ENDIF
-;SIF TALENT:恋慕
-;	PRINTFORML %CALLNAME:TARGET%は%CALLNAME:PLAYER%の首に手を回して抱きついてきた…
+
 ;背面座位
 @TRAIN_MESSAGE_COM25
 IF TCVAR:100 == PLAYER && SAME_PLAYER()
