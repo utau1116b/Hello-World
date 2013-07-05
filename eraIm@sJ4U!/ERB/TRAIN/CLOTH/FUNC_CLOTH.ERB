@@ -1,0 +1,778 @@
+;衣装着脱系の関数はeratohoReverse#を一部参照
+;────────────────────────────────────
+;
+;衣装脱着系処理
+;
+;────────────────────────────────────
+;────────────────────────────────────
+;調教開始の処理
+;────────────────────────────────────
+@EVENTTRAIN
+;デフォルト衣装セット
+CALL CLOTHES_SETUP(MASTER)
+CALL CLOTHES_SETUP(TARGET)
+SIF ASSI != 0 && ASSI != -1
+	CALL CLOTHES_SETUP(ASSI)
+;衣装を設定
+TEQUIP:MASTER:オプション1 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション1 # 0
+TEQUIP:MASTER:オプション2 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション2 # 0
+TEQUIP:MASTER:オプション3 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション3 # 0
+TEQUIP:MASTER:オプション4 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション4 # 0
+TEQUIP:MASTER:オプション5 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション5 # 0
+TEQUIP:MASTER:頭 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:頭 # 0
+TEQUIP:MASTER:手 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:手 # 0
+TEQUIP:MASTER:靴下 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:靴下 # 0
+TEQUIP:MASTER:下着（下） = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:下着（下） # 0
+TEQUIP:MASTER:下着（上） = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:下着（上） # 0
+TEQUIP:MASTER:下着（上下一体） = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:下着（上下一体） # 0
+TEQUIP:MASTER:ボトムス = CFLAG:MASTER:脱衣レベル < 1 ? EQUIP:MASTER:ボトムス # 0
+TEQUIP:MASTER:インナー = CFLAG:MASTER:脱衣レベル < 1 ? EQUIP:MASTER:インナー # 0
+TEQUIP:MASTER:アウター = CFLAG:MASTER:脱衣レベル < 1 ? EQUIP:MASTER:アウター # 0
+TEQUIP:MASTER:上下一体服 = CFLAG:MASTER:脱衣レベル < 1 ? EQUIP:MASTER:上下一体服 # 0
+TEQUIP:MASTER:コスプレ服 = CFLAG:MASTER:脱衣レベル < 1 ? EQUIP:MASTER:コスプレ服 # 0
+;TEQUIP:MASTER:コスプレ服 = CFLAG:MASTER:脱衣レベル == 3 ? EQUIP:MASTER:コスプレ服 # 0
+;結婚指輪は外せない
+;TEQUIP:MASTER:エンゲージリング = EQUIP:MASTER:エンゲージリング
+TEQUIP:TARGET:オプション1 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション1 # 0
+TEQUIP:TARGET:オプション2 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション2 # 0
+TEQUIP:TARGET:オプション3 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション3 # 0
+TEQUIP:TARGET:オプション4 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション4 # 0
+TEQUIP:TARGET:オプション5 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション5 # 0
+TEQUIP:TARGET:頭 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:頭 # 0
+TEQUIP:TARGET:手 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:手 # 0
+TEQUIP:TARGET:靴下 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:靴下 # 0
+TEQUIP:TARGET:下着（下） = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:下着（下） # 0
+TEQUIP:TARGET:下着（上） = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:下着（上） # 0
+TEQUIP:TARGET:下着（上下一体） = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:下着（上下一体） # 0
+TEQUIP:TARGET:ボトムス = CFLAG:TARGET:脱衣レベル < 1 ? EQUIP:TARGET:ボトムス # 0
+TEQUIP:TARGET:インナー = CFLAG:TARGET:脱衣レベル < 1 ? EQUIP:TARGET:インナー # 0
+TEQUIP:TARGET:アウター = CFLAG:TARGET:脱衣レベル < 1 ? EQUIP:TARGET:アウター # 0
+TEQUIP:TARGET:上下一体服 = CFLAG:TARGET:脱衣レベル < 1 ? EQUIP:TARGET:上下一体服 # 0
+TEQUIP:TARGET:コスプレ服 = CFLAG:TARGET:脱衣レベル < 1 ? EQUIP:TARGET:コスプレ服 # 0
+;TEQUIP:TARGET:コスプレ服 = CFLAG:TARGET:脱衣レベル == 3 ? EQUIP:TARGET:コスプレ服 # 0
+
+;────────────────────────────────────
+;服装の表示
+;引数1なら調教者、2なら調教対象だけ表示。省略なら両方
+;────────────────────────────────────
+;マスターをプレイヤーに変更で助手に対応、ただし、脱いだ場合セーブできないのでまだやらない
+@SHOW_EQUIP_3(ARG)
+IF ARG == 1 || !ARG
+	CALL SET_COLOR(TARGET)
+	PRINTFORM %CALLNAME:TARGET, 10%
+	RESETCOLOR
+	PRINTFORM の衣装：
+	PRINTFORM \@ TEQUIP:TARGET:コスプレ服 ? [%COSPLAY(TARGET)%] # \@\@ TEQUIP:TARGET:上下一体服 ? [%DRESS(TARGET)%] # \@\@ TEQUIP:TARGET:アウター ? [%OUTER_T(TARGET)%] # \@\@ TEQUIP:TARGET:インナー ? [%OUTER_T2(TARGET)%] # \@\@ TEQUIP:TARGET:ボトムス ? [%OUTER_B(TARGET)%] # \@\@ TEQUIP:TARGET:下着（上下一体） ? [%INNER_TB(TARGET)%] # \@\@ TEQUIP:TARGET:下着（上） ? [%INNER_T(TARGET)%] # \@
+	PRINTFORM \@ TEQUIP:TARGET:下着（下） ? [%INNER_B(TARGET)%] # \@\@ TEQUIP:TARGET:靴下 ? [%SOCKS(TARGET)%] # \@\@ TEQUIP:TARGET:手 ? [%GLOVES(TARGET)%] # \@\@ TEQUIP:TARGET:頭 ? [%HEAD(TARGET)%] # \@\@ TEQUIP:TARGET:オプション1 ? [%ACCESSORY1(TARGET)%] # \@
+	PRINTFORML \@  TEQUIP:TARGET:オプション2 ? [%ACCESSORY1(TARGET, , 2)%] # \@\@  TEQUIP:TARGET:オプション3 ? [%ACCESSORY1(TARGET, , 3)%] #  \@\@ TEQUIP:TARGET:オプション4 ? [%ACCESSORY1(TARGET, , 4)%] # \@\@ TEQUIP:TARGET:オプション5 ? [%ACCESSORY1(TARGET, , 5)%] #  \@
+ENDIF
+IF ARG == 2 || !ARG
+	PRINTFORM %CALLNAME:MASTER, 10%の衣装：
+	PRINTFORM \@ TEQUIP:MASTER:コスプレ服 ? [%COSPLAY(MASTER)%] # \@\@ TEQUIP:MASTER:上下一体服 ? [%DRESS(MASTER)%] # \@\@ TEQUIP:MASTER:アウター ? [%OUTER_T(MASTER)%] # \@\@ TEQUIP:MASTER:インナー ? [%OUTER_T2(MASTER)%] # \@\@ TEQUIP:MASTER:ボトムス ? [%OUTER_B(MASTER)%] # \@\@ TEQUIP:MASTER:下着（上下一体） ? [%INNER_TB(MASTER)%] # \@\@ TEQUIP:MASTER:下着（上） ? [%INNER_T(MASTER)%] # \@
+	PRINTFORM \@ TEQUIP:MASTER:下着（下） ? [%INNER_B(MASTER)%] # \@\@ TEQUIP:MASTER:靴下 ? [%SOCKS(MASTER)%] # \@\@ TEQUIP:MASTER:手 ? [%GLOVES(MASTER)%] # \@\@ TEQUIP:MASTER:頭 ? [%HEAD(MASTER)%] # \@\@ TEQUIP:MASTER:オプション1 ? [%ACCESSORY1(MASTER)%] # \@
+	PRINTFORML \@  TEQUIP:MASTER:オプション2 ? [%ACCESSORY1(MASTER, , 2)%] # \@\@  TEQUIP:MASTER:オプション3 ? [%ACCESSORY1(MASTER, , 3)%] #  \@\@ TEQUIP:MASTER:オプション4 ? [%ACCESSORY1(MASTER, , 4)%] # \@\@ TEQUIP:MASTER:オプション5 ? [%ACCESSORY1(MASTER, , 5)%] #  \@
+ENDIF
+
+;────────────────────────────────────
+;
+;衣装が設定されていなければデフォルトの衣装を装備
+;
+;────────────────────────────────────
+@CLOTHES_SETUP(ARG)
+;衣装未設定（デフォ全裸）の場合のみここで設定
+IF !(EQUIP:ARG:オプション1+EQUIP:ARG:オプション2+EQUIP:ARG:オプション3+EQUIP:ARG:オプション4+EQUIP:ARG:オプション5+EQUIP:ARG:靴下+EQUIP:ARG:頭+EQUIP:ARG:手+EQUIP:ARG:靴下+EQUIP:ARG:コスプレ服+EQUIP:ARG:下着（下）+EQUIP:ARG:下着（上）+EQUIP:ARG:アウター+EQUIP:ARG:ボトムス+EQUIP:ARG:インナー+EQUIP:ARG:上下一体服+EQUIP:ARG:下着（上下一体）)
+	;オトコの場合、トランクス・シャツ・ネクタイ・ソックス・スラックス・ジャケット・ネクタイ
+	IF TALENT:ARG:オトコ
+		EQUIP:ARG:下着（下） = 3
+		EQUIP:ARG:アウター = 8
+		EQUIP:ARG:インナー = 2
+		EQUIP:ARG:ボトムス = 17
+		EQUIP:ARG:オプション5 = 2
+		EQUIP:ARG:靴下 = 1
+	;貧乳、絶壁の場合、パンティ・キャミソール・ワンピース
+	ELSEIF TALENT:ARG:貧乳 || TALENT:ARG:絶壁
+		EQUIP:ARG:下着（下） = 2
+		EQUIP:ARG:下着（上） = 4
+		EQUIP:ARG:上下一体服 = 15
+		;ハイソックスを履かせる
+		EQUIP:ARG:靴下 = 4
+	;それ以外の場合、パンティ・ブラジャー・スカート・Tシャツ
+	ELSE
+		EQUIP:ARG:下着（下） = 2
+		EQUIP:ARG:下着（上） = 1
+		EQUIP:ARG:アウター = 20
+		EQUIP:ARG:ボトムス = 1
+		;ハイソックスを履かせる
+		EQUIP:ARG:靴下 = 4
+	ENDIF
+	;ふたなりの場合パンティに入りそうにないのでドロワーズ
+	SIF TALENT:ARG:ふたなり
+		EQUIP:ARG:下着（下） = 1
+ENDIF
+;-------------------------------------------------
+;関数名:COSPLAY
+;概　要:服装名取得関数(カスタム衣装)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@COSPLAY(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE EQUIP:(ARG:0):コスプレ服
+	CASE 1
+		RETURNF "学ラン"
+	CASE 2
+		RETURNF "セーラー服"
+	CASE 3
+		RETURNF "ブルマ"
+	CASE 4
+		RETURNF "水着"
+	CASE 5
+		RETURNF "スク水（紺）"
+	CASE 6
+		RETURNF "スク水（白）"
+	CASE 7
+		RETURNF "白衣"
+	CASE 8
+		RETURNF "ナース服"
+	CASE 9
+		RETURNF "女性警官制服"
+	CASE 10
+		RETURNF "ボンテージ"
+	CASE 11
+		RETURNF "浴衣"
+	CASE 12
+		RETURNF "巫女服"
+	CASE 13
+		RETURNF "セーラー水着"
+	CASE 14
+		RETURNF "初音ミクのコスチューム"
+	CASE 15
+		RETURNF "メイド服"
+	CASE 16
+		RETURNF "スモック"
+	CASE 17
+		RETURNF "リボン"
+	CASE 18
+		RETURNF "ヨガウェア"
+	CASE 19
+		RETURNF "魔法少女のコスチューム"
+	CASE 20
+		RETURNF "ゴスロリ服"
+	CASE 21
+		RETURNF "バニーガール"
+	CASE 22
+		RETURNF "Yシャツ"
+	CASE 23
+		RETURNF "普段着"
+	;彼ティー
+	CASE 24
+		RETURNF "彼氏の服"
+	CASE 25
+		RETURNF "うさぎの着ぐるみ"
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:GLOVES
+;概　要:服装名取得関数(特殊)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、特殊装飾品の名前を返す
+;-------------------------------------------------
+@GLOVES(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE EQUIP:(ARG:0):手
+	;手袋
+	CASE 1
+		RETURNF "手袋"
+	;袖
+	CASE 2
+		RETURNF "袖"
+	;羽衣
+	CASE 3
+		RETURNF "羽衣"
+	CASE 4
+		RETURNF "パペット"
+	CASE 5
+		RETURNF "腕輪"
+	CASE 6
+		RETURNF "ブレスレット"
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:SOCKS
+;概　要:服装名取得関数(靴下)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、靴下の名前を返す
+;-------------------------------------------------
+@SOCKS(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE EQUIP:(ARG:0):靴下
+	;ソックス
+	CASE 1
+		RETURNF  \@ ARG:1 ? 靴下 # ソックス \@
+	;ニーソックス
+	CASE 2
+		RETURNF  \@ ARG:1 ? ニーソ # ニーソックス \@
+	;ガーターストッキング
+	CASE 3
+		RETURNF  \@ ARG:1 ? ガーター # ガーターストッキング \@
+	;ハイソックス
+	CASE 4
+		RETURNF "ハイソックス"
+	;足袋
+	CASE 5
+		RETURNF "足袋"
+	;ストッキング
+	CASE 6
+		RETURNF "ストッキング"
+	;タイツ
+	CASE 7
+		RETURNF "タイツ"
+	;黒タイツ
+	CASE 8
+		RETURNF "黒タイツ"
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:INNER_B
+;概　要:服装名取得関数(下半身下着)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、下半身下着の名前を返す
+;-------------------------------------------------
+@INNER_B(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE EQUIP:(ARG:0):下着（下）
+	;ドロワーズ
+	CASE 1
+		RETURNF \@ ARG:1 ? ドロワ # ドロワーズ \@
+	;パンティ
+	CASE 2
+		RETURNF \@ ARG:1 ? パンツ # パンティ \@
+	;トランクス
+	CASE 3
+		RETURNF "トランクス"
+	;パンティストッキング
+	CASE 4
+		RETURNF \@ ARG:1 ? パンスト # パンティストッキング \@
+	;ガーターベルト
+	CASE 5
+		RETURNF "ガーターベルト"
+	;褌
+	CASE 6
+		RETURNF "褌"
+	;ブリーフ
+	CASE 7
+		RETURNF "ブリーフ"
+	;ペチコート
+	CASE 8
+		RETURNF \@ ARG:1 ? ペチコ # ペチコート \@
+	;スキャンティ
+	CASE 9
+		RETURNF "スキャンティ"
+	;紐パン
+	CASE 10
+		RETURNF "紐パン"
+	;アンダースコート
+	CASE 11
+		RETURNF \@ ARG:1 ? アンスコ # アンダースコート \@
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:INNER_T
+;概　要:服装名取得関数(上半身下着)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、上半身下着の名前を返す
+;-------------------------------------------------
+@INNER_T(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE EQUIP:(ARG:0):下着（上）
+	;ブラジャー
+	CASE 1
+		RETURNF \@ ARG:1 ? ブラ # ブラジャー \@
+	;スポーツブラ
+	CASE 2
+		RETURNF \@ ARG:1 ? スポブラ # スポーツブラ \@
+	;さらし
+	CASE 3
+		RETURNF "さらし"
+	;キャミソール
+	CASE 4
+		RETURNF \@ ARG:1 ? キャミ # キャミソール \@
+	;大胸筋矯正サポーター
+	CASE 5
+		RETURNF "大胸筋矯正サポーター"
+	;オープンブラ
+	CASE 6
+		RETURNF "オープンブラ"
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:OUTER_B
+;概　要:服装名取得関数(下半身上着)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;      :ARG:2…省略可。真の場合、着ていなければ全身上着の名前を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、上半身下着の名前を返す
+;-------------------------------------------------
+@OUTER_B(ARG:0, ARG:1, ARG:2)
+#FUNCTIONS
+SELECTCASE EQUIP:(ARG:0):ボトムス
+	;スカート
+	CASE 1
+		RETURNF "スカート"
+	;キュロット
+	CASE 2
+		RETURNF "キュロット"
+	;もんぺ
+	CASE 3
+		RETURNF "もんぺ"
+	;ズボン
+	CASE 4
+		RETURNF "ズボン"
+	;スパッツ
+	CASE 5
+		RETURNF "スパッツ"
+	;タイツ
+	CASE 6
+		RETURNF "タイツ"
+	;ロングスカート
+	CASE 7
+		RETURNF "ロングスカート"
+	;トレパン
+	CASE 8
+		RETURNF "トレパン"
+	;ハーフパンツ
+	CASE 9
+		RETURNF "ハーフパンツ"
+	;ショートパンツ
+	CASE 10
+		RETURNF \@ ARG:1 ? ショーパン # ショートパンツ \@
+	;スウェット
+	CASE 11
+		RETURNF "スウェット"
+	;ジーンズ
+	CASE 12
+		RETURNF "ジーンズ"
+	;半ズボン
+	CASE 13
+		RETURNF "半ズボン"
+	;ホットパンツ
+	CASE 14
+		RETURNF "ホットパンツ"
+	;ミニスカート
+	CASE 15
+		RETURNF \@ ARG:1 ? ミニスカ # ミニスカート \@
+	;サスペンダースカート
+	CASE 16
+		RETURNF "サスペンダースカート"
+	;スラックス
+	CASE 17
+		RETURNF "スラックス"
+	;無し
+	CASE 0
+		RETURNF \@ ARG:2 ? %DRESS(ARG:0, ARG:1)% # \@
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:OUTER_T
+;概　要:服装名取得関数(上半身上着)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;      :ARG:2…省略可。真の場合、着ていなければ全身上着の名前を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、上半身上着の名前を返す
+;-------------------------------------------------
+@OUTER_T(ARG:0, ARG:1, ARG:2)
+#FUNCTIONS
+SELECTCASE EQUIP:(ARG:0):アウター
+	;キャミソール
+	CASE 1
+		RETURNF \@ ARG:1 ? キャミ # キャミソール \@
+	;シャツ
+	CASE 2
+		RETURNF "シャツ"
+	;タンクトップ
+	CASE 3
+		RETURNF "タンクトップ"
+	;チューブトップ
+	CASE 4
+		RETURNF "チューブトップ"
+	;ブラウス
+	CASE 5
+		RETURNF "ブラウス"
+	;ベアトップ
+	CASE 6
+		RETURNF "ベアトップ"
+	;カーディガン
+	CASE 7
+		RETURNF "カーディガン"
+	;ジャケット
+	CASE 8
+		RETURNF "ジャケット"
+	;ジャンパー
+	CASE 9
+		RETURNF "ジャンパー"
+	;セーター
+	CASE 10
+		RETURNF "セーター"
+	;トレーナー
+	CASE 11
+		RETURNF "トレーナー"
+	;パーカー
+	CASE 12
+		RETURNF "パーカー"
+	;ブレザー
+	CASE 13
+		RETURNF "ブレザー"
+	;ケープ
+	CASE 14
+		RETURNF "ケープ"
+	;ブルゾン
+	CASE 15
+		RETURNF "ブルゾン"
+	;カットソー
+	CASE 16
+		RETURNF "カットソー"
+	;ベスト
+	CASE 17
+		RETURNF "ベスト"
+	;コート
+	CASE 18
+		RETURNF "コート"
+	;チュニック
+	CASE 19
+		RETURNF "チュニック"
+	;Tシャツ
+	CASE 20
+		RETURNF "Ｔシャツ"
+	;ノースリーブ
+	CASE 21
+		RETURNF "ノースリーブ"
+	CASE 22
+		RETURNF "ジャージ上"
+	;タートルネック
+	CASE 23
+		RETURNF "タートルネック"
+	CASE 24
+		RETURNF "スクールセーター"
+	;無し
+	CASE 0
+		RETURNF \@ ARG:2 ? %DRESS(ARG:0, ARG:1)% # \@
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:DRESS
+;概　要:服装名取得関数(全身上着)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、全身上着の名前を返す
+;-------------------------------------------------
+@DRESS(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE EQUIP:(ARG:0):上下一体服
+	;和服
+	CASE 1
+		RETURNF "和服"
+	;スーツ
+	CASE 2
+		RETURNF "スーツ"
+	;タキシード
+	CASE 3
+		RETURNF "タキシード"
+	;ドレス
+	CASE 4
+		RETURNF "ドレス"
+	;燕尾服
+	CASE 5
+		RETURNF "燕尾服"
+	;背広
+	CASE 6
+		RETURNF  "背広"
+	;つなぎ
+	CASE 7
+		RETURNF "つなぎ"
+	;オールインワン
+	CASE 8
+		RETURNF "オールインワン"
+	;コンビネゾン
+	CASE 9
+		RETURNF  "コンビネゾン"
+	;ジャンプスーツ
+	CASE 10
+		RETURNF "ジャンプスーツ"
+	;ロンパース
+	CASE 11
+		RETURNF "ロンパース"
+	;サロペット
+	CASE 12
+		RETURNF "サロペット"
+	;オーバーオール
+	CASE 13
+		RETURNF "オーバーオール"
+	;アウター？
+	;ポンチョ
+	CASE 14
+		RETURNF "ポンチョ"
+	;ワンピース
+	CASE 15
+		RETURNF  \@ ARG:1 ? ワンピ # ワンピース \@
+	;ネグリジェ
+	CASE 16
+		RETURNF  "ネグリジェ"
+	;エプロン
+	CASE 17
+		RETURNF  "エプロン"
+	;チャイナドレス
+	CASE 18
+		RETURNF  "チャイナドレス"
+	CASE 19
+		RETURNF  "特攻服"
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:INNER_TB
+;概　要:服装名取得関数(上下一体下着)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、下半身下着の名前を返す
+;-------------------------------------------------
+@INNER_TB(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE EQUIP:(ARG:0):下着（上下一体）
+	;ビスチェ
+	CASE 1
+		RETURNF "ビスチェ"
+	;ベビードール
+	CASE 2
+		RETURNF "ベビードール"
+	;ネグリジェ
+	;CASE 3
+	;	RETURNF "ネグリジェ"
+ENDSELECT
+;-------------------------------------------------
+;関数名:HEAD
+;概　要:服装名取得関数(頭)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、全身上着の名前を返す
+;-------------------------------------------------
+@HEAD(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE EQUIP:(ARG:0):頭
+	;和服
+	CASE 1
+		RETURNF "帽子"
+	;スーツ
+	CASE 2
+		RETURNF \@ ARG:1 ? 麦わら帽 # 麦わら帽子 \@
+	;フード
+	CASE 3
+		RETURNF "フード"
+	;テンガロンハット
+	;略すとTENGA
+	CASE 4
+		RETURNF "テンガロンハット"
+	;魔女帽子
+	CASE 5
+		RETURNF "魔女帽子"
+	;キャスケット
+	CASE 6
+		RETURNF  "キャスケット帽"
+	;キャップ
+	CASE 7
+		RETURNF "キャップ"
+	;サンバイザー
+	CASE 8
+		RETURNF "サンバイザー"
+	;花冠
+	CASE 9
+		RETURNF  "花冠"
+	;リボン
+	CASE 10
+		RETURNF "リボン"
+	;髪留め
+	CASE 11
+		RETURNF "髪留め"
+	;インカム
+	CASE 12
+		RETURNF "インカム"
+	;シュシュ
+	CASE 13
+		RETURNF "シュシュ"
+	;カチューシャ
+	CASE 14
+		RETURNF "カチューシャ"
+	;髪飾り
+	CASE 15
+		RETURNF "髪飾り"
+	;ニット帽
+	CASE 16
+		RETURNF "ニット帽"
+	CASE 17
+		RETURNF "ヘッドフォン"
+ENDSELECT
+;-------------------------------------------------
+;関数名:ACCESSORY1
+;概　要:服装名取得関数(オプション1)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;	   ;ARG:2…0,1アクセ1  2,アクセ2 3,アクセ3 4,アクセ4 5,アクセ5 
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、全身上着の名前を返す
+;-------------------------------------------------
+@ACCESSORY1(ARG:0, ARG:1, ARG:2)
+#FUNCTIONS
+#LOCALSIZE 1
+SELECTCASE ARG:2
+	CASE 0
+		LOCAL = 22
+	CASE 1
+	CASE 2
+		LOCAL = 23
+	CASE 3
+		LOCAL = 24
+	CASE 4
+		LOCAL = 25
+	CASE 5
+		LOCAL = 26
+	CASEELSE
+		LOCAL = -1;要するにエラー
+;	CASE 2
+;		LOCAL = 22
+;	CASE 3
+;		LOCAL = 23
+;	CASE 4
+;		LOCAL = 24
+;	CASE 5
+;		LOCAL = 25
+;	CASEELSE
+;		LOCAL = 26
+ENDSELECT
+SELECTCASE EQUIP:(ARG:0):LOCAL
+	;眼鏡
+	CASE 1
+		RETURNF "眼鏡"
+	;ネクタイ
+	CASE 2
+		RETURNF "ネクタイ"
+	;イヤリング
+	CASE 3
+		RETURNF "イヤリング"
+	;エプロン
+	CASE 4
+		RETURNF "エプロン"
+	CASE 5
+		RETURNF "ピアス"
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:OUTER_T
+;概　要:服装名取得関数(インナー)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;      :ARG:2…省略可。真の場合、着ていなければ全身上着の名前を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、上半身上着の名前を返す
+;-------------------------------------------------
+@OUTER_T2(ARG:0, ARG:1, ARG:2)
+#FUNCTIONS
+SELECTCASE EQUIP:(ARG:0):インナー
+	;キャミソール
+	CASE 1
+		RETURNF \@ ARG:1 ? キャミ # キャミソール \@
+	;シャツ
+	CASE 2
+		RETURNF "シャツ"
+	;タンクトップ
+	CASE 3
+		RETURNF "タンクトップ"
+	;チューブトップ
+	CASE 4
+		RETURNF "チューブトップ"
+	;ブラウス
+	CASE 5
+		RETURNF "ブラウス"
+	;ベアトップ
+	CASE 6
+		RETURNF "ベアトップ"
+	;カーディガン
+	CASE 7
+		RETURNF "カーディガン"
+	;ジャケット
+	CASE 8
+		RETURNF "ジャケット"
+	;ジャンパー
+	CASE 9
+		RETURNF "ジャンパー"
+	;セーター
+	CASE 10
+		RETURNF "セーター"
+	;トレーナー
+	CASE 11
+		RETURNF "トレーナー"
+	;パーカー
+	CASE 12
+		RETURNF "パーカー"
+	;ブレザー
+	CASE 13
+		RETURNF "ブレザー"
+	;ケープ
+	CASE 14
+		RETURNF "ケープ"
+	;ブルゾン
+	CASE 15
+		RETURNF "ブルゾン"
+	;カットソー
+	CASE 16
+		RETURNF "カットソー"
+	;ベスト
+	CASE 17
+		RETURNF "ベスト"
+	;コート
+	CASE 18
+		RETURNF "コート"
+	;チュニック
+	CASE 19
+		RETURNF "チュニック"
+	;Tシャツ
+	CASE 20
+		RETURNF "Ｔシャツ"
+	;ノースリーブ
+	CASE 21
+		RETURNF "ノースリーブ"
+	CASE 22
+		RETURNF "ジャージ上"
+	;タートルネック
+	CASE 23
+		RETURNF "タートルネック"
+	CASE 24
+		RETURNF "スクールセーター"
+	;無し
+	CASE 0
+		RETURNF \@ ARG:2 ? %DRESS(ARG:0, ARG:1)% # \@
+ENDSELECT

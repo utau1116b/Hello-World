@@ -1,0 +1,213 @@
+;/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+;
+;自給自足にしてる人たちの金銭感覚が勝手に上がったら便利かなと思った
+;
+;/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+;-------------------------------------------------
+;メイン関数
+;-------------------------------------------------
+@EVENTTURNEND
+#LATER
+;コンフィグでオフならリターン
+SIF ((FLAG:62 & 32768) == 0) 
+	RETURN 0
+
+;ターゲットを待避
+Y = TARGET
+
+
+REPEAT CHARANUM
+	;仲間になっていなければスキップ
+	SIF CFLAG:COUNT:勧誘状況 != -1
+		CONTINUE
+	
+	;別れ中はスキップ
+	SIF CFLAG:COUNT:21
+		CONTINUE
+	
+	$WHILE_LOOP
+	;金銭感覚を上げられるかチェック
+	TARGET = COUNT
+	CALL ISABLUP19
+	;上げられないならスキップ
+	SIF RESULT == 0
+		CONTINUE
+	;生活の珠で上げられない
+	SIF I
+		CONTINUE
+	;生活の珠で上げる
+	ABL:TARGET:金銭感覚 += 1
+	JUEL:TARGET:16 -= A
+
+	IF FLAG:62 & 65536
+		PRINTFORM %CALLNAME:TARGET%は
+		PRINTS ABLNAME:19
+		PRINT のレベルが
+		PRINTV ABL:金銭感覚
+		PRINTL になりました。
+	ENDIF
+
+	;再チェック
+	GOTO WHILE_LOOP
+	I = 0
+REND
+
+;待避したターゲットを戻す
+TARGET = Y
+
+;/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+;
+;トレーニングしてる人たちの能力が勝手に上がったら便利かなと思った
+;
+;/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+;-------------------------------------------------
+;メイン関数(歌唱技能)
+;-------------------------------------------------
+@EVENTTURNEND
+#LATER
+;コンフィグでオフならリターン
+SIF ((FLAG:62 & 262144) == 0) 
+	RETURN 0
+
+;ターゲットを待避
+Y = TARGET
+
+
+REPEAT CHARANUM
+	;仲間になっていなければスキップ
+	SIF CFLAG:COUNT:勧誘状況 != -1
+		CONTINUE
+	
+	;別れ中はスキップ
+	SIF CFLAG:COUNT:21
+		CONTINUE
+	
+	$WHILE_LOOP
+	;歌唱技能を上げられるかチェック
+	TARGET = COUNT
+	CALL ISABLUP45
+	;上げられないならスキップ
+	SIF RESULT == 0
+		CONTINUE
+		
+	;歌唱技能を上げる
+	ABL:TARGET:Ｖｏ技能 += 1
+	JUEL:TARGET:105 -= C
+	
+	IF FLAG:62 & 524288
+		PRINTFORM %CALLNAME:TARGET%は
+		PRINTS ABLNAME:45
+		PRINT のレベルが
+		PRINTV ABL:Ｖｏ技能
+		PRINTL になりました。
+	ENDIF
+
+	;再チェック
+	GOTO WHILE_LOOP
+REND
+
+;待避したターゲットを戻す
+TARGET = Y
+
+;-------------------------------------------------
+;メイン関数(被写技能)
+;-------------------------------------------------
+@EVENTTURNEND
+#LATER
+;コンフィグでオフならリターン
+SIF ((FLAG:62 & 262144) == 0) 
+	RETURN 0
+
+;ターゲットを待避
+Y = TARGET
+
+
+REPEAT CHARANUM
+	;仲間になっていなければスキップ
+	SIF CFLAG:COUNT:勧誘状況 != -1
+		CONTINUE
+	
+	;別れ中はスキップ
+	SIF CFLAG:COUNT:21
+		CONTINUE
+	
+	$WHILE_LOOP
+	;歌唱技能を上げられるかチェック
+	TARGET = COUNT
+	CALL ISABLUP46
+	;上げられないならスキップ
+	SIF RESULT == 0
+		CONTINUE
+		
+	;被写技能を上げる
+	ABL:TARGET:Ｖｉ技能 += 1
+	JUEL:TARGET:106 -= C
+	
+	IF FLAG:62 & 524288
+		PRINTFORM %CALLNAME:TARGET%は
+		PRINTS ABLNAME:46
+		PRINT のレベルが
+		PRINTV ABL:Ｖｉ技能
+		PRINTL になりました。
+	ENDIF
+
+	;再チェック
+	GOTO WHILE_LOOP
+REND
+
+;待避したターゲットを戻す
+TARGET = Y
+
+
+;-------------------------------------------------
+;メイン関数(舞踊技能)
+;-------------------------------------------------
+@EVENTTURNEND
+#LATER
+;コンフィグでオフならリターン
+SIF ((FLAG:62 & 262144) == 0) 
+	RETURN 0
+
+;ターゲットを待避
+Y = TARGET
+
+
+REPEAT CHARANUM
+	;仲間になっていなければスキップ
+	SIF CFLAG:COUNT:勧誘状況 != -1
+		CONTINUE
+	
+	;別れ中はスキップ
+	SIF CFLAG:COUNT:21
+		CONTINUE
+	
+	$WHILE_LOOP
+	;舞踊技能を上げられるかチェック
+	TARGET = COUNT
+	CALL ISABLUP47
+	;上げられないならスキップ
+	SIF RESULT == 0
+		CONTINUE
+		
+	;歌唱技能を上げる
+	ABL:TARGET:Ｄａ技能 += 1
+	JUEL:TARGET:107 -= C
+	
+	IF FLAG:62 & 524288
+		PRINTFORM %CALLNAME:TARGET%は
+		PRINTS ABLNAME:47
+		PRINT のレベルが
+		PRINTV ABL:Ｄａ技能
+		PRINTL になりました。
+	ENDIF
+
+	;再チェック
+	GOTO WHILE_LOOP
+REND
+
+;待避したターゲットを戻す
+TARGET = Y
+
+

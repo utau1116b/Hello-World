@@ -1,0 +1,101 @@
+;======================================================
+;装備品のデータ
+;======================================================
+
+@装備タイプ_928
+;1 = FLORAL 2 = LUXURY 3 = STARRY 4 = EXTRA
+RETURN 4
+
+;1 = 衣装 2 = HEAD 3 = BODY 4 = HAND 5 = LEG 6 = お守り
+@装備箇所_928
+RETURN 1
+
+@装備レベル_928
+RETURN 0
+
+@装備シリーズ_928
+RETURN 0
+
+@購入条件_928
+SIF MONEY < 1000
+	RETURN 0
+RETURN 1
+
+@装備解説_928
+PRINTL 
+
+@装備条件_928,ARG
+RETURN 1
+
+@装備条件説明_928
+PRINTL 装備条件：
+
+;合成可能か
+@合成条件_928
+;SIF
+;	RETURN 0
+RETURN 1
+
+;合成素材(変数に素材、個数を入れる)
+@合成素材_928
+RETURN 1
+
+@VO_928
+RETURN 4 * 5 * 100
+
+@VI_928
+RETURN 8 * 5 * 100
+
+@DA_928
+RETURN 5 * 5 * 100
+
+@HP_928
+RETURN 0
+
+@MP_928
+RETURN 0
+
+@POW_928
+RETURN 0
+
+@GUA_928
+RETURN 0
+
+@DEX_928
+RETURN 0
+
+@SPD_928
+RETURN 0
+
+@LUC_928
+RETURN 0
+
+@VO耐性_928
+RETURN 0
+
+@VI耐性_928
+RETURN 0
+
+@DA耐性_928
+RETURN 0
+
+@攻撃回数_928
+RETURN 1
+
+@攻撃範囲_928
+RETURN 0
+
+@スキル1_928
+RETURN 0
+
+@スキル2_928
+RETURN 0
+
+@スキル3_928
+RETURN 0
+
+@スキル4_928
+RETURN 0
+
+@スキル5_928
+RETURN 0

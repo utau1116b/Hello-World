@@ -1,0 +1,101 @@
+;======================================================
+;装備品のデータ
+;======================================================
+
+@装備タイプ_619
+;1 = FLORAL 2 = LUXURY 3 = STARRY 4 = EXTRA
+RETURN 1
+
+;1 = 衣装 2 = HEAD 3 = BODY 4 = HAND 5 = LEG 6 = お守り
+@装備箇所_619
+RETURN 1
+
+@装備レベル_619
+RETURN 0
+
+@装備シリーズ_619
+RETURN 0
+
+@購入条件_619
+SIF MONEY < 1000
+	RETURN 0
+RETURN 1
+
+@装備解説_619
+PRINTL 
+
+@装備条件_619,ARG
+RETURN 1
+
+@装備条件説明_619
+PRINTL 装備条件：
+
+;合成可能か
+@合成条件_619
+;SIF
+;	RETURN 0
+RETURN 1
+
+;合成素材(変数に素材、個数を入れる)
+@合成素材_619
+RETURN 1
+
+@VO_619
+RETURN 6 * 5 * 100
+
+@VI_619
+RETURN 3 * 5 * 100
+
+@DA_619
+RETURN 4 * 5 * 100
+
+@HP_619
+RETURN 0
+
+@MP_619
+RETURN 0
+
+@POW_619
+RETURN 0
+
+@GUA_619
+RETURN 0
+
+@DEX_619
+RETURN 0
+
+@SPD_619
+RETURN 0
+
+@LUC_619
+RETURN 0
+
+@VO耐性_619
+RETURN 0
+
+@VI耐性_619
+RETURN 0
+
+@DA耐性_619
+RETURN 0
+
+@攻撃回数_619
+RETURN 1
+
+@攻撃範囲_619
+RETURN 0
+
+@スキル1_619
+RETURN 0
+
+@スキル2_619
+RETURN 0
+
+@スキル3_619
+RETURN 0
+
+@スキル4_619
+RETURN 0
+
+@スキル5_619
+RETURN 0

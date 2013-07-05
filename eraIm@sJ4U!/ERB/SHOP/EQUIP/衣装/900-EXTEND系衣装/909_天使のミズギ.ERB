@@ -1,0 +1,101 @@
+;======================================================
+;装備品のデータ
+;======================================================
+
+@装備タイプ_909
+;1 = FLORAL 2 = LUXURY 3 = STARRY 4 = EXTRA
+RETURN 4
+
+;1 = 衣装 2 = HEAD 3 = BODY 4 = HAND 5 = LEG 6 = お守り
+@装備箇所_909
+RETURN 1
+
+@装備レベル_909
+RETURN 1
+
+@装備シリーズ_909
+RETURN 0
+
+@購入条件_909
+SIF MONEY < 1000
+	RETURN 0
+RETURN 1
+
+@装備解説_909
+PRINTL 
+
+@装備条件_909,ARG
+RETURN 1
+
+@装備条件説明_909
+PRINTL 装備条件：
+
+;合成可能か
+@合成条件_909
+;SIF
+;	RETURN 0
+RETURN 1
+
+;合成素材(変数に素材、個数を入れる)
+@合成素材_909
+RETURN 1
+
+@VO_909
+RETURN 3 * 5 * 100
+
+@VI_909
+RETURN 6 * 5 * 100
+
+@DA_909
+RETURN 4 * 5 * 100
+
+@HP_909
+RETURN 0
+
+@MP_909
+RETURN 0
+
+@POW_909
+RETURN 1200
+
+@GUA_909
+RETURN 200
+
+@DEX_909
+RETURN 0
+
+@SPD_909
+RETURN 800
+
+@LUC_909
+RETURN 0
+
+@VO耐性_909
+RETURN 0
+
+@VI耐性_909
+RETURN 0
+
+@DA耐性_909
+RETURN 0
+
+@攻撃回数_909
+RETURN 1
+
+@攻撃範囲_909
+RETURN 0
+
+@スキル1_909
+RETURN 0
+
+@スキル2_909
+RETURN 0
+
+@スキル3_909
+RETURN 0
+
+@スキル4_909
+RETURN 0
+
+@スキル5_909
+RETURN 0

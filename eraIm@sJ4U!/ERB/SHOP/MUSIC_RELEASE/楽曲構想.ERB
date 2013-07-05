@@ -1,0 +1,90 @@
+;ARGS	曲名or曲番号
+;ARGS:1	プロパティ(曲名、売り上げ、最高ランキング、曲番号、ハイスコア)
+;ARGS:2	0,取得するか、1,設定するか
+;ARGS:3	セットする場合の値
+;メンバは
+;※文字列はTSTR:0に入れて返すので注意
+@DISCプロパティ(ARGS, ARGS:1, ARGS:2, ARGS:3)
+;#FUNCTIONS 
+#DIM IS_NUMBER
+#DIM IS_WORD
+IS_NUMBER = 0
+IS_WORD = 0
+VARSET LOCAL
+;まずARGSが文字列か数字かを確かめる
+;数字だった
+IF TOINT(ARGS) > 0
+	 IS_NUMBER = 1
+	 LOCAL = TOINT(ARGS)
+;名前だった
+ELSE
+	IS_WORD = 1
+	FOR LOCAL, 0, 300
+		SIF SONGNAME:LOCAL == ARGS
+			BREAK
+	NEXT
+	SIF !LOCAL
+		RETURN
+ENDIF
+
+;設定する場合
+IF ARGS:2 == "set" || ARGS:2 == "Set" || ARGS:2 == "SET" || ARGS:2 == "1"
+
+	;曲名と番号は設定できない
+	SELECTCASE ARGS:1
+		;CASE "曲名"
+		;	IF TOINT(ARGS) <= 0
+		;		TSTR = %ARGS%
+		;		RETURN
+		;	ELSE
+		;		TSTR = %SONGNAME:(TOINT(ARGS))%
+		;	ENDIF
+		;
+		;CASE "番号"
+		;	FOR LOCAL, 0, 300
+		;		SIF SONGNAME:LOCAL == ARGS
+		;			BREAK
+		;	NEXT
+		;	RETURN LOCAL
+		CASE "売り上げ"
+			SONG:LOCAL:1 = TOINT(ARGS:3)
+	
+		CASE "ランキング"
+			SONG:LOCAL:2 = TOINT(ARGS:3)
+		
+		CASE "ハイスコア"
+			SONG:LOCAL:0 = TOINT(ARGS:3)
+
+	ENDSELECT
+
+;取得する場合
+ELSE
+
+	SELECTCASE ARGS:1
+		CASE "曲名"
+			IF TOINT(ARGS) <= 0
+				TSTR = %ARGS%
+				RETURN
+			ELSE
+				TSTR = %SONGNAME:(TOINT(ARGS))%
+			ENDIF
+		
+		CASE "番号"
+			FOR LOCAL, 0, 300
+				SIF SONGNAME:LOCAL == ARGS
+					BREAK
+			NEXT
+			RETURN LOCAL
+		CASE "売り上げ"
+			RETURN SONG:LOCAL:1
+	
+		CASE "ランキング"
+			RETURN SONG:LOCAL:2
+		
+		CASE "ハイスコア"
+			RETURN SONG:LOCAL:0
+
+	ENDSELECT
+	
+ENDIF
+RETURN 

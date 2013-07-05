@@ -1,0 +1,101 @@
+;======================================================
+;装備品のデータ
+;======================================================
+
+@装備タイプ_706
+;1 = FLORAL 2 = LUXURY 3 = STARRY 4 = EXTRA
+RETURN 2
+
+;1 = 衣装 2 = HEAD 3 = BODY 4 = HAND 5 = LEG 6 = お守り
+@装備箇所_706
+RETURN 1
+
+@装備レベル_706
+RETURN 0
+
+@装備シリーズ_706
+RETURN 0
+
+@購入条件_706
+SIF MONEY < 1000
+	RETURN 0
+RETURN 1
+
+@装備解説_706
+PRINTL 
+
+@装備条件_706,ARG
+RETURN 1
+
+@装備条件説明_706
+PRINTL 装備条件：
+
+;合成可能か
+@合成条件_706
+;SIF
+;	RETURN 0
+RETURN 1
+
+;合成素材(変数に素材、個数を入れる)
+@合成素材_706
+RETURN 1
+
+@VO_706
+RETURN 2 * 5 * 100
+
+@VI_706
+RETURN 5 * 5 * 100
+
+@DA_706
+RETURN 6 * 5 * 100
+
+@HP_706
+RETURN 0
+
+@MP_706
+RETURN 0
+
+@POW_706
+RETURN 0
+
+@GUA_706
+RETURN 0
+
+@DEX_706
+RETURN 0
+
+@SPD_706
+RETURN 0
+
+@LUC_706
+RETURN 0
+
+@VO耐性_706
+RETURN 0
+
+@VI耐性_706
+RETURN 0
+
+@DA耐性_706
+RETURN 0
+
+@攻撃回数_706
+RETURN 1
+
+@攻撃範囲_706
+RETURN 0
+
+@スキル1_706
+RETURN 0
+
+@スキル2_706
+RETURN 0
+
+@スキル3_706
+RETURN 0
+
+@スキル4_706
+RETURN 0
+
+@スキル5_706
+RETURN 0

@@ -1,0 +1,33 @@
+;307	my song
+
+;1, VO2, VI3, DA
+@曲タイプ_7
+
+RETURN 1
+
+;曲説明を表示
+@曲説明_7
+DRAWLINE
+PRINTFORML %SONGNAME:7%
+DRAWLINE
+
+;VOの上昇値
+@VO_7
+
+RETURN 8 * 5 * 100
+
+;VIの上昇値
+@VI_7
+
+RETURN 7 * 5 * 100
+
+;DAの上昇値
+@DA_7
+
+RETURN 7 * 5 * 100
+
+;曲のBMP
+@BPM_7
+
+RETURN 104
+

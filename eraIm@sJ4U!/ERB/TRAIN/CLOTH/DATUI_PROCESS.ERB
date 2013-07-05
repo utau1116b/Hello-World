@@ -1,0 +1,136 @@
+;-----------EDIT 001 START--------------
+;地の文分離の一環として独立させる
+;内部処理をビット演算に変更
+;将来的に強制脱衣、自主脱衣をビットで扱えるように
+;---------------------------------------
+;────────────────────────────────────
+;強制脱衣、自主脱衣時の脱衣処理
+;────────────────────────────────────
+;※前提として自主脱衣/強制脱衣最適化、強制脱衣成否判定が行われている必要がある
+@DATUI_PROCESS
+;LOCAL初期化
+VARSET LOCAL
+
+;調教対象、調教者脱衣部位確認
+;LOCAL:1 = MASTER
+;LOCAL:2 = TARGET
+;LOCAL:3 = ASSI
+;以下、脱がす箇所にビットをセット
+FOR LOCAL, 1, 3
+	SETBIT LOCAL:LOCAL, 0
+	SETBIT LOCAL:LOCAL, 1
+	SETBIT LOCAL:LOCAL, 2
+	SETBIT LOCAL:LOCAL, 3
+	SETBIT LOCAL:LOCAL, 4
+	SETBIT LOCAL:LOCAL, 5
+	SETBIT LOCAL:LOCAL, 6
+	SETBIT LOCAL:LOCAL, 7
+	SETBIT LOCAL:LOCAL, 8
+	SETBIT LOCAL:LOCAL, 9
+	SETBIT LOCAL:LOCAL, 10
+;	SETBIT LOCAL:LOCAL, 11
+;	SETBIT LOCAL:LOCAL, 12
+;	SETBIT LOCAL:LOCAL, 13
+	SETBIT LOCAL:LOCAL, 14
+	SETBIT LOCAL:LOCAL, 15
+NEXT
+
+;脱衣対象最適化処理(脱衣指定箇所に着衣が存在しなければ指定を解除)
+FOR LOCAL, 0, 16
+	SIF GETBIT(LOCAL:1, LOCAL) && !TEQUIP:MASTER:(LOCAL + 130) 
+		CLEARBIT LOCAL:1, LOCAL
+	SIF GETBIT(LOCAL:2, LOCAL) && !TEQUIP:TARGET:(LOCAL + 130) 
+		CLEARBIT LOCAL:2, LOCAL
+	;PRINTFORML TEQUIP:TARGET:{LOCAL + 130} = {TEQUIP:TARGET:(LOCAL + 130)}
+NEXT
+
+;脱衣寸前での地の文/口上表示
+CALL DATUI_MESSAGE(LOCAL:1, LOCAL:2)
+
+;脱衣処理(実際の脱衣はここで行われる)
+FOR LOCAL, 0, 16
+	SIF GETBIT(LOCAL:1, LOCAL)
+		TEQUIP:MASTER:(LOCAL + 130) = 0
+	SIF GETBIT(LOCAL:2, LOCAL)
+		TEQUIP:TARGET:(LOCAL + 130) = 0
+	;PRINTFORML TEQUIP:TARGET:{LOCAL + 130} = {TEQUIP:TARGET:(LOCAL + 130)}
+NEXT
+
+;脱衣直後での地の文/口上表示
+CALL DATUI_MESSAGE2(LOCAL:1, LOCAL:2)
+
+RETURN RESULT
+;主に引数によって判定する方式に変更
+;---------------------------------------
+;────────────────────────────────────
+;強制脱衣、自主脱衣時の地の文/口上表示
+;────────────────────────────────────
+;強制脱衣・自主脱衣のメッセージを表示します
+
+;脱衣寸前での地の文/口上
+@DATUI_MESSAGE(ARG, ARG:1)
+#DIM LCOUNT, 2
+;脱衣前に服装を保存する(脱衣直後での地の文で利用)
+CALLF CLOTHE_SAVE(TARGET)
+FOR LCOUNT, 0, 20
+	LOCAL:LCOUNT = CLOTHE_SAVE(TARGET, LCOUNT)
+	;PRINTFORML (DATUI_MESSAGE)%CALLNAME:TARGET% LOCAL:{LCOUNT} = {LOCAL:LCOUNT}
+NEXT
+CALLF CLOTHE_SAVE(MASTER)
+FOR LCOUNT, 0, 20
+	LOCAL:LCOUNT = CLOTHE_SAVE(MASTER, LCOUNT)
+	;PRINTFORML (DATUI_MESSAGE)%CALLNAME:MASTER% LOCAL:{LCOUNT} = {LOCAL:LCOUNT}
+NEXT
+RETURN RESULT
+
+;脱衣直後での地の文/口上
+@DATUI_MESSAGE2(ARG, ARG:1)
+PRINTL 
+;調教対象、調教者脱衣時結果を表示
+SIF ARG > 0
+	CALL DATUI_ANIME(MASTER)
+SIF ARG:1 > 0
+	CALL DATUI_ANIME(TARGET)
+SIF  ARG > 0 || ARG:1 > 0
+	WAIT
+
+;-------------------------------------------------
+;関数名:CLOTHE_SAVE
+;概　要:脱衣用、服装保存・取得関数
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET。省略したり妙な数値が入るとTARGET)
+;　　　:ARG:1…省略=-1にすると現在の服装を保存。数値を入れると保存した服装と現在の服装の差異を返す。
+;戻り値:違っている＝脱ぎ着していれば正。一応、脱いだら1、着ていると2で返す。
+;備　考:式中関数
+;保存しておいた服装と現在の服装の差異を返す。MASTERとTARGETにしか対応していない
+;-------------------------------------------------
+;eratohoReverse#を参考に作成
+;助手verは未作成
+;LOCAL:0～LOCAL:19 MASTER
+;LOCAL:20～LOCAL:39 TARGET
+@CLOTHE_SAVE(ARG:0, ARG:1 = -1)
+#FUNCTION
+#LOCALSIZE 41
+#DIM LCOUNT, 1
+#DIM PLUS, 1
+IF ARG == MASTER
+	ARG = MASTER
+	PLUS = 0
+ELSEIF ARG == TARGET
+	PLUS = 20
+ELSE
+	ARG = TARGET
+	PLUS = 20
+ENDIF
+
+;SAVE
+IF ARG:1 < 0
+	FOR LCOUNT, 0, 20
+		LOCAL:(LCOUNT+PLUS) = TEQUIP:ARG:(LCOUNT + 130)
+	NEXT
+	RETURNF 0
+;LOAD
+ELSEIF LOCAL:(ARG:1+PLUS) == TEQUIP:ARG:(ARG:1 + 130)
+	RETURNF 0
+ELSE
+	RETURNF TEQUIP:ARG:(ARG:1) ? 2 # 1
+ENDIF

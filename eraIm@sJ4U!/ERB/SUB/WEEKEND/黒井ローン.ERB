@@ -1,0 +1,114 @@
+;こうでもしないと黒井の出番が無くなりそうなので
+@黒井ローン
+[SKIPSTART]
+PRINTFORML 「ここでは大手芸能事務所961プロダクションから借金をすることができるわ」
+;PRINTFORML ここでは水瀬金融から借金をすることができるわ
+PRINTFORML 「裏ではアイドルを調教して夜の接待をさせてるだの、黒い噂の絶えない事務所だけど、今のあなたにお金を貸してくれるのはここくらいね」
+PRINTFORML 「ま、黒井の坊やは小悪党だから、交渉さえ失敗しなければ有益に利用してやることができるわ」
+PRINTFORML 「うまく交渉することね」
+;いやにハンサムボイスの社長が経営する
+;※株をたくさん保持することで961を傘下に
+;借りられる最大金額はあなたのＰランクで決まるわ
+[SKIPEND]
+IF FLAG:借金 == 0
+	PRINTFORML 「ほう、我が961プロから金を借りたいというのか」
+	PRINTFORML 「貸してやってもいいが、利息は安くはないぞ？」
+	PRINTFORML 「期限までに返済できない場合、貴様の事務所のアイドルを一人貰うからよく覚えておくといい」
+	FLAG:借金 = 1
+ELSEIF FLAG:借金 == -1
+	PRINTFORML 「おや？　まだ借金の返済を終えていないようだが？」
+ELSE
+	PRINTFORML 「いくら借りていくんだ？」
+ENDIF
+PRINTL
+PRINTL 借りたい金額を入力して下さい（0でキャンセルします）
+DO
+	REDRAW 0
+	CALL SAVELINE
+	LOCAL:1 = -1
+	CALL INPUT_MANY(0, 999999)
+	IF RESULT >= 0 && RESULT <= 999999
+		LOCAL:1 = RESULT
+	ELSE
+		CALL RETURNLINE
+		CALL 再入力
+		CONTINUE
+	ENDIF
+	IF LOCAL:1 == 0
+		CALL RETURNLINE
+		RETURN
+	ENDIF
+	SIF LOCAL:1 > 0
+		PRINTFORML {LOCAL:1}Ｇ借金します。　よろしいですか？
+		CALL INPUT_YN
+		IF RESULT == 1
+			CALL RETURNLINE
+			CONTINUE
+		ENDIF
+	PRINTFORML 返済期間はどうしますか（1～10）※単位は週間
+	DO
+		CALL INPUT_MANY(1, 10)
+		IF RESULT >= 1 && RESULT <= 10
+			LOCAL:2 = RESULT
+		ELSE
+			CLEARLINE 1
+		ENDIF
+	LOOP (!LOCAL:2)
+	PRINTFORML 「{LOCAL:1}Ｇを{LOCAL:2}回の分割払いだな？」
+	PRINTFORML 「それだと一週間の返済額は{PAY_PER_WEEK(LOCAL:1, LOCAL:2)}Ｇになるがいいか？」
+	CALL INPUT_YN
+	IF RESULT == 1
+		CALL RETURNLINE
+		CONTINUE
+	ENDIF
+	PRINTFORML ※961プロダクションから{LOCAL:1}Ｇ借金しました
+	FLAG:ローン = LOCAL:2
+	FLAG:一週間の返済額 = PAY_PER_WEEK(LOCAL:1, LOCAL:2)
+	FLAG:借金 = -1
+	RETURN
+LOOP 1
+
+;ARG G
+;ARG:1 分割払い
+@PAY_PER_WEEK(ARG, ARG:1)
+#FUNCTION
+#LOCALSIZE 3
+VARSET LOCAL
+;LOCAL:1 = 一万()*((INT_RATE(ARG:1) / 100) * (ARG / ARG:1))
+;LOCAL:2 = 1 - POWER(((INT_RATE(ARG:1) / 100) / ARG:1) + 1, -ARG:1)
+;RETURNF LOCAL:1 / LOCAL:2
+LOCAL = INT_RATE(ARG:1)
+LOCAL:1 = ARG * LOCAL / 100
+LOCAL:2 = 一億() - 一億() * POWER(100, ARG:1) / POWER((100 + LOCAL), ARG:1)
+RETURNF 一億() * LOCAL:1 / LOCAL:2
+
+;ARG:1 1～10
+@INT_RATE(ARG)
+#FUNCTION
+#LOCALSIZE 1
+SELECTCASE ARG
+	CASE 1
+		LOCAL = 6
+	CASE 2
+		LOCAL = 7
+	CASE 3
+		LOCAL = 8
+	CASE 4
+		LOCAL = 9
+	CASE 5
+		LOCAL = 10
+	CASE 6
+		LOCAL = 12
+	CASE 7
+		LOCAL = 14
+	CASE 8
+		LOCAL = 15
+	CASE 9
+		LOCAL = 17
+	CASE 10
+		LOCAL = 18
+ENDSELECT
+RETURNF LOCAL
+
+@借金返済
+MONEY -= FLAG:一週間の返済額

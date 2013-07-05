@@ -1,0 +1,151 @@
+;ARGS	地方
+;ARG	注目度	
+@購買力(ARGS, ARG)
+#FUNCTION
+#LOCALSIZE 5
+VARSET LOCAL
+SELECTCASE ARG
+	CASE 0 TO 20
+		LOCAL:1 = 80
+	CASE 21 TO 40
+		LOCAL:1 = 85
+	CASE 41 TO 60
+		LOCAL:1 = 90
+	CASE 61 TO 80
+		LOCAL:1 = 95
+	CASEELSE
+		LOCAL:1 = 100
+ENDSELECT
+SELECTCASE ARGS
+	CASE "北東"
+		LOCAL:2 = 51
+	CASE "首都"
+		LOCAL:2 = 52
+	CASE "中央"
+		LOCAL:2 = 53
+	CASE "上方"
+		LOCAL:2 = 54
+	CASE "西"
+		LOCAL:2 = 55
+	CASE "南"
+		LOCAL:2 = 56
+	CASEELSE
+ENDSELECT
+FOR LOCAL, 11, (11 + FLAG:キャラ数)
+	SIF CFLAG:LOCAL:勧誘状況 != -1 || CFLAG:LOCAL:21 || LOCAL == MASTER
+		CONTINUE
+	LOCAL:3 += ABL:LOCAL:(LOCAL:2)
+NEXT
+LOCAL:4 = 10000 * (LOCAL:3 * LOCAL:1 / 100) / 10000
+RETURNF LOCAL:4
+
+;計算元の数値
+@セールスボーナス(ARG)
+#FUNCTION
+#LOCALSIZE 2
+VARSET LOCAL
+LOCAL:1 = ARG * 10000 * (100 + 5 * (FLAG:リリース済み曲数 - 1)) / 100 / 10000
+RETURNF LOCAL:1
+
+;計算元の数値
+@セールス係数(ARG)
+#FUNCTION
+#LOCALSIZE 2
+VARSET LOCAL
+;FLAG:発売期間 = 0 ～ 6
+VARSET LOCAL
+RETURNF ARG * (6300 - FLAG:発売期間 * 9 * 100) / 一万()
+
+@PRINT_CDセールス()
+#FUNCTIONS
+#LOCALSIZE 4
+VARSET LOCAL
+LOCALS = 
+FOR LOCAL, 1029, 1033
+	LOCAL:1 += FLAG:LOCAL
+NEXT
+;10000枚を超えていたら万を付ける
+IF LOCAL:1 >= 10000
+	LOCAL:2 = LOCAL:1 / 10000
+	LOCALS = %TOSTR(LOCAL:2)%万
+ENDIF
+LOCAL:3 = LOCAL:1 % 10000
+LOCALS = %LOCALS%%TOSTR(LOCAL:3)%
+RETURNF LOCALS
+
+;CDのセールスランキングを返す
+@セールスランキング
+VARSET LOCAL 
+FOR LOCAL, 1029, 1033
+	LOCAL:1 += FLAG:LOCAL
+NEXT
+
+FOR LOCAL, 0, 100
+	LOCAL:2 = 100 * LOCAL * LOCAL
+	SIF LOCAL:1 >= LOCAL:2
+		LOCAL:3 = LOCAL
+NEXT
+RETURN (100 - LOCAL:3)
+
+
+@楽曲売上()
+#FUNCTION
+;LOCAL		ループ用
+;LOCAL:1	北東
+;LOCAL:2	首都
+;LOCAL:3	中央
+;LOCAL:4	上方
+;LOCAL:5	西
+;LOCAL:6	南
+;LOCAL:7	購買力
+VARSET LOCAL
+LOCAL:1 = 購買力("北東", FLAG:北東注目度)
+LOCAL:2 = 購買力("首都", FLAG:首都注目度)
+LOCAL:3 = 購買力("中央", FLAG:中央注目度)
+LOCAL:4 = 購買力("上方", FLAG:上方注目度)
+LOCAL:5 = 購買力("西", FLAG:西注目度)
+LOCAL:6 = 購買力("南", FLAG:南注目度)
+;購買力算出
+LOCAL:7 = SUMARRAY(LOCAL, 1, 7)
+
+LOCAL:8 = ((LOCAL:7 / 2) + ((SONG:(FLAG:リリース中楽曲):0 * 4)))
+LOCAL:8 = セールスボーナス(LOCAL:8)
+LOCAL:8 = セールス係数(LOCAL:8)
+RETURNF LOCAL:8
+
+@CD管理(ARGS="")
+SELECTCASE ARGS
+	CASE "リリース期間"
+		;朝
+		IF !TIME:0 && !TIME:12
+		
+		;夜
+		ELSE
+			IF FLAG:リリース管理 == 1
+				FLAG:発売期間++
+				SIF FLAG:発売期間 >= 7
+					RETURN 
+				CALL CDセールス(楽曲売上())
+				FLAG:(FLAG:発売期間+1029) = RESULT
+			ENDIF
+		ENDIF
+	;呼び出されるのは日曜の夜
+	CASE "リリース管理"
+		;-2,リリース休止中
+		;-1,リリース準備中
+		;1,リリース中
+		;0,リリース可能状態
+		SELECTCASE FLAG:リリース管理
+			CASE -1
+				FLAG:リリース管理 = 1
+			CASE -2
+				FLAG:リリース管理 = 0
+			CASE 1
+				FLAG:リリース管理 = -2
+				;～日目の売り上げリセット
+				VARSET FLAG, 0, 1029, 1035
+			CASEELSE
+				FLAG:リリース管理 = 0
+		ENDSELECT
+	CASEELSE
+ENDSELECT

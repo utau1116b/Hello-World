@@ -1,0 +1,743 @@
+;-------------------------------------------------
+;関数名:HAIRCOLOR
+;概　要:髪色名取得関数(カスタム衣装)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@HAIRCOLOR(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE CFLAG:(ARG:0):髪色
+	CASE 1
+		RETURNF  \@ ARG:1 ? 黒 # 黒髪 \@
+	CASE 2
+		RETURNF  \@ ARG:1 ? 栗色 # 栗毛 \@
+	CASE 3
+		RETURNF  \@ ARG:1 ? 金 # 金髪 \@
+	CASE 4
+		RETURNF  \@ ARG:1 ? 赤 # 赤毛 \@
+	CASE 5
+		RETURNF  \@ ARG:1 ? 銀 # 銀髪 \@
+	CASE 6
+		RETURNF  \@ ARG:1 ? 青 # 青髪 \@
+	CASE 7
+		RETURNF  \@ ARG:1 ? 緑 # 緑髪 \@
+	CASE 8
+		RETURNF  \@ ARG:1 ? ピンク # ピンク髪 \@
+	CASE 9
+		RETURNF  \@ ARG:1 ? 紫 # 紫髪 \@
+	CASE 10
+		RETURNF  \@ ARG:1 ? 水色 # 水色髪 \@
+	CASE 11
+		RETURNF  \@ ARG:1 ? 白 # 白髪 \@
+	CASE 12
+		RETURNF  \@ ARG:1 ? オレンジ # オレンジ髪 \@
+	CASE 13
+		RETURNF  \@ ARG:1 ? 茶色 # 茶髪 \@
+	CASE 14
+		RETURNF  \@ ARG:1 ? 鶯色 # 鶯色髪 \@
+	CASE 15
+		RETURNF  \@ ARG:1 ? 亜麻色 # 亜麻髪 \@
+	CASE 16
+		RETURNF  \@ ARG:1 ? 藍色 # 藍髪 \@
+	CASE 17
+		RETURNF  \@ ARG:1 ? 臙脂色 # 臙脂髪 \@
+	CASE 18
+		RETURNF  \@ ARG:1 ? 海老茶色 # 海老茶髪 \@
+	CASE 19
+		RETURNF  \@ ARG:1 ? 小麦色 # 小麦髪 \@
+	CASEELSE
+		RETURNF  "－－－"
+ENDSELECT
+;-------------------------------------------------
+;関数名:HAIRLENGTH
+;概　要:髪の長さ取得関数
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、靴下の名前を返す
+;-------------------------------------------------
+@HAIRLENGTH(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE CFLAG:(ARG:0):髪の長さ
+	CASE 1
+		RETURNF  \@ ARG:1 ? ロング # ロングヘアー \@
+	CASE 2
+		RETURNF  \@ ARG:1 ? セミロング # セミロングヘアー \@
+	CASE 3
+		RETURNF  \@ ARG:1 ? ミディアム # ミディアムカット \@
+	CASE 4
+		RETURNF  \@ ARG:1 ? ショート # ショートカット \@
+	CASE 5
+		RETURNF  \@ ARG:1 ? ベリーショート # ベリーショートカット \@
+	CASE 6
+		RETURNF  \@ ARG:1 ? 禿 # 青髪 \@
+	CASEELSE
+		RETURNF  "－－－"
+ENDSELECT
+;-------------------------------------------------
+;関数名:HAIRSTRETCH
+;概　要:髪質取得関数(カスタム衣装)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@HAIRSTRETCH(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE CFLAG:(ARG:0):髪の伸縮
+	CASE 1
+		RETURNF  \@ ARG:1 ? ストレート # ストレートヘア \@
+	CASE 2
+		RETURNF  "ウェーブ"
+	CASE 3
+		RETURNF  "パーマ"
+	CASE 4
+		RETURNF  "ソバージュ"
+	CASE 5
+		RETURNF  "エアリー"
+	CASE 6
+		RETURNF  "くせっ毛"
+	CASE 7
+		RETURNF  \@ ARG:1 ? 天パ # 天然パーマ \@
+	CASE 8
+		RETURNF  \@ ARG:1 ? ドレッド # ドレッドヘア \@
+	CASEELSE
+		RETURNF  "－－－"
+ENDSELECT
+;-------------------------------------------------
+;関数名:HAIRSTYLE
+;概　要:髪型取得関数(カスタム衣装)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@HAIRSTYLE(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE CFLAG:(ARG:0):髪型
+	CASE 1
+		RETURNF  \@ ARG:1 ? ポニー # ポニーテール \@
+	CASE 2
+		RETURNF  "一本結び"
+	CASE 3
+		RETURNF  "ハーフアップ"
+	CASE 4
+		RETURNF  "サイドテール"
+	CASE 5
+		RETURNF  "ツインテール"
+	CASE 6
+		RETURNF  "ツーサイドアップ"
+	CASE 7
+		RETURNF  "おさげ"
+	CASE 8
+		RETURNF  "二つ結び"
+	CASE 9
+		RETURNF  "みずら"
+	CASE 10
+		RETURNF  "三つ編み"
+	CASE 11
+		RETURNF  "辮髪"
+	CASE 12
+		RETURNF  "サイドアップ"
+	CASE 13
+		RETURNF  "アシンメトリー"
+	CASE 14
+		RETURNF  "ポンパドール"
+	CASE 15
+		RETURNF  "ひっつめ"
+	CASE 16
+		RETURNF  "コーンロウ"
+	CASE 17
+		RETURNF  "シニヨン"
+	CASE 18
+		RETURNF  "パイナップルヘア"
+	CASE 19
+		RETURNF  "日本髪"
+	CASE 20
+		RETURNF  "ちょんまげ"
+	CASE 21
+		RETURNF  "ツインリング"
+	CASE 22
+		RETURNF  "ウルフカット"
+	CASE 23
+		RETURNF  "縦ロール"
+	CASE 24
+		RETURNF  "オールバック"
+	CASE 25
+		RETURNF  "リーゼント"
+	CASE 26
+		RETURNF  "外ハネ"
+	CASE 27
+		RETURNF  "おかっぱ"
+	CASE 28
+		RETURNF  "姫カット"
+	CASE 29
+		RETURNF  "アフロ"
+	CASE 30
+		RETURNF  "インテーク"
+	CASE 31
+		RETURNF  ""
+	CASE 32
+		RETURNF  "テクノカット"
+	CASE 33
+		RETURNF  "ツーブロック"
+	CASE 34
+		RETURNF  \@ ARG:1 ? ボブ # ボブカット \@
+	CASE 35
+		RETURNF  "ブレイズ"
+	CASE 36
+		RETURNF  "ワンレングス"
+	CASE 37
+		RETURNF  "ローレイヤー"
+	CASE 38
+		RETURNF  \@ ARG:1 ? マニッシュ # マニッシュショート \@
+	CASE 39
+		RETURNF  "マッシュ"
+	CASE 40
+		RETURNF  \@ ARG:1 ? 七三 # 七三分け \@
+	CASEELSE
+		RETURNF  "－－－"
+ENDSELECT
+;-------------------------------------------------
+;関数名:HAIROPTION
+;概　要:髪オプション取得関数(カスタム衣装)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+	   ;ARG:2…省略可。数字を入れるとオプション2のデータを返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@HAIROPTION(ARG:0, ARG:1, ARG:2)
+#FUNCTIONS
+IF ARG:2
+	LOCAL = CFLAG:(ARG:0):髪オプション2
+ELSE
+	LOCAL = CFLAG:(ARG:0):髪オプション1
+ENDIF
+
+SELECTCASE LOCAL
+	CASE 1
+		RETURNF  "アホ毛"
+	CASE 2
+		RETURNF  "片目出し"
+	CASE 3
+		RETURNF  "でこ出し"
+	CASE 4
+		RETURNF  "シャギー"
+	CASE 5
+		RETURNF  "前髪ぱっつん"
+	CASE 6
+		RETURNF  "寝癖"
+	CASE 7
+		RETURNF  \@ ARG:1 ? エクステ # エクステンション \@
+	CASE 8
+		RETURNF  "カール"
+	CASE 9
+		RETURNF  "編みこみ"
+	CASE 10
+		RETURNF  "おくれ毛"
+	CASE 11
+		RETURNF  "後ろ髪ハネ"
+	CASE 12
+		RETURNF  "前髪下し"
+	CASE 13
+		RETURNF  "ウィッグ"
+	CASEELSE
+		RETURNF  "－－－"
+ENDSELECT
+;-------------------------------------------------
+;関数名:EYECOLOR
+;概　要:瞳の色取得関数(カスタム衣装)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@EYECOLOR(ARG:0, ARG:1)
+#FUNCTIONS
+SELECTCASE CFLAG:(ARG:0):瞳の色
+	CASE 1
+		RETURNF  \@ ARG:1 ? グリーン # 緑眼 \@
+	CASE 2
+		RETURNF  \@ ARG:1 ? オッドアイ # オッドアイ \@
+	CASE 3
+		RETURNF  \@ ARG:1 ? ブラウン # 褐色眼 \@
+	CASE 4
+		RETURNF  \@ ARG:1 ? ヴァイオレット # 青紫眼 \@
+	CASE 5
+		RETURNF  \@ ARG:1 ? ブルー # 碧眼 \@
+	CASE 6
+		RETURNF  \@ ARG:1 ? 淡褐色 # 淡褐色眼 \@
+	CASE 7
+		RETURNF  \@ ARG:1 ? 琥珀色 # 琥珀色眼 \@
+	CASE 8
+		RETURNF  \@ ARG:1 ? グレー # 灰眼 \@
+	CASE 9
+		RETURNF  \@ ARG:1 ? レッド # 紅眼 \@
+	CASEELSE
+		RETURNF  "－－－"
+ENDSELECT
+;-------------------------------------------------
+;関数名:EYESTYLE
+;概　要:髪色名取得関数(カスタム衣装)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+	   ;ARG:2…省略可。2を入れるとオプション2のデータを返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@EYESTYLE(ARG:0, ARG:1, ARG:2)
+#FUNCTIONS
+
+SELECTCASE CFLAG:(ARG:0):瞳の形
+	CASE 1
+		RETURNF  "タレ目"
+	CASE 2
+		RETURNF  "ツリ目"
+	CASE 3
+		RETURNF  "半目"
+	CASE 4
+		RETURNF  "三白眼"
+	CASE 5
+		RETURNF  "ジト目"
+	CASE 6
+		RETURNF  "細目"
+	CASE 7
+		RETURNF  "猫目"
+	CASEELSE
+		RETURNF  "－－－"
+ENDSELECT
+;-------------------------------------------------
+;関数名:SKINCOLOR
+;概　要:肌色取得関数(カスタム衣装)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@SKINCOLOR(ARG:0, ARG:1)
+#FUNCTIONS
+
+SELECTCASE CFLAG:(ARG:0):肌の色
+	CASE 1
+		RETURNF  "色白"
+	CASE 2
+		RETURNF  \@ ARG:1 ? 褐色 # 褐色肌 \@
+	CASEELSE
+		RETURNF  "－－－"
+ENDSELECT
+;-------------------------------------------------
+;関数名:PERSONALITY
+;概　要:性格取得関数(カスタム衣装)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+	   ;ARG:2…省略可。2を入れるとオプション2のデータを返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@PERSONALITY(ARG:0, ARG:1, ARG:2)
+#FUNCTIONS
+
+SELECTCASE CFLAG:(ARG:0):性格
+	CASE 1
+		RETURNF  "快活"
+	CASE 2
+		RETURNF  "セクシー"
+	CASE 3
+		RETURNF  "お嬢様"
+	CASE 4
+		RETURNF  "毅然"
+	CASE 5
+		RETURNF  ""
+	CASE 6
+		RETURNF  "癒し系"
+	CASE 7
+		RETURNF  ""
+	CASE 8
+		RETURNF  "おっとり"
+	CASE 9
+		RETURNF  "せっかち"
+	CASE 10
+		RETURNF  "マイペース"
+	CASE 11
+		RETURNF  "高飛車"
+	CASE 12
+		RETURNF  "見栄っ張り"
+	CASE 13
+		RETURNF  "清楚"
+	CASE 14
+		RETURNF  "自信家"
+	CASE 15
+		RETURNF  ""
+	CASE 16
+		RETURNF  "甘えん坊"
+	CASE 17
+		RETURNF  "うっかり者"
+	CASE 18
+		RETURNF  "お調子者"
+	CASE 19
+		RETURNF  "おっちょこちょい"
+	CASE 20
+		RETURNF  "男勝り"
+	CASE 21
+		RETURNF  "お転婆"
+	CASE 22
+		RETURNF  "おせっかい"
+	CASE 23
+		RETURNF  "頑固"
+	CASE 24
+		RETURNF  "頑張り屋"
+	CASE 25
+		RETURNF  "切れ者"
+	CASE 26
+		RETURNF  "苦労人"
+	CASE 27
+		RETURNF  "寂しがり屋"
+	CASE 28
+		RETURNF  "幸せ者"
+	CASE 29
+		RETURNF  "頭脳明晰"
+	CASE 30
+		RETURNF  "世間知らず"
+	CASE 31
+		RETURNF  "泣き虫"
+	CASE 32
+		RETURNF  "なまけもの"
+	CASE 33
+		RETURNF  "熱血漢"
+	CASE 34
+		RETURNF  "のんきもの"
+	CASE 35
+		RETURNF  "引っ込み思案"
+	CASE 36
+		RETURNF  "ひねくれもの"
+	CASE 37
+		RETURNF  "優しい"
+	CASE 38
+		RETURNF  "乱暴者"
+	CASE 39
+		RETURNF  "ロマンチスト"
+	CASE 40
+		RETURNF  "わがまま"
+	CASE 41
+		RETURNF  "一匹狼"
+	CASE 42
+		RETURNF  "真面目"
+	CASE 43
+		RETURNF  "爽やか"
+	CASE 44
+		RETURNF  "謙虚"
+	CASE 45
+		RETURNF  "物静か"
+	CASE 46
+		RETURNF  "几帳面"
+	CASE 47
+		RETURNF  "負けず嫌い"
+	CASE 48
+		RETURNF  "冷静沈着"
+	CASE 49
+		RETURNF  "神経質"
+	CASE 50
+		RETURNF  "お人よし"
+	CASE 51
+		RETURNF  "おおらか"
+	CASE 52
+		RETURNF  "無邪気"
+	CASE 53
+		RETURNF  "元気"
+	CASE 54
+		RETURNF  "天真爛漫"
+	CASEELSE
+		RETURNF  "－－－"
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:JOBNAME
+;概　要:性格取得関数(カスタム衣装)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+	   ;ARG:2…省略可。数字を入れると副職業の名前を返す
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@JOBNAME(ARG:0, ARG:1, ARG:2)
+#FUNCTIONS
+IF ARG:2
+	LOCAL = CFLAG:(ARG:0):副職業
+ELSE
+	LOCAL = CFLAG:(ARG:0):職業
+ENDIF
+SELECTCASE LOCAL
+	CASE 1
+		RETURNF  "プロデューサー"
+	CASE 2
+		RETURNF  "アイドル"
+	CASE 3
+		RETURNF  "ネットアイドル"
+	CASE 4
+		RETURNF  "元アイドル"
+	CASE 5
+		RETURNF  "事務員"
+	CASE 6
+		RETURNF  "マネージャー"
+	CASE 7
+		RETURNF  "一般人"
+	CASE 8
+		RETURNF  "ニート"
+	CASE 9
+		RETURNF  "小学生"
+	CASE 10
+		RETURNF  "中学生"
+	CASE 11
+		RETURNF  "高校生"
+	CASE 12
+		RETURNF  "大学生"
+	CASE 13
+		RETURNF  "社長"
+	CASE 14
+		RETURNF  "シスター"
+	CASE 15
+		RETURNF  "保母"
+	CASE 16
+		RETURNF  "報道者"
+	CASE 17
+		RETURNF  "専門学生"
+	CASE 18
+		RETURNF  "主婦"
+	CASE 19
+		RETURNF  "秘書"
+	CASE 20
+		RETURNF  "巫女"
+	CASEELSE
+		RETURNF  "－－－"
+ENDSELECT
+
+;-------------------------------------------------
+;関数名:FLAVOR
+;概　要:性格取得関数(カスタム衣装)
+;引　数:ARG:0…キャラ登録番号(MASTERかTARGET)
+;　　　:ARG:1…省略可。真の場合、短縮名を返す
+	   ;ARG:2…省略可。1,2,3,4,5を入れると対応したフレイバー名を返す（省略時は1）
+;戻り値:服装名(文字列)
+;備　考:式中関数
+;キャラ登録番号から、カスタム衣装の名前を返す
+;-------------------------------------------------
+@FLAVOR(ARG:0, ARG:1, ARG:2)
+#FUNCTIONS
+IF ARG:2 == 5
+	LOCAL = CFLAG:(ARG:0):フレーバー5
+ELSEIF ARG:2 == 4
+	LOCAL = CFLAG:(ARG:0):フレーバー4
+ELSEIF ARG:2 == 3
+	LOCAL = CFLAG:(ARG:0):フレーバー3
+ELSEIF ARG:2 == 2
+	LOCAL = CFLAG:(ARG:0):フレーバー2
+ELSEIF ARG:2 == 1
+	LOCAL = CFLAG:(ARG:0):フレーバー1
+ELSE
+	LOCAL = CFLAG:(ARG:0):フレーバー1
+ENDIF
+SELECTCASE LOCAL
+	CASE 1
+		RETURNF  "令嬢"
+	CASE 2
+		RETURNF  "貧乏"
+	CASE 3
+		RETURNF  "不良"
+	CASE 4
+		RETURNF  "優等生"
+	CASE 5
+		RETURNF  "おしゃれ"
+	CASE 6
+		RETURNF  "外国人"
+	CASE 7
+		RETURNF  "眼鏡っ子"
+	CASE 8
+		RETURNF  "コスプレ属性"
+	CASE 9
+		RETURNF  "生徒会長"
+	CASE 10
+		RETURNF  "聖職者"
+	CASE 11
+		RETURNF  "オタク趣味"
+	CASE 12
+		RETURNF  "既婚"
+	CASE 13
+		RETURNF  "アルバイト"
+	CASE 14
+		RETURNF  "ロボ娘"
+	CASE 15
+		RETURNF  "マッドサイエンティスト"
+	CASE 16
+		RETURNF  "情報通"
+	CASE 17
+		RETURNF  "ドジっ娘"
+	CASE 18
+		RETURNF  "姉"
+	CASE 19
+		RETURNF  "妹"
+	CASE 20
+		RETURNF  ""
+	CASE 21
+		RETURNF  "インテリ"
+	CASE 22
+		RETURNF  "宇宙人"
+	CASE 23
+		RETURNF  "貴族"
+	CASE 24
+		RETURNF  "おしゃれ下手"
+	CASE 25
+		RETURNF  ""
+	CASE 26
+		RETURNF  ""
+	CASE 27
+		RETURNF  ""
+	CASE 28
+		RETURNF  "男の娘"
+	CASE 29
+		RETURNF  "家庭的"
+	CASE 30
+		RETURNF  "可愛いモノ好き"
+	CASE 31
+		RETURNF  "関西弁"
+	CASE 32
+		RETURNF  "帰国子女"
+	CASE 33
+		RETURNF  "傷跡"
+	CASE 34
+		RETURNF  "巨大娘"
+	CASE 35
+		RETURNF  "食いしん坊"
+	CASE 36
+		RETURNF  "ゴスロリ"
+	CASE 37
+		RETURNF  "クール"
+	CASE 38
+		RETURNF  "大声"
+	CASE 39
+		RETURNF  "舌足らず"
+	CASE 40
+		RETURNF  "熟女"
+	CASE 41
+		RETURNF  ""
+	CASE 42
+		RETURNF  "邪気眼"
+	CASE 43
+		RETURNF  "常識人"
+	CASE 44
+		RETURNF  "スポーツ少女"
+	CASE 45
+		RETURNF  "そばかす"
+	CASE 46
+		RETURNF  "ダルデレ"
+	CASE 47
+		RETURNF  "男装"
+	CASE 48
+		RETURNF  ""
+	CASE 49
+		RETURNF  ""
+	CASE 50
+		RETURNF  "ツッコミ"
+	CASE 51
+		RETURNF  ""
+	CASE 52
+		RETURNF  "天然"
+	CASE 53
+		RETURNF  ""
+	CASE 54
+		RETURNF  "童顔"
+	CASE 55
+		RETURNF  "毒舌"
+	CASE 56
+		RETURNF  "動物好き"
+	CASE 57
+		RETURNF  "脱ぎたがり"
+	CASE 58
+		RETURNF  "猫舌"
+	CASE 59
+		RETURNF  "ハイテンション"
+	CASE 60
+		RETURNF  "薄幸"
+	CASE 61
+		RETURNF  "母"
+	CASE 62
+		RETURNF  "人妻"
+	CASE 63
+		RETURNF  "元引きこもり"
+	CASE 64
+		RETURNF  "ビッチ"
+	CASE 65
+		RETURNF  "朴念仁"
+	CASE 66
+		RETURNF  "病弱"
+	CASE 67
+		RETURNF  "昼行燈"
+	CASE 68
+		RETURNF  "風紀委員"
+	CASE 69
+		RETURNF  "ボーイッシュ"
+	CASE 70
+		RETURNF  "双子"
+	CASE 71
+		RETURNF  "武道家"
+	CASE 72
+		RETURNF  "文学少女"
+	CASE 73
+		RETURNF  "へタレ"
+	CASE 74
+		RETURNF  "変態"
+	CASE 75
+		RETURNF  "方向音痴"
+	CASE 76
+		RETURNF  "泣きぼくろ"
+	CASE 77
+		RETURNF  "方言"
+	CASE 78
+		RETURNF  "ボクっ娘"
+	CASE 79
+		RETURNF  "ぽっちゃり"
+	CASE 80
+		RETURNF  "魔法少女"
+	CASE 81
+		RETURNF  "未来人"
+	CASE 82
+		RETURNF  "無口"
+	CASE 83
+		RETURNF  "無表情"
+	CASE 84
+		RETURNF  "ミステリアス"
+	CASE 85
+		RETURNF  "八重歯"
+	CASE 86
+		RETURNF  "大和撫子"
+	CASE 87
+		RETURNF  "幼女"
+	CASE 88
+		RETURNF  "惚れっぽい"
+	CASE 89
+		RETURNF  "妄想癖"
+	CASE 90
+		RETURNF  "豆腐メンタル"
+	CASE 91
+		RETURNF  "ゆとり"
+	CASE 92
+		RETURNF  "天才"
+	CASE 93
+		RETURNF  "ヤンデレ"
+	CASE 94
+		RETURNF  "音楽愛好家"
+	CASEELSE
+		RETURNF  "－－－"
+ENDSELECT
