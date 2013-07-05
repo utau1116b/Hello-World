@@ -146,7 +146,7 @@ ELSE
 	ENDIF
 	;セックス中またはアナルセックス中
 	IF TEQUIP:TARGET:50 >= 0 || TEQUIP:TARGET:51 >= 0
-		PRINTL 乳首とクリトリスをいじりだした…
+		PRINTL 乳首と\@ TALENT:オトコ ? ペニス # クリトリス \@をいじりだした…
 	ELSE
 		PRINTL 快感を味わっている…
 	ENDIF
@@ -675,7 +675,7 @@ IF TEQUIP:触手プレイ
 	IF !TEQUIP:クリキャップ
 		PRINTFORML 触手は%CALLNAME:TARGET%のクリ責めを中断した
 	ELSE
-		PRINTFORML 細かく枝分かれした触手が%CALLNAME:TARGET%のクリトリスを責めはじめた
+		PRINTFORML 細かく枝分かれした触手が%CALLNAME:TARGET%の\@ TALENT:オトコ ? ペニス # クリトリス \@を責めはじめた
 	ENDIF
 ELSE
 	IF !TEQUIP:クリキャップ
@@ -1439,6 +1439,7 @@ ELSE
 	PRINTFORM %CALLNAME:PLAYER%に全身を擦りつけて
 ENDIF
 PRINTW 愛撫した…
+
 ;騎乗位アナル
 @TRAIN_MESSAGE_COM36
 ;前回と今回の調教者が同じ、連続
@@ -1460,9 +1461,8 @@ ELSE
 	;潤滑LV4以上
 	SIF PALAM:潤滑 >= PALAMLV:4
 		PRINT 粘液にまみれた
-		PRINT アヌスでゆっくりと%CALLNAME:PLAYER%のモノを飲み込んでいった…
+		PRINTFORM アヌスでゆっくりと%CALLNAME:PLAYER%のモノを飲み込んでいった…
 ENDIF
-
 ;陥落済み
 IF TALENT:恋慕
 	IF EXP:Ｖ経験 >= EXPLV:3
@@ -1597,7 +1597,7 @@ ELSE
 	PRINTFORM 何度も何度も叩かれている内に、%CALLNAME:TARGET%の
 	;オトコ＋マゾっ気LV2以上
 	IF TALENT:オトコ && (ABL:マゾっ気 >= 2)
-		PRINTFORML %CALLNAME:TARGET%の股間は硬くなっていった…
+		PRINTFORML 股間は硬くなっていった…
 	ELSEIF ABL:マゾっ気 >= 2 && TEQUIP:TARGET:50 == -1
 		PRINTL 股間は自身の愛液で濡れはじめていた…
 	ELSE
@@ -1632,7 +1632,7 @@ IF TFLAG:主導権
 	ENDIF
 ELSE
 	;主人公主導
-	PRINTFORM %CALLNAME:TARGET%の乳首やクリトリスに
+	PRINTFORM %CALLNAME:TARGET%の乳首や\@ TALENT:オトコ ? ペニス # クリトリス \@に
 	IF TALENT:PLAYER:針さばき || TALENT:PLAYER:サド || ABL:PLAYER:サドっ気 >= 5
 		PRINTW 容赦なく針を突き刺した…
 	ELSE
@@ -1640,12 +1640,11 @@ ELSE
 	ENDIF
 ENDIF
 
-
 @TRAIN_MESSAGE_COM43
 ;アイマスクの着脱
 IF !IS_EQUIP(TARGET, "アイマスク")
 	PRINTFORML %CALLNAME:TARGET%からアイマスクをはずしてあげた
-ELSEIF TEQUIP:PLAYER:アイマスク
+ELSEIF !TEQUIP:PLAYER:アイマスク
 	PRINTFORML %CALLNAME:TARGET%にアイマスクをはずしてもらった
 ELSEIF TFLAG:主導権 == 0 || (FLAG:61 & 128) == 0
 	PRINTFORML %CALLNAME:TARGET%にアイマスクを着けさせた
@@ -1814,11 +1813,7 @@ ENDIF
 IF !TEQUIP:羞恥プレイ
 	PRINTFORML %CALLNAME:TARGET%を連れて鏡の前から離れた…
 ELSE
-	IF NAME_CSV(NO:PLAYER, 0) == "四季映姫"
-		PRINTFORML %CALLNAME:TARGET%を地獄から取り寄せてきた浄玻璃の鏡の前に連れて来た…
-	ELSE
-		PRINTFORML %CALLNAME:TARGET%を鏡の前に連れて来た…
-	ENDIF
+	PRINTFORML %CALLNAME:TARGET%を鏡の前に連れて来た…
 ENDIF
 
 ;-------------------------------------------------
@@ -1835,7 +1830,7 @@ ENDIF
 ;59,新妻プレイ,
 ;-------------------------------------------------
 @TRAIN_MESSAGE_COM59
-IF IS_EQUIP(TARGET, "裸エプロン")
+IF !IS_EQUIP(TARGET, "裸エプロン")
 	PRINTFORML %CALLNAME:TARGET%のエプロンを脱がした…
 ELSE
 	PRINTFORML %CALLNAME:TARGET%の素肌にエプロンをつけさせた…
@@ -2656,7 +2651,8 @@ ELSE
 	PRINTL 荊の色とも相まって怪しげなコントラストを形作っている…
 ENDIF
 
-;※伊織、亜里沙、仁奈、杏などぬいぐるみ持ちのキャラならＯＫにする？
+;※伊織、亜里沙などぬいぐるみ持ちのキャラならＯＫにする？
+;素質：人形師
 ;人形愛撫
 ;@TRAIN_MESSAGE_COM157
 
@@ -3208,18 +3204,6 @@ IF TFLAG:コマンド内容== 0
 	ELSE
 		PRINTFORMW %CALLNAME:TARGET%は%CALLNAME:PLAYER%から離れた…
 	ENDIF
-;	ELSEIF RAND:16 == 0
-;		TFLAG:コマンド内容= 1
-;		PRINTFORMW %CALLNAME:TARGET%の部屋を片付け始めた…
-;		IF TALENT:恋慕 && RAND:3 >= 1
-;			PRINTFORMW %CALLNAME:TARGET%は自分を責める器具にわずかに興奮しているようだ…
-;		ELSEIF ABL:親密 >= 4 && EXP:21 >= 250
-;			PRINTFORMW %CALLNAME:TARGET%は慌てた様子で%CALLNAME:PLAYER%を手伝った
-;		ELSEIF ABL:親密 >= 2 && EXP:21 <= 150
-;			PRINTFORMW %CALLNAME:TARGET%は仕方なさそうに%CALLNAME:PLAYER%を手伝った…
-;		ELSE
-;			PRINTFORMW %CALLNAME:TARGET%は何もしないでいる…
-;		ENDIF
 ELSEIF TFLAG:コマンド内容== 2
 	PRINTFORMW %CALLNAME:TARGET%の目を手で覆ってあげた…
 	IF TALENT:恋慕 && RAND:3 >= 1
@@ -4321,8 +4305,16 @@ ENDIF
 
 ;炬燵にあたる
 @TRAIN_MESSAGE_COM314
+;撤去
+IF !TEQUIP:炬燵
+	;主導権を持ってる方が撤去する
+	IF TFLAG:主導権 == 0
+		PRINTFORMW %CALLNAME:PLAYER%は炬燵を撤去した…
+	ELSE
+		PRINTFORMW %CALLNAME:TARGET%は炬燵を撤去した…
+	ENDIF
 ;設置
-IF TEQUIP:7 == 0
+ELSE
 	;主導権を持ってる方が設置する(一緒にあたろうと誘う)
 	IF TFLAG:主導権 == 0
 		PRINTFORMW %CALLNAME:PLAYER%は炬燵を設置した
@@ -4339,16 +4331,7 @@ IF TEQUIP:7 == 0
 	ELSE
 		PRINTFORMW %CALLNAME:TARGET%は隣に潜り込んだ…
 	ENDIF
-;撤去
-ELSE
-	;主導権を持ってる方が撤去する
-	IF TFLAG:主導権 == 0
-		PRINTFORMW %CALLNAME:PLAYER%は炬燵を撤去した…
-	ELSE
-		PRINTFORMW %CALLNAME:TARGET%は炬燵を撤去した…
-	ENDIF
 ENDIF
-
 
 ;お散歩する
 ;季節毎の描写等は敢えて避けています。
@@ -5412,7 +5395,7 @@ ENDIF
 
 ;オムツの着脱
 @TRAIN_MESSAGE_COM371
-IF IS_EQUIP(TARGET, "オムツ")
+IF !IS_EQUIP(TARGET, "オムツ")
 	PRINTFORML %CALLNAME:TARGET%に履かせていたオムツを取り外した。
 	PRINTFORM 中は汗
 	IF IS_EQUIP(TARGET, "オムツ") == 2

@@ -15,119 +15,16 @@ RESULTS =
 VARSET LOCAL
 SELECTCASE ARGS
 ;------------------------------------------------------------
-;ファーストインプレッション系KOJO出力処理（俗に言うエクストラ構文）
-;------------------------------------------------------------
-;	CASE "ENCOUNTER"
-;		;TARGETに発言者設定（現在のTARGETはLOCALへ退避）
-;		LOCAL = TARGET
-;		TARGET = ARG:2
-;		;口上存在判定
-;		TRYCALLFORM M_KOJO_K{NO:TARGET}
-;		;口上存在しないなら終了
-;		IF !RESULT
-;			TARGET = LOCAL
-;			RETURN 0
-;		ENDIF
-;		;口上表示設定なら表示
-;		IF FLAG:口上表示頻度 > 0
-;			TRYCALLFORM M_KOJO%RESULTS%_ENCOUNTER_K{NO:TARGET}
-;		ENDIF
-;		TARGET = LOCAL
-;------------------------------------------------------------
 ;SPイベント系KOJO出力処理
 ;SPイベントは各々が SPEVENT_MESSAGE_X という共通口上を持つ
 ;------------------------------------------------------------
-;	CASE "SP_EVENT"
-;		;TARGETに発言者設定（現在のTARGETはLOCALへ退避）
-;		LOCAL = TARGET
-;		TARGET = ARG:2
-;		;口上未表示なら共通口上へ
-;		IF FLAG:口上表示頻度 <= 0
-;			;共通口上出力
-;			CALLFORM SPEVENT_MESSAGE_{ARG:1}(ARG:3,ARG:4)
-;			TARGET = LOCAL
-;			RETURN 0
-;		ENDIF
-;		RESULT = 0
-;		RESULTS =
-;		;TARGETの発言
-;		;@M_KOJO_KXにてRESULTSを定義すると口上が被らず起動する
-;		TRYCALLFORM M_KOJO_K{NO:TARGET}
-;		;口上が存在しないなら共通口上へ
-;		IF !RESULT
-;			;口上表示設定なら共通表示
-;			IF FLAG:口上表示頻度 > 0
-;				;共通口上出力
-;				CALLFORM SPEVENT_MESSAGE_{ARG:1}(ARG:3,ARG:4)
-;				TARGET = LOCAL
-;				RETURN 0
-;			ENDIF
-;		ENDIF
-;		;口上表示
-;		;M_KOJO_KXでRESULTSを定義すると切り替え可
-;		SIF FLAG:口上表示頻度 > 0
-;			TRYCALLFORM M_KOJO%RESULTS%_SPEVENT_K{NO:TARGET}_{ARG:1}(ARG:3,ARG:4)
-;		TARGET = LOCAL
 ;------------------------------------------------------------
 ;イベント系KOJO出力処理
 ;イベントは共通メッセージを持たない（ロジックは存在するが EVENT_MESSAGE_Xは存在しない）
 ;------------------------------------------------------------
-;	CASE "EVENT"
-;		;TARGETに発言者設定（現在のTARGETはLOCALへ退避）
-;		LOCAL = TARGET
-;		TARGET = ARG:2
-;		;口上未表示ならイベント情景へ
-;		IF FLAG:口上表示頻度 <= 0
-;			;イベント情景出力 (バリアント本体には用意されていない)
-;			TRYCALLFORM EVENT_MESSAGE_{ARG:1}
-;			TARGET = LOCAL
-;			RETURN 0
-;		ENDIF
-;		RESULT = 0
-;		RESULTS =
-;		;TARGETの発言
-;		;@M_KOJO_KXにてRESULTSを定義すると口上が被らず起動する
-;		TRYCALLFORM M_KOJO_K{NO:TARGET}
-;		;口上が存在しないならイベント情景へ
-;		IF !RESULT
-;			;口上表示設定ならイベント情景表示
-;			IF FLAG:口上表示頻度 > 0
-;				;イベント情景出力 (バリアント本体には用意されていない)
-;				TRYCALLFORM EVENT_MESSAGE_{ARG:1}(ARG:3,ARG:4)
-;				TARGET = LOCAL
-;				RETURN 0
-;			ENDIF
-;		ENDIF
-;		;口上表示
-;		SIF FLAG:口上表示頻度 > 0
-;			TRYCALLFORM M_KOJO%RESULTS%_EVENT_K{NO:TARGET}_{ARG:1}(ARG:3,ARG:4)
-;		TARGET = LOCAL
 ;------------------------------------------------------------
 ;インフォメーション系KOJO出力処理
 ;------------------------------------------------------------
-;	CASE "INFO"
-;		;TARGETに発言者設定（現在のTARGETはLOCALへ退避）
-;		LOCAL = TARGET
-;		TARGET = ARG:2
-;		;口上未表示なら終了
-;		IF FLAG:口上表示頻度 <= 0
-;			RETURN 0
-;		ENDIF
-;		RESULT = 0
-;		RESULTS =
-;		;TARGETの発言
-;		;@M_KOJO_KXにてRESULTSを定義すると口上が被らず起動する
-;		TRYCALLFORM M_KOJO_K{NO:TARGET}
-;		;口上が存在しないならイベント情景へ
-;		IF !RESULT
-;			RETURN 0
-;		ENDIF
-;		;口上表示
-;		SIF FLAG:口上表示頻度 > 0
-;			;TARGET口上出力
-;			TRYCALLFORM M_KOJO%RESULTS%_INFO_K{NO:TARGET}_{ARG:1}(ARG:3,ARG:4)
-;		TARGET = LOCAL
-;
 ;------------------------------------------------------------
 ;純愛系KOJO出力処理
 ;------------------------------------------------------------
@@ -181,11 +78,6 @@ SELECTCASE ARGS
 				CALL TRAIN_MESSAGE
 				RETURN 0
 		ELSE
-			;RESULT = 0
-			;RESULTS =
-			;口上の存在判定 and RESULTSに文字列代入
-			;TRYCALLFORM KOJO_EXIST_K{NO:TARGET}
-			;IF !RESULT && FLAG:テキスト表示 > 0
 			;-------------------------------------------------
 			;地の文の表示
 			;-------------------------------------------------
@@ -197,16 +89,6 @@ SELECTCASE ARGS
 				CALL KOJO_MESSAGE_COM_MASTER
 				CALL KOJO_MESSAGE_COM_ASSI
 				CALL KOJO_MESSAGE_COM
-			;ENDIF
-			;RESULT = 0
-			;IF TFLAG:50
-			;	TRYCALLFORM M_KOJO%RESULTS%_MESSAGE_SCOM_K{NO:TARGET}_{TFLAG:50}
-			;ELSE
-			;	TRYCALLFORM M_KOJO%RESULTS%_MESSAGE_COM_K{NO:TARGET}_{SELECTCOM}
-			;ENDIF
-			;埋めていないところは汎用的な処理が可能
-			;SIF RESULT
-			;	TRYCALLFORM M_KOJO%RESULTS%_MESSAGE_COM_K{NO:TARGET}_00
 			SIF TFLAG:派生COM番号
 				SELECTCOM = LOCAL
 
@@ -259,33 +141,14 @@ SELECTCASE ARGS
 					;関係ないキャラは省く
 					SIF LOCAL != MASTER && LOCAL != TARGET && LOCAL != ASSI
 						CONTINUE
-					;SIF TARGET:LOCAL < 1
-					;	CONTINUE
-					;TARGET,TARGET:1,…の順に出力
-					;SIF LOCAL > 0 && TARGET:LOCAL == TARGET
-					;	CONTINUE
 					;口上出力用のフラグがないと飛ばす
 					SIF !TCVAR:LOCAL:50
 						CONTINUE
 					LOCAL:1 = TARGET
 					TARGET = LOCAL
-					;RESULT = 0
-					;RESULTS =
-					;口上の存在判定 and RESULTSに文字列代入
-					;TRYCALLFORM M_KOJO_K{NO:TARGET}
-					;IF !RESULT &&  FLAG:テキスト表示 > 0
-						CALL PALAM_MESSAGE_A
-						TARGET = LOCAL:1
-						RETURN 0
-					;ENDIF
-					;射精口上出力ギミック
-					;CALL KOJO_MESSAGE_PALAMCNG_A2(LOCAL)
-					;SIF !RESULT
-					;LOCAL:2 ++
-					;TARGET = LOCAL:1
-					;コンドーム口上は対象一人のみ
-					;SIF GETBIT(TFLAG:1,0)
-					;	BREAK
+					CALL PALAM_MESSAGE_A
+					TARGET = LOCAL:1
+					RETURN 0
 				NEXT
 		;==== 絶頂時口上 ============
 			CASE 2
@@ -294,15 +157,8 @@ SELECTCASE ARGS
 						CALL PALAM_MESSAGE_B
 					RETURN 0
 				ENDIF
-				;RESULT = 0
-				;RESULTS =
-				;口上の存在判定 and RESULTSに文字列代入
-				;TRYCALLFORM M_KOJO_K{NO:TARGET}
-				;IF !RESULT && FLAG:テキスト表示 > 0
 					CALL PALAM_MESSAGE_B
 					RETURN 0
-				;ENDIF
-				;TRYCALLFORM M_KOJO_MESSAGE_PALAMCNG_B_K{NO:TARGET}
 		;==== 調教後口上 ============
 			CASE 3
 				IF FLAG:口上表示頻度 <= 0
@@ -310,15 +166,8 @@ SELECTCASE ARGS
 						CALL PALAM_MESSAGE_C
 					RETURN 0
 				ENDIF
-				;RESULT = 0
-				;RESULTS =
-				;口上の存在判定 and RESULTSに文字列代入
-				;TRYCALLFORM M_KOJO_K{NO:TARGET}
-				;IF !RESULT && FLAG:テキスト表示 > 0
 					CALL PALAM_MESSAGE_C
 					RETURN 0
-				;ENDIF
-				;TRYCALLFORM M_KOJO_MESSAGE_PALAMCNG_C_K{NO:TARGET}
 		;==== パラメータ変動口上 ====
 			CASE 4
 				IF FLAG:口上表示頻度 <= 0
@@ -326,15 +175,8 @@ SELECTCASE ARGS
 						CALL PALAM_MESSAGE_D
 					RETURN 0
 				ENDIF
-				;RESULT = 0
-				;RESULTS =
-				;口上の存在判定 and RESULTSに文字列代入
-				;TRYCALLFORM M_KOJO_K{NO:TARGET}
-				;IF !RESULT && FLAG:テキスト表示 > 0
 					CALL PALAM_MESSAGE_D
 					RETURN 0
-				;ENDIF
-				;TRYCALLFORM M_KOJO_MESSAGE_PALAMCNG_D_K{NO:TARGET}
 		;==== 触手の射精 ============
 			CASE 5
 				IF FLAG:口上表示頻度 <= 0
@@ -342,15 +184,8 @@ SELECTCASE ARGS
 						CALL PALAM_MESSAGE_E
 					RETURN 0
 				ENDIF
-				;RESULT = 0
-				;RESULTS =
-				;口上の存在判定 and RESULTSに文字列代入
-				;TRYCALLFORM M_KOJO_K{NO:TARGET}
-				;IF !RESULT && FLAG:テキスト表示 > 0
 					CALL PALAM_MESSAGE_E
 					RETURN 0
-				;ENDIF
-				;TRYCALLFORM M_KOJO_MESSAGE_PALAMCNG_E_K{NO:TARGET}
 		ENDSELECT
 ;	;刻印系KOJO出力処理
 	CASE "MARK"

@@ -1,11 +1,13 @@
 ;@CALLTRAINEND
 ;TFLAG:CALLTRAIN = 0
 @SHOW_USERCOM
-CALL BGM("TRAIN", "メイン")
-;CALL RETURNLINE
+VARSET LOCAL
+
 TFLAG:調教自動実行管理 = 0
 TFLAG:COMABLE管理 = !TFLAG:調教自動実行管理
-VARSET LOCAL
+
+CALL BGM("TRAIN", "メイン")
+
 ;前ターンのMASTERが射精した相手をLOCAL:1へセット
 IF TCVAR:MASTER:直前のターンの射精した箇所 == 1
 	;V
@@ -165,6 +167,7 @@ IF CFLAG:TARGET:独自コマンド使用判定
 		ENDIF
 	NEXT
 ENDIF
+
 IF ASSI > 0
 	IF ASSIPLAY && TEQUIP:90 == 0 && TEQUIP:2 == 0 && (TFLAG:うふふ == 0 || TALENT:152)
 		PRINTC マスターと交代[900]
@@ -195,7 +198,7 @@ IF PREVCOM >= 0
 		PRINT (助手) 
 	PRINT >
 ENDIF
-;ENDIF
+
 ;---------------------------------------------------------
 ;USERCOM内の改行処理
 ;---------------------------------------------------------
@@ -231,6 +234,7 @@ CATCH
 	;元々実行判定のないコマンドの場合
 	RETURN 0
 ENDCATCH
+
 ;---------------------------------------------------------------------------------------------
 ;コマンド名変更処理
 ;元はPRINTFORMC %TRAINNAME:LOCAL%[{LOCAL:1,3}]でTrain.csvのコマンド名通りに表示されていた処理
@@ -286,6 +290,7 @@ ELSE
 	LOCALS = %TRAINNAME:ARG%[{ARG:1,3}]
 ENDIF
 PRINTBUTTONC LOCALS, ARG:1
+
 @USERCOM
 DEBUGPRINTFORML SELECTCOM = {SELECTCOM} TFLAG:SELECTCOM保存 = {TFLAG:SELECTCOM保存}１
 ;コマンド入力ミスフラグ初期化
@@ -348,6 +353,7 @@ ELSEIF RESULT == 802
 ELSEIF RESULT == 810 && A
 	;アイテム使用
 	CALL USE_TREASURE_ITEM
+;服を脱がせる
 ELSEIF RESULT == 850 && TFLAG:うふふ == 0 && !IS_友情(TARGET)
 	IF FLAG:23 & 2
 		PRINTFORML 服を脱がせて(Ｈな事をしようとして)もよろしいですか？

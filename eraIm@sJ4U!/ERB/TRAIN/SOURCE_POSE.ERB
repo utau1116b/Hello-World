@@ -8,7 +8,9 @@
 ;RETURN		VOID
 ;COMMENT	
 ;-----------------------------------------------------------
+;コンフィグで表示・非表示を切り替えられるといい(現在はコメントアウト)
 @SHOW_TOUCH
+[SKIPSTART]
 FOR LOCAL,1,CHARANUM
 	LOCAL:2 = 0
 	;関係ない人は省く
@@ -85,6 +87,8 @@ FOR LOCAL,1,CHARANUM
 	;ENDSELECT
 	PRINTFORML (%CALLNAME:(LOCAL)%)
 NEXT
+[SKIPEND]
+
 ;PRINTL 
 
 ;FileName_GET_INSERT_CHARA.ERB -------------------------- Rev1.00

@@ -78,14 +78,18 @@ FOR LOCAL:1, 990, 1000
 	;PRINTFORML {LOCAL:1}番%CALLNAME:(LOCAL:1)%を加える
 NEXT
 
+;0 勧誘可能
+;-1勧誘不可能
 ;全キャラ加入
 FOR LOCAL:1, 11, 100
 	ADDCHARA LOCAL:1
 	CFLAG:(LOCAL:1):パートナー選択可 = 0
+	SIF LOCAL:1 > 90
+		CFLAG:(LOCAL:1):パートナー選択可 = -1
 NEXT
 
 ;追加キャラ加入
 FOR LOCAL:1, 100, 104
 	ADDCHARA LOCAL:1
-	CFLAG:COUNT:パートナー選択可 = 0
+	CFLAG:COUNT:パートナー選択可 = -1
 NEXT

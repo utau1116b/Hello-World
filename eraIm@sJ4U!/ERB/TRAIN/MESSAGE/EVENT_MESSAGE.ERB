@@ -24,6 +24,14 @@ ENDIF
 ;調教後のテキスト
 ;-------------------------------------------
 @PALAM_MESSAGE_C
+PRINTL 
+;キス未経験喪失
+SIF TALENT:PLAYER:キス未経験 && EXP_UP(96, PLAYER) > 0 && TFLAG:特殊COM != 62
+	PRINTFORMW %CALLNAME:PLAYER%は【キス未経験】を失いました
+
+SIF TALENT:TARGET:キス未経験 && EXP_UP(96, TARGET) > 0 && TFLAG:特殊COM != 62
+	PRINTFORMW %CALLNAME:TARGET%は【キス未経験】を失いました
+
 ;処女喪失
 FOR LOCAL,0,CHARANUM
 	;関係ない人は省く
