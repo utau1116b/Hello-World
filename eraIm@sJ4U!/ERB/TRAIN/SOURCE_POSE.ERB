@@ -103,6 +103,11 @@ NEXT
 ;-----------------------------------------------------------
 @GET_INSERT_CHARA(ARG,ARGS,ARGS:1,ARG:2)
 #FUNCTION
+
+;‘ÎÛ‚ª‚¢‚È‚¢Žž‚ÍƒŠƒ^[ƒ“
+SIF ARG < 0
+	RETURNF -1
+	
 IF ARGS == "P"
 	LOCAL = 101
 ELSEIF ARGS == "C"
@@ -120,6 +125,7 @@ ELSEIF ARGS == "A"
 ELSE
 	RETURNF -1
 ENDIF
+
 IF ARGS:1 == "P"
 	LOCAL:1 = 1
 ELSEIF ARGS:1 == "C"
@@ -137,6 +143,7 @@ ELSEIF ARGS:1 == "A"
 ELSE
 	RETURNF -1
 ENDIF
+
 IF TEQUIP:ARG:LOCAL > 10
 	;ŠY“–‰ÓŠ‘}“üŽÒ—L‚è
 	IF TEQUIP:ARG:LOCAL % 10 == LOCAL:1
@@ -150,6 +157,7 @@ ELSE
 	SIF TEQUIP:ARG:LOCAL == LOCAL:1
 		RETURNF 0
 ENDIF
+
 RETURNF -1
 
 ;FileName_SOURCE_POSE.ERB -------------------------- Rev1.00
