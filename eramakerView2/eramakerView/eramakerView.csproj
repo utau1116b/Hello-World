@@ -53,6 +53,7 @@
     <Compile Include="ConstantData.cs" />
     <Compile Include="EraStreamReader.cs" />
     <Compile Include="EraStreamWriter.cs" />
+    <Compile Include="html\EraIndex.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

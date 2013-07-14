@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -38,8 +39,18 @@ namespace Utau.Eramakerview
 			ConstantData cd = new ConstantData(this);
 			ExeDir = Library.Library.ExeDir;
 			CsvDir = ExeDir + "csv\\";
+
+			//時間測定
+			//DateTime dt = new DateTime();
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
+			//System.Threading.Thread.Sleep(1000);
 			//データ読み込み
 			cd.LoadData(CsvDir);
+			sw.Stop();
+			long millisec = sw.ElapsedMilliseconds;
+			WriteLabel(millisec + "ms");
+			//時間測定/
 
 			//データコピー
 			this.charaList = cd.GetChara();
@@ -47,12 +58,20 @@ namespace Utau.Eramakerview
 			this.pNameList = cd.GetParamName();
 			this.gbData = cd.GetGameBase();
 
-			
+			return;
+			//ここまで
+			//
+			//int temp;
+			//temp = charaList[0].BASE[0];
 
 			//データ書き込み
+			Stopwatch sw2 = new Stopwatch();
+			sw2.Start();
 			OutputData od = new OutputData(this, gbData, pNameList, valiableList, charaList);
 			od.MakeHtml(CsvDir);
-
+			sw2.Stop();
+			long millisec2 = sw2.ElapsedMilliseconds;
+			WriteLabel(millisec2 + "ms");
 			//自分用
 			//cd.WriteProgram(CsvDir + "EraIndex.html", CsvDir + "EraIndex.txt");
 			//cd.WriteProgram(CsvDir + "EraMenu.html", CsvDir + "EraMenu.txt");

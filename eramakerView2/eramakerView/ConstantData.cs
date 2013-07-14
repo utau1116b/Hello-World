@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 using Utau.Eramakerview.Library;
@@ -89,7 +90,13 @@ namespace Utau.Eramakerview.GameData
 		//charaListを返す
 		public CharacterTemplate[] GetChara ()
 		{
+			//mf.WriteLabel("charalist = " + charaList[11].BASE[1] + "");
 			return charaList;
+		}
+		public void GetCharaRef(out CharacterTemplate []chara)
+		{
+			chara = charaList;
+			//charaList.CopyTo(chara, 0);
 		}
 
 		public int[] GetVariableSize() 
@@ -121,22 +128,36 @@ namespace Utau.Eramakerview.GameData
 				ParamNameList[i] = new string[MaxDataList[i]];
 			}
 
-			//パラメータ系CSV読み込み
-			loadDataTo(csvPath + "Abl.csv", ablIndex, null);
-			loadDataTo(csvPath + "Exp.csv", expIndex, null);
-			loadDataTo(csvPath + "Talent.csv", talentIndex, null);
-			loadDataTo(csvPath + "Palam.csv", palamIndex, null);
-			loadDataTo(csvPath + "Train.csv", trainIndex, null);
-			loadDataTo(csvPath + "Mark.csv", markIndex, null);
-			loadDataTo(csvPath + "Item.csv", itemIndex, null);
-			loadDataTo(csvPath + "Base.csv", baseIndex, null);
-			loadDataTo(csvPath + "Source.csv", sourceIndex, null);
-			loadDataTo(csvPath + "Equip.csv", equipIndex, null);
-			loadDataTo(csvPath + "Cflag.csv", cflagIndex, null);
 
-			//キャラクター系CSV読み込み
-			loadCharaDataTo(csvPath);
+			//テストINVOKE
+			Parallel.Invoke(
+				() =>
+				{
+					//パラメータ系CSV読み込み
+					loadDataTo(csvPath + "Abl.csv", ablIndex, null);
+					loadDataTo(csvPath + "Exp.csv", expIndex, null);
+					loadDataTo(csvPath + "Talent.csv", talentIndex, null);
+					loadDataTo(csvPath + "Palam.csv", palamIndex, null);
 
+				},
+				() =>
+				{
+					loadDataTo(csvPath + "Train.csv", trainIndex, null);
+					loadDataTo(csvPath + "Mark.csv", markIndex, null);
+					loadDataTo(csvPath + "Item.csv", itemIndex, null);
+					loadDataTo(csvPath + "Base.csv", baseIndex, null);
+				},
+				() =>
+				{
+					loadDataTo(csvPath + "Source.csv", sourceIndex, null);
+					loadDataTo(csvPath + "Equip.csv", equipIndex, null);
+					loadDataTo(csvPath + "Cflag.csv", cflagIndex, null);
+				},
+				() =>
+				{
+					//キャラクター系CSV読み込み
+					loadCharaDataTo(csvPath);
+				});
 			//for (int i = 0; i < 100; i++) 
 			//{
 			//	mf.WriteLabel(" " + i + "=" + ParamNameList[ablIndex][i]);
@@ -248,6 +269,9 @@ namespace Utau.Eramakerview.GameData
 								break;
 							case "バージョン違い認める":
 								gbData.defver = vtoken[1];
+								break;
+							case "コード":
+								gbData.code = vtoken[1];
 								break;
 							default:
 								break;
@@ -489,7 +513,7 @@ namespace Utau.Eramakerview.GameData
 			}
 			catch
 			{
-				mf.WriteLabel("  Index" + targetIndex + "でエラーが発生しました");
+				//.WriteLabel("  Index" + targetIndex + "でエラーが発生しました");
 				System.Media.SystemSounds.Hand.Play();
 				//予期しないエラーが発生しました
 			}
@@ -510,9 +534,10 @@ namespace Utau.Eramakerview.GameData
 			EraStreamReader eReader = new EraStreamReader(mf);
 			charaList = new CharacterTemplate[filepath.Length];//配列の要素数を決定
 			charaList[0].NAME = "あなた";
-			mf.WriteLabel("charaList.Length = " + charaList.Length + " charaList[0] = " + charaList[0].NAME);
+		//f.WriteLabel("charaList.Length = " + charaList.Length + " charaList[0] = " + charaList[0].NAME);
 
 			foreach (var paths in filepath.Select((s, i) => new { s, i }))
+			//Parallel.ForEach(filepath.Select((s, i) => new { s, i }), paths =>
 			{
 				if (!eReader.Open(paths.s))
 				{
@@ -520,11 +545,13 @@ namespace Utau.Eramakerview.GameData
 					continue;
 				}
 
-				if (paths.i == 10)
-				{
-					mf.WriteLabel("charaList[0].NAME = " + charaList[0].NAME);
-					return;
-				}
+				//テスト用.10人で返る
+
+				//if (paths.i == 10)
+				//{
+				//	mf.WriteLabel("charaList[0].NAME = " + charaList[0].NAME);
+				//	return;
+				//}
 
 				int count = paths.i;//ループカウンタ
 
@@ -532,6 +559,7 @@ namespace Utau.Eramakerview.GameData
 				{
 					string str = eReader.ReadLine();
 					string[] tokens = str.Split(',');
+
 
 					//文字列要素はここ
 					switch (tokens[0])
@@ -569,6 +597,7 @@ namespace Utau.Eramakerview.GameData
 								case "BASE":
 									t2 = int.Parse(tokens[2]);
 									charaList[count].BASE[t1] = t2;
+									mf.WriteLabel(charaList[count].NAME+ "BASE:"+charaList[count].BASE[t1]);
 									break;
 								case "素質":
 								case "TALENT":
@@ -612,6 +641,7 @@ namespace Utau.Eramakerview.GameData
 									if (t1 == -1)
 										continue;
 									charaList[count].BASE[t1] = int.Parse(tokens[2]);
+									mf.WriteLabel(charaList[count].NAME + "BASE:" + charaList[count].BASE[t1]);
 									break;
 								case "素質":
 								case "TALENT":
@@ -680,22 +710,6 @@ public struct CharacterTemplate
 	public int[] RELATION;
 	public int[] CFLAG;
 	public int[] EQUIP;
-
-	//LENGTH
-	//typeはenumでintにした方が綺麗？
-	/*
-	public void ADD(string type, int no, int data)
-	{
-		switch (type)
-		{
-			case "TALENT":
-				TALENT[no] = data;
-				break;
-
-
-		}
-	}
-	 */
 }
 
 public struct GameBaseData
@@ -706,4 +720,6 @@ public struct GameBaseData
 	public string year;
 	public string apendinfo;
 	public string defver;
+	public string code;
 }
+
