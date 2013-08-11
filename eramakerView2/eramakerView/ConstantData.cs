@@ -45,6 +45,7 @@ namespace Utau.Eramakerview.GameData
 		public ConstantData(MainForm mainForm)
 		{
 			mf = mainForm;//メインフォームへの参照
+			cTempList = new List<CharacterTemplate>();
 		}
 
 		MainForm mf;
@@ -83,35 +84,38 @@ namespace Utau.Eramakerview.GameData
 		//パラメータの名前を入れる
 		public string[][] ParamNameList = new string[countParam][];
 		//loadDataでcharaにデータを格納
-		CharacterTemplate[] charaList;
 		//GameBaseのデータを入れる
 		GameBaseData gbData = new GameBaseData();
+		//キャラクターデータを入れる
+		private List<CharacterTemplate> cTempList;
+		private Dictionary<string, int>[] RevDict = new Dictionary<string, int>[13];//逆引き辞書
+		private Dictionary<string, int> Dict = new Dictionary<string, int>();
+		private Dictionary<int, string> Dict2 = new Dictionary<int, string>();
 
 		//charaListを返す
-		public CharacterTemplate[] GetChara ()
+		public void GetCharaRef(out List<CharacterTemplate> chara)
 		{
-			//mf.WriteLabel("charalist = " + charaList[11].BASE[1] + "");
-			return charaList;
-		}
-		public void GetCharaRef(out CharacterTemplate []chara)
-		{
-			chara = charaList;
-			//charaList.CopyTo(chara, 0);
+			chara = cTempList;
 		}
 
-		public int[] GetVariableSize() 
+		public int[] GetVariableSize()
 		{
 			return MaxDataList;
 		}
 
-		public GameBaseData GetGameBase ()
+		public GameBaseData GetGameBase()
 		{
 			return gbData;
 		}
 
-		public string[][] GetParamName ()
+		public string[][] GetParamName()
 		{
 			return ParamNameList;
+		}
+		
+		public void GetParamDict(out Dictionary<string, int>[] pname)
+		{
+			pname = RevDict;
 		}
 
 		public void LoadData(string csvPath)
@@ -152,26 +156,32 @@ namespace Utau.Eramakerview.GameData
 					loadDataTo(csvPath + "Source.csv", sourceIndex, null);
 					loadDataTo(csvPath + "Equip.csv", equipIndex, null);
 					loadDataTo(csvPath + "Cflag.csv", cflagIndex, null);
-				},
-				() =>
-				{
-					//キャラクター系CSV読み込み
-					loadCharaDataTo(csvPath);
+
 				});
-			//for (int i = 0; i < 100; i++) 
-			//{
-			//	mf.WriteLabel(" " + i + "=" + ParamNameList[ablIndex][i]);
-			//}
-			//loadDataTo(csvPath + "Cstr.csv", ablIndex, null);
 
-			//charaDataをLoad
+			//逆引き辞書を作成
+			for (int i = 0; i < countParam; i++)
+			{
+				for (int j = 0; j < ParamNameList[i].Length; j++)
+				{
+					if (ParamNameList[i][j] != null && ParamNameList[i][j] != "")
+					{
+						if (Dict.ContainsKey(ParamNameList[i][j]))//今のところキーが重複していたら追加しない
+							continue;
+						Dict.Add(ParamNameList[i][j], j);
+					}
 
+				}
+
+				//RevDict[i] = Dict;
+				RevDict[i] = new Dictionary<string, int>(Dict);
+				//ここまではRevDictにちゃんと追加されている、ということは……
+				Dict.Clear();
+			}
+
+			//キャラクター系CSV読み込み
+			loadCharaDataFile(csvPath);
 		}
-
-		//loadDataでcharaにデータを格納
-		//CharacterTemplate[] charaList;
-		//GameBaseのデータを入れる
-		//GameBaseData[] gbdata;
 
 		//自分用
 		//プログラムにプログラムを書かせる
@@ -277,7 +287,7 @@ namespace Utau.Eramakerview.GameData
 								break;
 						}
 					}
-					else 
+					else
 					{
 						eReader.Close();
 						break;
@@ -316,13 +326,9 @@ namespace Utau.Eramakerview.GameData
 				{
 					str = eReader.ReadLine();//一行読み込み文字取得
 
-					//mf.WriteLabel("readline後 " + str + "←中身 \n" + eReader.EOF());
-					//eReader.ReadTest();
-					//mf.WriteLabel("a");
 					if (eReader.EOF() != true)//読み込めた
 					{
 						string[] vtoken = str.Split(',');
-						//mf.WriteLabel("b");
 						try
 						{
 							int.TryParse(vtoken[1], out o);//配列の二番目を数字に変換できるか
@@ -333,13 +339,13 @@ namespace Utau.Eramakerview.GameData
 								case "BASE":
 									if (o > MaxDataList[(int)CIntData.BASE])
 										MaxDataList[(int)CIntData.BASE] = o;
-									//mf.WriteLabel("。。" + vtoken[0] + " = " + MaxDataList[(int)CIntData.BASE] + "。。"+"い"+(int)CIntData.BASE+"い");
+									
 									break;
 								case "TALENTNAME":
 								case "TALENT":
 									if (o > MaxDataList[(int)CIntData.TALENT])
 										MaxDataList[(int)CIntData.TALENT] = o;
-									//mf.WriteLabel("。。" + vtoken[0] + " = " + MaxDataList[(int)CIntData.BASE] + "。。" + "い" + (int)CIntData.BASE + "い");
+							
 									break;
 								case "EXPNAME":
 								case "EXP":
@@ -388,21 +394,16 @@ namespace Utau.Eramakerview.GameData
 										MaxDataList[(int)CIntData.SOURCE] = o;
 									break;
 								default:
-									//mf.WriteLabel("d。。"+vtoken[0]+" = "+ o +"。。");
 									break;
 							}
 						}
 						catch
 						{
 							tmp++;
-							//mf.WriteLabel("e");
-							//mf.WriteLabel("数値に変換出来ませんでした。。。\n");
 						}
-
 					}
 					else
 					{
-						//mf.WriteLabel("f");
 						eReader.Close();//末尾に達した
 						break;
 					}
@@ -416,14 +417,12 @@ namespace Utau.Eramakerview.GameData
 			}
 			finally
 			{
-				for (int i = 0; i < 10; i++)
-				{
-					mf.WriteLabel("MAXDATALIST[" + i + "] = " + MaxDataList[i] + " \n");
-
-				}
+				//for (int i = 0; i < 10; i++)
+				//{
+					//mf.WriteLabel("MAXDATALIST[" + i + "] = " + MaxDataList[i] + " \n");
+				//}
 				eReader.Close();
 			}
-
 		}
 
 		//値の許容値を変更する
@@ -437,11 +436,6 @@ namespace Utau.Eramakerview.GameData
 				return;
 			}
 			string idtoken = tokens[0].Trim();
-			//idをゲットする
-			//if (id識別不可)
-			//if (2番目の値を整数値に変換できるかチェック)
-			//変換できたらLengthに入れる
-			//if (値が1000000以上)
 
 			//switchでコードによって分岐させ、MaxDataListにlength値を入れる
 			MaxDataList[0] = length;
@@ -450,7 +444,6 @@ namespace Utau.Eramakerview.GameData
 		//データ読みこみ
 		private void loadDataTo(string csvPath, int targetIndex, Int64[] targetI)
 		{
-			//mf.WriteLabel("h");
 			if (!File.Exists(csvPath))
 				return;
 
@@ -472,36 +465,33 @@ namespace Utau.Eramakerview.GameData
 					string[] tokens = str.Split(',');
 					if (!eReader.EOF() == true)
 					{
-						//mf.WriteLabel("a");
 						try
 						{
-							//mf.WriteLabel("b");
 							if (tokens.Length < 2)
 							{
 								//,が必要です
 								continue;
 							}
-							//mf.WriteLabel("c");
+
 							int index = 0;
+
 							if (!Int32.TryParse(tokens[0], out index))
 							{
 								//一つ目の値を整数値に変換できません
 								continue;
 							}
-							//mf.WriteLabel("d");
 							if ((index < 0) || (target.Length <= index))
 							{
 								//配列の範囲外です
 								continue;
 							}
-							//mf.WriteLabel("e");
 							target[index] = tokens[1];
 							//二度手間……
 							ParamNameList[targetIndex][index] = target[index];
 						}
 						catch
 						{
-							//mf.WriteLabel("f");
+
 						}
 					}
 					else
@@ -513,7 +503,6 @@ namespace Utau.Eramakerview.GameData
 			}
 			catch
 			{
-				//.WriteLabel("  Index" + targetIndex + "でエラーが発生しました");
 				System.Media.SystemSounds.Hand.Play();
 				//予期しないエラーが発生しました
 			}
@@ -523,193 +512,306 @@ namespace Utau.Eramakerview.GameData
 			}
 		}
 
-		public void loadCharaDataTo(string path)
+		//キャラデータをリストに追加
+		public void loadCharaDataFile(string path)
 		{
-
-			//キャラクターの数をカウント
-			int[] targeta = new int[100];
 			string[] filepath = Directory.GetFiles(path, "Chara*", System.IO.SearchOption.AllDirectories);
+			//Parallel.ForEach(filepath.Select((s, i) => new { s, i }), paths =>
 
+			Parallel.For(0, filepath.Length, i =>
+			{
+				string csvpath = filepath[i];
+				CharacterTemplate templ = null;
+
+				loadCharaDataTo(csvpath, out templ);
+
+				if (templ != null)
+					cTempList.Add(templ);
+			});
+		}
+
+		public void loadCharaDataTo(string path, out CharacterTemplate templa)
+		{
+			string filepath = path;
+			CharacterTemplate templb = new CharacterTemplate();
 			//中身を開いてテンプレへ保存
 			EraStreamReader eReader = new EraStreamReader(mf);
-			charaList = new CharacterTemplate[filepath.Length];//配列の要素数を決定
-			charaList[0].NAME = "あなた";
-		//f.WriteLabel("charaList.Length = " + charaList.Length + " charaList[0] = " + charaList[0].NAME);
+			Dictionary<string, int> tDics = null;
+			int flag0;
+			flag0 = 0;
 
-			foreach (var paths in filepath.Select((s, i) => new { s, i }))
-			//Parallel.ForEach(filepath.Select((s, i) => new { s, i }), paths =>
+			if (!eReader.Open(filepath))
 			{
-				if (!eReader.Open(paths.s))
+				//開けなかった
+				templa = null;
+				return;
+			}
+
+			while (!eReader.EOF() == true)
+			{
+				string str = eReader.ReadLine();
+				string[] tokens = str.Split(',');
+
+				//文字列要素はここ
+				switch (tokens[0])
 				{
-					//開けなかった
+					case "名前":
+					case "NAME":
+						templb.NAME = tokens[1];
+						break;
+					case "呼び名":
+					case "CALLNAME":
+						templb.CALLNAME = tokens[1];
+						break;
+					default:
+						break;
+				}
+				try
+				{
+					//*もし時間が掛かり過ぎるならcharalistの全要素をstringを文字形式にして
+					//配列にそのまま文字を入れる
+					int t1, t2,flag;
+					flag = 0;
+					//整数型要素はここ
+					//二番目の要素を数値に変換できる？
+					try
+					{
+						int.TryParse(tokens[1], out t1);
+						if (int.TryParse(tokens[1], out t1) == true)
+						{
+							flag = 1;
+						}
+						//値を代入していく
+						switch (tokens[0])
+						{
+							case "番号":
+							case "NO":
+								templb.NO = t1;
+								break;
+							case "基礎":
+							case "BASE":
+								t2 = int.Parse(tokens[2]);
+								
+								//0番の処理
+								if (flag == 1 && t1 == 0)
+								{
+									templb.Base[0] = t2;
+								}
+								
+								templb.Base.Add(t1, t2);
+								break;
+							case "素質":
+							case "TALENT":
+								//templb.Talent[t1] = 1;
+								//0番の処理
+								if (flag == 1 && t1 == 0)
+								{
+									templb.Talent[0] = 1;
+								}
+								templb.Talent.Add(t1, 1);
+								break;
+							case "能力":
+							case "ABL":
+								t2 = int.Parse(tokens[2]);
+								//0番の処理
+								if (flag == 1 && t1 == 0)
+								{
+									templb.Abl[0] = t2;
+								}
+								templb.Abl.Add(t1, t2);
+								break;
+							case "経験":
+							case "EXP":
+								t2 = int.Parse(tokens[2]);
+								//0番の処理
+								if (flag == 1 && t1 == 0)
+								{
+									templb.Exp[0] = t2;
+								}
+								templb.Exp.Add(t1, t2);
+								break;
+							case "相性":
+							case "RELATION":
+								t2 = int.Parse(tokens[2]);
+								
+								//0番の処理
+								if (flag == 1 && t1 == 0)
+								{
+									templb.Relation[0] = t2;
+								}
+								
+								templb.Relation.Add(t1, t2);
+								break;
+							case "EQUIP":
+							case "装着物":
+								break;
+							case "フラグ":
+							case "CFLAG":
+								t2 = int.Parse(tokens[2]);
+								//0番の処理
+								if (flag == 1 && t1 == 0)
+								{
+									templb.Cflag[0] = t2;
+									flag0 = 1;
+								}
+								templb.Cflag.Add(t1, t2);
+								break;
+							default:
+								continue;
+
+						}
+					}
+					//変換できなかったら配列から探す
+					catch
+					{
+						
+						switch (tokens[0])
+						{
+							case "基礎":
+							case "BASE":
+								//mf.WriteLabel(templb.NO + "番 in Base");
+								tDics = RevDict[baseIndex];
+								if (tDics.ContainsKey(tokens[1]) == false)
+									continue;
+								t1 = tDics[tokens[1]];
+								//if (t1 == 0) { templb.Base.Remove(0); }
+								//0番の処理
+								if (t1 == 0)
+								{
+									templb.Base[0] = int.Parse(tokens[2]);
+								}
+								templb.Base.Add(t1, int.Parse(tokens[2]));
+								//templb.Base[t1] = int.Parse(tokens[2]);
+								break;
+							case "素質":
+							case "TALENT":
+								tDics = RevDict[talentIndex];
+								if (tDics.ContainsKey(tokens[1]) == false)
+									continue;
+								t1 = tDics[tokens[1]];
+								//0番の処理
+								if (t1 == 0)
+								{
+									templb.Talent[0] = 1;
+								}
+								templb.Talent.Add(t1, 1);
+								//templb.Talent[t1] = 1;
+								break;
+							case "能力":
+							case "ABL":
+								tDics = RevDict[ablIndex];
+								if (tDics.ContainsKey(tokens[1]) == false)
+									continue;
+								t1 = tDics[tokens[1]];
+								//0番の処理
+								if (t1 == 0)
+								{
+									templb.Abl[0] = int.Parse(tokens[2]);
+								}
+								templb.Abl.Add(t1, int.Parse(tokens[2]));
+								break;
+							case "経験":
+							case "EXP":
+								tDics = RevDict[expIndex];
+								if (tDics.ContainsKey(tokens[1]) == false)
+									continue;
+								t1 = tDics[tokens[1]];
+								//0番の処理
+								if (t1 == 0)
+								{
+									templb.Exp[0] = int.Parse(tokens[2]);
+								}
+								templb.Exp.Add(t1, int.Parse(tokens[2]));
+								//templb.Exp[t1] = int.Parse(tokens[2]);
+								//デバッグ
+								//if (templb.CALLNAME == "春香") 
+								//{
+								//	mf.WriteLabel("EXP:" + t1 + " = " + int.Parse(tokens[2]));
+								//}
+								break;
+							case "EQUIP":
+							case "装着物":
+								break;
+							case "フラグ":
+							case "CFLAG":
+								tDics = RevDict[cflagIndex];
+								if (tDics.ContainsKey(tokens[1]) == false)
+									continue;
+								t1 = tDics[tokens[1]];
+								//0番の処理
+								if (t1 == 0)
+								{
+									templb.Cflag[0] = int.Parse(tokens[2]);
+									flag0 = 1;
+								}
+								templb.Cflag.Add(t1, int.Parse(tokens[2]));
+								break;
+							default:
+								continue;
+
+						}
+						 
+					}
+				}
+				//数値に変換出来なかった
+				catch
+				{
 					continue;
 				}
 
-				//テスト用.10人で返る
-
-				//if (paths.i == 10)
-				//{
-				//	mf.WriteLabel("charaList[0].NAME = " + charaList[0].NAME);
-				//	return;
-				//}
-
-				int count = paths.i;//ループカウンタ
-
-				while (!eReader.EOF() == true)
-				{
-					string str = eReader.ReadLine();
-					string[] tokens = str.Split(',');
-
-
-					//文字列要素はここ
-					switch (tokens[0])
-					{
-						case "名前":
-						case "NAME":
-							charaList[count].NAME = tokens[1];
-							break;
-						case "呼び名":
-						case "CALLNAME":
-							charaList[count].CALLNAME = tokens[1];
-							break;
-						default:
-							break;
-					}
-
-					try
-					{
-						//*もし時間が掛かり過ぎるならcharalistの全要素をstringを文字形式にして
-						//配列にそのまま文字を入れる
-						int t1, t2;
-						//整数型要素はここ
-						//二番目の要素を数値に変換できる？
-						try
-						{
-							int.TryParse(tokens[1], out t1);
-							//値を代入していく
-							switch (tokens[0])
-							{
-								case "番号":
-								case "NO":
-									charaList[count].NO = t1;
-									break;
-								case "基礎":
-								case "BASE":
-									t2 = int.Parse(tokens[2]);
-									charaList[count].BASE[t1] = t2;
-									mf.WriteLabel(charaList[count].NAME+ "BASE:"+charaList[count].BASE[t1]);
-									break;
-								case "素質":
-								case "TALENT":
-									t2 = int.Parse(tokens[2]);
-									charaList[count].TALENT[t1] = 1;
-									break;
-								case "能力":
-								case "ABL":
-									t2 = int.Parse(tokens[2]);
-									charaList[count].ABL[t1] = t2;
-									break;
-								case "経験":
-								case "EXP":
-									t2 = int.Parse(tokens[2]);
-									charaList[count].EXP[t1] = t2;
-									break;
-								case "相性":
-								case "relation":
-									break;
-								case "EQUIP":
-								case "装着物":
-									break;
-								case "フラグ":
-								case "CFLAG":
-									t2 = int.Parse(tokens[2]);
-									charaList[count].CFLAG[t1] = t2;
-									break;
-								default:
-									continue;
-
-							}
-						}
-						//変換できなかったら配列から探す
-						catch
-						{
-							switch (tokens[0])
-							{
-								case "基礎":
-								case "BASE":
-									t1 = Array.IndexOf(ParamNameList[baseIndex], tokens[1]);
-									if (t1 == -1)
-										continue;
-									charaList[count].BASE[t1] = int.Parse(tokens[2]);
-									mf.WriteLabel(charaList[count].NAME + "BASE:" + charaList[count].BASE[t1]);
-									break;
-								case "素質":
-								case "TALENT":
-									t1 = Array.IndexOf(ParamNameList[talentIndex], tokens[1]);
-									if (t1 == -1)
-										continue;
-									charaList[count].TALENT[t1] = int.Parse(tokens[2]);
-									break;
-								case "能力":
-								case "ABL":
-									t1 = Array.IndexOf(ParamNameList[ablIndex], tokens[1]);
-									if (t1 == -1)
-										continue;
-									charaList[count].ABL[t1] = int.Parse(tokens[2]);
-									break;
-								case "経験":
-								case "EXP":
-									t1 = Array.IndexOf(ParamNameList[expIndex], tokens[1]);
-									if (t1 == -1)
-										continue;
-									charaList[count].EXP[t1] = int.Parse(tokens[2]);
-									break;
-								case "EQUIP":
-								case "装着物":
-									break;
-								case "フラグ":
-								case "CFLAG":
-									t1 = Array.IndexOf(ParamNameList[cflagIndex], tokens[1]);
-									if (t1 == -1)
-										continue;
-									charaList[count].CFLAG[t1] = int.Parse(tokens[2]);
-									break;
-								default:
-									continue;
-
-							}
-						}
-					}
-					//数値に変換出来なかった
-					catch
-					{
-						continue;
-					}
-				}
-
 			}
+
+			//Cflag[0]が0かつ、CSVに明記されていない
+			if (flag0 == 0 && templb.Cflag[0] == 0)
+			{
+				templb.Cflag.Remove(0);
+			}
+			//SortedDictionary<int, int> stempl = new SortedDictionary<int, int>(templb.Cflag);
+			//List<int, int> stempl = new List<KeyValuePair<int, int>>(templb.Cflag);
+			//stempl.Sort(CompareKeyValuePair);
+			//templb.Cflag = stempl.ToDictionary(x => x.Key);
+			//Dictionary<KeyValuePair<int,int>>stempl2 = new Dictionary<KeyValuePair< int, int>>(stempl);
+
+			templa = templb;
+
+			//});
 		}//loadCharaDataTo
+
+		// 二つのKeyValuePair<string, int>を比較するためのメソッド
+		//static int CompareKeyValuePair(KeyValuePair<int, int> x, KeyValuePair<int, int> y);
 
 	}//class
 
 }//namespace
 
-
-	//キャラクターデータを格納するクラス型配列？
-public struct CharacterTemplate
+//キャラクターデータを格納するクラス型配列？
+public class CharacterTemplate
 {
+	/*
+	public CharacterTemplate() 
+	{
+		Base.Clear();
+		Talent.Clear();
+		Abl.Clear();
+		Exp.Clear();
+		Relation.Clear();
+		Cflag.Clear();
+	}
+	 */ 
+
 	public string NAME;
 	public string CALLNAME;
-
-	//配列はインデクサーかプロパティを使い、フェイルソフトに
 	public int NO;
-	public int[] BASE;
-	public int[] TALENT;
-	public int[] ABL;
-	public int[] EXP;
-	public int[] RELATION;
-	public int[] CFLAG;
-	public int[] EQUIP;
+
+	//初期化しない場合、一番最初の要素を0番目に入れてしまう
+	//初期化すると0番の要素を格納できない
+	public Dictionary<int, int> Base = new Dictionary<int, int>() { { 0, 0 } };
+	public Dictionary<int, int> Talent = new Dictionary<int, int>() { { 0, 0 } };
+	public Dictionary<int, int> Abl = new Dictionary<int, int>() { { 0, 0 } };
+	public Dictionary<int, int> Exp = new Dictionary<int, int>() { { 0, 0 } };
+	public Dictionary<int, int> Relation = new Dictionary<int, int>() { { 0, 0 } };
+	public Dictionary<int, int> Cflag = new Dictionary<int, int>() { { 0, 0 } };
+	//public Dictionary<int, int> Equip = new Dictionary<int, int>();
 }
 
 public struct GameBaseData

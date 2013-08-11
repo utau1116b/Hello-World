@@ -20,10 +20,13 @@ namespace Utau.Eramakerview
 		   label1.Text = "";
         }
 
-		CharacterTemplate[] charaList;
+		//CharacterTemplate[] charaList;
 		int[] valiableList;
 		string[][] pNameList;
 		GameBaseData gbData;
+
+		Dictionary<string, int>[] pNameDict = null;
+		List<CharacterTemplate> cList = null;
 
 		//TextBox1.Textを取得、設定するためのプロパティ
 		public string TextBoxText 
@@ -53,12 +56,42 @@ namespace Utau.Eramakerview
 			//時間測定/
 
 			//データコピー
-			this.charaList = cd.GetChara();
+			//this.charaList = cd.GetChara();
+			cd.GetCharaRef(out this.cList);
 			this.valiableList = cd.GetVariableSize();
+			cd.GetParamDict(out this.pNameDict);
 			this.pNameList = cd.GetParamName();
 			this.gbData = cd.GetGameBase();
 
-			return;
+			//例：春香さんデータ展開
+			/*
+			foreach (int i in cList[11].Exp.Keys)
+			{
+				int key = i;
+				this.WriteLabel("key = " + key + ",");
+			}
+			foreach (int i in cList[11].Exp.Values)
+			{
+				int key = i;
+				this.WriteLabel("value = " + key + ",");
+			}
+			 */ 
+			//this.WriteLabel("春香さんEXP:0 = " + cList[11].Exp[0]);
+			//this.WriteLabel("春香さんEXP:1 = " + cList[11].Exp[1]);
+			//this.WriteLabel("春香さんEXP:10 = " + cList[11].Exp[10]);
+			//this.WriteLabel("春香さんEXP:93 = " + cList[93].Exp[93]);
+			
+			//↓パラレルだからか毎回cList[1]の中身が違う
+			/*
+			foreach (KeyValuePair<int, int> pair in cList[1].Cflag)
+			{
+					//if (pair.Value >= 0)
+					//{
+						this.WriteLabel(cList[1].CALLNAME+"さんCFLAG" + pair.Key + ": = " + pair.Value);
+					//}
+			}
+			*/
+			//return;
 			//ここまで
 			//
 			//int temp;
@@ -67,7 +100,7 @@ namespace Utau.Eramakerview
 			//データ書き込み
 			Stopwatch sw2 = new Stopwatch();
 			sw2.Start();
-			OutputData od = new OutputData(this, gbData, pNameList, valiableList, charaList);
+			OutputData od = new OutputData(this, gbData, pNameList, valiableList, cList,pNameDict);
 			od.MakeHtml(CsvDir);
 			sw2.Stop();
 			long millisec2 = sw2.ElapsedMilliseconds;
