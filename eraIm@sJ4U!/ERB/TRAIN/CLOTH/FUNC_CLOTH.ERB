@@ -15,12 +15,12 @@ SIF ASSI != 0 && ASSI != -1
 	CALL CLOTHES_SETUP(ASSI)
 ;衣装を設定
 TEQUIP:MASTER:オプション1 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション1 # 0
-TEQUIP:MASTER:オプション2 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション2 # 0
-TEQUIP:MASTER:オプション3 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション3 # 0
-TEQUIP:MASTER:オプション4 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション4 # 0
-TEQUIP:MASTER:オプション5 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション5 # 0
+;TEQUIP:MASTER:オプション2 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション2 # 0
+;TEQUIP:MASTER:オプション3 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション3 # 0
+;TEQUIP:MASTER:オプション4 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション4 # 0
+;TEQUIP:MASTER:オプション5 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:オプション5 # 0
 TEQUIP:MASTER:頭 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:頭 # 0
-TEQUIP:MASTER:手 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:手 # 0
+;TEQUIP:MASTER:手 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:手 # 0
 TEQUIP:MASTER:靴下 = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:靴下 # 0
 TEQUIP:MASTER:下着（下） = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:下着（下） # 0
 TEQUIP:MASTER:下着（上） = CFLAG:MASTER:脱衣レベル < 2 ? EQUIP:MASTER:下着（上） # 0
@@ -34,12 +34,12 @@ TEQUIP:MASTER:コスプレ服 = CFLAG:MASTER:脱衣レベル < 1 ? EQUIP:MASTER:コスプレ服
 ;結婚指輪は外せない
 ;TEQUIP:MASTER:エンゲージリング = EQUIP:MASTER:エンゲージリング
 TEQUIP:TARGET:オプション1 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション1 # 0
-TEQUIP:TARGET:オプション2 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション2 # 0
-TEQUIP:TARGET:オプション3 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション3 # 0
-TEQUIP:TARGET:オプション4 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション4 # 0
-TEQUIP:TARGET:オプション5 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション5 # 0
+;TEQUIP:TARGET:オプション2 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション2 # 0
+;TEQUIP:TARGET:オプション3 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション3 # 0
+;TEQUIP:TARGET:オプション4 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション4 # 0
+;TEQUIP:TARGET:オプション5 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:オプション5 # 0
 TEQUIP:TARGET:頭 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:頭 # 0
-TEQUIP:TARGET:手 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:手 # 0
+;TEQUIP:TARGET:手 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:手 # 0
 TEQUIP:TARGET:靴下 = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:靴下 # 0
 TEQUIP:TARGET:下着（下） = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:下着（下） # 0
 TEQUIP:TARGET:下着（上） = CFLAG:TARGET:脱衣レベル < 2 ? EQUIP:TARGET:下着（上） # 0
@@ -63,14 +63,16 @@ IF ARG == 1 || !ARG
 	RESETCOLOR
 	PRINTFORM の衣装：
 	PRINTFORM \@ TEQUIP:TARGET:コスプレ服 ? [%COSPLAY(TARGET)%] # \@\@ TEQUIP:TARGET:上下一体服 ? [%DRESS(TARGET)%] # \@\@ TEQUIP:TARGET:アウター ? [%OUTER_T(TARGET)%] # \@\@ TEQUIP:TARGET:インナー ? [%OUTER_T2(TARGET)%] # \@\@ TEQUIP:TARGET:ボトムス ? [%OUTER_B(TARGET)%] # \@\@ TEQUIP:TARGET:下着（上下一体） ? [%INNER_TB(TARGET)%] # \@\@ TEQUIP:TARGET:下着（上） ? [%INNER_T(TARGET)%] # \@
-	PRINTFORM \@ TEQUIP:TARGET:下着（下） ? [%INNER_B(TARGET)%] # \@\@ TEQUIP:TARGET:靴下 ? [%SOCKS(TARGET)%] # \@\@ TEQUIP:TARGET:手 ? [%GLOVES(TARGET)%] # \@\@ TEQUIP:TARGET:頭 ? [%HEAD(TARGET)%] # \@\@ TEQUIP:TARGET:オプション1 ? [%ACCESSORY1(TARGET)%] # \@
-	PRINTFORML \@  TEQUIP:TARGET:オプション2 ? [%ACCESSORY1(TARGET, , 2)%] # \@\@  TEQUIP:TARGET:オプション3 ? [%ACCESSORY1(TARGET, , 3)%] #  \@\@ TEQUIP:TARGET:オプション4 ? [%ACCESSORY1(TARGET, , 4)%] # \@\@ TEQUIP:TARGET:オプション5 ? [%ACCESSORY1(TARGET, , 5)%] #  \@
+;	PRINTFORM \@ TEQUIP:TARGET:下着（下） ? [%INNER_B(TARGET)%] # \@\@ TEQUIP:TARGET:靴下 ? [%SOCKS(TARGET)%] # \@\@ TEQUIP:TARGET:手 ? [%GLOVES(TARGET)%] # \@\@ TEQUIP:TARGET:頭 ? [%HEAD(TARGET)%] # \@\@ TEQUIP:TARGET:オプション1 ? [%ACCESSORY1(TARGET)%] # \@
+	PRINTFORM \@ TEQUIP:TARGET:下着（下） ? [%INNER_B(TARGET)%] # \@\@ TEQUIP:TARGET:靴下 ? [%SOCKS(TARGET)%] # \@\@ TEQUIP:TARGET:頭 ? [%HEAD(TARGET)%] # \@\@ TEQUIP:TARGET:オプション1 ? [%ACCESSORY1(TARGET)%] # \@
+	;PRINTFORML \@  TEQUIP:TARGET:オプション2 ? [%ACCESSORY1(TARGET, , 2)%] # \@\@  TEQUIP:TARGET:オプション3 ? [%ACCESSORY1(TARGET, , 3)%] #  \@\@ TEQUIP:TARGET:オプション4 ? [%ACCESSORY1(TARGET, , 4)%] # \@\@ TEQUIP:TARGET:オプション5 ? [%ACCESSORY1(TARGET, , 5)%] #  \@
 ENDIF
 IF ARG == 2 || !ARG
 	PRINTFORM %CALLNAME:MASTER, 10%の衣装：
 	PRINTFORM \@ TEQUIP:MASTER:コスプレ服 ? [%COSPLAY(MASTER)%] # \@\@ TEQUIP:MASTER:上下一体服 ? [%DRESS(MASTER)%] # \@\@ TEQUIP:MASTER:アウター ? [%OUTER_T(MASTER)%] # \@\@ TEQUIP:MASTER:インナー ? [%OUTER_T2(MASTER)%] # \@\@ TEQUIP:MASTER:ボトムス ? [%OUTER_B(MASTER)%] # \@\@ TEQUIP:MASTER:下着（上下一体） ? [%INNER_TB(MASTER)%] # \@\@ TEQUIP:MASTER:下着（上） ? [%INNER_T(MASTER)%] # \@
-	PRINTFORM \@ TEQUIP:MASTER:下着（下） ? [%INNER_B(MASTER)%] # \@\@ TEQUIP:MASTER:靴下 ? [%SOCKS(MASTER)%] # \@\@ TEQUIP:MASTER:手 ? [%GLOVES(MASTER)%] # \@\@ TEQUIP:MASTER:頭 ? [%HEAD(MASTER)%] # \@\@ TEQUIP:MASTER:オプション1 ? [%ACCESSORY1(MASTER)%] # \@
-	PRINTFORML \@  TEQUIP:MASTER:オプション2 ? [%ACCESSORY1(MASTER, , 2)%] # \@\@  TEQUIP:MASTER:オプション3 ? [%ACCESSORY1(MASTER, , 3)%] #  \@\@ TEQUIP:MASTER:オプション4 ? [%ACCESSORY1(MASTER, , 4)%] # \@\@ TEQUIP:MASTER:オプション5 ? [%ACCESSORY1(MASTER, , 5)%] #  \@
+;	PRINTFORM \@ TEQUIP:MASTER:下着（下） ? [%INNER_B(MASTER)%] # \@\@ TEQUIP:MASTER:靴下 ? [%SOCKS(MASTER)%] # \@\@ TEQUIP:MASTER:手 ? [%GLOVES(MASTER)%] # \@\@ TEQUIP:MASTER:頭 ? [%HEAD(MASTER)%] # \@\@ TEQUIP:MASTER:オプション1 ? [%ACCESSORY1(MASTER)%] # \@
+	PRINTFORM \@ TEQUIP:MASTER:下着（下） ? [%INNER_B(MASTER)%] # \@\@ TEQUIP:MASTER:靴下 ? [%SOCKS(MASTER)%] # \@\@ TEQUIP:MASTER:頭 ? [%HEAD(MASTER)%] # \@\@ TEQUIP:MASTER:オプション1 ? [%ACCESSORY1(MASTER)%] # \@
+	;PRINTFORML \@  TEQUIP:MASTER:オプション2 ? [%ACCESSORY1(MASTER, , 2)%] # \@\@  TEQUIP:MASTER:オプション3 ? [%ACCESSORY1(MASTER, , 3)%] #  \@\@ TEQUIP:MASTER:オプション4 ? [%ACCESSORY1(MASTER, , 4)%] # \@\@ TEQUIP:MASTER:オプション5 ? [%ACCESSORY1(MASTER, , 5)%] #  \@
 ENDIF
 
 ;────────────────────────────────────
@@ -80,14 +82,15 @@ ENDIF
 ;────────────────────────────────────
 @CLOTHES_SETUP(ARG)
 ;衣装未設定（デフォ全裸）の場合のみここで設定
-IF !(EQUIP:ARG:オプション1+EQUIP:ARG:オプション2+EQUIP:ARG:オプション3+EQUIP:ARG:オプション4+EQUIP:ARG:オプション5+EQUIP:ARG:靴下+EQUIP:ARG:頭+EQUIP:ARG:手+EQUIP:ARG:靴下+EQUIP:ARG:コスプレ服+EQUIP:ARG:下着（下）+EQUIP:ARG:下着（上）+EQUIP:ARG:アウター+EQUIP:ARG:ボトムス+EQUIP:ARG:インナー+EQUIP:ARG:上下一体服+EQUIP:ARG:下着（上下一体）)
+;IF !(EQUIP:ARG:オプション1+EQUIP:ARG:オプション2+EQUIP:ARG:オプション3+EQUIP:ARG:オプション4+EQUIP:ARG:オプション5+EQUIP:ARG:靴下+EQUIP:ARG:頭+EQUIP:ARG:手+EQUIP:ARG:靴下+EQUIP:ARG:コスプレ服+EQUIP:ARG:下着（下）+EQUIP:ARG:下着（上）+EQUIP:ARG:アウター+EQUIP:ARG:ボトムス+EQUIP:ARG:インナー+EQUIP:ARG:上下一体服+EQUIP:ARG:下着（上下一体）)
+IF !(EQUIP:ARG:オプション1+EQUIP:ARG:靴下+EQUIP:ARG:頭+EQUIP:ARG:靴下+EQUIP:ARG:コスプレ服+EQUIP:ARG:下着（下）+EQUIP:ARG:下着（上）+EQUIP:ARG:アウター+EQUIP:ARG:ボトムス+EQUIP:ARG:インナー+EQUIP:ARG:上下一体服+EQUIP:ARG:下着（上下一体）)
 	;オトコの場合、トランクス・シャツ・ネクタイ・ソックス・スラックス・ジャケット・ネクタイ
 	IF TALENT:ARG:オトコ
 		EQUIP:ARG:下着（下） = 3
 		EQUIP:ARG:アウター = 8
 		EQUIP:ARG:インナー = 2
 		EQUIP:ARG:ボトムス = 17
-		EQUIP:ARG:オプション5 = 2
+		;EQUIP:ARG:オプション5 = 2
 		EQUIP:ARG:靴下 = 1
 	;貧乳、絶壁の場合、パンティ・キャミソール・ワンピース
 	ELSEIF TALENT:ARG:貧乳 || TALENT:ARG:絶壁
@@ -185,6 +188,7 @@ ENDSELECT
 ;-------------------------------------------------
 @GLOVES(ARG:0, ARG:1)
 #FUNCTIONS
+[SKIPSTART]
 SELECTCASE EQUIP:(ARG:0):手
 	;手袋
 	CASE 1
@@ -202,7 +206,7 @@ SELECTCASE EQUIP:(ARG:0):手
 	CASE 6
 		RETURNF "ブレスレット"
 ENDSELECT
-
+[SKIPEND]
 ;-------------------------------------------------
 ;関数名:SOCKS
 ;概　要:服装名取得関数(靴下)
@@ -404,7 +408,7 @@ ENDSELECT
 SELECTCASE EQUIP:(ARG:0):アウター
 	;キャミソール
 	CASE 1
-		RETURNF \@ ARG:1 ? キャミ # キャミソール \@
+		RETURNF \@ ARG:1 ? キャミドレス # キャミソールドレス \@
 	;シャツ
 	CASE 2
 		RETURNF "シャツ"
@@ -470,8 +474,15 @@ SELECTCASE EQUIP:(ARG:0):アウター
 	;タートルネック
 	CASE 23
 		RETURNF "タートルネック"
+	;スクールセーター
 	CASE 24
 		RETURNF "スクールセーター"
+	;ボレロ
+	CASE 25
+		RETURNF "ボレロ"
+	;ミニワンピース
+	CASE 26
+		RETURNF \@ ARG:2 ? ミニワンピ # ミニワンピース \@
 	;無し
 	CASE 0
 		RETURNF \@ ARG:2 ? %DRESS(ARG:0, ARG:1)% # \@
@@ -687,6 +698,8 @@ SELECTCASE EQUIP:(ARG:0):LOCAL
 		RETURNF "エプロン"
 	CASE 5
 		RETURNF "ピアス"
+	CASE 6
+		RETURNF "マント"
 ENDSELECT
 
 ;-------------------------------------------------

@@ -89,6 +89,7 @@ ENDSELECT
 ;-------------------------------------------------
 @HAIRSTRETCH(ARG:0, ARG:1)
 #FUNCTIONS
+[SKIPSTART]
 SELECTCASE CFLAG:(ARG:0):髪の伸縮
 	CASE 1
 		RETURNF  \@ ARG:1 ? ストレート # ストレートヘア \@
@@ -109,6 +110,7 @@ SELECTCASE CFLAG:(ARG:0):髪の伸縮
 	CASEELSE
 		RETURNF  "－－－"
 ENDSELECT
+[SKIPEND]
 ;-------------------------------------------------
 ;関数名:HAIRSTYLE
 ;概　要:髪型取得関数(カスタム衣装)
@@ -201,6 +203,10 @@ SELECTCASE CFLAG:(ARG:0):髪型
 		RETURNF  "マッシュ"
 	CASE 40
 		RETURNF  \@ ARG:1 ? 七三 # 七三分け \@
+	CASE 41
+		RETURNF  "ミディアムレイヤー"
+	CASE 42
+		RETURNF  "ベッカムヘアー"
 	CASEELSE
 		RETURNF  "－－－"
 ENDSELECT
@@ -216,6 +222,7 @@ ENDSELECT
 ;-------------------------------------------------
 @HAIROPTION(ARG:0, ARG:1, ARG:2)
 #FUNCTIONS
+[SKIPSTART]
 IF ARG:2
 	LOCAL = CFLAG:(ARG:0):髪オプション2
 ELSE
@@ -252,6 +259,7 @@ SELECTCASE LOCAL
 	CASEELSE
 		RETURNF  "－－－"
 ENDSELECT
+[SKIPEND]
 ;-------------------------------------------------
 ;関数名:EYECOLOR
 ;概　要:瞳の色取得関数(カスタム衣装)
@@ -263,6 +271,7 @@ ENDSELECT
 ;-------------------------------------------------
 @EYECOLOR(ARG:0, ARG:1)
 #FUNCTIONS
+[SKIPSTART]
 SELECTCASE CFLAG:(ARG:0):瞳の色
 	CASE 1
 		RETURNF  \@ ARG:1 ? グリーン # 緑眼 \@
@@ -285,6 +294,7 @@ SELECTCASE CFLAG:(ARG:0):瞳の色
 	CASEELSE
 		RETURNF  "－－－"
 ENDSELECT
+[SKIPEND]
 ;-------------------------------------------------
 ;関数名:EYESTYLE
 ;概　要:髪色名取得関数(カスタム衣装)
@@ -297,7 +307,7 @@ ENDSELECT
 ;-------------------------------------------------
 @EYESTYLE(ARG:0, ARG:1, ARG:2)
 #FUNCTIONS
-
+[SKIPSTART]
 SELECTCASE CFLAG:(ARG:0):瞳の形
 	CASE 1
 		RETURNF  "タレ目"
@@ -316,6 +326,7 @@ SELECTCASE CFLAG:(ARG:0):瞳の形
 	CASEELSE
 		RETURNF  "－－－"
 ENDSELECT
+[SKIPEND]
 ;-------------------------------------------------
 ;関数名:SKINCOLOR
 ;概　要:肌色取得関数(カスタム衣装)
@@ -327,7 +338,7 @@ ENDSELECT
 ;-------------------------------------------------
 @SKINCOLOR(ARG:0, ARG:1)
 #FUNCTIONS
-
+[SKIPSTART]
 SELECTCASE CFLAG:(ARG:0):肌の色
 	CASE 1
 		RETURNF  "色白"
@@ -336,6 +347,7 @@ SELECTCASE CFLAG:(ARG:0):肌の色
 	CASEELSE
 		RETURNF  "－－－"
 ENDSELECT
+[SKIPEND]
 ;-------------------------------------------------
 ;関数名:PERSONALITY
 ;概　要:性格取得関数(カスタム衣装)
@@ -379,7 +391,7 @@ SELECTCASE CFLAG:(ARG:0):性格
 	CASE 14
 		RETURNF  "自信家"
 	CASE 15
-		RETURNF  ""
+		RETURNF  "ナルシスト"
 	CASE 16
 		RETURNF  "甘えん坊"
 	CASE 17
@@ -537,9 +549,9 @@ ENDSELECT
 @FLAVOR(ARG:0, ARG:1, ARG:2)
 #FUNCTIONS
 IF ARG:2 == 5
-	LOCAL = CFLAG:(ARG:0):フレーバー5
+	;LOCAL = CFLAG:(ARG:0):フレーバー5
 ELSEIF ARG:2 == 4
-	LOCAL = CFLAG:(ARG:0):フレーバー4
+	;LOCAL = CFLAG:(ARG:0):フレーバー4
 ELSEIF ARG:2 == 3
 	LOCAL = CFLAG:(ARG:0):フレーバー3
 ELSEIF ARG:2 == 2
@@ -585,9 +597,9 @@ SELECTCASE LOCAL
 	CASE 17
 		RETURNF  "ドジっ娘"
 	CASE 18
-		RETURNF  "姉"
+		RETURNF  \@ TALENT:ARG:オトコ ? 兄 # 姉 \@
 	CASE 19
-		RETURNF  "妹"
+		RETURNF  \@ TALENT:ARG:オトコ ? 弟 # 妹 \@
 	CASE 20
 		RETURNF  ""
 	CASE 21
