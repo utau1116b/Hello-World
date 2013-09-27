@@ -77,6 +77,11 @@ SIF TEQUIP:ARG:シャワー
 ;新妻プレイ中
 SIF TEQUIP:ARG:新妻プレイ
 	CALL EQUIP_COM新妻プレイ(ARG)
+
+;コスプレ中
+SIF TEQUIP:ARG:65 > 0
+	CALL EQUIP_COMコスプレ(ARG)
+
 ;挿入中
 IF ARG != PLAYER
 	SIF TEQUIP:ARG:50 >= 0 && !SOURCE:ARG:快Ｖ

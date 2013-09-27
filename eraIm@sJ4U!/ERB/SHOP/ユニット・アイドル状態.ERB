@@ -1,0 +1,505 @@
+;アイドルの状態に関わることはここで管理
+@STATE_MANAGEMR(ARGS,ARG)
+SELECTCASE ARGS
+	CASE "仕事成功"
+		CALL RELATIONS_UP(3)
+		CALL SINMITSU_UP(4)
+		CALL STRESS_UP(300)
+	CASE "仕事失敗"
+		CALL RELATIONS_UP(-1)
+		CALL STRESS_UP(300)
+	CASE "営業成功"
+		CALL RELATIONS_UP(2)
+		CALL SINMITSU_UP(2)
+		CALL STRESS_UP(100)
+	CASE "営業失敗"
+		CALL RELATIONS_UP(-1)
+		CALL STRESS_UP(100)
+	CASE "夜"
+		CALL SINMITSU_UP(-1)
+		CALL STRESS_UP(-200,1)
+		IF TARGET > 0 && ASSI > 0
+			relations:TARGET:ASSI++
+			relations:ASSI:TARGET++
+		ENDIF
+		CALL STATE_MANAGEMR("リフレッシュ")
+		CALL CHECK_ILLNESS
+		CALL IDOL_STATE_RENEW
+		CALL UNIT_STATE_RENEW
+	CASE "おやすみ"
+		CALL RELATIONS_UP(3)
+		CALL SINMITSU_UP(3)
+		CALL STRESS_UP(-500,1)
+		FOR LOCAL, 0, CHARANUM
+			SIF CFLAG:LOCAL:勧誘状況 != -1
+				CONTINUE
+			;別れ中はスキップ
+			SIF CFLAG:LOCAL:21
+				CONTINUE
+			SIF LOCAL == MASTER
+				CONTINUE
+			SIF TALENT:LOCAL:病気 > 0
+				TALENT:LOCAL:病気 --
+		NEXT
+	CASE "リフレッシュ"
+		FOR LOCAL, 0, CHARANUM
+			SIF CFLAG:LOCAL:勧誘状況 != -1
+				CONTINUE
+			;別れ中はスキップ
+			SIF CFLAG:LOCAL:21
+				CONTINUE
+			SIF LOCAL == MASTER
+				CONTINUE
+			;待機中動作がリフレッシュのとき
+			IF CFLAG:LOCAL:待機中行動 == 2
+				BASE:LOCAL:ストレス -= 500
+				SIF BASE:LOCAL:ストレス > 10000
+					BASE:LOCAL:ストレス = 10000
+				SIF BASE:LOCAL:ストレス < 0
+					BASE:LOCAL:ストレス = 0
+				SIF TALENT:LOCAL:病気 > 0
+					TALENT:LOCAL:病気 --
+			ENDIF
+		NEXT
+	CASE "アイドルにお任せ"
+		CALL STRESS_UP(100)
+	CASEELSE
+		PRINTFORMW エラー！ARGSが不明な文字列「%ARGS%」です（@STATE_MANAGER）
+ENDSELECT
+RETURN 0
+;relations	……キャラクター間の親密度
+;親密度		……ユニットに対する信頼度
+;ストレス	……仕事をすると溜まっていく
+
+;病気になっていないかチェックする
+@CHECK_ILLNESS
+VARSET LOCAL
+
+FOR LOCAL, 0, CHARANUM
+	SIF CFLAG:LOCAL:勧誘状況 != -1
+		CONTINUE
+	;別れ中はスキップ
+	SIF CFLAG:LOCAL:21
+		CONTINUE
+	SIF LOCAL == MASTER
+		CONTINUE
+	;ストレスなければスキップ
+	SIF BASE:LOCAL:ストレス <= 0
+		CONTINUE
+	SIF TALENT:LOCAL:病気
+		CONTINUE
+		
+	;ここから病気判定
+	LOCAL:1 = BASE:LOCAL:ストレス
+	SELECTCASE LOCAL:1
+		CASE 0 TO 2999
+			LOCAL:2 = 0
+		CASE 3000 TO 4999
+			LOCAL:2 = (LOCAL:1 - 2000) * 2 / 100
+		CASE 5000 TO 6999
+			LOCAL:2 = LOCAL:1 * 3 / 100
+		CASE 7000 TO 9999
+			LOCAL:2 = LOCAL:1 / 10
+		CASE 10000
+			LOCAL:2 = 10000
+		CASEELSE
+	ENDSELECT
+	;POWER LOCAL:1, BASE:ARG:ストレス, 2
+	;LOCAL:1 = LOCAL:1 * 15 / 32
+	IF (RAND:10000 < LOCAL:2) && TALENT:LOCAL:病気 == 0
+		PRINTFORMW 疲労の蓄積した%CALLNAME:LOCAL%は[病気]になってしまった……
+		TALENT:LOCAL:病気 = 11
+		CFLAG:LOCAL:アイドル状態 = [[状態:病気]]
+	ENDIF
+	
+	IF TALENT:LOCAL:病気 == 1
+		PRINTFORMW どうやら%CALLNAME:LOCAL%は病気を克服できたようだ
+		PRINTFORMW %CALLNAME:LOCAL%の[病気]が治癒した
+		TALENT:LOCAL:病気 = 0
+		CFLAG:LOCAL:アイドル状態 = 0
+	ENDIF
+NEXT
+
+@IDOL_STATE_RENEW
+FOR LOCAL, 0, CHARANUM
+	SIF CFLAG:LOCAL:勧誘状況 != -1
+		CONTINUE
+	;別れ中はスキップ
+	SIF CFLAG:LOCAL:21
+		CONTINUE
+	SIF LOCAL == MASTER
+		CONTINUE
+		
+	CFLAG:LOCAL:アイドル状態 = 0
+;	SIF TALENT:LOCAL:覚醒
+;		CFLAG:LOCAL:アイドル状態 = [[状態:覚醒]]
+	IF TALENT:LOCAL:病気
+		CFLAG:LOCAL:アイドル状態 = [[状態:病気]]
+		CONTINUE
+	ENDIF
+	SIF CHECK_喧嘩(LOCAL)
+		CONTINUE
+	SIF CHECK_有頂天(LOCAL)
+		CONTINUE
+	;SIF CHECK_覚醒(LOCAL)
+	;	CONTINUE
+	SIF CHECK_かしまし(LOCAL)
+		CONTINUE
+	SIF CHECK_鼻歌_キラキラ_小躍り(LOCAL)
+		CONTINUE
+NEXT
+
+;ユニットメンバーだけでok
+FOR LOCAL, 1080, 1085
+	SIF FLAG:LOCAL <= 0
+		CONTINUE
+	SIF CFLAG:(FLAG:LOCAL):アイドル状態
+		CONTINUE
+	SIF CHECK_喧嘩(FLAG:LOCAL)
+		CONTINUE
+	SIF CHECK_有頂天(FLAG:LOCAL)
+		CONTINUE
+	SIF CHECK_かしまし(FLAG:LOCAL)
+		CONTINUE
+	SIF CHECK_鼻歌_キラキラ_小躍り(FLAG:LOCAL)
+		CONTINUE
+	SIF CHECK_覚醒(FLAG:LOCAL)
+		CONTINUE
+	CFLAG:(FLAG:LOCAL):アイドル状態 = 0
+NEXT
+
+;ユニット状態を更新
+@UNIT_STATE_RENEW
+
+VARSET LOCAL
+
+FLAG:ユニット状態 = 0
+;大団円…全員かしまし
+IF CMATCH(CFLAG:アイドル状態,[[状態:かしまし]],FLAG:1080,FLAG:1085) == メンバー数()
+	FLAG:ユニット状態 = 1
+ELSE
+	FOR LOCAL, 1080, 1085
+		SIF FLAG:LOCAL <= 0
+			CONTINUE
+		SIF CFLAG:(FLAG:LOCAL):アイドル状態 == [[状態:鼻歌]]
+			LOCAL:1++
+		SIF CFLAG:(FLAG:LOCAL):アイドル状態 == [[状態:キラキラ]]
+			LOCAL:2++
+		SIF CFLAG:(FLAG:LOCAL):アイドル状態 == [[状態:小躍り]]
+			LOCAL:3++
+		SIF CFLAG:(FLAG:LOCAL):アイドル状態 == [[状態:かしまし]]
+			LOCAL:4++
+		SIF CFLAG:(FLAG:LOCAL):アイドル状態 == [[状態:覚醒]]
+			LOCAL:5++
+		SIF CFLAG:(FLAG:LOCAL):アイドル状態 == [[状態:普通]]
+			LOCAL:6++
+	NEXT
+	;大合唱(鼻歌＋かしまし＋覚醒＋普通の数がユニットメンバー数と同じ)
+	SIF LOCAL:1 + LOCAL:4 + LOCAL:5 + LOCAL:6 == メンバー数()
+		FLAG:ユニット状態 = 3
+	;スーパースター(鼻歌＋かしまし＋覚醒＋普通の数がユニットメンバー数と同じ)
+	SIF LOCAL:2 + LOCAL:4 + LOCAL:5 + LOCAL:6 == メンバー数()
+		FLAG:ユニット状態 = 4
+	;ダンサブル(鼻歌＋かしまし＋覚醒＋普通の数がユニットメンバー数と同じ)
+	SIF LOCAL:3 + LOCAL:4 + LOCAL:5 + LOCAL:6 == メンバー数()
+		FLAG:ユニット状態 = 5
+ENDIF
+
+;SIF FLAG:ユニット状態
+;	RETURN 0
+
+VARSET LOCAL
+
+FOR LOCAL, 1080, 1085
+	SIF FLAG:LOCAL <= 0
+		CONTINUE
+	SIF CFLAG:(FLAG:LOCAL):アイドル状態 == [[状態:有頂天]]
+		LOCAL:1 ++
+	SIF CFLAG:(FLAG:LOCAL):アイドル状態 == [[状態:喧嘩]]
+		LOCAL:2 ++
+NEXT
+SELECTCASE メンバー数()
+	CASE 1
+		FLAG:ユニット状態 = 0
+	CASE 2
+		IF LOCAL:2 == 2
+			FLAG:ユニット状態 = 2
+		ELSE
+			FLAG:ユニット状態 = 0
+		ENDIF
+	CASE 3
+		IF LOCAL:2 == 2
+			FLAG:ユニット状態 = 2
+		ELSEIF LOCAL:1 == 1
+			FLAG:ユニット状態 = 6
+		ELSE
+			FLAG:ユニット状態 = 0
+		ENDIF
+	CASE 4
+		IF LOCAL:2 >= 2
+			FLAG:ユニット状態 = 2
+		ELSEIF LOCAL:1 == 1 || LOCAL:1 ==2
+			FLAG:ユニット状態 = 6
+		ELSE
+			FLAG:ユニット状態 = 0
+		ENDIF
+	CASE 5
+		IF LOCAL:2 >= 3
+			FLAG:ユニット状態 = 2
+		ELSEIF LOCAL:1 == 1 || LOCAL:1 ==2
+			FLAG:ユニット状態 = 6
+		ELSE
+			FLAG:ユニット状態 = 0
+		ENDIF
+ENDSELECT
+
+RETURN 0
+
+;ARG,上昇量
+;ARG:1,相性補正有
+@RELATIONS_UP(ARG,ARG:1)
+VARSET LOCAL
+FOR LOCAL,1080, 1085
+	IF FLAG:LOCAL > 0
+		FOR LOCAL:1, 1080, 1085
+			SIF LOCAL:1 == LOCAL
+				CONTINUE
+			IF FLAG:(LOCAL:1) > 0
+				relations:(FLAG:LOCAL):(FLAG:(LOCAL:1)) += ARG
+				IF ARG:1
+					IF RELATION:(FLAG:LOCAL):(FLAG:(LOCAL:1)) >= 120
+						LOCAL:2 = 1
+					;RELATIONは基本0
+					ELSEIF RELATION:(FLAG:LOCAL):(FLAG:(LOCAL:1)) <= 80
+						SIF ARG > 0
+							LOCAL:2 = -1
+					ELSE
+						LOCAL:2 = 0
+					ENDIF
+					SIF RELATION:(FLAG:LOCAL):(FLAG:(LOCAL:1)) == 0
+						LOCAL:2 = 0
+					relations:(FLAG:LOCAL):(FLAG:(LOCAL:1)) += LOCAL:2
+				ENDIF
+			ENDIF
+		NEXT
+	ENDIF
+NEXT
+
+@SINMITSU_UP(ARG)
+FOR LOCAL, 1080, 1085
+	SIF FLAG:LOCAL > 0
+		BASE:(FLAG:LOCAL):親密度 += ARG
+NEXT
+
+;ARG	上昇量
+;ARG:1	0,ユニットのみ上昇	1,全員上昇
+@STRESS_UP(ARG,ARG:1)
+IF ARG:1 == 0
+	FOR LOCAL, 1080, 1085
+		SIF FLAG:LOCAL <= 0
+			CONTINUE
+		BASE:(FLAG:LOCAL):ストレス += ARG
+		SIF BASE:(FLAG:LOCAL):ストレス > 10000
+			BASE:(FLAG:LOCAL):ストレス = 10000
+		SIF BASE:(FLAG:LOCAL):ストレス < 0
+			BASE:(FLAG:LOCAL):ストレス = 0
+	NEXT
+ELSE
+	FOR LOCAL, 0, CHARANUM
+		SIF CFLAG:LOCAL:勧誘状況 != -1
+			CONTINUE
+		;別れ中はスキップ
+		SIF CFLAG:LOCAL:21
+			CONTINUE
+		SIF LOCAL == MASTER
+			CONTINUE
+		BASE:LOCAL:ストレス += ARG
+		SIF BASE:LOCAL:ストレス > 10000
+			BASE:LOCAL:ストレス = 10000
+		SIF BASE:LOCAL:ストレス < 0
+			BASE:LOCAL:ストレス = 0
+	NEXT
+ENDIF
+
+@CHECK_喧嘩(ARG)
+#FUNCTION
+SIF MATCH(FLAG,ARG,1080,1085) == 0
+	RETURNF 0
+
+FOR LOCAL ,1080, 1085
+	SIF FLAG:LOCAL <= 0 || FLAG:LOCAL == ARG
+		CONTINUE
+	SELECTCASE RELATION:ARG:(FLAG:LOCAL)
+		CASE IS < 80
+			LOCAL:1 = -20
+		CASE IS <=100
+			LOCAL:1 = -25
+		CASE IS < 150
+			LOCAL:1 = -40
+		CASE IS < 200
+			LOCAL:1 = -50
+		CASEELSE
+			LOCAL:1 = -100
+	ENDSELECT
+	IF relations:ARG:(FLAG:LOCAL) <= LOCAL:1
+		CFLAG:ARG:アイドル状態 = [[状態:喧嘩]]
+		CFLAG:(FLAG:LOCAL):アイドル状態 = [[状態:喧嘩]]
+		RETURNF 1
+	ENDIF
+NEXT
+RETURNF 0
+
+;自分の親密度が10以上
+;メンバーに親密度が0未満かつ自分と20以上開きのあるキャラが2人以上いる
+@CHECK_有頂天(ARG)
+#FUNCTION
+#DIM キャラクター, 5
+
+VARSET LOCAL
+
+;ユニットメンバーでなければリターン
+SIF MATCH(FLAG,ARG,1080,1085) == 0
+	RETURNF 0
+SIF BASE:ARG:親密度 < 10
+	RETURNF 0
+
+LOCAL:1 = BASE:ARG:親密度
+FOR LOCAL, 1080, 1085
+	SIF FLAG:LOCAL <= 0 || FLAG:LOCAL == ARG
+		CONTINUE
+	SIF BASE:(FLAG:LOCAL):親密度 >= 0
+		CONTINUE
+	SIF LOCAL:1 - BASE:(FLAG:LOCAL):親密度 >= 20
+		LOCAL:2 ++
+NEXT
+IF LOCAL:2 >= 2
+	CFLAG:ARG:アイドル状態 = [[状態:有頂天]]
+	RETURNF 1
+ENDIF
+
+RETURNF 0
+
+@CHECK_覚醒(ARG)
+#FUNCTION
+SIF !TALENT:ARG:恋慕 || !CFLAG:ARG:アイドルマスター技 || !FLAG:仕事成功 || TALENT:ARG:覚醒
+	RETURNF 0
+SIF !RAND:10
+	TALENT:ARG:覚醒 = 1
+;美希は条件さえ満たしていれば覚醒
+SIF ARG == 21
+	TALENT:ARG:覚醒 = 1
+
+IF TALENT:ARG:覚醒
+	CFLAG:ARG:アイドル状態 = [[状態:覚醒]]
+	RETURNF 1
+ENDIF
+
+RETURNF 0
+
+;親密度が20以上かつユニット全員とのrelationsが20以上
+@CHECK_かしまし(ARG)
+#FUNCTION
+
+VARSET LOCAL
+
+;ユニットメンバーでなければリターン
+SIF MATCH(FLAG,ARG,1080,1085) == 0
+	RETURNF 0
+SIF BASE:ARG:親密度 < 20
+	RETURNF 0
+
+FOR LOCAL, 1080, 1085
+	SIF FLAG:LOCAL == ARG || FLAG:LOCAL <= 0
+		CONTINUE
+	SIF relations:ARG:(FLAG:LOCAL) < 20
+		LOCAL:1 ++
+NEXT
+SIF LOCAL:1 == 0
+	RETURNF 1
+	
+RETURNF 0
+
+;親密度が10以上かつVO,VI,DA倍率のいずれかが120以上
+@CHECK_鼻歌_キラキラ_小躍り(ARG)
+#FUNCTION
+
+VARSET LOCAL
+
+FOR LOCAL, 1080, 1085
+	SIF FLAG:LOCAL == ARG || FLAG:LOCAL <= 0
+		CONTINUE
+	SIF relations:ARG:(FLAG:LOCAL) < 5
+		RETURNF 0
+NEXT
+
+MAX BASE:ARG:VO倍率, BASE:ARG:VI倍率, BASE:ARG:DA倍率
+
+SIF RESULT < 120
+	RETURNF 0
+	
+SIF RESULT == BASE:ARG:VO倍率
+	CFLAG:ARG:アイドル状態 = [[状態:鼻歌]]
+SIF RESULT == BASE:ARG:VI倍率
+	CFLAG:ARG:アイドル状態 = [[状態:キラキラ]]
+SIF RESULT == BASE:ARG:DA倍率
+	CFLAG:ARG:アイドル状態 = [[状態:小躍り]]
+	
+RETURNF 1
+
+@PRINT_ユニット状態
+#FUNCTIONS
+SELECTCASE FLAG:ユニット状態
+	CASE 0
+		LOCALS = 普通
+	CASE 1
+		LOCALS = 大団円
+	CASE 2
+		LOCALS = ギスギス
+	CASE 3
+		LOCALS = 大合唱
+	CASE 4
+		LOCALS = スーパースター
+	CASE 5
+		LOCALS = ダンサブル
+	CASE 6
+		LOCALS = ドン引き
+	CASEELSE
+		LOCALS = エラー
+ENDSELECT
+RETURNF LOCALS
+
+@PRINT_アイドル状態(ARG)
+#FUNCTIONS
+SELECTCASE CFLAG:ARG:アイドル状態
+	CASE 0
+		LOCALS = 普通
+	CASE 1
+		LOCALS = 有頂天
+	;CASE 2
+	;	LOCALS = ドン引き
+	CASE 3
+		LOCALS = 自信喪失
+	CASE 4
+		LOCALS = 無気力
+	CASE 5
+		LOCALS = 喧嘩
+	CASE 6
+		LOCALS = 鼻歌
+	CASE 7
+		LOCALS = キラキラ
+	CASE 8
+		LOCALS = 小躍り
+	CASE 9
+		LOCALS = かしまし
+	CASE 10
+		LOCALS = 体調不良
+	CASE 11
+		LOCALS = 病気
+	CASE 12
+		LOCALS = 覚醒
+	CASE 13
+		LOCALS = えらます
+	CASEELSE
+		LOCALS = エラー
+ENDSELECT
+RETURNF LOCALS

@@ -37,13 +37,14 @@ FLAG:リリース中楽曲 = 201
 FLAG:リリース期間 = -1
 FLAG:発売期間 = -1
 
-IF !GLOBAL:初期設定
-	GLOBAL:メッセージ速度 = 1
-	GLOBAL:オート時ウェイト = 500
-	GLOBAL:右クリック時ウェイト = 1000
-	GLOBAL:メッセージアニメ利用 = 1
-	GLOBAL:初期設定 = 1
-ENDIF
+;IF !GLOBAL:初期設定
+GLOBAL:メッセージ速度 = 1
+GLOBAL:オート時ウェイト = 500
+GLOBAL:右クリック時ウェイト = 1000
+GLOBAL:メッセージアニメ利用 = 1
+GLOBAL:初期設定 = 1
+SAVEGLOBAL
+;ENDIF
 
 ;初期注目度を設定
 FOR LOCAL, 1017, 1023
@@ -92,7 +93,11 @@ NEXT
 ;100-111特殊キャラ加入
 FOR LOCAL:1, 100, 111
 	ADDCHARA LOCAL:1
-	CFLAG:COUNT:パートナー選択可 = -1
+	IF TALENT:(LOCAL:1):オトコ || LOCAL:1 == 100
+		CFLAG:(LOCAL:1):パートナー選択可 = -1
+	ELSE
+		CFLAG:(LOCAL:1):パートナー選択可 = 0
+	ENDIF
 NEXT
 ;PRINTFORML あああ
 ;111-全キャラ加入

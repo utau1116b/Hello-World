@@ -140,6 +140,10 @@ IF ARG:2 == 1
 		LOCAL *= TFLAG:VOレート
 	SIF ARG < 11
 		LOCAL *= 10000
+	SIF CFLAG:ARG:アイドル状態 == [[状態:鼻歌]]
+		TIMES LOCAL, 1.20
+	SIF FLAG:ユニット状態 == 3
+		TIMES LOCAL, 1.20
 ELSEIF ARG:2 == 2
 
 	LOCAL += SUM_VI(ARG)
@@ -147,6 +151,10 @@ ELSEIF ARG:2 == 2
 		LOCAL *= TFLAG:VIレート
 	SIF ARG < 11
 		LOCAL *= 10000
+	SIF CFLAG:ARG:アイドル状態 == [[状態:キラキラ]]
+		TIMES LOCAL, 1.20
+	SIF FLAG:ユニット状態 == 4
+		TIMES LOCAL, 1.20
 ELSE
 
 	LOCAL += SUM_DA(ARG)
@@ -154,7 +162,10 @@ ELSE
 		LOCAL *= TFLAG:DAレート
 	SIF ARG < 11
 		LOCAL *= 10000
-	
+	SIF CFLAG:ARG:アイドル状態 == [[状態:小躍り]]
+		TIMES LOCAL, 1.20
+	SIF FLAG:ユニット状態 == 5
+		TIMES LOCAL, 1.20
 ENDIF
 
 LOCAL *= 2
@@ -173,9 +184,6 @@ SIF ARG:1 < 1
 ;ユニット状態適用
 SIF FLAG:ユニット状態 == 1
 	TIMES LOCAL , 1.50
-	
-;現在未完成なのでリップサービス
-	;TIMES LOCAL , 1.50
 	
 	TIMES LOCAL , 1.70
 	
@@ -291,3 +299,36 @@ ELSE
 	ENDIF
 	;SPDで待機時間減少は…やめた方がいいかな
 ENDIF
+
+;ARG	使用者
+;ARG:1	元値
+;ARGS	アピール種別
+;@APPEAL_BOOST(ARG,ARG:1,ARGS)
+;#FUNCTIONS
+
+;VARSET LOCAL
+;LOCAL = ARG:1
+;
+;SELECTCASE ARGS
+;	CASE "VOアピール"
+;		SIF CFLAG:ARG:アイドル状態 == [[状態:鼻歌]]
+;			TIMES LOCAL, 1.20
+;		SIF FLAG:ユニット状態 == 3
+;			TIMES LOCAL, 1.20
+;	CASE "VIアピール"
+;		SIF CFLAG:ARG:アイドル状態 == [[状態:キラキラ]]
+;			TIMES LOCAL, 1.20
+;		SIF FLAG:ユニット状態 == 4
+;			TIMES LOCAL, 1.20
+;	CASE "DAアピール"
+;		SIF CFLAG:ARG:アイドル状態 == [[状態:小躍り]]
+;			TIMES LOCAL, 1.20
+;		SIF FLAG:ユニット状態 == 5
+;			TIMES LOCAL, 1.20
+;	CASE "バーストアピール"
+;	CASE "思い出アピール"
+;ENDSELECT
+;SIF FLAG:ユニット状態 == 1
+;	TIMES LOCAL, 1.50
+
+;RETURNF LOCAL

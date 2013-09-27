@@ -269,14 +269,14 @@ ALIGNMENT LEFT
 @LAF終了メッセージ
 IF TFLAG:戦闘中 == 2
 	IF TFLAG:合格フラグ == 1
-		CALL MESSAGE, "", @"審査員の口から%CSTR:0:22%の合格が告げられた" , "/" , 0 , "LEFT", "", , 2
-		CALL MESSAGE, "", @"%CALLNAME:TARGET%達は見事オーディションに合格できたようだ！" , "/" , 0 , "LEFT", "", , 2
+		CALL MESSAGE_WINDOW, "", @"審査員の口から%CSTR:0:22%の合格が告げられた" , "/" , 0 , "LEFT"
+		CALL MESSAGE_WINDOW, "", @"%CALLNAME:TARGET%達は見事オーディションに合格できたようだ！" , "/" , 0 , "LEFT"
 		CALL SE("お仕事","ステージ","成功")
 		;PRINTFORMW 審査員の口から%CSTR:0:22%の合格が告げられた
 		;PRINTFORMW %CALLNAME:TARGET%達は見事オーディションに合格できたようだ！
 	ELSE
-		CALL MESSAGE, "", @"審査員の口から%CSTR:0:22%の名前が告げられることは無かった……" , "/" , 0 , "LEFT", "", , 2
-		CALL MESSAGE, "", @"どうやら%CALLNAME:TARGET%達はオーディションに落ちてしまったようだ……" , "/" , 0 , "LEFT", "", , 2
+		CALL MESSAGE_WINDOW, "", @"審査員の口から%CSTR:0:22%の名前が告げられることは無かった……" , "/" , 0 , "LEFT"
+		CALL MESSAGE_WINDOW, "", @"どうやら%CALLNAME:TARGET%達はオーディションに落ちてしまったようだ……" , "/" , 0 , "LEFT"
 		CALL SE("お仕事","ステージ","成功")
 		;PRINTFORMW 審査員の口から%CSTR:0:22%の名前が告げられることは無かった……
 		;PRINTFORMW どうやら%CALLNAME:TARGET%達はオーディションに落ちてしまったようだ……
@@ -285,21 +285,21 @@ IF TFLAG:戦闘中 == 2
 ELSEIF TFLAG:戦闘中 == 3
 		IF TFLAG:合格フラグ == 1
 			CALL SE("お仕事","ステージ","歓声")
-			CALL MESSAGE, "", @"会場の熱気は最大まで達し、/アンコールを求める声が鳴りやまない" , "/" , 0 , "LEFT", "", , 2
-			CALL MESSAGE, "", @"%CALLNAME:TARGET%達は見事にライブを盛り上げることが出来たようだ!!" , "/" , 0 , "LEFT", "", , 2
+			CALL MESSAGE_WINDOW, "", @"会場の熱気は最大まで達し、/アンコールを求める声が鳴りやまない" , "/" , 0 , "LEFT"
+			CALL MESSAGE_WINDOW, "", @"%CALLNAME:TARGET%達は見事にライブを盛り上げることが出来たようだ!!" , "/" , 0 , "LEFT"
 			CALL SE("お仕事","ステージ","成功")
 		ELSE
-			CALL MESSAGE, "", @"会場は今一つ盛り上がりに欠け、/観客は白け切っている" , "/" , 0 , "LEFT", "", , 2
-			CALL MESSAGE, "", @"%CSTR:0:22%のライブは失敗に終わったようだ……" , "/" , 0 , "LEFT", "", , 2
+			CALL MESSAGE_WINDOW, "", @"会場は今一つ盛り上がりに欠け、/観客は白け切っている" , "/" , 0 , "LEFT"
+			CALL MESSAGE_WINDOW, "", @"%CSTR:0:22%のライブは失敗に終わったようだ……" , "/" , 0 , "LEFT"
 			CALL SE("お仕事","ステージ","失敗")
 		ENDIF
 ELSEIF TFLAG:戦闘中 == 4
 	IF TFLAG:合格フラグ == 1
 		CALL SE("お仕事","ステージ","歓声")
-		CALL MESSAGE, "", @"%CSTR:0:22%は%CALLNAME:1%に勝利した!!" , "/" , 0 , "LEFT", "", , 2
+		CALL MESSAGE_WINDOW, "", @"%CSTR:0:22%は%CALLNAME:1%に勝利した!!" , "/" , 0 , "LEFT"
 		CALL SE("お仕事","ステージ","成功")
 	ELSE
-		CALL MESSAGE, "", @"%CSTR:0:22%は%CALLNAME:1%に敗北してしまった…" , "/" , 0 , "LEFT", "", , 2
+		CALL MESSAGE_WINDOW, "", @"%CSTR:0:22%は%CALLNAME:1%に敗北してしまった…" , "/" , 0 , "LEFT"
 		CALL SE("お仕事","ステージ","失敗")
 		
 	ENDIF
@@ -338,6 +338,7 @@ VARSET LOCAL
 FOR LOCAL, 0, 6
 	PREV_FAN:LOCAL = 地方ファン数(LOCAL)
 	PREV_PRF:LOCAL = 地方注目度(LOCAL)
+	;PRINTFORMW PREV_FAN:{LOCAL} = {PREV_FAN:LOCAL}
 NEXT
 ;合計ファン数
 PREV_SUM_FAN = SUM_ファン数()
@@ -428,9 +429,11 @@ ELSE
 				CASE 0
 					ABL:(FLAG:(LOCAL)):首都ファン数 += A
 					PREV_FAN_G:0 += A
+					;PRINTFORMW PREV_FAN_G:{FLAG:仕事地方} = {PREV_FAN_G:(FLAG:仕事地方)}
 				CASE 1
 					ABL:(FLAG:(LOCAL)):北東ファン数 += A
 					PREV_FAN_G:1 += A
+					
 				CASE 2
 					ABL:(FLAG:(LOCAL)):中央ファン数 += A
 					PREV_FAN_G:2 += A
@@ -446,6 +449,7 @@ ELSE
 				CASEELSE
 				;	PRINTFORMW エラー！不明な地方{FLAG:仕事地方}が選ばれました!(LAFクリア)
 			ENDSELECT
+			;PRINTFORMW PREV_FAN_G:{FLAG:仕事地方} = {PREV_FAN_G:(FLAG:仕事地方)}
 		ENDIF
 	NEXT
 
@@ -474,11 +478,13 @@ ENDIF
 FOR LOCAL, 0, 6
 	NOW_FAN:LOCAL = 地方ファン数(LOCAL)
 	NOW_PRF:LOCAL = 地方注目度(LOCAL)
+	;PRINTFORMW NOW_FAN:{LOCAL} = {NOW_FAN:LOCAL}
 NEXT
 
 ;変化後は0になるもの
 FOR LOCAL, 0 ,6
 	NOW_FAN_G:LOCAL = 0
+	;PRINTFORMW NOW_FAN_G:{LOCAL} = {NOW_FAN_G:LOCAL}
 NEXT
 NOW_MNY_G = 0
 
@@ -529,6 +535,8 @@ CUSTOMDRAWLINE =
 CALL PRINTCOLORL(0XEA70BF, "お仕事結果")
 DRAWLINE
 PRINTFORML FAN
+
+;PRINTFORMW LOCAL:11 = {LOCAL:11}
 
 PRINTFORM 北東エリア{LOCAL:11, 8}
 LOCALS = +{LOCAL:21, 6, LEFT}

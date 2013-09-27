@@ -1,0 +1,182 @@
+;*************************************************
+;イベント名設定
+;TSTR にスケジュール選択時に表示されるイベント名を入れる
+;*************************************************
+@KOJO_EVENT_NAME_11_1
+
+TSTR = ミーティング（春香）
+
+RETURN 0
+;*************************************************
+;コンフィグ設定
+;RESULTは初期値-1になっています。コンフィグ項目に対応した設定をしてください。
+;コメントアウト部分、-1になっている部分は、設定を変更しません。
+;*************************************************
+;今のところ色つき表示かどうかだけ
+@KOJO_EVENT_SETUP_11_1
+
+;口上を色つきで表示する
+RESULT:1 = 1
+
+;*************************************************
+;イベント発生条件
+;・FIRSTTIMEはの記述は必須。FIRSTTIME(イベント番号, ,1 )でイベントが実行済かチェック
+;	実行済みなら発生させない
+;・FLAG:イベント判定の設定も必須。発生させるタイミングを記述する必要あり
+;*************************************************
+@KOJO_EVENT_ABLE_11_1
+
+;春香がパートナーじゃないとダメ
+SIF TARGET != 11
+	RETURN 0
+
+;一度実行していたらダメ
+SIF FIRSTTIME(1, , 1) != 1
+	RETURN 0
+;好感度100以上だとダメ
+SIF CFLAG:11:2 >= 100
+	RETURN 0
+;反発刻印があるとダメ
+SIF MARK:11:3
+	RETURN 0
+;イベントを呼び出すタイミング
+;1,スケジュール選択 2,夜（アフターコミュ） 3, 4, 5, 6,
+SIF FLAG:イベント判定 != 1
+	RETURN 0
+	
+RETURN 1
+;*************************************************
+;イベント内容
+;大筋 春香がアイドルを目指した理由
+;*************************************************
+@KOJO_EVENT_K11_1
+;LOCAL:1 一番目の選択肢の数値管理
+;LOCAL:2 二番目の選択肢の数値管理
+CALL MMPLAY("Tender")
+VARSET LOCAL
+CALL MESSAGE, "", "事務所" , "/" , 1 , "CENTER" , "" , , 1 , "FADE"
+CALL SET_COLOR(11)
+PRINTL
+PRINTFORMDL アイドルをプロデュースすることになったあなただったが
+PRINTFORMDW 最初に何をすればいいか分からなかった
+PRINTL 
+PRINTFORMDL やはりまずは業界とのコネ作りだろうか？仕事を取るなら知ってるツテを片っ端から当たって……
+PRINTFORMDL などと頭を悩ませているあなたの様子を、物陰に隠れて覗く者がいた
+PRINTFORMDW 本人は隠れているつもりなのだろうが、頭のリボンが下手人の正体を語っている
+PRINTFORMDW ……さて、ここはどうしようか？
+CALL SELECT_CHOICE("見なかったことにする", "どうしたんだ春香？", "曲者！！")
+IF RESULT == 2
+	PRINTFORMDW どうしたんだ春香？
+	PRINTL 
+	PRINTFORMDW あなたに覗いていたのが気付かれたことに驚いたのか、春香はあわわ、と慌てて姿を見せた
+	PRINTFORMW 「あ、あのですね、気を悪くしたのなら謝ります」
+	PRINTFORMW 「お恥ずかしい話ですが、私今まで全然売れてなくて……」
+	PRINTFORMW 「プロデューサーがついてくれたのも今回が初めてっていうか……」
+	PRINTFORMW 「それで、その……嬉しくってつい見ちゃって……」
+	PRINTL 
+	PRINTFORMDW ぷっ、ははは
+	PRINTL 
+	PRINTFORMW 「ええ！？どうして笑うんですか」
+	PRINTFORMDW そういえば俺も、アイドルをプロデュースするなんて初めての事だと思い出してな
+	PRINTFORMDW 仕事をどうするかよりも前に、まず自分のパートナーについて知っておかなくちゃな
+	PRINTL 
+	PRINTFORMDW よし、今日はミーティングをするぞ
+	PRINTFORMDW どんなことでもいい、春香の事を俺に教えてくれないか
+	PRINTL
+	PRINTFORMW 「は……はい！」
+	LOCAL:1 = 3
+ELSEIF RESULT == 1
+	PRINTFORMDL よし、ここは何もみなかったことにしよう
+	PRINTFORMDW そうしてあなたは再び自分の考えに戻ることにした
+	PRINTL 
+	PRINTFORMDL ・・・・・
+	PRINTFORMDL しかし、どうも春香の視線が気になって集中できない
+	PRINTFORMDW あなたは仕方ないと開き直り、今日は春香とのミーティングでも行うことにした
+	PRINTL 
+	PRINTFORMDL あなたに呼ばれた春香は、白々しくも
+	PRINTFORMW 「は、はい！わた、私は何も見てませんでしたよ？今初めてこっちにきました」
+	PRINTFORMDW などと言いつつも、嬉しそうにあなたとのミーティングに賛成した
+	LOCAL:1 = 1
+ELSE
+	PRINTFORMDL 曲者！！
+	CALL QUAKE
+	PRINTFORMDW 
+	PRINTL 
+	PRINTFORMDL あなたの一声に驚いたのか、春香はわたわたと慌てて転んでしまった
+	PRINTFORMW 「いたた……もう、プロデューサーさん！いきなり大声を出さないで下さいよ！」
+	PRINTFORMDL 某の一喝は見事に鼠を炙り出したようだが？
+	PRINTFORMW 「う、覗いていたのは謝ります……」
+	PRINTFORMW 「でも、私プロデューサーさんがついてくれるなんて、これが初めてのことだから嬉しくてつい……」
+	PRINTL 
+	PRINTFORMDL 覗いていたのには春香なりの理由があったらしい
+	PRINTFORMDW ……もう少しちゃんと対応してあげればよかっただろうか？
+	PRINTL
+	PRINTFORMDL だが、これも折角の機会だ
+	PRINTFORMDL お互いのことをもっと知るためにも、今日は春香とミーティングをすることにしよう
+	PRINTFORMDW 春香もぶつぶつ言いながら、結局は嬉しそうにミーティングをすることに賛成した
+	LOCAL:1 = 0
+ENDIF
+PRINTL
+PRINTFORMDL 最初は少し緊張していたのか、言葉を選びつつ当たり障りないことを話していた春香だったが
+PRINTFORMDW しだいに自分の色々な事をあなたに話してくれた
+PRINTL
+PRINTFORMW 「私、歌はあんまり上手くないけど、歌うことが好きな気持ちだけは本当なんです」
+PRINTFORMW 「子供の頃、よく近所の公園で歌を歌っていたお姉さんがいたんです」
+PRINTFORMW 「それがすごく素敵な歌で、いつのまにか私お姉さんの歌を聴きに毎日公園に通っていました」
+PRINTFORMW 「ある日、お姉さんが私に一緒に歌ってみないか誘ってくれたんです」
+PRINTFORMW 「今思えばすごく下手な歌だったけど、お姉さんは私の歌声を素敵な声だって言ってくれて……」
+PRINTFORMW 「その時、私もお姉さんみたいに、歌でみんなに夢を届けられる人になりたいって思ったんです」
+PRINTFORMW 「あはは……それがアイドルを目指したきっかけだなんて、私ったら単純ですよね」
+PRINTL 
+CALL SELECT_CHOICE("いいじゃないか", "春香はバカだなあ")
+IF RESULT == 1
+	PRINTFORMDW いいじゃないか
+	PRINTFORMDW 変に理屈をつけるよりも、春香の正直な気持ちが伝わってきたよ
+	PRINTL
+	PRINTFORMW 「ホントですか！？」
+	PRINTFORMW 「よかった～、私もしかしたら笑ったり、茶化されたりするんじゃないかと思ってました」
+	PRINTL
+	PRINTFORMDW 失敬な、俺はいつだって大真面目だ
+	PRINTL
+	PRINTFORMW 「うふふ、じゃあ私の話はこれくらいにして、今度はプロデューサーさんのことを教えてください」
+	PRINTL
+	PRINTFORMDW その後も無事に春香と打ち解けることができ、お互いの距離が少し近づいた気がした……
+	LOCAL:2 = 2
+ELSE
+	PRINTFORMDW 春香はバカだなあ
+	PRINTFORMDW 単純すぎて悪い男に引っ掛かったりしないか、ちょっと心配になってきたよ
+	PRINTL
+	PRINTFORMW 「え？私、正直に話しただけ……、そこまで言わなくったって……う、うぇえん」
+	PRINTFORMDW な！？俺はただ春香のことが心配で……
+	PRINTFORMW 「話が飛躍しすぎなんですよおおおぉぉ……うえぇん、うえぇえん」
+	PRINTL
+	PRINTFORMDW その後、なんとか春香をなだめることが出来たものの、それ以上春香が自分について語ることは無かった……
+	LOCAL:2 = 0
+ENDIF
+PRINTL 
+LOCAL:1 += LOCAL:2
+SELECTCASE LOCAL:1
+CASE 5
+	PRINTL
+	CALL SEPLAY(19)
+	PRINTFORMDW PERFECT COMMUNICATION !!
+	CFLAG:11:2 += 100
+	PRINTFORMDW %CALLNAME:11%の好感度が100上がった
+CASE 3 TO 5
+	PRINTL
+	CALL SEPLAY(19)
+	PRINTFORMDW GOOD COMMUNICATION !
+	CFLAG:11:2 += 80
+	PRINTFORMDW %CALLNAME:11%の好感度が80上がった
+CASE 1 TO 3
+	PRINTL 
+	CALL SEPLAY(19)
+	PRINTFORMDW NORMAL COMMUNICATION
+	CFLAG:11:2 += 50
+	PRINTFORMDW %CALLNAME:11%の好感度が50上がった
+CASEELSE
+	PRINTL 
+	CALL SEPLAY(5)
+	PRINTFORMDW BAD COMMUNICATION ……
+ENDSELECT
+

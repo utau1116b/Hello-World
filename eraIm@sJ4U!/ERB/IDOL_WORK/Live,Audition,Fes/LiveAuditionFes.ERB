@@ -93,7 +93,7 @@ TFLAG:カウントタイマー = 10
 TFLAG:ループカウント = 0
 
 PRINTL 
-CALL MESSAGE, "", "ステージが始まります！" , "/" , 0 , "LEFT", "", , 2
+CALL MESSAGE_WINDOW, "", "ステージが始まります！" , "/" , 0 , "LEFT"
 IF ARG == 999
 	CALL PRINT_クリア目標(1)
 ELSE
@@ -104,7 +104,7 @@ CALL COUNTDOWN(3900)
 ;	オーディション開始
 ;PRINTFORMW 戦闘中フラグ{TFLAG:戦闘中}
 CALL LAF_MAIN_LOOP
-CALL MESSAGE, "", "そこまで！" , "/" , 0 , "LEFT", "", , 2
+CALL MESSAGE_WINDOW, "", "そこまで！" , "/" , 0 , "LEFT"
 PRINTL 
 PRINTFORMW ・
 PRINTFORMW ・
@@ -162,8 +162,9 @@ IF TFLAG:合格フラグ == 1
 	FONTREGULAR
 	CALL リザルト画面
 	CALL LAF終了メッセージ
-	CALL RELATIONS_UP(2)
-	CALL 自信_UP(1)
+	CALL STATE_MANAGEMR("仕事成功")
+	;CALL RELATIONS_UP(2)
+	;CALL 自信_UP(1)
 	SIF TFLAG:記者判定
 		CALL GET_記者
 	CALL LAFクリア(1)
@@ -175,7 +176,8 @@ ELSE
 	ENDIF
 	CALL リザルト画面
 	CALL LAF終了メッセージ
-	CALL RELATIONS_UP(-2)
-	CALL 自信_UP(-1)
+	CALL STATE_MANAGEMR("仕事失敗")
+	;CALL RELATIONS_UP(-2)
+	;CALL 自信_UP(-1)
 	CALL LAFクリア(0)
 ENDIF

@@ -67,37 +67,36 @@ PRINTL
 SIF ARG != 999
 	CALL SELECT_アイドルにお任せ
 IF RESULT == 1
-	CALL MESSAGE, @"%CALLNAME:MASTER%", @"よし、今日の仕事は%CALLNAME:TARGET%達に任せる！/皆、頑張って来てくれ！" , "/" , 0 , "LEFT", "", , 2
-	CALL MESSAGE, "", @"%CALLNAME:TARGET%達は、はい！/と勢いよく答えた" , "/" , 0 , "LEFT"
-	CALL 掛け声
+	CALL MESSAGE_WINDOW, @"%CALLNAME:MASTER%", @"よし、今日の仕事は%CALLNAME:TARGET%達に任せる！/皆、頑張って来てくれ！" , "/" , 0 , "LEFT"
+	CALL MESSAGE_WINDOW, "", @"%CALLNAME:TARGET%達は、はい！/と勢いよく答えた" , "/" , 0 , "LEFT"
+	;CALL 掛け声
 	CALL MMSTOP()
 	CALL アイドルにお任せ
 ELSE
 
-
 SELECTCASE FLAG:現在挑戦中仕事
 	;オーディション
 	CASE 1000 TO 1099
-		CALL MESSAGE, @"%CALLNAME:MASTER%", @"よし、準備万端だな！/……おっ、番組ディレクターが来たみたいだぞ" , "/" , 0 , "LEFT", "", , 2
-		CALL MESSAGE, "ディレクター", @"おっ、%CSTR:0:22%ちゃん達！/相変わらず、カワイイねえ～" , "/" , 0 , "LEFT", "", , 2
-		CALL MESSAGE, "ディレクター", "でも、衣装は、もっとセクシーなほうが、/いいんじゃんない？　ううん、残念～" , "/" , 0 , "LEFT", "", , 2
+		CALL MESSAGE_WINDOW, @"%CALLNAME:MASTER%", @"よし、準備万端だな！/……おっ、番組ディレクターが来たみたいだぞ" , "/" , 0 , "LEFT"
+		CALL MESSAGE_WINDOW, "ディレクター", @"おっ、%CSTR:0:22%ちゃん達！/相変わらず、カワイイねえ～" , "/" , 0 , "LEFT"
+		CALL MESSAGE_WINDOW, "ディレクター", "でも、衣装は、もっとセクシーなほうが、/いいんじゃんない？　ううん、残念～" , "/" , 0 , "LEFT"
 		;CALL MESSAGE, @"%CALLNAME:MASTER%", @"さあ、気を引き締めていこう！" , "/" , 0 , "LEFT", "", , 2
 	;ライブ
 	CASE 1100 TO 1199
 		LOCALS:1 = 某ステージ
-		CALL MESSAGE, @"%CALLNAME:MASTER%", "さあ、気を引き締めていこう！" , "/" , 0 , "LEFT", "", , 2
-		CALL MESSAGE, "スタッフ", "皆さん、そろそろ本番なので、お願いします！" , "/" , 0 , "LEFT", "", , 2
+		CALL MESSAGE_WINDOW, @"%CALLNAME:MASTER%", "さあ、気を引き締めていこう！" , "/" , 0 , "LEFT"
+		CALL MESSAGE_WINDOW, "スタッフ", "皆さん、そろそろ本番なので、お願いします！" , "/" , 0 , "LEFT"
 	;フェス
 	CASE 1200 TO 1299
 		LOCALS:1 = 某野外ステージ
-		CALL MESSAGE, "スタッフ", "皆さん、そろそろ時間なので、お願いします！" , "/" , 0 , "LEFT", "", , 2
-		CALL MESSAGE, "スタッフ", "お隣のステージでは相手が準備して/います。スペシャルなステージになりそうですよっ！" , "/" , 0 , "LEFT", "", , 2
-		CALL MESSAGE, "スタッフ", "向こうに負けないくらい、/ステージを盛り上げて下さいね！" , "/" , 0 , "LEFT", "", , 2
+		CALL MESSAGE_WINDOW, "スタッフ", "皆さん、そろそろ時間なので、お願いします！" , "/" , 0 , "LEFT"
+		CALL MESSAGE_WINDOW, "スタッフ", "お隣のステージでは相手が準備して/います。スペシャルなステージになりそうですよっ！" , "/" , 0 , "LEFT"
+		CALL MESSAGE_WINDOW, "スタッフ", "向こうに負けないくらい、/ステージを盛り上げて下さいね！" , "/" , 0 , "LEFT"
 	CASEELSE
 	
 ENDSELECT
 	;CALL MUSIC_SELECT
-	CALL 掛け声
+	;CALL 掛け声
 	;ステージに補正掛けるならここ
 	CALL MMSTOP()
 	CALL LAF(ARG)

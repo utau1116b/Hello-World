@@ -3,7 +3,7 @@
 ;暫定
 VARSET LOCAL
 
-CALL 朝会話
+;CALL 朝会話
 PRINTL 
 PRINTW ・・・・・
 PRINTL 
@@ -56,6 +56,12 @@ ELSE
 	PRINTFORMW %CALLNAME:TARGET%達の仕事は失敗してしまった……
 	B = 4
 ENDIF
+IF B == 4
+	CALL STATE_MANAGEMR("営業失敗")
+ELSE
+	CALL STATE_MANAGEMR("営業成功")
+ENDIF
+
 ;好感度30アップ
 ;原作では思い出アップなので代わりに
 FOR LOCAL, 1080, 1085

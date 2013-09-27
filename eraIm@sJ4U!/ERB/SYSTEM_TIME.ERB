@@ -366,19 +366,21 @@ FLAG:ダンジョン探索済み = 0
 ;二日に一回、注目度によるファン数変動＆注目度減
 IF DAY:7 % 2 == 0
 	CALL ファン数変動
+	;減少量を半分にしてみる
 	FOR LOCAL, 1017, 1023
-		FLAG:LOCAL -= 12
+		FLAG:LOCAL -= 6
 	NEXT
 ENDIF
-CALL 親愛_UP(-1)
-SIF !FLAG:仕事成功 && FLAG:ユニット状態 != 1
-	CALL RELATIONS_UP(-1,1)
+;CALL 親愛_UP(-1)
+;SIF !FLAG:仕事成功 && FLAG:ユニット状態 != 1
+;	CALL RELATIONS_UP(-1,1)
 ;ここで処理するのは美しくないけど
-IF TARGET > 0 && ASSI > 0
-	relations:target:assi++
-	relations:assi:target++
-ENDIF
-CALL アイドル状態変化
+;IF TARGET > 0 && ASSI > 0
+;	relations:target:assi++
+;	relations:assi:target++
+;ENDIF
+;CALL アイドル状態変化
+CALL STATE_MANAGEMR("夜")
 IF FLAG:ユニット状態 == 1
 	CALL 団結値上昇(5)
 ELSE

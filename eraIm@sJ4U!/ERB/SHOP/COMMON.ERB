@@ -1825,8 +1825,66 @@ CFLAG:A:75 = DAY:1
 CFLAG:A:76 = DAY:2
 
 ;ストレス設定
-MAXBASE:A:ストレス = 100
+MAXBASE:A:ストレス = 10000
 BASE:A:ストレス = 0
+
+;-----------------------------------
+;RPG系素質が設定されてなければ設定
+;-----------------------------------
+IF MAXBASE:A:HP == 0
+	MAXBASE:A:HP = 10
+	BASE:A:HP = 10
+ENDIF
+IF MAXBASE:A:MP == 0
+	MAXBASE:A:MP = 10
+	BASE:A:MP = 10
+ENDIF
+IF MAXBASE:A:ボルテージ == 0
+	MAXBASE:A:ボルテージ = 100
+	BASE:A:ボルテージ = 100
+ENDIF
+IF MAXBASE:A:ベースPOW == 0
+	MAXBASE:A:ベースPOW = 10
+	BASE:A:ベースPOW = 10
+ENDIF
+IF MAXBASE:A:ベースGUA == 0
+	MAXBASE:A:ベースGUA = 10
+	BASE:A:ベースGUA = 10
+ENDIF
+IF MAXBASE:A:ベースDEX == 0
+	MAXBASE:A:ベースDEX = 10
+	BASE:A:ベースDEX = 10
+ENDIF
+IF MAXBASE:A:ベースHIT == 0
+	MAXBASE:A:ベースHIT = 10
+	BASE:A:ベースHIT = 10
+ENDIF
+IF MAXBASE:A:ベースSPD == 0
+	MAXBASE:A:ベースSPD = 10
+	BASE:A:ベースSPD = 10
+ENDIF
+IF MAXBASE:A:ベースLUC == 0
+	MAXBASE:A:ベースLUC = 10
+	BASE:A:ベースLUC = 10
+ENDIF
+
+SIF ABL:A:POW素質 == 0
+	ABL:A:POW素質 = 100
+SIF ABL:A:GUA素質 == 0
+	ABL:A:GUA素質 = 100
+SIF ABL:A:DEX素質 == 0
+	ABL:A:DEX素質 = 100
+SIF ABL:A:HIT素質 == 0
+	ABL:A:HIT素質 = 100
+SIF ABL:A:SPD素質 == 0
+	ABL:A:SPD素質 = 100
+SIF ABL:A:LUC素質 == 0
+	ABL:A:LUC素質 = 100
+SIF ABL:A:SKL素質 == 0
+	ABL:A:SKL素質 = 100
+SIF ABL:A:GRO素質 == 0
+	ABL:A:GRO素質 = 100
+;-----------------------------------
 
 ;経験からVO,VI,DAの技能アップ
 FOR LOCAL, 0, 99
@@ -1890,7 +1948,6 @@ IF CFLAG:A:0 && FLAG:29 == NO:A
 ENDIF
 
 @ADD_NEWCHARA(ARG:0)
-
 ;CFLAG:(ARG:0):7340 = 3
 
 ;加入時の共通設定
@@ -1919,6 +1976,7 @@ BASE:ARG:親密度 = 0
 MAXBASE:ARG:親愛度 = 99
 BASE:ARG:親愛度 = 0
 MAXBASE:ARG:戦闘レベル = 200
+BASE:ARG:戦闘レベル = 1
 ;加入時口上表示
 FLAG:フェス中口上 = 2
 CALL KOJO(ARG:0)

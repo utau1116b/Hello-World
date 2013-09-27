@@ -64,14 +64,14 @@ IF ARG == 1 || !ARG
 	PRINTFORM の衣装：
 	PRINTFORM \@ TEQUIP:TARGET:コスプレ服 ? [%COSPLAY(TARGET)%] # \@\@ TEQUIP:TARGET:上下一体服 ? [%DRESS(TARGET)%] # \@\@ TEQUIP:TARGET:アウター ? [%OUTER_T(TARGET)%] # \@\@ TEQUIP:TARGET:インナー ? [%OUTER_T2(TARGET)%] # \@\@ TEQUIP:TARGET:ボトムス ? [%OUTER_B(TARGET)%] # \@\@ TEQUIP:TARGET:下着（上下一体） ? [%INNER_TB(TARGET)%] # \@\@ TEQUIP:TARGET:下着（上） ? [%INNER_T(TARGET)%] # \@
 ;	PRINTFORM \@ TEQUIP:TARGET:下着（下） ? [%INNER_B(TARGET)%] # \@\@ TEQUIP:TARGET:靴下 ? [%SOCKS(TARGET)%] # \@\@ TEQUIP:TARGET:手 ? [%GLOVES(TARGET)%] # \@\@ TEQUIP:TARGET:頭 ? [%HEAD(TARGET)%] # \@\@ TEQUIP:TARGET:オプション1 ? [%ACCESSORY1(TARGET)%] # \@
-	PRINTFORM \@ TEQUIP:TARGET:下着（下） ? [%INNER_B(TARGET)%] # \@\@ TEQUIP:TARGET:靴下 ? [%SOCKS(TARGET)%] # \@\@ TEQUIP:TARGET:頭 ? [%HEAD(TARGET)%] # \@\@ TEQUIP:TARGET:オプション1 ? [%ACCESSORY1(TARGET)%] # \@
+	PRINTFORML \@ TEQUIP:TARGET:下着（下） ? [%INNER_B(TARGET)%] # \@\@ TEQUIP:TARGET:靴下 ? [%SOCKS(TARGET)%] # \@\@ TEQUIP:TARGET:頭 ? [%HEAD(TARGET)%] # \@\@ TEQUIP:TARGET:オプション1 ? [%ACCESSORY1(TARGET)%] # \@
 	;PRINTFORML \@  TEQUIP:TARGET:オプション2 ? [%ACCESSORY1(TARGET, , 2)%] # \@\@  TEQUIP:TARGET:オプション3 ? [%ACCESSORY1(TARGET, , 3)%] #  \@\@ TEQUIP:TARGET:オプション4 ? [%ACCESSORY1(TARGET, , 4)%] # \@\@ TEQUIP:TARGET:オプション5 ? [%ACCESSORY1(TARGET, , 5)%] #  \@
 ENDIF
 IF ARG == 2 || !ARG
 	PRINTFORM %CALLNAME:MASTER, 10%の衣装：
 	PRINTFORM \@ TEQUIP:MASTER:コスプレ服 ? [%COSPLAY(MASTER)%] # \@\@ TEQUIP:MASTER:上下一体服 ? [%DRESS(MASTER)%] # \@\@ TEQUIP:MASTER:アウター ? [%OUTER_T(MASTER)%] # \@\@ TEQUIP:MASTER:インナー ? [%OUTER_T2(MASTER)%] # \@\@ TEQUIP:MASTER:ボトムス ? [%OUTER_B(MASTER)%] # \@\@ TEQUIP:MASTER:下着（上下一体） ? [%INNER_TB(MASTER)%] # \@\@ TEQUIP:MASTER:下着（上） ? [%INNER_T(MASTER)%] # \@
 ;	PRINTFORM \@ TEQUIP:MASTER:下着（下） ? [%INNER_B(MASTER)%] # \@\@ TEQUIP:MASTER:靴下 ? [%SOCKS(MASTER)%] # \@\@ TEQUIP:MASTER:手 ? [%GLOVES(MASTER)%] # \@\@ TEQUIP:MASTER:頭 ? [%HEAD(MASTER)%] # \@\@ TEQUIP:MASTER:オプション1 ? [%ACCESSORY1(MASTER)%] # \@
-	PRINTFORM \@ TEQUIP:MASTER:下着（下） ? [%INNER_B(MASTER)%] # \@\@ TEQUIP:MASTER:靴下 ? [%SOCKS(MASTER)%] # \@\@ TEQUIP:MASTER:頭 ? [%HEAD(MASTER)%] # \@\@ TEQUIP:MASTER:オプション1 ? [%ACCESSORY1(MASTER)%] # \@
+	PRINTFORML \@ TEQUIP:MASTER:下着（下） ? [%INNER_B(MASTER)%] # \@\@ TEQUIP:MASTER:靴下 ? [%SOCKS(MASTER)%] # \@\@ TEQUIP:MASTER:頭 ? [%HEAD(MASTER)%] # \@\@ TEQUIP:MASTER:オプション1 ? [%ACCESSORY1(MASTER)%] # \@
 	;PRINTFORML \@  TEQUIP:MASTER:オプション2 ? [%ACCESSORY1(MASTER, , 2)%] # \@\@  TEQUIP:MASTER:オプション3 ? [%ACCESSORY1(MASTER, , 3)%] #  \@\@ TEQUIP:MASTER:オプション4 ? [%ACCESSORY1(MASTER, , 4)%] # \@\@ TEQUIP:MASTER:オプション5 ? [%ACCESSORY1(MASTER, , 5)%] #  \@
 ENDIF
 
@@ -271,25 +271,25 @@ SELECTCASE EQUIP:(ARG:0):下着（下）
 		RETURNF \@ ARG:1 ? パンスト # パンティストッキング \@
 	;ガーターベルト
 	CASE 5
-		RETURNF "ガーターベルト"
+	;	RETURNF "ガーターベルト"
 	;褌
 	CASE 6
-		RETURNF "褌"
+	;	RETURNF "褌"
 	;ブリーフ
 	CASE 7
 		RETURNF "ブリーフ"
 	;ペチコート
 	CASE 8
-		RETURNF \@ ARG:1 ? ペチコ # ペチコート \@
+	;	RETURNF \@ ARG:1 ? ペチコ # ペチコート \@
 	;スキャンティ
 	CASE 9
-		RETURNF "スキャンティ"
+	;	RETURNF "スキャンティ"
 	;紐パン
 	CASE 10
 		RETURNF "紐パン"
 	;アンダースコート
 	CASE 11
-		RETURNF \@ ARG:1 ? アンスコ # アンダースコート \@
+	;	RETURNF \@ ARG:1 ? アンスコ # アンダースコート \@
 ENDSELECT
 
 ;-------------------------------------------------
@@ -318,10 +318,10 @@ SELECTCASE EQUIP:(ARG:0):下着（上）
 		RETURNF \@ ARG:1 ? キャミ # キャミソール \@
 	;大胸筋矯正サポーター
 	CASE 5
-		RETURNF "大胸筋矯正サポーター"
+	;	RETURNF "大胸筋矯正サポーター"
 	;オープンブラ
 	CASE 6
-		RETURNF "オープンブラ"
+	;	RETURNF "オープンブラ"
 ENDSELECT
 
 ;-------------------------------------------------
@@ -345,7 +345,7 @@ SELECTCASE EQUIP:(ARG:0):ボトムス
 		RETURNF "キュロット"
 	;もんぺ
 	CASE 3
-		RETURNF "もんぺ"
+	;	RETURNF "もんぺ"
 	;ズボン
 	CASE 4
 		RETURNF "ズボン"
@@ -354,13 +354,13 @@ SELECTCASE EQUIP:(ARG:0):ボトムス
 		RETURNF "スパッツ"
 	;タイツ
 	CASE 6
-		RETURNF "タイツ"
+	;	RETURNF "タイツ"
 	;ロングスカート
 	CASE 7
 		RETURNF "ロングスカート"
 	;トレパン
 	CASE 8
-		RETURNF "トレパン"
+	;	RETURNF "トレパン"
 	;ハーフパンツ
 	CASE 9
 		RETURNF "ハーフパンツ"
@@ -378,7 +378,7 @@ SELECTCASE EQUIP:(ARG:0):ボトムス
 		RETURNF "半ズボン"
 	;ホットパンツ
 	CASE 14
-		RETURNF "ホットパンツ"
+	;	RETURNF "ホットパンツ"
 	;ミニスカート
 	CASE 15
 		RETURNF \@ ARG:1 ? ミニスカ # ミニスカート \@
@@ -388,6 +388,8 @@ SELECTCASE EQUIP:(ARG:0):ボトムス
 	;スラックス
 	CASE 17
 		RETURNF "スラックス"
+	CASE 18
+		RETURNF "タイトスカート"
 	;無し
 	CASE 0
 		RETURNF \@ ARG:2 ? %DRESS(ARG:0, ARG:1)% # \@
@@ -414,16 +416,16 @@ SELECTCASE EQUIP:(ARG:0):アウター
 		RETURNF "シャツ"
 	;タンクトップ
 	CASE 3
-		RETURNF "タンクトップ"
+	;	RETURNF "タンクトップ"
 	;チューブトップ
 	CASE 4
-		RETURNF "チューブトップ"
+	;	RETURNF "チューブトップ"
 	;ブラウス
 	CASE 5
 		RETURNF "ブラウス"
 	;ベアトップ
 	CASE 6
-		RETURNF "ベアトップ"
+	;	RETURNF "ベアトップ"
 	;カーディガン
 	CASE 7
 		RETURNF "カーディガン"
@@ -432,7 +434,7 @@ SELECTCASE EQUIP:(ARG:0):アウター
 		RETURNF "ジャケット"
 	;ジャンパー
 	CASE 9
-		RETURNF "ジャンパー"
+	;	RETURNF "ジャンパー"
 	;セーター
 	CASE 10
 		RETURNF "セーター"
@@ -453,7 +455,7 @@ SELECTCASE EQUIP:(ARG:0):アウター
 		RETURNF "ブルゾン"
 	;カットソー
 	CASE 16
-		RETURNF "カットソー"
+	;	RETURNF "カットソー"
 	;ベスト
 	CASE 17
 		RETURNF "ベスト"
@@ -473,7 +475,7 @@ SELECTCASE EQUIP:(ARG:0):アウター
 		RETURNF "ジャージ上"
 	;タートルネック
 	CASE 23
-		RETURNF "タートルネック"
+	;	RETURNF "タートルネック"
 	;スクールセーター
 	CASE 24
 		RETURNF "スクールセーター"
@@ -700,6 +702,8 @@ SELECTCASE EQUIP:(ARG:0):LOCAL
 		RETURNF "ピアス"
 	CASE 6
 		RETURNF "マント"
+	CASE 7
+		RETURNF "絆創膏"
 ENDSELECT
 
 ;-------------------------------------------------
@@ -730,45 +734,45 @@ SELECTCASE EQUIP:(ARG:0):インナー
 	;ブラウス
 	CASE 5
 		RETURNF "ブラウス"
-	;ベアトップ
+	;ポロシャツ
 	CASE 6
-		RETURNF "ベアトップ"
+		RETURNF "ポロシャツ"
 	;カーディガン
 	CASE 7
-		RETURNF "カーディガン"
+	;	RETURNF "カーディガン"
 	;ジャケット
 	CASE 8
-		RETURNF "ジャケット"
+	;	RETURNF "ジャケット"
 	;ジャンパー
 	CASE 9
-		RETURNF "ジャンパー"
+	;	RETURNF "ジャンパー"
 	;セーター
 	CASE 10
 		RETURNF "セーター"
 	;トレーナー
 	CASE 11
-		RETURNF "トレーナー"
+	;	RETURNF "トレーナー"
 	;パーカー
 	CASE 12
-		RETURNF "パーカー"
+	;	RETURNF "パーカー"
 	;ブレザー
 	CASE 13
-		RETURNF "ブレザー"
+	;	RETURNF "ブレザー"
 	;ケープ
 	CASE 14
-		RETURNF "ケープ"
+	;	RETURNF "ケープ"
 	;ブルゾン
 	CASE 15
-		RETURNF "ブルゾン"
+	;	RETURNF "ブルゾン"
 	;カットソー
 	CASE 16
 		RETURNF "カットソー"
 	;ベスト
 	CASE 17
-		RETURNF "ベスト"
+	;	RETURNF "ベスト"
 	;コート
 	CASE 18
-		RETURNF "コート"
+	;	RETURNF "コート"
 	;チュニック
 	CASE 19
 		RETURNF "チュニック"
@@ -779,13 +783,14 @@ SELECTCASE EQUIP:(ARG:0):インナー
 	CASE 21
 		RETURNF "ノースリーブ"
 	CASE 22
-		RETURNF "ジャージ上"
+	;	RETURNF "ジャージ上"
 	;タートルネック
 	CASE 23
 		RETURNF "タートルネック"
 	CASE 24
-		RETURNF "スクールセーター"
+	;	RETURNF "スクールセーター"
 	;無し
 	CASE 0
 		RETURNF \@ ARG:2 ? %DRESS(ARG:0, ARG:1)% # \@
+	;ベアトップワンピース
 ENDSELECT

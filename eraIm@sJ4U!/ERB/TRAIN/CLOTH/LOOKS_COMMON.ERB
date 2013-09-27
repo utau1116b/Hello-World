@@ -128,7 +128,7 @@ SELECTCASE CFLAG:(ARG:0):髪型
 	CASE 2
 		RETURNF  "一本結び"
 	CASE 3
-		RETURNF  "ハーフアップ"
+		RETURNF  "お嬢様結び"
 	CASE 4
 		RETURNF  "サイドテール"
 	CASE 5
@@ -136,15 +136,15 @@ SELECTCASE CFLAG:(ARG:0):髪型
 	CASE 6
 		RETURNF  "ツーサイドアップ"
 	CASE 7
-		RETURNF  "おさげ"
+		RETURNF  "編み込み"
 	CASE 8
 		RETURNF  "二つ結び"
 	CASE 9
-		RETURNF  "みずら"
+	;	RETURNF  "みずら"
 	CASE 10
 		RETURNF  "三つ編み"
 	CASE 11
-		RETURNF  "辮髪"
+	;	RETURNF  "辮髪"
 	CASE 12
 		RETURNF  "サイドアップ"
 	CASE 13
@@ -152,19 +152,19 @@ SELECTCASE CFLAG:(ARG:0):髪型
 	CASE 14
 		RETURNF  "ポンパドール"
 	CASE 15
-		RETURNF  "ひっつめ"
+	;	RETURNF  "ひっつめ"
 	CASE 16
-		RETURNF  "コーンロウ"
+	;	RETURNF  "コーンロウ"
 	CASE 17
 		RETURNF  "シニヨン"
 	CASE 18
 		RETURNF  "パイナップルヘア"
 	CASE 19
-		RETURNF  "日本髪"
+	;	RETURNF  "日本髪"
 	CASE 20
-		RETURNF  "ちょんまげ"
+	;	RETURNF  "ちょんまげ"
 	CASE 21
-		RETURNF  "ツインリング"
+	;	RETURNF  "ツインリング"
 	CASE 22
 		RETURNF  "ウルフカット"
 	CASE 23
@@ -172,27 +172,27 @@ SELECTCASE CFLAG:(ARG:0):髪型
 	CASE 24
 		RETURNF  "オールバック"
 	CASE 25
-		RETURNF  "リーゼント"
+	;	RETURNF  "リーゼント"
 	CASE 26
 		RETURNF  "外ハネ"
 	CASE 27
-		RETURNF  "おかっぱ"
+	;	RETURNF  "おかっぱ"
 	CASE 28
 		RETURNF  "姫カット"
 	CASE 29
-		RETURNF  "アフロ"
+	;	RETURNF  "アフロ"
 	CASE 30
 		RETURNF  "インテーク"
 	CASE 31
-		RETURNF  ""
+	;	RETURNF  ""
 	CASE 32
-		RETURNF  "テクノカット"
+	;	RETURNF  "テクノカット"
 	CASE 33
 		RETURNF  "ツーブロック"
 	CASE 34
 		RETURNF  \@ ARG:1 ? ボブ # ボブカット \@
 	CASE 35
-		RETURNF  "ブレイズ"
+	;	RETURNF  "ブレイズ"
 	CASE 36
 		RETURNF  "ワンレングス"
 	CASE 37
@@ -383,11 +383,11 @@ SELECTCASE CFLAG:(ARG:0):性格
 	CASE 10
 		RETURNF  "マイペース"
 	CASE 11
-		RETURNF  "高飛車"
+	;	RETURNF  "高飛車"
 	CASE 12
-		RETURNF  "見栄っ張り"
+	;	RETURNF  "見栄っ張り"
 	CASE 13
-		RETURNF  "清楚"
+		RETURNF  "腹黒"
 	CASE 14
 		RETURNF  "自信家"
 	CASE 15
@@ -395,7 +395,7 @@ SELECTCASE CFLAG:(ARG:0):性格
 	CASE 16
 		RETURNF  "甘えん坊"
 	CASE 17
-		RETURNF  "うっかり者"
+	;	RETURNF  "うっかり者"
 	CASE 18
 		RETURNF  "お調子者"
 	CASE 19
@@ -421,9 +421,9 @@ SELECTCASE CFLAG:(ARG:0):性格
 	CASE 29
 		RETURNF  "頭脳明晰"
 	CASE 30
-		RETURNF  "世間知らず"
+	;	RETURNF  "世間知らず"
 	CASE 31
-		RETURNF  "泣き虫"
+	;	RETURNF  "泣き虫"
 	CASE 32
 		RETURNF  "なまけもの"
 	CASE 33
@@ -437,7 +437,7 @@ SELECTCASE CFLAG:(ARG:0):性格
 	CASE 37
 		RETURNF  "優しい"
 	CASE 38
-		RETURNF  "乱暴者"
+	;	RETURNF  "乱暴者"
 	CASE 39
 		RETURNF  "ロマンチスト"
 	CASE 40
@@ -449,11 +449,11 @@ SELECTCASE CFLAG:(ARG:0):性格
 	CASE 43
 		RETURNF  "爽やか"
 	CASE 44
-		RETURNF  "謙虚"
+	;	RETURNF  "謙虚"
 	CASE 45
 		RETURNF  "物静か"
 	CASE 46
-		RETURNF  "几帳面"
+	;	RETURNF  "几帳面"
 	CASE 47
 		RETURNF  "負けず嫌い"
 	CASE 48
@@ -467,7 +467,7 @@ SELECTCASE CFLAG:(ARG:0):性格
 	CASE 52
 		RETURNF  "無邪気"
 	CASE 53
-		RETURNF  "元気"
+	;	RETURNF  "元気"
 	CASE 54
 		RETURNF  "天真爛漫"
 	CASEELSE
@@ -532,6 +532,10 @@ SELECTCASE LOCAL
 		RETURNF  "秘書"
 	CASE 20
 		RETURNF  "巫女"
+	CASE 21
+		RETURNF  "メイド"
+	CASE 22
+		RETURNF  "トレーナー"
 	CASEELSE
 		RETURNF  "－－－"
 ENDSELECT
@@ -579,17 +583,17 @@ SELECTCASE LOCAL
 	CASE 8
 		RETURNF  "コスプレ属性"
 	CASE 9
-		RETURNF  "生徒会長"
+		RETURNF  "委員長"
 	CASE 10
 		RETURNF  "聖職者"
 	CASE 11
 		RETURNF  "オタク趣味"
 	CASE 12
-		RETURNF  "既婚"
+	;	RETURNF  "既婚"
 	CASE 13
-		RETURNF  "アルバイト"
+	;	RETURNF  "アルバイト"
 	CASE 14
-		RETURNF  "ロボ娘"
+	;	RETURNF  "ロボ娘"
 	CASE 15
 		RETURNF  "マッドサイエンティスト"
 	CASE 16
@@ -601,21 +605,21 @@ SELECTCASE LOCAL
 	CASE 19
 		RETURNF  \@ TALENT:ARG:オトコ ? 弟 # 妹 \@
 	CASE 20
-		RETURNF  ""
+	;	RETURNF  ""
 	CASE 21
 		RETURNF  "インテリ"
 	CASE 22
-		RETURNF  "宇宙人"
+	;	RETURNF  "宇宙人"
 	CASE 23
 		RETURNF  "貴族"
 	CASE 24
 		RETURNF  "おしゃれ下手"
 	CASE 25
-		RETURNF  ""
+	;	RETURNF  ""
 	CASE 26
-		RETURNF  ""
+	;	RETURNF  ""
 	CASE 27
-		RETURNF  ""
+	;	RETURNF  ""
 	CASE 28
 		RETURNF  "男の娘"
 	CASE 29
@@ -625,9 +629,9 @@ SELECTCASE LOCAL
 	CASE 31
 		RETURNF  "関西弁"
 	CASE 32
-		RETURNF  "帰国子女"
+		RETURNF  "カタコト"
 	CASE 33
-		RETURNF  "傷跡"
+	;	RETURNF  "傷跡"
 	CASE 34
 		RETURNF  "巨大娘"
 	CASE 35
@@ -641,9 +645,9 @@ SELECTCASE LOCAL
 	CASE 39
 		RETURNF  "舌足らず"
 	CASE 40
-		RETURNF  "熟女"
+	;	RETURNF  "熟女"
 	CASE 41
-		RETURNF  ""
+	;	RETURNF  ""
 	CASE 42
 		RETURNF  "邪気眼"
 	CASE 43
@@ -657,17 +661,17 @@ SELECTCASE LOCAL
 	CASE 47
 		RETURNF  "男装"
 	CASE 48
-		RETURNF  ""
+	;	RETURNF  ""
 	CASE 49
-		RETURNF  ""
+	;	RETURNF  ""
 	CASE 50
 		RETURNF  "ツッコミ"
 	CASE 51
-		RETURNF  ""
+	;	RETURNF  ""
 	CASE 52
 		RETURNF  "天然"
 	CASE 53
-		RETURNF  ""
+	;	RETURNF  ""
 	CASE 54
 		RETURNF  "童顔"
 	CASE 55

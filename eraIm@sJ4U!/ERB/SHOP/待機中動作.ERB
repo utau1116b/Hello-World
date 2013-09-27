@@ -1,0 +1,713 @@
+;_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+;_/
+;_/待機中指示関連
+;_/
+;_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+;-------------------------------------------------
+;待機中指示変更
+;-------------------------------------------------
+@CHANGE_ACTION
+X = 0
+REPEAT CHARANUM
+	SIF CFLAG:COUNT:16 == 1
+		X = 1
+REND
+
+;臨月、育児中キャラは強制的に[何もしない]
+REPEAT CHARANUM
+	SIF MARK:COUNT:90 == 1
+		CFLAG:COUNT:待機中行動 = 0
+REND
+
+PRINTL 誰に指示を出しますか？
+CALL ACTION_LIST
+IF CHARANUM <= 100
+	PRINTL [100] 戻る
+ELSE
+	PRINTL [1000][-1] 戻る
+ENDIF
+IF X == 1 && U == 0
+	PRINTFORML [200] 休憩中のキャラも表示する
+ELSEIF X == 1 && U == 1
+	PRINTFORML [200] 休憩中のキャラを非表示にする
+ENDIF
+SIF CHARANUM >= 3
+	PRINTFORML [300] 全員に指示を出す
+
+
+$INPUT_LOOP
+INPUT
+IF RESULT == -1 || (CHARANUM <= 100 && RESULT == 100) || RESULT == 1000
+	RETURN 0
+ELSEIF RESULT == 200 && X == 1
+	IF U == 0
+		U = 1
+		RESTART
+	ELSE
+		U = 0
+		RESTART
+	ENDIF
+ELSEIF RESULT == 300 && CHARANUM >= 3
+	;全員に指示を出す
+	CALL SHOP_ACT_LIST
+	$INPUT_LOOP_ACT_TOTAL
+	INPUT
+	IF RESULT == 100
+		RESTART
+	ELSEIF RESULT < 0 || RESULT > 100
+		PRINTFORML 正しい値を入力してください
+		GOTO INPUT_LOOP_ACT_TOTAL
+	ELSEIF C:RESULT == 0
+		PRINTFORML 正しい値を入力してください
+		GOTO INPUT_LOOP_ACT_TOTAL
+	ELSE
+		;選択された待機中行動を保存
+		D = RESULT
+		IF RESULT == 20
+			;[13] リフレッシュ(耐力○％以下)
+			CALL STARMARK_Y
+			PRINTFORML が○％以下の仲間にリフレッシュを指示します。
+			PRINTFORML 何％以下の仲間に指示しますか？ （1-100、0で戻る）
+			$INPUT_LOOP_REFRESH2
+			INPUT
+			IF RESULT == 0
+				CALL SHOP_ACT_LIST
+				GOTO INPUT_LOOP_ACT_TOTAL
+			ELSEIF RESULT < 0 || RESULT > 100
+				PRINTFORML 正しい値を入力してください
+				GOTO INPUT_LOOP_REFRESH2
+			ELSE
+				;キャラごとに選択された待機中行動を判定し、可能なキャラは変更する
+				FOR A, 0, CHARANUM
+					;MASTERは変更できない
+					SIF A == MASTER
+						CONTINUE
+					;U == 0の時（休憩中のキャラが表示されていない時）は休憩中のキャラの行動を変えない
+					SIF U == 0 && CFLAG:A:16
+						CONTINUE
+					;勧誘済みでないと選べない
+					SIF CFLAG:A:勧誘状況 != -1
+						CONTINUE
+						
+					;耐力が○(選択された値)％以下ならリフレッシュに変更
+					SIF (BASE:A:HP <= MAXBASE:A:HP * RESULT / 100)
+						CFLAG:A:13 = 2
+				NEXT
+			ENDIF
+		ELSE
+			;キャラごとに選択された待機中行動を判定し、可能なキャラは変更する
+			FOR A, 0, CHARANUM
+				;MASTERは変更できない
+				SIF A == MASTER
+					CONTINUE
+				;U == 0の時（休憩中のキャラが表示されていない時）は休憩中のキャラの行動を変えない
+				SIF U == 0 && CFLAG:A:16
+					CONTINUE
+				;勧誘済みでないと選べない
+				SIF CFLAG:A:勧誘状況 != -1
+					CONTINUE
+				
+				CALL SHOP_ACT_ABLE
+				;D（選択された待機中行動）が可能（B:D = 1）なら変更
+				SIF B:D
+					CFLAG:A:13 = D
+			NEXT
+		ENDIF
+		PRINTW 全員に指示しました
+		CALL ACTION_LIST
+		CALL SHOP_ACT_LIST
+		GOTO INPUT_LOOP_ACT_TOTAL
+	ENDIF
+	RESTART
+ELSEIF RESULT < 0 || RESULT >= CHARANUM
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP
+ELSEIF CFLAG:RESULT:16 == 1 && U == 0
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP
+ELSEIF CFLAG:RESULT:21 == 1
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP
+ELSEIF FLAG:62 & 1 && (MARK:RESULT:90 == 1)
+	PRINTFORML 正しい値を入力してください
+	GOTO INPUT_LOOP
+;ELSEIF RESULT == ASSI
+	;GOTO INPUT_LOOP
+ENDIF
+
+IF CFLAG:RESULT:16 == 0 || U == 1
+;内容を指示
+	;RESULT退避
+	A = RESULT
+
+	IF RESULT == MASTER
+		PRINT 新たに加わった仲間へのデフォルトとして
+	ENDIF
+	PRINTFORML 何を指示しますか？
+	
+	CALL SHOP_ACT_NAME
+	FOR LOCAL, 0, 15
+		CALL SHOP_ACT_ABLE
+		SIF B:LOCAL
+			PRINTFORML [{LOCAL, 3}] %TSTR:LOCAL,16,LEFT% ：%TSTR:(100+LOCAL)%
+	NEXT
+	PRINTFORML [100] キャンセル
+
+	$INPUT_LOOP_ACT
+	INPUT
+	IF RESULT == 100
+		RESTART
+	ELSEIF RESULT < 0 || RESULT > 100
+		PRINTFORML 正しい値を入力してください
+		GOTO INPUT_LOOP_ACT
+	ELSEIF B:RESULT == 0
+		PRINTFORML 正しい値を入力してください
+		GOTO INPUT_LOOP_ACT
+	ELSE
+		CFLAG:A:13 = RESULT
+		PRINTFORMW 指示を変更しました
+	ENDIF
+
+	RESTART
+ENDIF
+
+@SHOP_ACT_LIST
+IF U == 0
+	PRINTFORML 何を指示しますか？(休憩中のキャラには指示を出しません)
+ELSEIF U == 1
+	PRINTFORML 何を指示しますか？(休憩中のキャラも含めて全員に指示を出します)
+ENDIF
+;全キャラに対して指示可能な待機中行動(B:1～)を判定し、指示可能なキャラが1人でもいる待機中行動(C:1～に記録)を表示する
+VARSET C, 0
+FOR A, 0, CHARANUM
+	CALL SHOP_ACT_ABLE
+	FOR LOCAL, 0, 15
+		SIF B:LOCAL
+			C:LOCAL = 1
+	NEXT
+NEXT
+CALL SHOP_ACT_NAME
+FOR LOCAL, 0, 15
+	SIF C:LOCAL
+		PRINTFORML [{LOCAL, 3}] %TSTR:LOCAL,16,LEFT% ：%TSTR:(100+LOCAL)%
+NEXT
+PRINTFORM [ 20] リフレッシュ(
+CALL STARMARK_Y
+PRINTFORML ○％以下)
+C:13 = 1
+PRINTFORML [100] キャンセル
+
+@SHOP_ACT_NAME
+VARSET TSTR, ""
+TSTR:0  = 何もさせない
+TSTR:1  = トレーニング
+TSTR:2  = リフレッシュ
+TSTR:3  = 節約
+;TSTR:4  = 連携を確認する
+TSTR:5  = 家事
+;TSTR:6  = ワンマン営業
+TSTR:7  = イチャイチャする
+TSTR:8  = 朝フェラさせる
+TSTR:9  = 自慰
+TSTR:10 = レズ行為
+TSTR:11 = 性行為
+TSTR:12 = 宝探し
+;TSTR:20 = リフレッシュ(耐力○％以下)
+TSTR:100 = 変化なし
+;修業→自主トレーニング
+TSTR:101 = 回復量↓   生活費↓   経験↑
+;リフレッシュ
+TSTR:102 = 回復量↑↑ 生活費↑↑
+;自給自足
+TSTR:103 = 回復量↓↓ 生活費↓↓ 宝珠↑
+;連携を確認する→ユニットの団結力を高めるとか
+;TSTR:104 = 回復量↓   生活費↑   戦闘経験↑ 好感度↑
+;家事
+TSTR:105 = 回復量↓   生活費↓   宝珠↑
+;妖怪退治→一人で営業できるもん！
+;TSTR:106 = 回復量０   ★  ↓   経験↑ 金↑
+;イチャイチャする
+TSTR:107 = 生活費↑↑ 好感度↑
+;朝フェラ
+TSTR:108 = 回復量↓   経験  ↑   宝珠↑
+;自慰
+TSTR:109 = 回復量↓   生活費↑   経験↑ 宝珠↑
+;レズ行為
+TSTR:110 = 回復量↓   生活費↑   経験↑ 宝珠↑
+;性行為
+TSTR:111 = 回復量↓   生活費↑   経験↑ 宝珠↑ 好感度↑
+;宝探し
+TSTR:112 = 回復量↓   生活費↑   アイテム発見
+
+@SHOP_ACT_ABLE
+;事前にAにTARGET等キャラを指定しておき、Aが各待機中行動をできるか判定する
+;各待機中行動が可能な場合B:○が1になる
+VARSET B, 0
+;[0] 何もさせない
+B:0 = 1
+;[1] 修行
+B:1 = 1
+;[2] リフレッシュ
+B:2 = 1
+;[3] 自給自足
+;霊夢様には親密30以上ないと自給自足を指示できない
+SIF TALENT:A:201 == 0 || ABL:A:0 >= 30 || A == MASTER
+	B:3 = 1
+;[4] 連携を確認する
+;SIF A != MASTER && (ABL:A:0 >= 5 || CFLAG:A:2 >= 500 || TALENT:A:153)
+;	B:4 = 1
+;[5] 家事
+;霊夢様には親密20以上ないと指示できない
+SIF A != MASTER && (TALENT:A:201 == 0 && (ABL:A:0 >= 5 || CFLAG:A:2 >= 500 || TALENT:A:153) || ABL:A:0 >= 20)
+	B:5 = 1
+;[6] 妖怪退治
+;SIF A != MASTER && A != TARGET && A != ASSI && BASE:A:HP >= 500 && (ABL:A:0 >= 5 || CFLAG:A:2 >= 500 || TALENT:A:153)
+;	B:6 = 1
+;●友情パッチ用改変
+;[7] イチャイチャする
+SIF A != MASTER && TALENT:A:153 && !IS_友情(A)
+	B:7 = 1
+;[8] 朝フェラ
+SIF TALENT:A:54 == 0 && A != MASTER && (TALENT:A:152 || TALENT:A:153) && (ABL:A:0 >= 10 || ABL:A:1 >= 10 || ABL:A:6 >= 10 || ABL:A:11 >= 1) && (TALENT:MASTER:119 || TALENT:MASTER:121 || TALENT:MASTER:122) && !IS_友情(A)
+	B:8 = 1
+;[9] 自慰
+SIF A != MASTER && (TALENT:A:152 || TALENT:A:153) && (ABL:A:0 >= 10 || ABL:A:1 >= 10 || ABL:A:10 >= 1) && !IS_友情(A)
+	B:9 = 1
+;[10] レズ行為
+SIF A != MASTER && ABL:A:1 >= 5 && ABL:A:9 >= 3 && (ABL:A:0 >= 10 || ABL:A:1 >= 10 || ABL:A:9 >= 10 || ABL:A:12 >= 1) && TALENT:MASTER:122 == 0 && TALENT:A:122 == 0
+	B:10 = 1
+;[11] 性行為
+SIF A != MASTER && TALENT:MASTER:154 == 0 && TALENT:A:88 && TALENT:A:0 == 0 && (ABL:A:0 + ABL:A:1 + ABL:A:4 + ABL:A:6 >= 55) && (TALENT:MASTER:119 || TALENT:MASTER:121 || TALENT:MASTER:122) && !IS_友情(A)
+	B:11 = 1
+;[12] 宝探し
+;B:12 = 1
+;●ここまで
+@ACTION_LIST
+DRAWLINE
+REPEAT CHARANUM
+	;主人公は特別表示
+	SIF COUNT == MASTER
+		PRINTFORML                                   [ 0]デフォルト指示    
+	;SIF COUNT == MASTER
+	;	PRINTL 
+	SIF COUNT == 0
+		CONTINUE
+	;預かり中のキャラは非表示だと選べない
+	SIF CFLAG:COUNT:16 == 1 && U == 0
+		CONTINUE
+	;別れたキャラも選べない
+	SIF CFLAG:COUNT:21
+		CONTINUE
+	;臨月、育児中のキャラも選べない
+	SIF FLAG:62 & 1 && (MARK:COUNT:90 == 1)
+		CONTINUE
+	;勧誘してないキャラは選べない
+	SIF CFLAG:COUNT:勧誘状況 != -1 && COUNT != 0
+		CONTINUE
+		
+	IF COUNT != MASTER
+		PRINT 体力
+		A = BASE:COUNT:0
+		SIF BASE:COUNT:0 < 0
+			A = 0
+		;CALL PRINT_BAR_0, A, MAXBASE:COUNT:0, 16
+		CALL COMMON_SHOW_LIFEBAR1S, COUNT, 1
+		PRINTFORM ({BASE:COUNT:0,4}/{MAXBASE:COUNT:0,4})
+		IF COUNT == TARGET
+			PRINT  ☆
+		ELSEIF COUNT == ASSI
+			PRINT  ★
+		ELSE
+			PRINT  　
+		ENDIF
+		PRINTFORM [{COUNT,2}]%NAME:COUNT,16,LEFT%　
+		;CALL ARRANGE_CHARANAME
+	ENDIF
+
+	CALL SHOP_ACT_NAME
+	PRINTFORML （%TSTR:(CFLAG:COUNT:待機中行動)%）
+REND
+PRINTL 　　　　　　☆：パートナー　★：助手　を表しています
+
+;-------------------------------------------------
+;待機中行動
+;ARG	キャラ番号
+;ARG:1	回復量
+;ARG:2	維持費
+;-------------------------------------------------
+;維持費については考え直す
+@TURNEND_COM(ARG,ARG:1,ARG:2)
+;A体力の回復量
+;C金がいくらかかるか
+VARSET LOCAL, 0
+;待機中指示コマンド実行
+IF ARG != MASTER && CFLAG:ARG:17 == 0
+	IF CFLAG:ARG:待機中行動 == 0
+		;何もしない
+		;実行したコマンドを保存
+		Y:ARG = 0
+	ELSEIF CFLAG:ARG:待機中行動 == 1
+		;修行→トレーニング
+		TIMES ARG:1 , 0.70
+		LOCAL = RAND:2 + 1
+		LOCAL:1 = RAND:3
+		;歌唱
+		IF LOCAL:1 == 0
+			EXP:ARG:歌唱経験 += LOCAL
+			JUEL:ARG:歌唱 += LOCAL
+			CALL TURNEND_COM_PRINT, "EXP", 93, LOCAL, ARG
+		;被写
+		ELSEIF LOCAL:1 == 1
+			EXP:ARG:被写経験 += LOCAL
+			JUEL:ARG:被写 += LOCAL
+			CALL TURNEND_COM_PRINT, "EXP", 92, LOCAL, ARG
+		;舞踊
+		ELSE
+			EXP:ARG:舞踊経験 += LOCAL
+			JUEL:ARG:舞踊 += LOCAL
+			CALL TURNEND_COM_PRINT, "EXP", 103, LOCAL, ARG
+		ENDIF
+		Y:ARG = 1
+	ELSEIF CFLAG:ARG:待機中行動 == 2
+		;リフレッシュ
+		A *= 2
+		LOCAL = RAND:3 + 1
+		CFLAG:ARG:好感度 += LOCAL
+		CALL TURNEND_COM_PRINT, "CFLAG", 2, LOCAL, ARG
+		;実行したコマンドを保存
+		Y:ARG = 2
+	ELSEIF CFLAG:ARG:待機中行動 == 3
+		;自給自足
+		TIMES ARG:1 , 0.30
+		LOCAL = (ABL:ARG:2 * ABL:ARG:6 + 5) * (RAND:10 + 5) / 10
+		JUEL:ARG:16 += LOCAL
+		CALL TURNEND_COM_PRINT, "JUEL", 16, LOCAL, ARG
+		;実行したコマンドを保存
+		Y:ARG = 3
+	ELSEIF CFLAG:ARG:待機中行動 == 4 && H == 1
+		;連携を確認する
+		TIMES ARG:1 , 0.80
+		LOCAL = RAND:7 + 5
+		EXP:ARG:95 += LOCAL
+		CALL TURNEND_COM_PRINT, "EXP", 95, LOCAL, ARG
+		LOCAL = RAND:21 + 20
+		CFLAG:ARG:好感度 += LOCAL
+		CALL TURNEND_COM_PRINT, "CFLAG", 2, LOCAL, ARG
+		;実行したコマンドを保存
+		Y:ARG = 4
+	ELSEIF CFLAG:ARG:待機中行動 == 5
+		;家事
+		TIMES ARG:1 , 0.80
+		LOCAL = RAND:6 / 2 + 1
+		EXP:ARG:90 += LOCAL
+		CALL TURNEND_COM_PRINT, "EXP", 90, LOCAL, ARG
+		LOCAL = (ABL:ARG:6 * ABL:ARG:6 * (ABL:ARG:90 * 2 + ABL:ARG:技巧) / 3 + 5) * (RAND:10 + 5) / 10
+		JUEL:ARG:16 += LOCAL
+		CALL TURNEND_COM_PRINT, "JUEL", 16, LOCAL, ARG
+		LOCAL = RAND:6 + 5
+		CFLAG:ARG:好感度 += LOCAL
+		CALL TURNEND_COM_PRINT, "CFLAG", 2, LOCAL, ARG
+		;実行したコマンドを保存
+		Y:ARG = 5
+	ELSEIF CFLAG:ARG:待機中行動 == 6
+		;妖怪退治→ワンマン営業
+		IF BASE:ARG:HP >= 500
+		;実行したコマンドを保存
+			Y:ARG = 6
+		ELSE
+			PRINTFORML %CALLNAME:ARG%はかなり疲労しているようだ…
+		ENDIF
+	ELSEIF CFLAG:ARG:待機中行動 == 7 && H == 1 && !IS_友情(ARG)
+		;イチャイチャする
+		LOCAL = (ABL:ARG:0 + 5) * (ABL:ARG:6 + 3) * (RAND:10 + 10) / 10
+		JUEL:ARG:15 += LOCAL
+		CALL TURNEND_COM_PRINT, "JUEL", 15, LOCAL, ARG
+		LOCAL = RAND:51 + 50
+		CFLAG:ARG:2 += LOCAL
+		CALL TURNEND_COM_PRINT, "CFLAG", 2, LOCAL, ARG
+		BASE:MASTER:HP -= MAXBASE:MASTER:HP / 200
+		;実行したコマンドを保存
+		Y:ARG = 7
+	ELSEIF CFLAG:ARG:待機中行動 == 8 && H == 1 && !IS_友情(ARG)
+		;朝フェラ 朝じゃなくてもやってくれます。昼寝の寝起き？
+		TIMES ARG:1 , 0.90
+		LOCAL = RAND:11 + 10
+		CFLAG:ARG:2 += LOCAL
+		CALL TURNEND_COM_PRINT, "CFLAG", 2, LOCAL, ARG
+		BASE:MASTER:HP -= MAXBASE:MASTER:HP / 200
+
+		G = 0
+		IF ABL:ARG:11 == 1
+			G = 1
+		ELSEIF ABL:ARG:11 == 2
+			G = 2
+		ELSEIF ABL:ARG:11 == 3
+			G = 3
+		ELSEIF ABL:ARG:11 == 4
+			G = 4
+		ELSEIF ABL:ARG:11 >= 5
+			G = 3 + ABL:ARG:11 / 2
+		ENDIF
+
+		;汚臭鈍感
+		SIF TALENT:ARG:61
+			G += 1
+		;汚臭敏感
+		SIF TALENT:ARG:62
+			G -= 1
+		;献身的
+		SIF TALENT:ARG:63
+			G += 1
+		;恋慕
+		SIF TALENT:ARG:76
+			G += 1
+		;淫乱
+		SIF TALENT:ARG:85
+			G += 1
+		;親愛
+		SIF TALENT:ARG:88
+			G += 3
+		;恋人
+		SIF TALENT:ARG:153
+			G += 1
+
+		;言われてやってるので普段より多い
+		G += 1
+
+		SIF G <= 0
+			G = 1
+
+		EXP:ARG:22 += G
+		CALL TURNEND_COM_PRINT, "EXP", 22, G
+		EXP:ARG:20 += G*2
+		CALL TURNEND_COM_PRINT, "EXP", 20, G*2
+		JUEL:ARG:4 += G*100
+		CALL TURNEND_COM_PRINT, "JUEL", 4, G*100
+		JUEL:ARG:6 += G*30
+		CALL TURNEND_COM_PRINT, "JUEL", 6, G*30
+		JUEL:ARG:7 += G*40
+		CALL TURNEND_COM_PRINT, "JUEL", 7, G*40
+		JUEL:ARG:15 += G*100
+		CALL TURNEND_COM_PRINT, "JUEL", 15, G*100
+		
+		;実行したコマンドを保存
+		Y:ARG = 8
+	ELSEIF CFLAG:ARG:待機中行動 == 9 && !IS_友情(ARG)
+		;自慰
+		TIMES ARG:1 , 0.80
+		LOCAL = RAND:11 + 10
+		CFLAG:ARG:2 += LOCAL
+		CALL TURNEND_COM_PRINT, "CFLAG", 2, LOCAL, ARG
+
+		G = 0
+
+		IF ABL:ARG:10 == 1
+			G = 1
+		ELSEIF ABL:ARG:10 == 2
+			G = 2
+		ELSEIF ABL:ARG:10 == 3
+			G = 4
+		ELSEIF ABL:ARG:10 == 4
+			G = 6
+		ELSEIF ABL:ARG:10 >= 5
+			G = (ABL:ARG:10 * 2) - 1
+		ENDIF
+
+		;言われてやってるので普段より多い
+		G += 1
+
+		IF ABL:ARG:1 == 4 && ABL:ARG:3 >= 4
+			G += 1
+		ELSEIF ABL:ARG:1 >= 5 && ABL:ARG:3 >= 4
+			G += ABL:ARG:1 / 2
+		ENDIF
+		
+		;自慰しやすい
+		IF TALENT:ARG:60
+			G *= 2
+			;欲望ＬＶ３でもGに+1する
+			SIF ABL:ARG:1 >= 3 && ABL:ARG:3 >= 3
+				G += 1
+		ENDIF
+		
+		;快感に素直、快感の否定、淫乱化
+		IF TALENT:ARG:70
+			G += 1
+		ELSEIF TALENT:ARG:71
+			G -= 2
+		ENDIF
+		IF TALENT:ARG:76
+			G += 1
+		ENDIF
+		
+		SIF G <= 0
+			G = 1
+
+		EXP:ARG:10 += G
+		CALL TURNEND_COM_PRINT, "EXP", 10, G
+		EXP:ARG:2 += G / 5
+		CALL TURNEND_COM_PRINT, "EXP", 2, G/5
+		JUEL:ARG:0 += G*500
+		CALL TURNEND_COM_PRINT, "JUEL", 0, G*500
+		JUEL:ARG:4 += G*100
+		CALL TURNEND_COM_PRINT, "JUEL", 4, G*100
+		JUEL:ARG:5 += G*250
+		CALL TURNEND_COM_PRINT, "JUEL", 5, G*250
+		
+		IF ABL:ARG:0 + ABL:ARG:7 + ABL:ARG:8 >= 10
+			JUEL:ARG:8 += G*200
+			CALL TURNEND_COM_PRINT, "JUEL", 8, G*200
+		ENDIF
+		
+		;実行したコマンドを保存
+		Y:ARG = 9
+	ELSEIF CFLAG:ARG:待機中行動 == 10
+		;レズ行為
+		TIMES ARG:1 , 0.80
+		N = 0
+
+		IF ABL:ARG:12 == 1
+			N += 1
+		ELSEIF ABL:ARG:12 == 2
+			N += 2
+		ELSEIF ABL:ARG:12 == 3
+			N += 3
+		ELSEIF ABL:ARG:12 == 4
+			N += 5
+		ELSEIF ABL:ARG:12 >= 5
+			N += 2 + ABL:ARG:12
+		ENDIF
+		G = RAND:100 + 1
+		IF G <= 30
+			N += 1
+		ELSEIF G <= 65
+			N += 2
+		ELSEIF G <= 85
+			N += 5
+		ELSEIF G <= 95
+			N += 8
+		ELSE
+			N += 15
+		ENDIF
+		
+		R = RAND:76 + 75
+		N *= R
+		N /= 100
+
+		EXP:ARG:40 += N*20
+		CALL TURNEND_COM_PRINT, "EXP", 40, N*20
+		EXP:ARG:2 += N*100*ABL:ARG:0/500
+		CALL TURNEND_COM_PRINT, "EXP", 2, N*100*ABL:ARG:0/500
+		
+		JUEL:ARG:6 += N*75*(ABL:ARG:2+ABL:ARG:6)
+		CALL TURNEND_COM_PRINT, "JUEL", 6, N*75*(ABL:ARG:2+ABL:ARG:6)
+		JUEL:ARG:7 += N*75*(ABL:ARG:2+ABL:ARG:6)
+		CALL TURNEND_COM_PRINT, "JUEL", 7, N*75*(ABL:ARG:2+ABL:ARG:6)
+		IF TALENT:ARG:121
+			EXP:ARG:3 += N
+			CALL TURNEND_COM_PRINT, "EXP", 3, N
+			JUEL:ARG:8 += N*100
+			CALL TURNEND_COM_PRINT, "JUEL", 8, N*100
+		ENDIF
+		
+		;実行したコマンドを保存
+		Y:ARG = 10
+	ELSEIF CFLAG:ARG:待機中行動 == 11 && H == 1 && !IS_友情(ARG)
+		;性行為
+		TIMES ARG:1 , 0.70
+		LOCAL = RAND:41 + 30
+		CFLAG:ARG:2 += LOCAL
+		BASE:MASTER:HP -= MAXBASE:MASTER:HP / 50
+
+		S = 1
+		;V感覚
+		IF ABL:ARG:4 == 1
+			S += 1
+		ELSEIF ABL:ARG:4 == 2
+			S += 2
+		ELSEIF ABL:ARG:4 == 3
+			S += 2
+		ELSEIF ABL:ARG:4 == 4
+			S += 3
+		ELSEIF ABL:ARG:4 >= 5
+			S += 1 + (ABL:ARG:4 / 2)
+		ENDIF
+		
+		;欲望と奉仕精神によるボーナス
+		IF ABL:ARG:1 == 4 && ABL:ARG:6 >= 4
+			S += 1
+		ELSEIF ABL:ARG:1 >= 5 && ABL:ARG:6 >= 4
+			S += ABL:ARG:1 / 2
+		ENDIF
+		
+		;V感覚が充分にあれば、欲望ＬＶ３でもSに+1する
+		IF ABL:ARG:1 >= 3 && ABL:ARG:4 >= 3
+			S += 1
+		ENDIF
+		
+		;快感に素直、快感の否定、淫乱化
+		IF TALENT:ARG:70
+			S += 1
+		ELSEIF TALENT:ARG:71
+			S -= 2
+		ENDIF
+		
+		IF TALENT:ARG:76
+			S += 1
+		ENDIF
+	
+		SIF S <= 0
+			S = 1
+		EXP:ARG:0 += S
+		CALL TURNEND_COM_PRINT, "EXP", 0, S
+		EXP:ARG:2 += S
+		CALL TURNEND_COM_PRINT, "EXP", 2, S
+		CFLAG:MASTER:2 += S
+		CFLAG:ARG:2 += S*5
+		CALL TURNEND_COM_PRINT, "CFLAG", 2, S*5
+		IF TALENT:MASTER:121 || TALENT:MASTER:122
+			EXP:ARG:20 += S * 10
+			CALL TURNEND_COM_PRINT, "EXP", 20, S*10
+		ENDIF
+		JUEL:ARG:1 += S*800
+		CALL TURNEND_COM_PRINT, "JUEL", 1, S*800
+		JUEL:ARG:4 += S*500
+		CALL TURNEND_COM_PRINT, "JUEL", 4, S*500
+		JUEL:ARG:5 += S*500
+		CALL TURNEND_COM_PRINT, "JUEL", 5, S*500
+		JUEL:ARG:15 += S*500
+		CALL TURNEND_COM_PRINT, "JUEL", 15, S*500
+		
+		;実行したコマンドを保存
+		Y:ARG = 11
+	ELSEIF CFLAG:ARG:待機中行動 == 12
+		;宝探し
+		TIMES ARG:1 , 0.70
+		CALL TREASURE
+	;●ここまで
+		;実行したコマンドを保存
+		Y:ARG = 12
+	ENDIF
+	;リング資金稼ぎ
+	CALL TURNEND_EARN_MONEY_TM(ARG)
+ENDIF
+RETURN ARG:1
+
+;ARG:2	名前
+@TURNEND_COM_PRINT, ARGS, ARG, ARG:1, ARG:2
+;待機行動中に入手した経験や宝珠や好感度を表示させる関数
+;当該CONFIGがONのときのみ。
+SIF (FLAG:23 & 1p25) == 0
+	RETURN 0
+SIF ARG:1 == 0
+	RETURN 0
+SELECTCASE ARGS
+	CASE "CFLAG"
+		PRINTFORML %CALLNAME:(ARG:2)%は%CFLAGNAME:ARG%を\@(ARG:1 > 0) ? {ARG:1}だけ得ることができた。 # {-ARG:1}だけ減らした。\@
+	CASE "EXP"
+		PRINTFORML %CALLNAME:(ARG:2)%は%EXPNAME:ARG%を{ARG:1}だけ得ることができた。
+	CASE "JUEL"
+		PRINTFORML %CALLNAME:(ARG:2)%は%PALAMNAME:ARG%の宝珠を{ARG:1}だけ得ることができた。
+ENDSELECT
+RETURN 1

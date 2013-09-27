@@ -89,7 +89,12 @@ ELSE
 	CALL MMPLAY(7)
 ENDIF
 
-CALL LAF(999)
+;13/09/27
+;アイドルにお任せできるように
+
+;CALL LAF(999)
+CALL LAF_EXAM
+
 ;勝利
 IF RESULT == 0
 	;チュートリアル
@@ -227,6 +232,7 @@ LOCAL:6 = 70
 LOCAL:1 = 0
 
 ;3人だけファン獲得(修正予定)
+;＆1,2人の時A = 500じゃおかしい
 FOR LOCAL, 1080, 1083
 	FOR LOCAL:1, 51, 57
 		SIF FLAG:LOCAL < 0

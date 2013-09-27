@@ -1,0 +1,5580 @@
+;-------------------------------------------------
+;双葉杏口上（キャラクターの名前を入れる、下にコンセプトなど一言あれば入れる）
+;絶対に働きたくないでござる！
+;Ｐの方で杏ちゃんが余りにもダメ可愛かったので思わず書いた
+;Ｐの方の口上をリスペクトしつつ、こっちはこっちなりのダメ可愛さを出したい
+;-------------------------------------------------
+
+;-------------------------------------------------
+;純愛口上用雛形
+;このテンプレートはeratohoIm@s用の口上テンプレートですので、
+;eraIm@sJ系列以外のバリアントでは使用しないようにしてください
+;純愛イベント口上ではCALL COMMON_PLANE_TEXTを挿入することで、共通の地の文を呼び出せます
+;46、46をキャラ番号に置換してください。
+;なお、キャラ番号が0番代の場合は46は一桁で置換（例:1）し、
+;46は0を含めて二桁で置換（例:01）してください
+;※キャラ番号は春香(11),千早(12),雪歩(13)…となっています
+;-------------------------------------------------
+
+;--------------------------------------------------
+;口上ファイルの存在判定（46をキャラ番号に置換）
+;--------------------------------------------------
+@EVENTTRAIN
+#PRI
+FLAG:146 = 1
+SIF FLAG:7 == 0
+FLAG:7 = 2
+
+@EVENTEND
+#LATER
+FLAG:146 = 0
+;キャラ選択時の強調用
+@KOJO_EXIST_K46
+RETURN 1
+
+;--------------------------------------------------
+;純愛イベント口上　 CFLAG221
+;--------------------------------------------------
+@KOJO_JUN_K46
+;--------------------------------------------------
+;エキストラモード構文　CFLAG:220を使用
+;はいを選択した時に初調教時に口上設定用の素質に変更できます
+;下記に処女化する場合の構文をサンプルとして載せておきます
+;-------------------------------------------------
+;IF TFLAG:600 == 0 && CFLAG:220 == 0
+;	PRINTL 処女モードに移行しますか？
+;	PRINTL [0] はい
+;	PRINTL [1] いいえ
+;	$INPUT_LOOP
+;	INPUT
+;	IF RESULT == 0
+;		PRINTFORMW ―処女モードに素質、能力を変更します―
+;		TALENT:TARGET:0 = 1
+;		ABL:TARGET:4 = 0
+;		EXP:TARGET:0 = 0
+;	ELSEIF RESULT == 1
+;		PRINTFORMW ―通常モードで調教を開始します―
+;	ELSE
+;		GOTO INPUT_LOOP
+;	ENDIF
+;	CFLAG:220 = 1
+;ENDIF
+
+;-------------------------------------------------
+;オープニング
+;-------------------------------------------------
+IF TFLAG:600 == 28
+	CALL COMMON_PLANE_TEXT
+	PRINTFORML 
+	PRINTFORML 
+	PRINTFORMW 　パートナーとなった、ちんちくりんアイドルは薄っぺらい胸をぐいっと反らすと滔々と述べ始めた
+	PRINTFORMW 「はるかなるアイドル道を極める為！」
+	PRINTFORMW 「たゆまぬ努力は欠かしません！」
+	PRINTFORMW 「ラクな道ではないけれど！」
+	PRINTFORMW 「きっとやりとげてみせます！」
+	PRINTFORMW 「たまに飴さえ貰えるならば！」
+	PRINTFORMW 「くろうなんて！」
+	PRINTFORMW 「なんのその！」
+	PRINTFORMW 「いも」
+	PRINTFORML 
+	PRINTFORMW 　挨拶？を終えた杏は一仕事やり遂げたと言わんばかりのドヤ顔をキメると、薄汚れたぬいぐるみを枕にその場でダラけを開始した
+ENDIF
+
+;-------------------------------------------------
+;朝になったとき CFLAG221
+;-------------------------------------------------
+IF TFLAG:600 == 38
+	;デート後一回目
+	IF EXP:94 > 0 && CFLAG:221 < 1
+		PRINTFORMW 
+		CFLAG:221 = 1
+	;キス後一回目
+	ELSEIF EXP:96 > 0 && CFLAG:221 < 2
+		PRINTFORMW 
+		CFLAG:221 = 2
+	;恋慕後一回目
+	ELSEIF TALENT:85 == 1 && CFLAG:221 < 3
+		PRINTFORMW 
+		CFLAG:221 = 3
+	;エンディング後一回目
+	ELSEIF FLAG:28 > 0 && CFLAG:221 < 4
+		PRINTFORMW 
+		CFLAG:221 = 4
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;ファーストキス
+;-------------------------------------------------
+IF TFLAG:600 == 1
+	;デート経験有り
+	IF EXP:94 > 0
+		PRINTFORMW 「んむ……ふぅ……」
+		PRINTFORMW 「ふふ、これでプロデューサーには私を扶養する義務が生じたぞっ！」
+		PRINTFORMW 　真っ赤になって杏はそんな照れ隠しを言った
+		PRINTFORMW 　……６割くらい本気な気もするが
+	;それ以外
+	ELSE
+		PRINTFORMW 「んむ……び、びっくりした、具体的にはスタミナがゼロになるくらい」
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;告白成功
+;-------------------------------------------------
+IF TFLAG:600 == 2
+	;キス経験有り
+	IF EXP:96 > 0
+		PRINTFORMW 「し、仕方ないなー、プロデューサーには杏を養う権利をあげよう！」
+		PRINTFORMW 「き、キスもしちゃったしね……」
+		PRINTFORMW 　杏は真っ赤に染まったにやけ顔でプロデューサーの気持ちを受け入れた
+	;デート経験有り
+	ELSEIF EXP:94 > 0
+		PRINTFORMW 「し、仕方ないなー、プロデューサーには杏を養う権利をあげよう！」
+		PRINTFORMW 　杏は真っ赤に染まったにやけ顔でプロデューサーの気持ちを受け入れた
+	;それ以外
+	ELSE
+		PRINTFORMW 「し、仕方ないなー、プロデューサーには杏を養う権利をあげよう！」
+		PRINTFORMW 　杏は真っ赤に染まったにやけ顔でプロデューサーの気持ちを受け入れた
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;告白失敗　 CFLAG222
+;-------------------------------------------------
+IF TFLAG:600 == 3
+	;キス経験有り
+	IF EXP:96 > 0 && (CFLAG:222 < 3 || FLAG:7 == 2)
+		PRINTFORMW 「三食昼寝付きで毎月新作ゲーム買ってくれて快速ネット環境が保証される生活なら考えてもいいなー」
+		PRINTFORMW 「……贅沢言うなって？　それならこの話はなしね」
+		PRINTFORMW 　杏はべーっと舌を出してプロデューサーの告白を断った
+		CFLAG:222 = 3
+	;デート経験有り
+	ELSEIF EXP:94 > 0 && (CFLAG:222 < 2 || FLAG:7 == 2)
+		PRINTFORMW 「三食昼寝付きで毎月新作ゲーム買ってくれて快速ネット環境が保証される生活なら考えてもいいなー」
+		PRINTFORMW 「……贅沢言うなって？　それならこの話はなしね」
+		PRINTFORMW 　杏はべーっと舌を出してプロデューサーの告白を断った
+		CFLAG:222 = 2
+	;それ以外
+	ELSEIF CFLAG:222 < 1 || FLAG:7 == 2
+		PRINTFORMW 「三食昼寝付きで毎月新作ゲーム買ってくれて快速ネット環境が保証される生活なら考えてもいいなー」
+		PRINTFORMW 「……贅沢言うなって？　それならこの話はなしね」
+		PRINTFORMW 　杏はべーっと舌を出してプロデューサーの告白を断った
+		CFLAG:222 = 1
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;服を無理矢理脱がせる　 CFLAG223
+;-------------------------------------------------
+IF TFLAG:600 == 4
+	;恋人
+	IF TALENT:153 == 1 && (CFLAG:223 < 3 || FLAG:7 == 2)
+		PRINTFORMW 「わぁっ！？　こ、子供じゃないんだから自分で脱げ……や、やっぱ脱がして……」
+		CFLAG:223 = 3
+	;それ以外
+	ELSEIF CFLAG:223 < 5 || FLAG:7 == 2
+		PRINTFORMW 「あぁー……抵抗するのもめんどくさいー……」
+		PRINTFORMW 　杏はされるがままに脱がされている
+		CFLAG:223 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;服を脱がせる　 CFLAG224
+;-------------------------------------------------
+IF TFLAG:600 == 5
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:224 < 4 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORML 「ふっふっふ、この魅惑のせくしーぼでぃ☆が見たいというのならば仕方ない……」
+				PRINTFORMW 「ああっ、プロデューサーが白い目で見るっ！」
+				PRINTFORMW 「傷ついた！　このショックを癒すにはもう帰って寝るしかないっ！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「だるーい……プロデューサー、めんどくさいから脱がせてー」
+			ELSE
+				PRINTFORML 「はいはい、まったくスケベなプロデューサーだなー」
+				PRINTFORMW 　杏は服をその場に脱ぎ散らかすと、平べったい胸を「どやっ！」とばかりに張った
+			ENDIF
+			CFLAG:224 = 4
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:224 < 3 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORML 「ふっふっふ、この魅惑のせくしーぼでぃ☆が見たいというのならば仕方ない……」
+				PRINTFORMW 「ああっ、プロデューサーが白い目で見るっ！」
+				PRINTFORMW 「傷ついた！　このショックを癒すにはもう帰って寝るしかないっ！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「だるーい……プロデューサー、めんどくさいから脱がせてー」
+			ELSE
+				PRINTFORML 「はいはい、まったくスケベなプロデューサーだなー」
+				PRINTFORMW 　杏は服をその場に脱ぎ散らかすと、平べったい胸を「どやっ！」とばかりに張った
+			ENDIF
+			CFLAG:224 = 3
+		;それ以外
+		ELSEIF CFLAG:224 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「だるーい……プロデューサー、めんどくさいから脱がせてー」
+			ELSE
+				PRINTFORML 「はいはい、まったくスケベなプロデューサーだなー」
+				PRINTFORMW 　杏は服をその場に脱ぎ散らかすと、平べったい胸を「どやっ！」とばかりに張った
+			ENDIF
+			CFLAG:224 = 2
+		ENDIF
+ENDIF
+
+;-------------------------------------------------
+;服脱がせ失敗　 CFLAG225
+;-------------------------------------------------
+IF TFLAG:600 == 6
+	;初めて
+	IF CFLAG:225 == 0
+		PRINTFORMW 「いーやーだーっ！」
+		CFLAG:225 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:225 < 4 || FLAG:7 == 2)
+			PRINTFORMW 「いーやーだーっ！」
+			CFLAG:225 = 4
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:225 < 3 || FLAG:7 == 2)
+			PRINTFORMW 「いーやーだーっ！」
+			CFLAG:225 = 3
+		;それ以外
+		ELSEIF CFLAG:225 < 2 || FLAG:7 == 2
+			PRINTFORMW 「いーやーだーっ！」
+			CFLAG:225 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;「合意」で服脱がせる　 CFLAG226
+;-------------------------------------------------
+IF TFLAG:600 == 7
+	;初めて
+	IF CFLAG:226 == 0
+		PRINTFORMW 「もう、プロデューサーはいつもいつも変な事ばっかりさせるんだから……」
+		PRINTFORMW 　ぶつぶつ言いながらも杏は服を脱ぎ捨てた
+		PRINTFORMW 「どやっ！　この魅惑の玉子肌！」
+		PRINTFORMW 　だがツルペッタン
+		PRINTFORMW 「ほっとけー！」
+		CFLAG:226 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:226 < 4 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「まったくもー、仕方ないなー、面倒だなー」
+				PRINTFORMW 　服を脱ぎながらこちらにチラチラと向ける視線には、明らかに期待の色が混じっていた
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「脱ぎ脱ぎっと……このまま、二人で裸でダラダラタイム開始だねっ」
+			ELSE
+				PRINTFORML 「そりゃーね、どたぷーんどころかつるぺったーんだけどさ……」
+				PRINTFORMW 「プロデューサーは、こんな杏がいいんだよね？」
+			ENDIF
+			CFLAG:226 = 4
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:226 < 3 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「まったくもー、仕方ないなー、面倒だなー」
+				PRINTFORMW 　服を脱ぎながらこちらにチラチラと向ける視線には、明らかに期待の色が混じっていた
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「脱ぎ脱ぎっと……このまま、二人で裸でダラダラタイム開始だねっ」
+			ELSE
+				PRINTFORML 「そりゃーね、どたぷーんどころかつるぺったーんだけどさ……」
+				PRINTFORMW 「プロデューサーは、こんな杏がいいんだよね？」
+			ENDIF
+			CFLAG:226 = 3
+		;それ以外
+		ELSEIF CFLAG:226 < 2 || FLAG:7 == 2
+			PRINTFORMW 「脱ぎ脱ぎっと……このままお風呂入ってお布団にダイブしたい……」
+			CFLAG:226 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;営業イベントのお仕事系　 CFLAG239
+;-------------------------------------------------
+IF TFLAG:600 == 16
+	;恋慕
+	IF TALENT:85 == 1 && (CFLAG:239 < 6 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:239 = 6
+	;恋人
+	ELSEIF TALENT:153 == 1 && (CFLAG:239 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:239 = 5
+	;キス経験有り
+	ELSEIF EXP:96 > 0 && (CFLAG:239 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:239 = 4
+	;デート経験有り
+	ELSEIF EXP:94 > 0 && (CFLAG:239 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:239 = 3
+	;それ以外
+	ELSEIF CFLAG:239 < 5 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:239 = 2
+	ENDIF
+ENDIF
+
+
+;-------------------------------------------------
+;営業地方ラジオなど声のお仕事系　 CFLAG240
+;-------------------------------------------------
+IF TFLAG:600 == 17
+	;恋慕
+	IF TALENT:85 == 1 && (CFLAG:240 < 6 || FLAG:7 == 2)
+		PRINTFORMW 「ダラけきったラジオ、ダラジオはっじまるよー」
+		CFLAG:240 = 6
+	;恋人
+	ELSEIF TALENT:153 == 1 && (CFLAG:240 < 5 || FLAG:7 == 2)
+		PRINTFORMW 「ダラけきったラジオ、ダラジオはっじまるよー」
+		CFLAG:240 = 5
+	;キス経験有り
+	ELSEIF EXP:96 > 0 && (CFLAG:240 < 5 || FLAG:7 == 2)
+		PRINTFORMW 「ダラけきったラジオ、ダラジオはっじまるよー」
+		CFLAG:240 = 4
+	;デート経験有り
+	ELSEIF EXP:94 > 0 && (CFLAG:240 < 5 || FLAG:7 == 2)
+		PRINTFORMW 「ダラけきったラジオ、ダラジオはっじまるよー」
+		CFLAG:240 = 3
+	;それ以外
+	ELSEIF CFLAG:240 < 5 || FLAG:7 == 2
+		PRINTFORMW 「ダラけきったラジオ、ダラジオはっじまるよー」
+		CFLAG:240 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;営業地方テレビのお仕事など被写系　 CFLAG240
+;-------------------------------------------------
+IF TFLAG:600 == 43
+	;恋慕
+	IF TALENT:85 == 1 && (CFLAG:240 < 6 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:240 = 6
+	;恋人
+	ELSEIF TALENT:153 == 1 && (CFLAG:240 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:240 = 5
+	;キス経験有り
+	ELSEIF EXP:96 > 0 && (CFLAG:240 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:240 = 4
+	;デート経験有り
+	ELSEIF EXP:94 > 0 && (CFLAG:240 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:240 = 3
+	;それ以外
+	ELSEIF CFLAG:240 < 5 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:240 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;営業エキストラなど踊りに関係する系　 CFLAG240
+;-------------------------------------------------
+IF TFLAG:600 == 44
+	;恋慕
+	IF TALENT:85 == 1 && (CFLAG:240 < 6 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:240 = 6
+	;恋人
+	ELSEIF TALENT:153 == 1 && (CFLAG:240 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:240 = 5
+	;キス経験有り
+	ELSEIF EXP:96 > 0 && (CFLAG:240 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:240 = 4
+	;デート経験有り
+	ELSEIF EXP:94 > 0 && (CFLAG:240 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:240 = 3
+	;それ以外
+	ELSEIF CFLAG:240 < 5 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:240 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;休憩　 CFLAG244
+;-------------------------------------------------
+IF TFLAG:600 == 21
+	;恋慕
+	IF TALENT:85 == 1 && (CFLAG:244 < 6 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「ふふっ、これはただの休憩じゃない……。　そう、戦略的休憩だよっ！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「果報は寝て待てって名言だよね」
+			ELSE
+				PRINTFORMW 「充電中～。　……このまま一生充電してたい……」
+			ENDIF
+		CFLAG:244 = 6
+	;恋人
+	ELSEIF TALENT:153 == 1 && (CFLAG:244 < 5 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「ふふっ、これはただの休憩じゃない……。　そう、戦略的休憩だよっ！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「果報は寝て待てって名言だよね」
+			ELSE
+				PRINTFORMW 「充電中～。　……このまま一生充電してたい……」
+			ENDIF
+		CFLAG:244 = 5
+	;キス経験有り
+	ELSEIF EXP:96 > 0 && (CFLAG:244 < 5 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「ふふっ、これはただの休憩じゃない……。　そう、戦略的休憩だよっ！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「果報は寝て待てって名言だよね」
+			ELSE
+				PRINTFORMW 「充電中～。　……このまま一生充電してたい……」
+			ENDIF
+		CFLAG:244 = 4
+	;デート経験有り
+	ELSEIF EXP:94 > 0 && (CFLAG:244 < 5 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「ふふっ、これはただの休憩じゃない……。　そう、戦略的休憩だよっ！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「果報は寝て待てって名言だよね」
+			ELSE
+				PRINTFORMW 「充電中～。　……このまま一生充電してたい……」
+			ENDIF
+		CFLAG:244 = 3
+	;それ以外
+	ELSEIF CFLAG:244 < 5 || FLAG:7 == 2
+			IF RAND:3 == 0
+				PRINTFORMW 「ふふっ、これはただの休憩じゃない……。　そう、戦略的休憩だよっ！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「果報は寝て待てって名言だよね」
+			ELSE
+				PRINTFORMW 「充電中～。　……このまま一生充電してたい……」
+			ENDIF
+		CFLAG:244 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;パートナー交代　 CFLAG245
+;交代した後の相手はTで取得可能
+;-------------------------------------------------
+IF TFLAG:600 == 22
+	;恋慕
+	IF TALENT:85 == 1 && (CFLAG:245 < 6 || FLAG:7 == 2)
+		IF RAND:2 == 0
+			PRINTFORMW 「お休みくれるの？　プロデューサーも一緒に休まない？」
+		ELSE
+			PRINTFORMW 「ふーん、%CALLNAME:T%と一緒に居るんだ……」
+		ENDIF
+		CFLAG:245 = 6
+	;恋人
+	ELSEIF TALENT:153 == 1 && (CFLAG:245 < 5 || FLAG:7 == 2)
+		IF RAND:2 == 0
+			PRINTFORMW 「お休みくれるの？　プロデューサーも一緒に休まない？」
+		ELSE
+			PRINTFORMW 「ふーん、%CALLNAME:T%と一緒に居るんだ……」
+		ENDIF
+		CFLAG:245 = 5
+	;キス経験有り
+	ELSEIF EXP:96 > 0 && (CFLAG:245 < 5 || FLAG:7 == 2)
+		IF RAND:2 == 0
+			PRINTFORMW 「わーい、お休みだーっ！」
+		ELSE
+			PRINTFORMW 「あ、杏には全力でダラけるお仕事があるので、%CALLNAME:T%は頑張って働いてね！」
+		ENDIF
+		CFLAG:245 = 4
+;	;デート経験有り
+	ELSEIF EXP:94 > 0 && (CFLAG:245 < 5 || FLAG:7 == 2)
+		IF RAND:2 == 0
+			PRINTFORMW 「わーい、お休みだーっ！」
+		ELSE
+			PRINTFORMW 「あ、杏には全力でダラけるお仕事があるので、%CALLNAME:T%は頑張って働いてね！」
+		ENDIF
+		CFLAG:245 = 3
+	;それ以外
+	ELSEIF CFLAG:245 < 5 || FLAG:7 == 2
+		IF RAND:2 == 0
+			PRINTFORMW 「わーい、お休みだーっ！」
+		ELSE
+			PRINTFORMW 「あ、杏には全力でダラけるお仕事があるので、%CALLNAME:T%は頑張って働いてね！」
+		ENDIF
+		CFLAG:245 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;助手交代　 CFLAG246
+;-------------------------------------------------
+IF TFLAG:600 == 23
+	;恋慕
+	IF TALENT:85 == 1 && (CFLAG:246 < 6 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:246 = 6
+	;恋人
+	ELSEIF TALENT:153 == 1 && (CFLAG:246 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+			CFLAG:246 = 5
+	;キス経験有り
+	ELSEIF EXP:96 > 0 && (CFLAG:246 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:246 = 4
+	;デート経験有り
+	ELSEIF EXP:94 > 0 && (CFLAG:246 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:246 = 3
+	;それ以外
+	ELSEIF CFLAG:246 < 5 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:246 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;デート中に向こうからファーストキス
+;-------------------------------------------------
+IF TFLAG:600 == 25
+	;恋慕
+	IF TALENT:85 == 1
+		PRINTFORMW 
+	;恋人
+	ELSEIF TALENT:153 == 1
+		PRINTFORMW 
+	;それ以外
+	ELSE
+		PRINTFORMW 
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;デート中に向こうから告白
+;ちなみにTALENT:151を持ってる＝キス未経験の場合、このタイミングで一緒にファーストキスもする
+;-------------------------------------------------
+IF TFLAG:600 == 26
+	;キス経験有り
+	IF EXP:96 > 0
+		PRINTFORMW 
+	;それ以外
+	ELSE
+		PRINTFORMW 
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;我慢できず押し倒される
+;-------------------------------------------------
+IF TFLAG:600 == 27
+	;恋慕
+	IF TALENT:85 == 1
+		PRINTFORMW 
+	;恋人
+	ELSEIF TALENT:153 == 1
+		PRINTFORMW 
+	;キス経験有り
+	ELSEIF EXP:96 > 0
+		PRINTFORMW 
+	;デート経験有り
+	ELSEIF EXP:94 > 0
+		PRINTFORMW 
+	;それ以外
+	ELSE
+		PRINTFORMW 
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;エンディング
+;-------------------------------------------------
+IF TFLAG:600 == 29
+	PRINTFORMW 
+ENDIF
+	TFLAG:600 = 0
+	RETURN 1
+
+
+
+;-------------------------------------------------
+;イベント口上
+;-------------------------------------------------
+@SELF_KOJO_K46
+;-------------------------------------------------
+;調教後自慰 CFLAG301
+;-------------------------------------------------
+IF TFLAG:13 == 1
+	;恋慕
+	IF TALENT:85 ==1 && (CFLAG:301 < 3 || FLAG:7 == 2)
+		IF RAND:2 == 0
+			PRINTFORMW 「んっ！　あんっ！　じ、自分でするのじゃ足りないよぉっ%UNICODE(0x2661)%」
+		ELSE
+			PRINTFORMW 「ふぁ……プロデューサーの指、私の指よりゴツゴツしてたっけ……んっ！」
+		ENDIF
+		CFLAG:301 = 3
+	;自慰中毒Lv3以上
+	ELSEIF ABL:10 >= 3 && (CFLAG:301 < 2 || FLAG:7 == 2)
+		IF RAND:2 == 0
+			PRINTFORMW 「はぅっ、ふぅんっ、オナニー気持ちいいよぉっ%UNICODE(0x2661)%」
+			PRINTFORMW 「もう私、オナニーだけする生き物になるぅっ%UNICODE(0x2661)%」
+		ELSE
+			PRINTFORMW 「セックスもいいけどオナニーもね！」
+		ENDIF
+		CFLAG:301 = 2
+	;それ以外
+	ELSEIF CFLAG:301 < 1 || FLAG:7 == 2
+		IF RAND:2 == 0
+			PRINTFORMW 「なんかムラムラする……」
+		ELSE
+			PRINTFORMW 「人をムラムラさせといて中途半端で放っておくなんて、プロデューサーも職務怠慢だよ」
+		ENDIF
+		CFLAG:301 = 1
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;レズプレイ CFLAG302
+;-------------------------------------------------
+IF TFLAG:13 == 2
+	;恋慕
+	IF TALENT:85 ==1 && (CFLAG:302 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:302 = 4
+	;レズ中毒Lv3以上
+	ELSEIF ABL:12 >= 3 && (CFLAG:302 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:302 = 3
+	;レズっけLv3以上
+	ELSEIF ABL:9 >= 3 && (CFLAG:302 < 2 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:302 = 2
+	;それ以外
+	ELSEIF CFLAG:302 < 1 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:302 = 1
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;朝フェラ CFLAG303
+;-------------------------------------------------
+IF TFLAG:13 == 3
+	;恋慕
+	IF TALENT:85 ==1 && (CFLAG:303 < 3 || FLAG:7 == 2)
+		IF RAND:2 == 0
+			PRINTFORMW 「朝っぱらから杏に労働する気にさせるなんて、プロデューサーはホント敏腕だねっ！」
+			PRINTFORMW 「じゃ、失礼しまーす……あむ」
+			PRINTFORMW 　杏は小さな口いっぱいにプロデューサーの一物を咥えた
+		ELSE
+			PRINTFORMW 「うっわー、朝っぱらからえげつない状態になってるよー」
+		ENDIF
+		CFLAG:303 = 3
+	;奉仕精神Lv5以上
+	ELSEIF ABL:6 >= 5 && (CFLAG:303 < 2 || FLAG:7 == 2)
+		IF RAND:2 == 0
+			PRINTFORMW 「朝っぱらから杏に労働する気にさせるなんて、プロデューサーはホント敏腕だねっ！」
+			PRINTFORMW 「じゃ、失礼しまーす……あむ」
+			PRINTFORMW 　杏は小さな口いっぱいにプロデューサーの一物を咥えた
+		ELSE
+			PRINTFORMW 「うっわー、朝っぱらからえげつない状態になってるよー」
+		ENDIF
+		CFLAG:303 = 2
+	;それ以外
+	ELSEIF CFLAG:303 < 1 || FLAG:7 == 2
+		PRINTFORMW 「そーせーじ……むぐむぐ……」
+		PRINTFORMW 　寝ぼけた杏が朝立ちした一物にしゃぶりついている
+		CFLAG:303 = 1
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;調教後セックス CFLAG304
+;-------------------------------------------------
+IF TFLAG:13 == 4
+	;V感覚Lv4以上
+	IF ABL:4 >= 4 && (CFLAG:304 < 2 || FLAG:7 == 2)
+		IF RAND:2 == 0
+			PRINTFORMW 「大きいっ%UNICODE(0x2661)%　大きいよっ、プロデューサーのっ%UNICODE(0x2661)%」
+			PRINTFORMW 　プロデューサーに跨った杏は小さな胎内に納めた一物を堪能するかのように腰を揺すっている
+		ELSE
+			PRINTFORMW 「んっ%UNICODE(0x2661)%　こ、こんな事、杏に教え込んでくれてっ%UNICODE(0x2661)%」
+			PRINTFORMW 「もう仕事なんかいかないっ%UNICODE(0x2661)%　プロデューサーとエッチだけしてるぅっ%UNICODE(0x2661)%」
+		ENDIF
+		CFLAG:304 = 2
+	;それ以外
+	ELSEIF CFLAG:304 < 1 || FLAG:7 == 2
+		IF RAND:2 == 0
+			PRINTFORMW 「もうちょっと、して欲しいな……%UNICODE(0x2661)%」
+			PRINTFORMW 上目遣いでおねだりしてくる杏を再度押し倒した
+		ELSE
+			PRINTFORML 「プロデューサー、もっとしようよ」
+			PRINTFORMW 「いっつもレッスンは大事だって言ってるじゃない%UNICODE(0x2661)%」
+			PRINTFORMW 　杏は悪戯っぽく笑うと、濡れそぼった秘唇を指先で開いて見せ付けてきた
+		ENDIF
+		CFLAG:304 = 1
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;調教後夜這い　 CFLAG305
+;-------------------------------------------------
+IF TFLAG:13 == 5
+	;V感覚Lv5以上
+	IF ABL:4 >= 5 && (CFLAG:305 < 2 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:305 = 2
+	;それ以外
+	ELSEIF CFLAG:305 < 1 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:305 = 1
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;エンゲージリング プレゼント時
+;-------------------------------------------------
+IF TFLAG:13 == 7
+	PRINTFORMW 
+ENDIF
+	TFLAG:13 = 0
+	RETURN 0
+
+
+;--------------------------------------------------
+;EVENTTRAIN関係（46をキャラ番号に置換）
+;調教開始時のセリフ CFLAG 201～219を使用
+;-------------------------------------------------
+@EVENTTRAIN
+SIF FLAG:7 <= 0
+	RETURN 0
+SIF NO:TARGET != 46
+	RETURN 0
+;--------------------------------------------------
+;簡易助手口上の発動時に初調教時口上をスキップ（Y1を助手のキャラ番号にする）
+;複数人いる際には、SIF NO:ASSI == Y1 || NO:ASSI == Z1と追加していく
+;--------------------------------------------------
+;IF CFLAG:201 == 0 && ASSI > 0
+;	SIF NO:ASSI == Y1
+;		CFLAG:201 =1
+;ENDIF
+;-------------------------------------------------
+;初パートナーと過ごす CFLAG201
+;-------------------------------------------------
+
+IF CFLAG:201 == 0
+	DRAWLINE
+	;素質:パートナーの場合
+	IF TALENT:150 == 1
+		PRINTFORMW 「プロデューサー、今日の予定は？」
+		PRINTFORMW 「休暇？　休憩？　有休？　自宅待機？」
+	;それ以外
+	ELSE
+		PRINTFORMW 「プロデューサー、今日の予定は？」
+		PRINTFORMW 「休暇？　休憩？　有休？　自宅待機？」
+	ENDIF
+		CFLAG:201 = 1
+	RETURN 1
+
+;-------------------------------------------------
+;パートナーと過ごす（一回のみ） CFLAG201
+;-------------------------------------------------
+
+;デート経験済み
+ELSEIF EXP:94 > 0 && TALENT:TARGET:85 == 0 && CFLAG:201 < 2
+	DRAWLINE
+	PRINTFORMW 「次はどこへ連れてってくれるの？」
+	PRINTFORMW 「杏はどこでもいいよ！　……お仕事以外なら」
+	CFLAG:201 = 2
+	RETURN 1
+
+;キス経験済み
+ELSEIF EXP:96 > 0 && TALENT:TARGET:85 == 0 && CFLAG:201 < 3
+	DRAWLINE
+	PRINTFORMW 「ふふっ、杏の唇は高くつくんだよ、プロデューサー？」
+	PRINTFORMW 　杏は頬を染めて、にんまりと笑った
+	CFLAG:201 = 3
+	RETURN 1
+
+;恋人
+ELSEIF TALENT:TARGET:153 == 1 && TALENT:TARGET:85 == 0 && CFLAG:201 < 4
+	DRAWLINE
+	PRINTFORMW 「こういうの、何だか照れるね、プロデューサー」
+	CFLAG:201 = 4
+	RETURN 1
+
+;恋慕
+ELSEIF TALENT:TARGET:85 == 1 && CFLAG:201 < 5
+	DRAWLINE
+	PRINTFORMW 「あっ……そ、その、今日はどうするの？」
+	PRINTFORMW 「レッスンやお仕事より、プロデューサーと打ち合わせしたいんだけど」
+	CFLAG:201 = 5
+	RETURN 1
+
+;助手の有無をチェック（いない場合は二回目以降へ飛ぶ）
+ELSEIF ASSI < 0 
+	CALL K46_KOJO2
+
+;-------------------------------------------------
+;簡易助手口上（Y1を助手のキャラ番号に置換、46をキャラ番号に変更する) CFLAG202
+;掛け合いをするキャラを増やす場合は、コピー＆ペーストをして、CFLAGの数を203、204と増やす
+;-------------------------------------------------
+;助手
+;ELSEIF NO:ASSI == Y1
+;	DRAWLINE
+	;初めて
+;	IF CFLAG:202 == 0
+		;恋慕＋恋慕時初口上（陥落イベント）が発生済み
+;		IF TALENT:TARGET:85 == 1 && CFLAG:201 >= 5
+;			PRINTFORMW 
+		;それ以外
+;		ELSE
+;			PRINTFORMW 
+;		ENDIF
+;			CFLAG:202 = 1
+;			RETURN 1
+	;二回目以降
+;	ELSEIF CFLAG:202 == 1 && FLAG:7 ==2
+		;恋慕
+;		IF TALENT:TARGET:85 == 1
+;			PRINTFORMW 
+		;それ以外
+;		ELSE
+;			PRINTFORMW 
+;		ENDIF
+;			RETURN 1
+;	ENDIF
+
+;ELSEIF NO:ASSI == Y1
+;	DRAWLINE
+	;初めて
+;	IF CFLAG:203 == 0
+		;恋慕＋恋慕時初口上（陥落イベント）が発生済み
+;		IF TALENT:TARGET:85 == 1 && CFLAG:201 >= 5
+;			PRINTFORMW 
+		;それ以外
+;		ELSE
+;			PRINTFORMW 
+;		ENDIF
+;			CFLAG:203 = 1
+;			RETURN 1
+	;二回目以降
+;	ELSEIF CFLAG:203 == 1 && FLAG:7 ==2
+		;恋慕
+;		IF TALENT:TARGET:85 == 1
+;			PRINTFORMW 
+		;それ以外
+;		ELSE
+;			PRINTFORMW 
+;		ENDIF
+;			RETURN 1
+;	ENDIF
+;口上のある助手が居ない場合は、通常の二回目以降の口上へ飛ぶ
+ELSE
+	CALL K46_KOJO2
+ENDIF
+
+
+;-------------------------------------------------
+;パートナーと過ごす（2回目以降、46をキャラ番号に変更する） CFLAGなし 
+;-------------------------------------------------
+@K46_KOJO2
+;反発感情Lv1以上
+IF MARK:3 >= 1 && FLAG:7 == 2
+	DRAWLINE
+	PRINTFORMW 「はぁ……早く終わらせて帰って寝たい……」
+	PRINTFORMW 　杏は本気で気だるそうに呟いた
+	RETURN 1
+
+;進展無し（デート経験0）
+ELSEIF EXP:94 == 0 && FLAG:7 == 2
+	IF RAND:4 == 0
+		DRAWLINE
+		PRINTFORMW 「プロデューサー、今日の予定は？」
+		PRINTFORMW 「休暇？　休憩？　有休？　自宅待機？」
+	ELSEIF RAND:3 == 0
+		DRAWLINE
+		PRINTFORMW 「次の休みは今日ですか～？」
+	ELSEIF RAND:2 == 0
+		DRAWLINE
+		PRINTFORMW 「まさか杏を働かせる気なんじゃ……絶対嫌だからねっ！」
+	ELSE
+		DRAWLINE
+		PRINTFORMW 「(……帰って寝たい)」
+	ENDIF
+	RETURN 1
+
+;デート経験済み
+ELSEIF EXP:94 > 0 && TALENT:TARGET:85 == 0 && FLAG:7 == 2
+	IF RAND:4 == 0
+		DRAWLINE
+		PRINTFORMW 「プロデューサー、今日の予定は？」
+		PRINTFORMW 「休暇？　休憩？　有休？　自宅待機？」
+	ELSEIF RAND:3 == 0
+		DRAWLINE
+		PRINTFORMW 「次の休みは今日ですか～？」
+	ELSEIF RAND:2 == 0
+		DRAWLINE
+		PRINTFORMW 「まさか杏を働かせる気なんじゃ……絶対嫌だからねっ！」
+	ELSE
+		DRAWLINE
+		PRINTFORMW 「プロデューサー、今日はイメージトレーニングにしない？」
+		PRINTFORMW 「デ、デートのイメトレとか、さ……」
+	ENDIF
+	RETURN 1
+
+;キス経験済み
+ELSEIF EXP:96 > 0 && TALENT:TARGET:85 == 0 && FLAG:7 == 2
+	IF RAND:4 == 0
+		DRAWLINE
+		PRINTFORMW 「プロデューサー、今日の予定は？」
+		PRINTFORMW 「休暇？　休憩？　有休？　自宅待機？」
+	ELSEIF RAND:3 == 0
+		DRAWLINE
+		PRINTFORMW 「次の休みは今日ですか～？」
+	ELSEIF RAND:2 == 0
+		DRAWLINE
+		PRINTFORMW 「まさか杏を働かせる気なんじゃ……絶対嫌だからねっ！」
+	ELSE
+		DRAWLINE
+		PRINTFORML 「プロデューサー、今日はイメージトレーニングにしない？」
+		PRINTFORMW 「デ、デートのイメトレとか、さ……」
+		PRINTFORML 「あ、じ、実技でもいいぞっ」
+		PRINTFORMW 「その、キスの実技とか……」
+	ENDIF
+	RETURN 1
+
+;恋人
+ELSEIF TALENT:TARGET:153 == 1 && TALENT:TARGET:85 == 0 && FLAG:7 == 2
+	IF RAND:3 == 0
+		DRAWLINE
+		PRINTFORML 「プロデューサー、今日はイメージトレーニングにしない？」
+		PRINTFORMW 「デ、デートのイメトレとか、さ……」
+		PRINTFORML 「あ、じ、実技でもいいぞっ」
+		PRINTFORMW 「その、キスの実技とか……」
+	ELSEIF RAND:2 == 0
+		DRAWLINE
+		PRINTFORMW 「ねぇ、プロデューサー。　新しいゲーム買ったからウチで一緒に遊ばない？」
+		PRINTFORMW 「大丈夫大丈夫っ。　明日から杏、頑張るから！！」
+	ELSE
+		DRAWLINE
+		PRINTFORMW 「プロデューサー、いつもお疲れ様。　でも、杏に遠慮は無用だよっ！　 無理せず、いつでも休んでいいからね♪」
+	ENDIF
+	RETURN 1
+
+;恋慕
+ELSEIF TALENT:TARGET:85 == 1 && FLAG:7 == 2
+	IF RAND:3 == 0
+		DRAWLINE
+		PRINTFORML 「プロデューサー、今日はイメージトレーニングにしない？」
+		PRINTFORMW 「デ、デートのイメトレとか、さ……」
+		PRINTFORML 「あ、じ、実技でもいいぞっ」
+		PRINTFORMW 「その、キスの実技とか……」
+	ELSEIF RAND:2 == 0
+		DRAWLINE
+		PRINTFORMW 「ねぇ、プロデューサー。　新しいゲーム買ったからウチで一緒に遊ばない？」
+		PRINTFORMW 「大丈夫大丈夫っ。　明日から杏、頑張るから！！」
+	ELSE
+		DRAWLINE
+		PRINTFORMW 「プロデューサー、いつもお疲れ様。　でも、杏に遠慮は無用だよっ！　 無理せず、いつでも休んでいいからね♪」
+	ENDIF
+	RETURN 1
+ENDIF
+RETURN 0
+
+;-------------------------------------------------
+;EVENTEND関係（46をキャラ番号に置換）
+;パートナーと一旦別れる
+;-------------------------------------------------
+@EVENTEND
+SIF FLAG:7 <= 0
+	RETURN 0
+SIF NO:TARGET != 46
+	RETURN 0
+;--------------------------------------------------
+;パートナーと一旦別れる
+;--------------------------------------------------
+;反発感情Lv1以上
+IF MARK:3 >= 1
+	DRAWLINE
+	PRINTFORMW 「あー、終わった終わったー……」
+	PRINTFORMW 「帰ってフテ寝しよう……」
+	RETURN 1
+
+;進展なし
+ELSEIF EXP:94 == 0 && TALENT:TARGET:85 == 0
+		IF RAND:2 == 0
+			DRAWLINE
+			PRINTFORMW 「杏のスタミナはもうゼロです」
+			PRINTFORMW 「回復まで三日は掛かるので明日はお休みです」
+		ELSE
+			DRAWLINE
+			PRINTFORMW 「人生で一番頑張った気がする」
+		ENDIF
+	RETURN 1
+
+;デート経験済み
+ELSEIF EXP:94 > 0 && TALENT:TARGET:85 == 0
+		IF RAND:3 == 0
+			DRAWLINE
+			PRINTFORMW 「杏のスタミナはもうゼロです」
+			PRINTFORMW 「回復まで三日は掛かるので明日はお休みです」
+		ELSEIF RAND:2 == 0
+			DRAWLINE
+			PRINTFORMW 「人生で一番頑張った気がする」
+		ELSE
+			DRAWLINE
+			PRINTFORMW 「新しいゲーム買ったからこれからウチで一緒に遊ばない？」
+		ENDIF
+	RETURN 1
+
+;キス経験済み
+ELSEIF EXP:96 > 0 && TALENT:TARGET:85 == 0
+		IF RAND:3 == 0
+			DRAWLINE
+			PRINTFORMW 「杏のスタミナはもうゼロです」
+			PRINTFORMW 「回復まで三日は掛かるので明日はお休みです」
+		ELSEIF RAND:2 == 0
+			DRAWLINE
+			PRINTFORMW 「人生で一番頑張った気がする」
+		ELSE
+			DRAWLINE
+			PRINTFORMW 「新しいゲーム買ったからこれからウチで一緒に遊ばない？」
+		ENDIF
+	RETURN 1
+
+;恋人
+ELSEIF TALENT:TARGET:153 == 1 && TALENT:TARGET:85 == 0
+		IF RAND:2 == 0
+			DRAWLINE
+			PRINTFORMW 「プロデューサー、無理せず少し休んだら？　うん､絶対それがいいよっ！」
+		ELSE
+			DRAWLINE
+			PRINTFORMW 「新しいゲーム買ったからこれからウチで一緒に遊ばない？」
+		ENDIF
+	RETURN 1
+
+;恋慕＋体力500未満
+ELSEIF TALENT:TARGET:85 == 1 && BASE:0 < 500
+		IF RAND:3 == 0
+			DRAWLINE
+			PRINTFORMW 「はぁはぁはぁはぁ……」
+		ELSEIF RAND:2 == 0
+			DRAWLINE
+			PRINTFORMW 「……これ以上は頑張れない」
+		ELSE
+			DRAWLINE
+			PRINTFORMW 「……ばたり」
+		ENDIF
+	RETURN 1
+
+;恋慕
+ELSEIF TALENT:TARGET:85 == 1
+		IF RAND:2 == 0
+			DRAWLINE
+			PRINTFORMW 「プロデューサー、無理せず少し休んだら？　うん､絶対それがいいよっ！」
+		ELSE
+			DRAWLINE
+			PRINTFORMW 「新しいゲーム買ったからこれからウチで一緒に遊ばない？」
+		ENDIF
+	RETURN 1
+ENDIF
+RETURN 0
+
+
+;-------------------------------------------------
+;@KOJO_MESSAGE_MARKCNG関係（46をキャラ番号に置換）
+;刻印変動をトリガーにした口上
+;刻印変動後に口上を発動します
+;-------------------------------------------------
+@KOJO_MESSAGE_MARKCNG_46
+;助手が調教した時に口上をスキップする（好みに応じて使う、行頭の;を消すとスキップするようになる）
+;SIF ASSI > 0 && ASSIPLAY
+;	RETURN 0 
+;ボールギャグ着用時には口上をスキップする（OFFだと口を塞いでるのに喋りまくる）
+SIF TEQUIP:45
+	RETURN 0
+;-------------------------------------------------
+;苦痛依存Lv3取得 CFLAG397
+;-------------------------------------------------
+IF TFLAG:22 == 3 && CFLAG:397 == 0
+	;恋慕
+	IF TALENT:85 == 1
+		PRINTFORMW 「いっ、痛っ、痛いってーっ！」
+		PRINTFORMW 「愛の鞭にしても痛すぎるよっ！」
+	ELSE
+		PRINTFORMW 「痛っ、痛いってばっ！」
+		PRINTFORMW 「もうやだっ、おうち帰って寝るーっ！」
+	ENDIF
+		CFLAG:397 = 1
+ENDIF
+
+;-------------------------------------------------
+;快楽依存Lv3取得 CFLAG398
+;-------------------------------------------------
+IF TFLAG:23 == 3 && CFLAG:398 == 0
+	;恋慕
+	IF TALENT:85 == 1
+		PRINTFORMW 「ふぁぁ……すっごい気持ちいいよぉ……%UNICODE(0x2661)%」
+		PRINTFORMW 杏はトロンとした瞳で快感に浸っている
+	ELSE
+		PRINTFORMW 「ふぁぁ……すっごい気持ちいいよぉ……%UNICODE(0x2661)%」
+		PRINTFORMW 杏はトロンとした瞳で快感に浸っている
+	ENDIF
+		CFLAG:398 = 1
+ENDIF
+
+;-------------------------------------------------
+;既成事実Lv1～3取得 CFLAG399
+;-------------------------------------------------
+;既成事実Lv3
+IF TFLAG:24 == 3 && CFLAG:399 < 3
+	;恋慕
+	IF TALENT:85 == 1
+		PRINTFORMW 「これはもう永久就職するしかないっ！（キリッ）」
+	ELSE
+		PRINTFORMW 「これはもう永久就職するしかないっ！（キリッ）」
+	ENDIF
+		CFLAG:399 = 3
+;既成事実Lv2
+ELSEIF TFLAG:24 == 2 && CFLAG:399 < 2
+	;恋慕
+	IF TALENT:85 == 1
+		PRINTFORMW 「これはちょっとプロデューサーの責任問題になっちゃうかも……」
+	ELSE
+		PRINTFORMW 「これはちょっとプロデューサーの責任問題になっちゃうかも……」
+	ENDIF
+		CFLAG:399 = 2
+;既成事実Lv1
+ELSEIF TFLAG:24 == 1 && CFLAG:399 < 1
+	;恋慕
+	IF TALENT:85 == 1
+		PRINTFORMW 「まいったなー……こんな事しちゃうなんて」
+	ELSE
+		PRINTFORMW 「まいったなー……こんな事しちゃうなんて」
+	ENDIF
+		CFLAG:399 = 1
+ENDIF
+
+;-------------------------------------------------
+;反発感情Lv1～3取得 CFLAG400
+;-------------------------------------------------
+;反発感情Lv3
+IF TFLAG:21 == 3 && CFLAG:400 < 3
+	;恋慕
+	IF TALENT:85 == 1
+		PRINTFORMW 
+	ELSE
+		PRINTFORMW 
+	ENDIF
+		CFLAG:400 = 3
+;反発感情Lv2
+ELSEIF TFLAG:21 == 2 && CFLAG:400 < 2
+	;恋慕
+	IF TALENT:85 == 1
+		PRINTFORMW 
+	ELSE
+		PRINTFORMW 
+	ENDIF
+		CFLAG:400 = 2
+;反発感情Lv1
+ELSEIF TFLAG:21 == 1 && CFLAG:400 < 1
+	;恋慕
+	IF TALENT:85 == 1
+		PRINTFORMW 
+	ELSE
+		PRINTFORMW 
+	ENDIF
+		CFLAG:400 = 1
+ENDIF
+
+;--------------------------------------------------
+;@KOJO_MESSAGE_COM関係（46をキャラ番号に置換）
+;--------------------------------------------------
+@KOJO_MESSAGE_COM_46
+;助手が調教した時に口上をスキップする（好みに応じて使う、行頭の;を消すとスキップするようになる）
+;SIF ASSI > 0 && ASSIPLAY
+;	RETURN 0 
+;ボールギャグ着用時には口上をスキップする（OFFだと口を塞いでるのに喋りまくる）
+SIF TEQUIP:45 && SELECTCOM != 45
+	RETURN 0
+;-------------------------------------------------
+;コマンド実行時のセリフ CFLAG 401～500を使用
+;-------------------------------------------------
+
+;～～～～～～～～～～～～～～～～～～～～～～～～～
+;コミュニケーション系コマンド
+;～～～～～～～～～～～～～～～～～～～～～～～～～
+;-------------------------------------------------
+;レッスン CFLAG401
+;-------------------------------------------------
+;-------------------------------------------------
+;TFLAG:17  0 = 自主トレ 1 = Voトレ 2 = Viトレ 3 = Daトレ 
+;		   4 = 超Voトレ 5 = 超Viトレ 6 = 超Daトレ 7 = 地獄の特訓 
+;-------------------------------------------------
+IF SELECTCOM == 300
+	;初めて
+	IF CFLAG:401 == 0
+		PRINTFORMW 「(隙を見て逃げよう……ふふふ)」
+		CFLAG:401 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:401 < 6 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「ち、違うよ！？　サボってるんじゃなくて充電してるんだよっ！！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「はぁはぁはぁはぁ……はぁはぁ……」
+			ELSE
+				PRINTFORMW 「一生分頑張った気がする……」
+			ENDIF
+			CFLAG:401 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:401 < 5 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「ち、違うよ！？　サボってるんじゃなくて充電してるんだよっ！！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「はぁはぁはぁはぁ……はぁはぁ……」
+			ELSE
+				PRINTFORMW 「一生分頑張った気がする……」
+			ENDIF
+			CFLAG:401 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:401 < 4 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「ち、違うよ！？　サボってるんじゃなくて充電してるんだよっ！！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「はぁはぁはぁはぁ……はぁはぁ……」
+			ELSE
+				PRINTFORMW 「一生分頑張った気がする……」
+			ENDIF
+			CFLAG:401 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:401 < 3 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「ち、違うよ！？　サボってるんじゃなくて充電してるんだよっ！！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「はぁはぁはぁはぁ……はぁはぁ……」
+			ELSE
+				PRINTFORMW 「一生分頑張った気がする……」
+			ENDIF
+			CFLAG:401 = 3
+		;それ以外
+		ELSEIF CFLAG:401 < 2 || FLAG:7 == 2
+			IF RAND:3 == 0
+				PRINTFORMW 「ち、違うよ！？　サボってるんじゃなくて充電してるんだよっ！！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「はぁはぁはぁはぁ……はぁはぁ……」
+			ELSE
+				PRINTFORMW 「一生分頑張った気がする……」
+			ENDIF
+			CFLAG:401 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;会話 CFLAG402
+;-------------------------------------------------
+IF SELECTCOM == 301
+	;初めて
+	IF CFLAG:402 == 0
+		PRINTFORMW 「口を開くのもめんどくさーい……」
+		PRINTFORMW なんというダメ人間であろうか
+		CFLAG:402 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:402 < 6 || FLAG:7 == 2)
+			IF RAND:9 == 0
+				PRINTFORMW 「飴玉はいいねえ、口に入れてるだけで噛んだり啜ったりしなくても食べれるから」
+			ELSEIF RAND:8 == 0
+				PRINTFORMW 「杏、週休８日を希望しま～す」
+			ELSEIF RAND:7 == 0
+				PRINTFORMW 「疲れたー、飴なめたーい」
+			ELSEIF RAND:6 == 0
+				PRINTFORMW 「人は人、私は私って名言だよね！」
+			ELSEIF RAND:5 == 0
+				PRINTFORMW 「プロデューサー、印税ってまだ入らないの？」
+			ELSEIF RAND:4 == 0
+				PRINTFORMW 「プロデューサー、無理は厳禁だよ、さぁ休憩しようっ！」」
+			ELSEIF RAND:3 == 0
+				PRINTFORMW 「寝て起きて寝る……それが私の生き様だっ！！(ドヤッ☆)」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「モンハンのプレイ時間？　3000時間くらいだったかなあ」
+				PRINTFORMW 「半分くらい寝落ちしてたけど」
+			ELSE
+				PRINTFORMW 「プロデューサー……えへへへ……」
+			ENDIF
+			CFLAG:402 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:402 < 5 || FLAG:7 == 2)
+			IF RAND:9 == 0
+				PRINTFORMW 「飴玉はいいねえ、口に入れてるだけで噛んだり啜ったりしなくても食べれるから」
+			ELSEIF RAND:8 == 0
+				PRINTFORMW 「杏、週休８日を希望しま～す」
+			ELSEIF RAND:7 == 0
+				PRINTFORMW 「疲れたー、飴なめたーい」
+			ELSEIF RAND:6 == 0
+				PRINTFORMW 「人は人、私は私って名言だよね！」
+			ELSEIF RAND:5 == 0
+				PRINTFORMW 「プロデューサー、印税ってまだ入らないの？」
+			ELSEIF RAND:4 == 0
+				PRINTFORMW 「プロデューサー、無理は厳禁だよ、さぁ休憩しようっ！」」
+			ELSEIF RAND:3 == 0
+				PRINTFORMW 「寝て起きて寝る……それが私の生き様だっ！！(ドヤッ☆)」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「モンハンのプレイ時間？　3000時間くらいだったかなあ」
+				PRINTFORMW 「半分くらい寝落ちしてたけど」
+			ELSE
+				PRINTFORMW 「プロデューサー……えへへへ……」
+			ENDIF
+			CFLAG:402 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:402 < 4 || FLAG:7 == 2)
+			IF RAND:9 == 0
+				PRINTFORMW 「飴玉はいいねえ、口に入れてるだけで噛んだり啜ったりしなくても食べれるから」
+			ELSEIF RAND:8 == 0
+				PRINTFORMW 「杏、週休８日を希望しま～す」
+			ELSEIF RAND:7 == 0
+				PRINTFORMW 「疲れたー、飴なめたーい」
+			ELSEIF RAND:6 == 0
+				PRINTFORMW 「人は人、私は私って名言だよね！」
+			ELSEIF RAND:5 == 0
+				PRINTFORMW 「プロデューサー、印税ってまだ入らないの？」
+			ELSEIF RAND:4 == 0
+				PRINTFORMW 「プロデューサー、無理は厳禁だよ、さぁ休憩しようっ！」」
+			ELSEIF RAND:3 == 0
+				PRINTFORMW 「寝て起きて寝る……それが私の生き様だっ！！(ドヤッ☆)」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「モンハンのプレイ時間？　3000時間くらいだったかなあ」
+				PRINTFORMW 「半分くらい寝落ちしてたけど」
+			ELSE
+				PRINTFORMW 「プロデューサー……えへへへ……」
+			ENDIF
+			CFLAG:402 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:402 < 3 || FLAG:7 == 2)
+			IF RAND:9 == 0
+				PRINTFORMW 「飴玉はいいねえ、口に入れてるだけで噛んだり啜ったりしなくても食べれるから」
+			ELSEIF RAND:8 == 0
+				PRINTFORMW 「杏、週休８日を希望しま～す」
+			ELSEIF RAND:7 == 0
+				PRINTFORMW 「疲れたー、飴なめたーい」
+			ELSEIF RAND:6 == 0
+				PRINTFORMW 「人は人、私は私って名言だよね！」
+			ELSEIF RAND:5 == 0
+				PRINTFORMW 「プロデューサー、印税ってまだ入らないの？」
+			ELSEIF RAND:4 == 0
+				PRINTFORMW 「プロデューサー、無理は厳禁だよ、さぁ休憩しようっ！」」
+			ELSEIF RAND:3 == 0
+				PRINTFORMW 「寝て起きて寝る……それが私の生き様だっ！！(ドヤッ☆)」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「モンハンのプレイ時間？　3000時間くらいだったかなあ」
+				PRINTFORMW 「半分くらい寝落ちしてたけど」
+			ELSE
+				PRINTFORMW 「プロデューサー……えへへへ……」
+			ENDIF
+			CFLAG:402 = 3
+		;それ以外
+		ELSEIF CFLAG:402 < 2 || FLAG:7 == 2
+			IF RAND:9 == 0
+				PRINTFORMW 「飴玉はいいねえ、口に入れてるだけで噛んだり啜ったりしなくても食べれるから」
+			ELSEIF RAND:8 == 0
+				PRINTFORMW 「杏、週休８日を希望しま～す」
+			ELSEIF RAND:7 == 0
+				PRINTFORMW 「疲れたー、飴なめたーい」
+			ELSEIF RAND:6 == 0
+				PRINTFORMW 「人は人、私は私って名言だよね！」
+			ELSEIF RAND:5 == 0
+				PRINTFORMW 「プロデューサー、印税ってまだ入らないの？」
+			ELSEIF RAND:4 == 0
+				PRINTFORMW 「プロデューサー、無理は厳禁だよ、さぁ休憩しようっ！」」
+			ELSEIF RAND:3 == 0
+				PRINTFORMW 「寝て起きて寝る……それが私の生き様だっ！！(ドヤッ☆)」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「モンハンのプレイ時間？　3000時間くらいだったかなあ」
+				PRINTFORMW 「半分くらい寝落ちしてたけど」
+			ELSE
+				PRINTFORMW 「……ハッ！？　うん、聞いてる聞いてる」
+				PRINTFORMW 「寝てないよ？　ちゃんと話聞いてたよ？」
+			ENDIF
+			CFLAG:402 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;プレゼント CFLAG403
+;-------------------------------------------------
+;-------------------------------------------------
+;TFLAG:17  0 = スマイル 1 = 嗜好品 2 = 日用品 3 = アクセサリ 
+;		   4 = 服 5 = パワーアップ版嗜好品 6 = 指輪
+;-------------------------------------------------
+IF SELECTCOM == 302
+	;初めて
+	IF CFLAG:403 == 0
+		PRINTFORMW 「何くれるの？　飴玉？」
+		CFLAG:403 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:403 < 6 || FLAG:7 == 2)
+			PRINTFORMW 「何くれるの？　飴玉？」
+			CFLAG:403 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:403 < 5 || FLAG:7 == 2)
+			PRINTFORMW 「何くれるの？　飴玉？」
+			CFLAG:403 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:403 < 4 || FLAG:7 == 2)
+			PRINTFORMW 「何くれるの？　飴玉？」
+			CFLAG:403 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:403 < 3 || FLAG:7 == 2)
+			PRINTFORMW 「何くれるの？　飴玉？」
+			CFLAG:403 = 3
+		;それ以外
+		ELSEIF CFLAG:403 < 2 || FLAG:7 == 2
+			PRINTFORMW 「何くれるの？　飴玉？」
+			CFLAG:403 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;スキンシップ CFLAG405
+;-------------------------------------------------
+IF SELECTCOM == 303
+	;初めて
+	IF CFLAG:405 == 0
+		PRINTFORML 「あんまりベタベタするのはセクハラだよっ！」
+		PRINTFORMW 「ハッ！　プロデューサーをセクハラで訴えて、その慰謝料でゴロ寝生活……」
+		PRINTFORMW 　なにか危険な呟きが聞こえた気がする
+		CFLAG:405 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:405 < 6 || FLAG:7 == 2)
+			IF RAND:5 == 0
+				PRINTFORML 「んっ……」
+				PRINTFORMW 「人の体温を感じると眠くなるね……」
+			ELSEIF RAND:4 == 0
+				PRINTFORMW 「な、撫でて、いいよ……」
+			ELSEIF RAND:3 == 0
+				PRINTFORMW 「こ、こら！　臭いを嗅ぐのはダメ！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「もっと激しい事しても、いいよ？」
+			ELSE
+				PRINTFORML 「あー、眠くなるー……」
+				PRINTFORMW 　頭を撫でていると、杏はうつらうつらしはじめた
+			ENDIF
+			CFLAG:405 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:405 < 5 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORML 「んっ……」
+				PRINTFORMW 「人の体温を感じると眠くなるね……」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「な、撫でて、いいよ……」
+			ELSE
+				PRINTFORML 「あー、眠くなるー……」
+				PRINTFORMW 　頭を撫でていると、杏はうつらうつらしはじめた
+			ENDIF
+			CFLAG:405 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:405 < 4 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORML 「んっ……」
+				PRINTFORMW 「人の体温を感じると眠くなるね……」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「な、撫でて、いいよ……」
+			ELSE
+				PRINTFORML 「あー、眠くなるー……」
+				PRINTFORMW 　頭を撫でていると、杏はうつらうつらしはじめた
+			ENDIF
+			CFLAG:405 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:405 < 3 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORML 「んっ……」
+				PRINTFORMW 「人の体温を感じると眠くなるね……」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「な、撫でて、いいよ……」
+			ELSE
+				PRINTFORML 「あー、眠くなるー……」
+				PRINTFORMW 　頭を撫でていると、杏はうつらうつらしはじめた
+			ENDIF
+			CFLAG:405 = 3
+		;それ以外
+		ELSEIF CFLAG:405 < 2 || FLAG:7 == 2
+			IF RAND:3 == 0
+				PRINTFORML 「うあー、つむじをつつくなー！」
+				PRINTFORMW 「背が伸びなくなるー！」
+				PRINTFORMW 　まだ延びる余地があるのだろうか
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「な、撫でるんだ……」
+			ELSE
+				PRINTFORML 「あー、眠くなるー……」
+				PRINTFORMW 　頭を撫でていると、杏はうつらうつらしはじめた
+			ENDIF
+			CFLAG:405 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;まったりする CFLAG408
+;-------------------------------------------------
+IF SELECTCOM == 304
+	;初めて
+	IF CFLAG:408 == 0
+		PRINTFORMW 「まったり？　だらけるって事？」
+		PRINTFORMW 「ふっふっふ、この杏ちゃんのプロフェッショナルなだらけをその目に焼き付けるがいいー」
+		CFLAG:408 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:408 < 6 || FLAG:7 == 2)
+			IF RAND:5 == 0
+				PRINTFORMW 　レンタルビデオを杏と一緒にごろごろしながら鑑賞した
+					IF RAND:3 == 0
+						PRINTFORMW 「思考コントロールの戦闘機かー、考えただけで操縦できるって楽そうだねー」
+						PRINTFORMW 　三角関係と飛行機がモチーフのアニメに、杏は彼女らしい感想を漏らした
+					ELSEIF RAND:2 == 0
+						PRINTFORMW 「……ｚｚｚ」
+						PRINTFORMW 　往年のメロドラマを鑑賞中。　妙に静かだと思えば杏は寝息を立てていた
+					ELSE
+						PRINTFORMW 「……こんなの見せたって、働かないからね？」
+						PRINTFORMW 　ダメな新兵をビシバシいびる鬼教官が登場する戦争映画を見せられ、杏は拗ねたように呟いた
+						PRINTFORMW 　一度、鬼教官と化してブートキャンプにでも放り込んでみるべきだろうか
+					ENDIF
+			ELSEIF RAND:4 == 0
+				PRINTFORMW 「んむ……んー……ｚｚｚ」
+				PRINTFORMW 　大の字に転がって昼寝する杏の腹を枕にプロデューサーも一眠りした
+			ELSEIF RAND:3 == 0
+				PRINTFORMW 「プロデューサー、マリカーしよう、マリカー」
+				PRINTFORMW 「私、クッパー」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「プロデューサー、逆鱗欲しいから逆鱗マラソン付き合って」
+				PRINTFORMW 　杏は携帯ゲーム機を振りながら、協力プレイに誘ってきた
+				PRINTFORMW 　普段の仕事にもこの熱意を向けて欲しいものである
+			ELSE
+				PRINTFORMW 「ぷひゅ～……んー……ｚｚｚ」
+				PRINTFORMW 　杏は小汚いぬいぐるみの代わりに、プロデューサーの腕を枕に昼寝している
+			ENDIF
+			CFLAG:408 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:408 < 5 || FLAG:7 == 2)
+			IF RAND:5 == 0
+				PRINTFORMW 　レンタルビデオを杏と一緒にごろごろしながら鑑賞した
+					IF RAND:3 == 0
+						PRINTFORMW 「思考コントロールの戦闘機かー、考えただけで操縦できるって楽そうだねー」
+						PRINTFORMW 　三角関係と飛行機がモチーフのアニメに、杏は彼女らしい感想を漏らした
+					ELSEIF RAND:2 == 0
+						PRINTFORMW 「……ｚｚｚ」
+						PRINTFORMW 　往年のメロドラマを鑑賞。　妙に静かだと思えば杏は寝息を立てていた
+					ELSE
+						PRINTFORMW 「……こんなの見せたって、働かないからね？」
+						PRINTFORMW 　ダメな新兵をビシバシいびる鬼教官が登場する戦争映画を見せられ、杏は拗ねたように呟いた
+						PRINTFORMW 　一度、鬼教官と化してブートキャンプにでも放り込んでみるべきだろうか
+					ENDIF
+			ELSEIF RAND:4 == 0
+				PRINTFORMW 「んむ……んー……ｚｚｚ」
+				PRINTFORMW 　大の字に転がって昼寝する杏の腹を枕にプロデューサーも一眠りした
+			ELSEIF RAND:3 == 0
+				PRINTFORMW 「プロデューサー、マリカーしよう、マリカー」
+				PRINTFORMW 「私、クッパー」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「プロデューサー、逆鱗欲しいから逆鱗マラソン付き合って」
+				PRINTFORMW 　杏は携帯ゲーム機を振りながら、協力プレイに誘ってきた
+				PRINTFORMW 　普段の仕事にもこの熱意を向けて欲しいものである
+			ELSE
+				PRINTFORMW 「ぷひゅ～……んー……ｚｚｚ」
+				PRINTFORMW 　杏は小汚いぬいぐるみの代わりに、プロデューサーの腕を枕に昼寝している
+			ENDIF
+			CFLAG:408 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:408 < 4 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「プロデューサー、マリカーしよう、マリカー」
+				PRINTFORMW 「私、クッパー」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「プロデューサー、逆鱗欲しいから逆鱗マラソン付き合って」
+				PRINTFORMW 　杏は携帯ゲーム機を振りながら、協力プレイに誘ってきた
+				PRINTFORMW 　普段の仕事にもこの熱意を向けて欲しいものである
+			ELSE
+				PRINTFORMW 「ぷひゅ～……ｚｚｚ」
+				PRINTFORMW 　小汚いぬいぐるみを枕に、杏はいびきとも寝息ともつかない物を漏らしながら昼寝している
+				PRINTFORMW 　大の字に転がってＴシャツから覗くヘソの辺りをボリボリ掻きながら爆睡する姿は、とても現役アイドルとは思えない
+			ENDIF
+			CFLAG:408 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:408 < 3 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「プロデューサー、マリカーしよう、マリカー」
+				PRINTFORMW 「私、クッパー」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「プロデューサー、逆鱗欲しいから逆鱗マラソン付き合って」
+				PRINTFORMW 　杏は携帯ゲーム機を振りながら、協力プレイに誘ってきた
+				PRINTFORMW 　普段の仕事にもこの熱意を向けて欲しいものである
+			ELSE
+				PRINTFORMW 「ぷひゅ～……ｚｚｚ」
+				PRINTFORMW 　小汚いぬいぐるみを枕に、杏はいびきとも寝息ともつかない物を漏らしながら昼寝している
+				PRINTFORMW 　大の字に転がってＴシャツから覗くヘソの辺りをボリボリ掻きながら爆睡する姿は、とても現役アイドルとは思えない
+			ENDIF
+			CFLAG:408 = 3
+		;それ以外
+		ELSEIF CFLAG:408 < 2 || FLAG:7 == 2
+			IF RAND:3 == 0
+				PRINTFORMW 「プロデューサー、マリカーしよう、マリカー」
+				PRINTFORMW 「私、クッパー」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「プロデューサー、逆鱗欲しいから逆鱗マラソン付き合って」
+				PRINTFORMW 　杏は携帯ゲーム機を振りながら、協力プレイに誘ってきた
+				PRINTFORMW 　普段の仕事にもこの熱意を向けて欲しいものである
+			ELSE
+				PRINTFORMW 「ぷひゅ～……ｚｚｚ」
+				PRINTFORMW 　小汚いぬいぐるみを枕に、杏はいびきとも寝息ともつかない物を漏らしながら昼寝している
+				PRINTFORMW 　大の字に転がってＴシャツから覗くヘソの辺りをボリボリ掻きながら爆睡する姿は、とても現役アイドルとは思えない
+			ENDIF
+			CFLAG:408 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;家事 CFLAG409
+;-------------------------------------------------
+IF SELECTCOM == 305
+	;初めて
+	IF CFLAG:409 == 0
+		PRINTFORMW 「やだ、めんどくさい」
+		PRINTFORMW 「……もー、めんどくさいって言ってるのにー」
+		CFLAG:409 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:409 < 6 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:409 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:409 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:409 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:409 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:409 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:409 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:409 = 3
+		;それ以外
+		ELSEIF CFLAG:409 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:409 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;料亭で食事 CFLAG404
+;-------------------------------------------------
+IF SELECTCOM == 320
+	;初めて
+	IF CFLAG:404 == 0
+		PRINTFORML 「わー、高そうな店だなー」
+		PRINTFORML 「ドレスコードとかにうるさいと面倒そうだなー……」
+		PRINTFORML 「コース料理とか順繰りに出てきて面倒そうだなー……」
+		PRINTFORMW 「よし！　帰ろう！」
+		PRINTFORMW 　ごちゃごちゃ言いつつ回れ右をする杏の襟首を掴んで入店した
+		CFLAG:404 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:404 < 6 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORML 「あーん……うん、美味しい♪　次はそっちの皿ねっ」
+				PRINTFORMW 　膝の上に乗った杏の指示通りに箸を伸ばす
+				PRINTFORMW 　見事なバカップルぶりに仲居さんに苦笑されてしまった
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「プロデューサー、えっと……」
+				PRINTFORMW 　真っ赤になって囁く杏のリクエストに応えて、口移しで食べさせた
+				PRINTFORMW 「んっ……プロデューサーの味がする……」
+			ELSE
+				PRINTFORML 「よーし、しっかり食べて英気を養って、たっぷり休もうー！」
+				PRINTFORMW 　たっぷり働こうじゃないらしい
+			ENDIF
+			CFLAG:404 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:404 < 5 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORML 「あーん……うん、美味しい♪　次はそっちの皿ねっ」
+				PRINTFORMW 　膝の上に乗った杏の指示通りに箸を伸ばす
+				PRINTFORMW 　見事なバカップルぶりに仲居さんに苦笑されてしまった
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「プロデューサー、えっと……」
+				PRINTFORMW 　真っ赤になって囁く杏のリクエストに応えて、口移しで食べさせた
+				PRINTFORMW 「んっ……プロデューサーの味がする……」
+			ELSE
+				PRINTFORML 「よーし、しっかり食べて英気を養って、たっぷり休もうー！」
+				PRINTFORMW 　たっぷり働こうじゃないらしい
+			ENDIF
+			CFLAG:404 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:404 < 4 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORML 「あーん……うん、美味しい♪　次はそっちの皿ねっ」
+				PRINTFORMW 　膝の上に乗った杏の指示通りに箸を伸ばす
+				PRINTFORMW 　見事なバカップルぶりに仲居さんに苦笑されてしまった
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「プロデューサー、えっと……」
+				PRINTFORMW 　真っ赤になって囁く杏のリクエストに応えて、口移しで食べさせた
+				PRINTFORMW 「んっ……プロデューサーの味がする……」
+			ELSE
+				PRINTFORML 「よーし、しっかり食べて英気を養って、たっぷり休もうー！」
+				PRINTFORMW 　たっぷり働こうじゃないらしい
+			ENDIF
+			CFLAG:404 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:404 < 3 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORML 「あーん……うん、美味しい♪　次はそっちの皿ね」
+				PRINTFORMW 　膝の上に乗った杏の指示通りに箸を伸ばす
+				PRINTFORMW 　見事なバカップルぶりに仲居さんに苦笑されてしまった
+			ELSE
+				PRINTFORML 「よーし、しっかり食べて英気を養って、たっぷり休もうー！」
+				PRINTFORMW 　たっぷり働こうじゃないらしい
+			ENDIF
+			CFLAG:404 = 3
+		;それ以外
+		ELSEIF CFLAG:404 < 2 || FLAG:7 == 2
+			IF RAND:3 == 0
+				PRINTFORML 「プロデューサー、あーん」
+				PRINTFORML 「なんだよ～、こんな可愛い子にあーんしてあげられる権利をあげてるのに」
+				PRINTFORMW 「ほら、私に食べさせるのだ～」
+				PRINTFORMW 　エサを待つ雛鳥のようにぽかっと開いた大口にワサビをたっぷり塗りつけた刺身を放り込んでやると、杏は転げまわって悶絶した
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「高い店に連れて来てくれるのはいいけどさ、その分のお金で杏の懐をあっためるというプランもあったんじゃない？」
+				PRINTFORMW 　なんとさもしいアイドルであろうか
+			ELSE
+				PRINTFORMW 「高い料理を食べると、普段働いてない私の胃腸が過労で悲鳴をあげそうな気がする……」
+				PRINTFORMW 　普段ろくなものを食べてないからこんなに発育不良なのだろうか
+			ENDIF
+			CFLAG:404 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;遊びに行く CFLAG406
+;-------------------------------------------------
+IF SELECTCOM == 321
+	;初めて
+	IF CFLAG:406 == 0
+		PRINTFORMW 「仕事でもレッスンでもなくて遊び？」
+		PRINTFORMW 「……どうせならウチに帰って遊びたい……」
+		CFLAG:406 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:406 < 6 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「あー、お外に出ると太陽が眩しい……」
+				PRINTFORMW 　杏は微妙に誤解されそうな事を呟いている
+			ELSE
+				PRINTFORMW 「プロデューサー、もうこのまま休みにしようよー」
+			ENDIF
+			CFLAG:406 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:406 < 5 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「あー、お外に出ると太陽が眩しい……」
+				PRINTFORMW 　杏は微妙に誤解されそうな事を呟いている
+			ELSE
+				PRINTFORMW 「プロデューサー、もうこのまま休みにしようよー」
+			ENDIF
+			CFLAG:406 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:406 < 4 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「あー、お外に出ると太陽が眩しい……」
+				PRINTFORMW 　杏は微妙に誤解されそうな事を呟いている
+			ELSE
+				PRINTFORMW 「プロデューサー、もうこのまま休みにしようよー」
+			ENDIF
+			CFLAG:406 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:406 < 3 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「あー、お外に出ると太陽が眩しい……」
+				PRINTFORMW 　杏は微妙に誤解されそうな事を呟いている
+			ELSE
+				PRINTFORMW 「プロデューサー、もうこのまま休みにしようよー」
+			ENDIF
+			CFLAG:406 = 3
+		;それ以外
+		ELSEIF CFLAG:406 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「出かけるのだるい……」
+			ELSE
+				PRINTFORMW 「プロデューサー、もうこのまま休みにしようよー」
+			ENDIF
+			CFLAG:406 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;ストリートライブ CFLAG493
+;-------------------------------------------------
+IF SELECTCOM == 322
+	;初めて
+	IF CFLAG:493 == 0
+		PRINTFORMW 
+		CFLAG:493 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:493 < 6 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:493 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:493 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:493 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:493 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:493 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:493 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:493 = 3
+		;それ以外
+		ELSEIF CFLAG:493 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:493 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;デート CFLAG407
+;-------------------------------------------------
+IF SELECTCOM == 323 && TEQUIP:2 > 0
+	;初めて
+	IF CFLAG:407 == 0
+		PRINTFORMW 
+		CFLAG:407 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:407 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:407 = 5
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:407 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:407 = 4
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:407 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:407 = 3
+		;それ以外
+		ELSEIF CFLAG:407 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:407 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;バードキス CFLAG410
+;-------------------------------------------------
+IF SELECTCOM == 340
+	;初めて
+	IF CFLAG:410 == 0
+		PRINTFORMW 　杏の桜色の唇をついばむように吸う
+		PRINTFORMW 「ん……。　なんか、よくわかんなかったから、もっかいしよ？」 
+		CFLAG:410 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:410 < 4 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORML 「ん……ふ……」
+				PRINTFORMW 　甘く鼻を鳴らす杏の唇をつつくように吸った
+			ELSE
+				PRINTFORMW 「んむ……ちゅ……」
+			ENDIF
+			CFLAG:410 = 4
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:410 < 3 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORML 「ん……ふ……」
+				PRINTFORMW 　甘く鼻を鳴らす杏の唇をつつくように吸った
+			ELSE
+				PRINTFORMW 「んむ……ちゅ……」
+			ENDIF
+			CFLAG:410 = 3
+		;それ以外
+		ELSEIF CFLAG:410 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORML 「ん……ふ……」
+				PRINTFORMW 　甘く鼻を鳴らす杏の唇をつつくように吸った
+			ELSE
+				PRINTFORMW 「んむ……ちゅ……」
+			ENDIF
+			CFLAG:410 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;ソフトキス CFLAG411
+;-------------------------------------------------
+IF SELECTCOM == 341
+	;初めて
+	IF CFLAG:411 == 0
+		PRINTFORMW 「ちょ、ちょっと本格的な感じがする……」
+		CFLAG:411 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:411 < 4 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「……ちゅ……ちゅ……」
+			ELSE
+				PRINTFORMW 「ふぁ……んちゅ……」
+			ENDIF
+			CFLAG:411 = 4
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:411 < 3 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「……ちゅ……ちゅ……」
+			ELSE
+				PRINTFORMW 「ふぁ……んちゅ……」
+			ENDIF
+			CFLAG:411 = 3
+		;それ以外
+		ELSEIF CFLAG:411 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「……ちゅ……ちゅ……」
+			ELSE
+				PRINTFORMW 「ふぁ……んちゅ……」
+			ENDIF
+			CFLAG:411 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;ディープキス CFLAG412
+;-------------------------------------------------
+IF SELECTCOM == 342
+	;初めて
+	IF CFLAG:412 == 0
+		PRINTFORML 「んむぅっ！？」
+		PRINTFORML 　唇を合わせたまま舌を差し込むと、杏は目を白黒させた
+		PRINTFORML 　いつも飴を食べているからだろうか、杏の口内はほのかに甘い
+		PRINTFORMW 「ふぁっ……こんな激しい事までするんだ……」、
+		CFLAG:412 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:412 < 4 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「じゅる……ちゅく……ふぁぁ……」
+				PRINTFORMW 　唇を離した杏は真っ赤に上気した顔で熱い吐息を漏らした
+			ELSEIF RAND:2 == 0
+				PRINTFORML 　杏の口内に舌を差し込むと、舌先に硬い感触が押し付けられた
+				PRINTFORML 　唇を合わせたまま悪戯っぽく目を細めた杏は、舌を絡めるようにしながらこちらの舌先に何かを乗せる
+				PRINTFORMW 　甘い
+				PRINTFORML 「ふふ、杏の味の飴、美味しい？」
+				PRINTFORMW 　唇を離した杏は、常のダラけた様子からは想像もつかない艶のある瞳で囁いた
+			ELSE
+				PRINTFORMW 「んふ……ちゅる……ちゅく……」
+			ENDIF
+			CFLAG:412 = 4
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:412 < 3 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「じゅる……ちゅく……ふぁぁ……」
+				PRINTFORMW 　唇を離した杏は真っ赤に上気した顔で熱い吐息を漏らした
+			ELSEIF RAND:2 == 0
+				PRINTFORML 　杏の口内に舌を差し込むと、舌先に硬い感触が押し付けられた
+				PRINTFORML 　唇を合わせたまま悪戯っぽく目を細めた杏は、舌を絡めるようにしながらこちらの舌先に何かを乗せる
+				PRINTFORMW 　甘い
+				PRINTFORML 「ふふ、杏の味の飴、美味しい？」
+				PRINTFORMW 　唇を離した杏は、常のダラけた様子からは想像もつかない艶のある瞳で囁いた
+			ELSE
+				PRINTFORMW 「んふ……ちゅる……ちゅく……」
+			ENDIF 
+			CFLAG:412 = 3
+		;それ以外
+		ELSEIF CFLAG:412 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「じゅる……ちゅく……ふぁぁ……」
+				PRINTFORMW 　唇を離した杏は真っ赤に上気した顔で熱い吐息を漏らした
+			ELSE
+				PRINTFORMW 「んふ……ちゅる……ちゅく……」
+			ENDIF
+			CFLAG:412 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;胸愛撫 CFLAG413
+;-------------------------------------------------
+IF SELECTCOM == 360
+	;初めて
+	IF CFLAG:413 == 0
+		PRINTFORMW 　薄っぺらい杏の胸に指を這わせる
+		PRINTFORMW 「あっ！？　そ、そんな事、するんだ……」
+		PRINTFORMW 一瞬身を強張らせた杏だったが、そのままプロデューサーの指先を受け入れてた
+		CFLAG:413 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:413 < 6 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「んっ……%UNICODE(0x2661)%」
+				PRINTFORMW 「やらしい手つきなんだから……」
+			ELSE
+				PRINTFORMW 「つ、摘まむのは無し！　それ、痛気持ちいいからっ」
+			ENDIF
+			CFLAG:413 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:413 < 5 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「んっ……%UNICODE(0x2661)%」
+				PRINTFORMW 「やらしい手つきなんだから……」
+			ELSE
+				PRINTFORMW 「つ、摘まむのは無し！　それ、痛気持ちいいからっ」
+			ENDIF
+			CFLAG:413 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:413 < 4 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「んっ……%UNICODE(0x2661)%」
+				PRINTFORMW 「やらしい手つきなんだから……」
+			ELSE
+				PRINTFORMW 「つ、摘まむのは無し！　それ、痛気持ちいいからっ」
+			ENDIF
+			CFLAG:413 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:413 < 3 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「んっ……%UNICODE(0x2661)%」
+				PRINTFORMW 「やらしい手つきなんだから……」
+			ELSE
+				PRINTFORMW 「つ、摘まむのは無し！　それ、痛気持ちいいからっ」
+			ENDIF
+			CFLAG:413 = 3
+		;それ以外
+		ELSEIF CFLAG:413 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「プロデューサーって、ロリだねロリ」
+			ELSE
+				PRINTFORMW 「自分で言うのも何だけど、こんな平たい胸を触って楽しいの？」
+			ENDIF
+			CFLAG:413 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;愛撫 CFLAG414
+;-------------------------------------------------
+IF SELECTCOM == 361
+	;初めて
+	IF CFLAG:414 == 0
+		PRINTFORMW 「そ、そんな所まで触るんだ……」
+		CFLAG:414 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:414 < 6 || FLAG:7 == 2)
+				IF RAND:3 == 0
+					PRINTFORMW 「んっ……手つき、いやらしいよ……」
+				ELSEIF RAND:2 == 0
+					PRINTFORMW 「はぁ……プロデューサーの指、好きだよ」
+				ELSE
+					PRINTFORMW 「じっとしてるから、気持ちよくしてね、プロデューサー」
+				ENDIF
+			CFLAG:414 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:414 < 5 || FLAG:7 == 2)
+				IF RAND:3 == 0
+					PRINTFORMW 「んっ……手つき、いやらしいよ……」
+				ELSEIF RAND:2 == 0
+					PRINTFORMW 「はぁ……プロデューサーの指、好きだよ」
+				ELSE
+					PRINTFORMW 「じっとしてるから、気持ちよくしてね、プロデューサー」
+				ENDIF
+			CFLAG:414 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:414 < 4 || FLAG:7 == 2)
+				IF RAND:3 == 0
+					PRINTFORMW 「んっ……手つき、いやらしいよ……」
+				ELSEIF RAND:2 == 0
+					PRINTFORMW 「はぁ……プロデューサーの指、好きだよ」
+				ELSE
+					PRINTFORMW 「じっとしてるから、気持ちよくしてね、プロデューサー」
+				ENDIF
+			CFLAG:414 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:414 < 3 || FLAG:7 == 2)
+				IF RAND:3 == 0
+					PRINTFORMW 「んっ……手つき、いやらしいよ……」
+				ELSEIF RAND:2 == 0
+					PRINTFORMW 「はぁ……プロデューサーの指、好きだよ」
+				ELSE
+					PRINTFORMW 「じっとしてるから、気持ちよくしてね、プロデューサー」
+				ENDIF
+			CFLAG:414 = 3
+		;それ以外
+		ELSEIF CFLAG:414 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「まぁ、外付けオナニー装置とでも思えばいいかな」
+				PRINTFORMW 　随分失礼な事を呟いている 
+			ELSE
+				PRINTFORMW 「うっ……」
+				PRINTFORMW 　プロデューサーの愛撫を受け、杏は小さく体を震わせた
+			ENDIF
+			CFLAG:414 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;告白する CFLAG415
+;-------------------------------------------------
+IF SELECTCOM == 399
+	;初めて
+	IF CFLAG:415 == 0
+		PRINTFORMW 
+		CFLAG:415 = 1
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:415 < 6 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:415 = 6
+		;恋人
+		ELSEIF TALENT:153 == 1 && (CFLAG:415 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:415 = 5
+		;キス経験有り
+		ELSEIF EXP:96 > 0 && (CFLAG:415 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:415 = 4
+		;デート経験有り
+		ELSEIF EXP:94 > 0 && (CFLAG:415 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:415 = 3
+		;それ以外
+		ELSEIF CFLAG:415 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:415 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+
+
+;～～～～～～～～～～～～～～～～～～～～～～～～～
+;純愛系コマンド
+;～～～～～～～～～～～～～～～～～～～～～～～～～
+;-------------------------------------------------
+;愛撫 CFLAG416
+;-------------------------------------------------
+IF SELECTCOM == 0
+	;初めて
+	IF CFLAG:416 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 「いいけど、ちゃんと気持ちよくしてよ？」
+			PRINTFORMW 　頷いて、杏の小さな体に指先を這わせた
+			PRINTFORMW 「んっ……自分でしなくていいのは楽チンでいいかも……」
+		ELSE
+			PRINTFORMW 「自分で言うのもなんだけど、こんな体に触りたがるなんてプロデューサーって変態だねっ」
+			PRINTFORMW 　杏は唇を歪めて冷笑して見せた
+		ENDIF
+			CFLAG:416 = 1
+	;二回目以降
+	ELSE
+		;恋慕+C感覚Lv5以上
+;		IF TALENT:85 == 1 && ABL:3 >= 5 && (CFLAG:416 < 5 || FLAG:7 == 2)
+;			PRINTFORMW 
+;			CFLAG:416 = 5
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:416 < 4 || FLAG:7 == 2)
+			IF PALAM:5 > 100000
+				IF RAND:2 == 0
+					PRINTFORMW 「プ、プロデューサー、もう焦らさないでよぉっ%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「も、もう我慢できないっ%UNICODE(0x2661)%」
+				ENDIF
+			ELSEIF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 「ぬ、濡れてきたとか報告しなくていいよっ」
+				ELSE
+					PRINTFORMW 「ふぅ……%UNICODE(0x2661)%　んふ……%UNICODE(0x2661)%」
+					PRINTFORMW 　杏の細い体は桜色に染まっている
+				ENDIF
+			ELSE
+				IF RAND:3 == 0
+					PRINTFORMW 「んっ……手つき、いやらしいよ……」
+				ELSEIF RAND:2 == 0
+					PRINTFORMW 「はぁ……プロデューサーの指、好きだよ」
+				ELSE
+					PRINTFORMW 「じっとしてるから、気持ちよくしてね、プロデューサー」
+				ENDIF
+			ENDIF
+			CFLAG:416 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:416 < 3 || FLAG:7 == 2)
+			IF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 「ぬ、濡れてきたとか報告しなくていいよっ」
+				ELSE
+					PRINTFORMW 「ふぅ……%UNICODE(0x2661)%　んふ……%UNICODE(0x2661)%」
+					PRINTFORMW 　杏の細い体は桜色に染まっている
+				ENDIF
+			ELSE
+				IF RAND:3 == 0
+					PRINTFORMW 「んっ……手つき、いやらしいよ……」
+				ELSEIF RAND:2 == 0
+					PRINTFORMW 「はぁ……プロデューサーの指、好きだよ」
+				ELSE
+					PRINTFORMW 「じっとしてるから、気持ちよくしてね、プロデューサー」
+				ENDIF
+			ENDIF
+			CFLAG:416 = 3
+		;それ以外
+		ELSEIF CFLAG:416 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「まぁ、外付けオナニー装置とでも思えばいいかな」
+				PRINTFORMW 　随分失礼な事を呟いている 
+			ELSE
+				PRINTFORMW 「うっ……」
+				PRINTFORMW 　プロデューサーの愛撫を受け、杏は小さく体を震わせた
+			ENDIF
+			CFLAG:416 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;クンニ CFLAG417
+;-------------------------------------------------
+;クンニ
+IF SELECTCOM == 1 && TEQUIP:57 == 0
+	;初めて
+	IF CFLAG:417 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORML 「ほ、ほんとに舐めるんだ、そんなとこ……」
+			PRINTFORMW 「……いいよ、プロデューサーが舐めたいなら……」
+			PRINTFORMW 　頬を染めて俯いた杏はプロデューサーが舐めやすいように足を開いた
+		ELSE
+			PRINTFORMW 「や、やだっ、そんな所っ！」
+			PRINTFORMW 「ネットの動画で見た事あるけど、ほんとに舐めるんだ……」
+		ENDIF
+			CFLAG:417 = 1
+	;二回目以降
+	ELSE
+		;恋慕+C感覚Lv5以上
+;		IF TALENT:85 == 1 && ABL:3 >= 5 && (CFLAG:417 < 5 || FLAG:7 == 2)
+;			PRINTFORMW 
+;			CFLAG:417 = 5
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:417 < 4 || FLAG:7 == 2)
+			IF PALAM:5 > 100000
+				IF RAND:2 == 0
+					PRINTFORMW 「プロデューサー、クリも吸って%UNICODE(0x2661)%」
+					PRINTFORMW 「クリちゃんチュウチュウされるの好きなのっ%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「ひゃんっ%UNICODE(0x2661)%　あうっ%UNICODE(0x2661)%　もっと舐めてよぉっ%UNICODE(0x2661)%」
+				ENDIF
+			ELSEIF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 　興奮してきたのかぷっくりと自己主張しているクリトリスを舌先で舐る
+					PRINTFORMW 「はぅっ%UNICODE(0x2661)%　あ、飴じゃないんだから、そんな風に転がさないでよぉ」
+				ELSE
+					PRINTFORMW 　興奮した杏の秘唇からは止め処なく愛液が零れ落ちている
+					PRINTFORMW 「杏ジュース、おいしいでしょ、プロデューサー%UNICODE(0x2661)%」
+					PRINTFORMW 　真っ赤に染まった顔で杏はそんな冗談を言った
+				ENDIF
+			ELSE
+				IF RAND:3 == 0
+					PRINTFORMW 「ぺちゃぺちゃ音たてないでっ！　わざとやってるでしょ、プロデューサー！」
+				ELSEIF RAND:2 == 0
+					PRINTFORMW 「杏のおまんこは美味しいですかー？」
+					PRINTFORMW 　プロデューサーに股間を舐め上げられながら、杏は茶化すようにおどけた
+				ELSE
+					PRINTFORMW 「んっ！　ちょ、ちょっとビクッてした……」
+				ENDIF
+			ENDIF
+			CFLAG:417 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:417 < 3 || FLAG:7 == 2)
+			IF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 　興奮してきたのかぷっくりと自己主張しているクリトリスを舌先で舐る
+					PRINTFORMW 「はぅっ%UNICODE(0x2661)%　あ、飴じゃないんだから、そんな風に転がさないでよぉ」
+				ELSE
+					PRINTFORMW 　興奮した杏の秘唇からは止め処なく愛液が零れ落ちている
+					PRINTFORMW 「杏ジュース、おいしいでしょ、プロデューサー%UNICODE(0x2661)%」
+					PRINTFORMW 　真っ赤に染まった顔で杏はそんな冗談を言った
+				ENDIF
+			ELSE
+				IF RAND:3 == 0
+					PRINTFORMW 「ぺちゃぺちゃ音たてないでっ！　わざとやってるでしょ、プロデューサー！」
+				ELSEIF RAND:2 == 0
+					PRINTFORMW 「杏のおまんこは美味しいですかー？」
+					PRINTFORMW 　プロデューサーに股間を舐め上げられながら、杏は茶化すようにおどけた
+				ELSE
+					PRINTFORMW 「んっ！　ちょ、ちょっとビクッてした……」
+				ENDIF
+			ENDIF
+			CFLAG:417 = 3
+		;それ以外
+		ELSEIF CFLAG:417 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「バター犬的な何かに奉仕させてる感じだね」
+			ELSE
+				PRINTFORMW 「……今度、トイレに行ってそのまま来てやる」
+			ENDIF
+			CFLAG:417 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;岩清水 CFLAG418
+;-------------------------------------------------
+IF SELECTCOM == 1 && TEQUIP:57
+	;初めて
+	IF CFLAG:418 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:418 = 1
+	;二回目以降
+	ELSE
+		;恋慕+C感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:3 >= 5 && (CFLAG:418 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:418 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:418 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:418 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:418 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:418 = 3
+		;それ以外
+		ELSEIF CFLAG:418 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:418 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;自慰（公開除く） CFLAG419
+;-------------------------------------------------
+IF SELECTCOM == 3 && TEQUIP:18 == 0 && TEQUIP:53 == 0
+	;初めて
+	IF CFLAG:419 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 「こんな事ばっかりさせてー」
+			PRINTFORMW 「明日お休みにしてよ、超過勤務だよ、精神的に！」
+			PRINTFORMW 　ぶつくさ言いながらも杏は股間に指を伸ばして自慰を開始した
+		ELSE
+			PRINTFORMW 「こんなの、人に見せるものじゃないよ！」
+			PRINTFORMW 「自慰っていうのはね、誰にも邪魔されず自由で、なんというか救われてなきゃあダメなんだ」
+			PRINTFORMW 「そんな訳でウチで一人でやりたいと思います！」
+			PRINTFORMW 　いいからやれ
+		ENDIF
+			CFLAG:419 = 1
+	;二回目以降
+	ELSE
+		;恋慕+自慰中毒Lv5以上
+;		IF TALENT:85 == 1 && ABL:10 >= 5 && (CFLAG:419 < 5 || FLAG:7 == 2)
+;			PRINTFORMW 
+;			CFLAG:419 = 5
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:419 < 4 || FLAG:7 == 2)
+			IF PALAM:5 > 100000
+				IF RAND:2 == 0
+					PRINTFORMW 「あっ%UNICODE(0x2661)%　ふぁっ%UNICODE(0x2661)%　はぅんっ%UNICODE(0x2661)%」
+					PRINTFORMW 　杏は派手な嬌声をあげながら、激しく自慰に耽っている
+				ELSE
+					PRINTFORMW 「プロデューサー、杏こんなになっちゃったよぉ%UNICODE(0x2661)%」
+					PRINTFORMW 「どろどろおまんこ弄ってるとこ、見てぇ%UNICODE(0x2661)%」
+				ENDIF
+			ELSEIF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 「み、見られてると、なんか興奮するよっ%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「やだ、指が止まんない……%UNICODE(0x2661)%」
+				ENDIF
+			ELSE
+				IF RAND:2 == 0
+					PRINTFORMW 「杏ちゃんのオナニーショー、どうぞご覧くださーい%UNICODE(0x2661)%」
+					PRINTFORMW 　杏はおどけてウィンクを飛ばした
+				ELSE
+					PRINTFORMW 「杏はクリトリス派。　中に指入れるの、怖いから」
+				ENDIF
+			ENDIF
+			CFLAG:419 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:419 < 3 || FLAG:7 == 2)
+			IF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 「み、見られてると、なんか興奮するよっ%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「やだ、指が止まんない……%UNICODE(0x2661)%」
+				ENDIF
+			ELSE
+				IF RAND:2 == 0
+					PRINTFORMW 「杏ちゃんのオナニーショー、どうぞご覧くださーい%UNICODE(0x2661)%」
+					PRINTFORMW 　杏はおどけてウィンクを飛ばした
+				ELSE
+					PRINTFORMW 「杏はクリトリス派。　中に指入れるの、怖いから」
+				ENDIF
+			ENDIF
+			CFLAG:419 = 3
+		;それ以外
+		ELSEIF CFLAG:419 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「見られてると、勝手が違うなー……」
+			ELSE
+				PRINTFORMW 「どうせなら家に帰ってからしたい」
+			ENDIF
+			CFLAG:419 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;シャワーオナニー（公開除く） CFLAG420
+;-------------------------------------------------
+IF SELECTCOM == 3 && TEQUIP:18 && TEQUIP:53 == 0
+	;初めて
+	IF CFLAG:420 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:420 = 1
+	;二回目以降
+	ELSE
+		;恋慕+自慰中毒Lv5以上
+		IF TALENT:85 == 1 && ABL:10 >= 5 && (CFLAG:420 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:420 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:420 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:420 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:420 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:420 = 3
+		;それ以外
+		ELSEIF CFLAG:420 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:420 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;胸愛撫 CFLAG421
+;-------------------------------------------------
+IF SELECTCOM == 5
+	;初めて
+	IF CFLAG:421 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 　揉むほどない杏の乳房を撫でるように愛撫する
+			PRINTFORMW 「ちっちゃいけど敏感な所なんだから、丁寧に触ってよ？」
+		ELSE
+			PRINTFORMW 　揉むほどない杏の乳房を撫でるように愛撫する
+			PRINTFORMW 「な、なんか気持ち悪い……」
+		ENDIF
+			CFLAG:421 = 1
+	;二回目以降
+	ELSE
+		;恋慕+B感覚Lv5以上
+		;IF TALENT:85 == 1 && ABL:14 >= 5 && (CFLAG:421 < 5 || FLAG:7 == 2)
+		;	PRINTFORMW 
+		;	CFLAG:421 = 5
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:421 < 4 || FLAG:7 == 2)
+			IF PALAM:5 > 100000
+				IF RAND:2 == 0
+					PRINTFORMW 「お、おっぱい、ピリピリするよぉっ%UNICODE(0x2661)%　もっと弄ってぇっ%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 　びんびんに自己主張している乳首を乱暴に捻ると、杏は蕩けた声をあげた
+					PRINTFORMW 「ひゃうぅぅっ%UNICODE(0x2661)%　杏のおっぱい、もっと虐めてぇっ%UNICODE(0x2661)%」
+				ENDIF
+			ELSEIF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 　硬くしこった桜色の乳首を弄ると、杏は甘い声をあげた
+					PRINTFORMW 「くぅ……%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「はぁぁ……%UNICODE(0x2661)%」
+					PRINTFORMW 「こんなにされちゃったら、杏のおっぱいもちょっとは大きくなりそうだね」
+				ENDIF
+			ELSE
+				IF RAND:2 == 0
+					PRINTFORMW 「んっ……%UNICODE(0x2661)%」
+					PRINTFORMW 「やらしい手つきなんだから……」
+				ELSE
+					PRINTFORMW 「つ、摘まむのは無し！　それ、痛気持ちいいからっ」
+				ENDIF
+			ENDIF
+			CFLAG:421 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:421 < 3 || FLAG:7 == 2)
+			IF PALAM:5 > 100000
+				IF RAND:2 == 0
+					PRINTFORMW 「お、おっぱい、ピリピリするよぉっ%UNICODE(0x2661)%　もっと弄ってぇっ%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 　びんびんに自己主張している乳首を乱暴に捻ると、杏は蕩けた声をあげた
+					PRINTFORMW 「ひゃうぅぅっ%UNICODE(0x2661)%　杏のおっぱい、もっと虐めてぇっ%UNICODE(0x2661)%」
+				ENDIF
+			ELSEIF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 　硬くしこった桜色の乳首を弄ると、杏は甘い声をあげた
+					PRINTFORMW 「くぅ……%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「はぁぁ……%UNICODE(0x2661)%」
+					PRINTFORMW 「こんなにされちゃったら、杏のおっぱいもちょっとは大きくなりそうだね」
+				ENDIF
+			ELSE
+				IF RAND:2 == 0
+					PRINTFORMW 「んっ……%UNICODE(0x2661)%」
+					PRINTFORMW 「やらしい手つきなんだから……」
+				ELSE
+					PRINTFORMW 「つ、摘まむのは無し！　それ、痛気持ちいいからっ」
+				ENDIF
+			ENDIF
+			CFLAG:421 = 3
+		;それ以外
+		ELSEIF CFLAG:421 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「プロデューサーって、ロリだねロリ」
+			ELSE
+				PRINTFORMW 「自分で言うのも何だけど、こんな平たい胸を触って楽しいの？」
+			ENDIF
+			CFLAG:421 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;キス CFLAG422
+;-------------------------------------------------
+IF SELECTCOM == 6
+	;初めて
+	IF CFLAG:422 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:422 = 1
+	;二回目以降
+	ELSE
+		;親愛
+		IF TALENT:88 == 1 && (CFLAG:422 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:422 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:422 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:422 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:422 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:422 = 3
+		;それ以外
+		ELSEIF CFLAG:422 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:422 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;何もしない CFLAG423
+;-------------------------------------------------
+IF SELECTCOM == 7
+	;初めて
+	IF CFLAG:423 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 「え？　裸にしといて何もしないんだ？」
+			PRINTFORMW 「……まぁいいけど……」
+			PRINTFORMW 　杏はどこか不満そうだ
+		ELSE
+			PRINTFORMW 「え？　裸にしといて何もしないんだ？」
+			PRINTFORMW 「楽でいいねっ！」
+		ENDIF
+			CFLAG:423 = 1
+	;二回目以降
+	ELSE
+		;親愛
+		IF TALENT:88 == 1 && (CFLAG:423 < 5 || FLAG:7 == 2)
+			IF RAND:4 == 0
+				PRINTFORMW 「ふふっ、これはただの休憩じゃない……。　そう、戦略的休憩だよっ！」
+			ELSEIF RAND:3 == 0
+				PRINTFORMW 「果報は寝て待てって名言だよね」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「充電中～。　……このまま一生充電してたい……」
+			ELSE
+				PRINTFORMW 「裸でくっついたままゴロゴロするのって、何だか野生っぽいねっ！」
+			ENDIF 
+			CFLAG:423 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:423 < 4 || FLAG:7 == 2)
+			IF RAND:4 == 0
+				PRINTFORMW 「ふふっ、これはただの休憩じゃない……。　そう、戦略的休憩だよっ！」
+			ELSEIF RAND:3 == 0
+				PRINTFORMW 「果報は寝て待てって名言だよね」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「充電中～。　……このまま一生充電してたい……」
+			ELSE
+				PRINTFORMW 「裸でくっついたままゴロゴロするのって、何だか野生っぽいねっ！」
+			ENDIF
+			CFLAG:423 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:423 < 3 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORMW 「ふふっ、これはただの休憩じゃない……。　そう、戦略的休憩だよっ！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「果報は寝て待てって名言だよね」
+			ELSE
+				PRINTFORMW 「充電中～。　……このまま一生充電してたい……」
+			ENDIF
+			CFLAG:423 = 3
+		;それ以外
+		ELSEIF CFLAG:423 < 2 || FLAG:7 == 2
+			IF RAND:3 == 0
+				PRINTFORMW 「ふふっ、これはただの休憩じゃない……。　そう、戦略的休憩だよっ！」
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「果報は寝て待てって名言だよね」
+			ELSE
+				PRINTFORMW 「充電中～。　……このまま一生充電してたい……」
+			ENDIF
+			CFLAG:423 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;指挿入れ CFLAG424
+;-------------------------------------------------
+IF SELECTCOM == 8
+	;初めて
+	IF CFLAG:424 == 0
+		;処女(処女喪失処理が既に終了しているので、V経験1の場合)
+		IF EXP:0 == 1
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		;非処女
+		ELSE
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		ENDIF
+			CFLAG:424 = 1
+	;二回目以降
+	ELSE
+		;恋慕+V感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:4 >= 5 && (CFLAG:424 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:424 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:424 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:424 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:424 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:424 = 3
+		;それ以外
+		ELSEIF CFLAG:424 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:424 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;Gスポット刺激 CFLAG425
+;-------------------------------------------------
+IF SELECTCOM == 84
+	;初めて
+	IF CFLAG:425 == 0
+		;処女(処女喪失処理が既に終了しているので、V経験1の場合)
+		IF EXP:0 == 1
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		;非処女
+		ELSE
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		ENDIF
+			CFLAG:425 = 1
+	;二回目以降
+	ELSE
+		;恋慕+V感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:4 >= 5 && (CFLAG:425 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:425 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:425 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:425 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:425 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:425 = 3
+		;それ以外
+		ELSEIF CFLAG:425 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:425 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;ローター CFLAG426
+;-------------------------------------------------
+IF SELECTCOM == 10
+	;初めて
+	IF CFLAG:426 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 　ローターを見せると杏はドギマギしたように目を逸らした
+			PRINTFORMW 「な、何に使うものか知ってるけど……杏に使うんだ、それ」
+		ELSE
+			PRINTFORMW 　ローターを見せると杏はドギマギしたように目を逸らした
+			PRINTFORMW 「な、何に使うものか知ってるけど……杏に使うんだ、それ」
+		ENDIF
+			CFLAG:426 = 1
+	;二回目以降
+	ELSE
+		;恋慕+C感覚Lv5以上
+		;IF TALENT:85 == 1 && ABL:3 >= 5 && (CFLAG:426 < 5 || FLAG:7 == 2)
+		;	PRINTFORMW 
+		;	CFLAG:426 = 5
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:426 < 4 || FLAG:7 == 2)
+			IF PALAM:5 > 100000
+				IF RAND:2 == 0
+					PRINTFORMW 「やぁぁっ%UNICODE(0x2661)%　クリちゃんおかしくなっちゃうよぉぉっ%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「い、一番強くしてっ！　そこ、そこに当てると気持ちいいのっ！」
+				ENDIF
+			ELSEIF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 「エロ動画の定番アイテムなのも納得だねっ！」
+					PRINTFORMW 「かなり効くよ、これ」
+				ELSE
+					PRINTFORMW 「んっ%UNICODE(0x2661)%　ふぁ……%UNICODE(0x2661)%」
+				ENDIF
+			ELSE
+				IF RAND:2 == 0
+					PRINTFORMW 「んぅっ……思ったより強烈……%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「くっ……杏を気持ちよくしてくれるなんて健気な機械じゃない」
+					PRINTFORMW 　杏は余裕ぶった素振りで、そんな事を言った
+				ENDIF
+			ENDIF
+			CFLAG:426 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:426 < 3 || FLAG:7 == 2)
+			IF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 「エロ動画の定番アイテムなのも納得だねっ！」
+					PRINTFORMW 「かなり効くよ、これ」
+				ELSE
+					PRINTFORMW 「んっ%UNICODE(0x2661)%　ふぁ……%UNICODE(0x2661)%」
+				ENDIF
+			ELSE
+				IF RAND:2 == 0
+					PRINTFORMW 「んぅっ……思ったより強烈……%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「くっ……杏を気持ちよくしてくれるなんて健気な機械じゃない」
+					PRINTFORMW 　杏は余裕ぶった素振りで、そんな事を言った
+				ENDIF
+			ENDIF
+			CFLAG:426 = 3
+		;それ以外
+		ELSEIF CFLAG:426 < 2 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「んぅっ……思ったより強烈……%UNICODE(0x2661)%」
+			ELSE
+				PRINTFORMW 「くっ……杏を気持ちよくしてくれるなんて健気な機械じゃない」
+				PRINTFORMW 　杏は余裕ぶった素振りで、そんな事を言った
+			ENDIF
+			CFLAG:426 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;バイブ開始時 CFLAG427
+;-------------------------------------------------
+IF SELECTCOM == 11 && TEQUIP:11
+	;初めて
+	IF CFLAG:427 == 0
+		;処女(処女喪失処理が既に終了しているので、V経験1の場合)
+		IF EXP:0 == 1
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		;非処女
+		ELSE
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 「そんなの使うんだ
+			ENDIF
+		ENDIF
+			CFLAG:427 = 1
+	;二回目以降
+	ELSE
+		;恋慕+V感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:4 >= 5 && (CFLAG:427 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:427 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:427 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:427 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:427 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:427 = 3
+		;それ以外
+		ELSEIF CFLAG:427 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:427 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+
+;-------------------------------------------------
+;バイブ終了時 CFLAG428
+;-------------------------------------------------
+IF SELECTCOM == 11 && TEQUIP:11 == 0
+	;恋慕+V感覚Lv5以上
+	IF TALENT:85 == 1 && ABL:4 >= 5 && (CFLAG:428 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:428 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:428 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:428 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:428 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:428 = 3
+	;それ以外
+	ELSEIF CFLAG:428 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:428 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;Ｅマッサージャ CFLAG429
+;-------------------------------------------------
+IF SELECTCOM == 12
+	;初めて
+	IF CFLAG:429 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:429 = 1
+	;二回目以降
+	ELSE
+		;恋慕+C感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:3 >= 5 && (CFLAG:429 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:429 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:429 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:429 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:429 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:429 = 3
+		;それ以外
+		ELSEIF CFLAG:429 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:429 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;クリキャップ開始時 CFLAG430
+;-------------------------------------------------
+IF SELECTCOM == 14 && TEQUIP:14
+	;初めて
+	IF CFLAG:430 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:430 = 1
+	;二回目以降
+	ELSE
+		;恋慕+C感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:3 >= 5 && (CFLAG:430 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:430 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:430 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:430 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:430 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:430 = 3
+		;それ以外
+		ELSEIF CFLAG:430 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:430 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;クリキャップ終了時 CFLAG431
+;-------------------------------------------------
+IF SELECTCOM == 14 && TEQUIP:14 == 0
+	;恋慕+C感覚Lv5以上
+	IF TALENT:85 == 1 && ABL:3 >= 5 && (CFLAG:431 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:431 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:431 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:431 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:431 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:431 = 3
+	;それ以外
+	ELSEIF CFLAG:431 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:431 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;ニプルキャップ開始時 CFLAG432
+;-------------------------------------------------
+IF SELECTCOM == 15 && TEQUIP:15
+	;初めて
+	IF CFLAG:432 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:432 = 1
+	;二回目以降
+	ELSE
+		;恋慕+B感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:14 >= 5 && (CFLAG:432 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:432 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:432 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:432 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:432 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:432 = 3
+		;それ以外
+		ELSEIF CFLAG:432 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:432 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;ニプルキャップ終了時 CFLAG433
+;-------------------------------------------------
+IF SELECTCOM == 15 && TEQUIP:15 == 0
+	;恋慕+B感覚Lv5以上
+	IF TALENT:85 == 1 && ABL:14 >= 5 && (CFLAG:433 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:433 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:433 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:433 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:433 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:433 = 3
+	;それ以外
+	ELSEIF CFLAG:433 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:433 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;シャワー開始時 CFLAG434
+;-------------------------------------------------
+IF SELECTCOM == 18 && TEQUIP:18
+	;親愛
+	IF TALENT:88 == 1 && (CFLAG:434 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:434 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:434 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:434 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:434 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:434 = 3
+	;それ以外
+	ELSEIF CFLAG:434 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:434 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;シャワー終了時 CFLAG435
+;-------------------------------------------------
+IF SELECTCOM == 18 && TEQUIP:18 == 0
+	;親愛
+	IF TALENT:88 == 1 && (CFLAG:435 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:435 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:435 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:435 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:435 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:435 = 3
+	;それ以外
+	ELSEIF CFLAG:435 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:435 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;正常位 CFLAG436
+;-------------------------------------------------
+IF SELECTCOM == 20
+	;初めて
+	IF CFLAG:436 == 0
+		;処女(処女喪失処理が既に終了しているので、V経験1の場合)
+		IF EXP:0 == 1
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORML 「まあ、プロデューサーならいいかな」
+				PRINTFORMW 「あげるよ、杏のバージン」
+				PRINTFORMW 　頬を染めてぶっきらぼうに言う杏の秘唇に肉棒を押し付ける
+				PRINTFORMW 「ちょ、ちょっと大きくない？　杏にはサイズオーバーじゃないかな？」
+				PRINTFORML 　小柄な杏の体躯と同様に小さな作りの秘所に比べ、プロデューサーの陰茎は確かに大きい
+				PRINTFORMW 　だが、赤ん坊が通るような器官である以上、この程度の大きさなら問題あるまい
+				PRINTFORMW 「それはそうだけど……あ、待って！　まだ心の準備……ぐっ！？」
+				PRINTFORML 　何者も侵入した事のない乙女の門を肉槍の切っ先でこじ開け、ゆっくりと中に侵入していく
+				PRINTFORMW 「うあ、あ、い、痛、痛い……」
+				PRINTFORML 　普段は生意気な事ばかり言っている杏もこの時ばかりは余裕が無い
+				PRINTFORML 　涙の浮いた瞳を大きく見開き、口をぱくぱくさせながらプロデューサーの肉槍が処女肉を引き裂いていく痛みを堪えている
+				PRINTFORMW 　やがて膣奥に亀頭が到達し、ごつんと底にぶつかる感触に杏は半ば泣き声のような悲鳴をあげた
+				PRINTFORML 「ひゃうっ……は、入るには入ったけど……きついね、これ」
+				PRINTFORMW 　涙目で無理に笑顔を浮かべてみせる杏の膣肉はプロデューサーの陰茎を抗議するかのように締め上げていた
+				PRINTFORML 「ちょ、ちょっと動けない……しばらく、このままでいい？」
+				PRINTFORMW 　杏の背に腕を回し、破瓜の痛みが治まるまでじっとしていた
+			ELSE
+				PRINTFORML 「ま、待って！　それはやだ！」
+				PRINTFORMW 　小さな体をバタつかせて逃れようとする杏の秘唇に肉棒を押し付ける
+				PRINTFORMW 「ひぃっ！？　や、やだっ、やっ……あぐぅっ！？」
+				PRINTFORML 　何者も侵入した事のない乙女の門を肉槍の切っ先でこじ開け、ゆっくりと中に侵入していく
+				PRINTFORMW 「うあ、あ、い、痛、痛い……」
+				PRINTFORML 　普段は生意気な事ばかり言っている杏もこの時ばかりは余裕が無い
+				PRINTFORML 　涙の浮いた瞳を大きく見開き、口をぱくぱくさせながらプロデューサーの肉槍が処女肉を引き裂いていく痛みを堪えている
+				PRINTFORMW 　やがて膣奥に亀頭が到達し、ごつんと底にぶつかる感触に杏は半ば泣き声のような悲鳴をあげた
+				PRINTFORML 「ひ、ひど、ひどいよっ、こんなのレイプだよっ……」
+				PRINTFORMW 　涙目で抗議する杏の膣肉は主と同様にプロデューサーの陰茎を締め上げて激しく抗議してくる
+				PRINTFORMW 　痛いが、この生意気なアイドルを屈服させたと思えば快感もある
+				PRINTFORML 「ひっ、まだ動かないでっ、あっ、うあぁぁっ！？」
+				PRINTFORMW 　悲鳴をあげる杏を押さえ付け、容赦なく腰を使った
+			ENDIF
+		;非処女
+		ELSE
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 「オーソドックスな姿勢だね」
+				PRINTFORMW 「とやかく言う気はないけど、初めてはやっぱりこういう姿勢の方が良かったかなぁ……」
+			ELSE
+				PRINTFORMW 「この格好、やだな」
+				PRINTFORMW 「露骨にセックスしてますって感じじゃない。　実際には無理やりなのにさー」
+			ENDIF
+		ENDIF
+			CFLAG:436 = 1
+	;二回目以降
+	ELSE
+		;恋慕+V感覚Lv5以上
+;		IF TALENT:85 == 1 && ABL:4 >= 5 && (CFLAG:436 < 5 || FLAG:7 == 2)
+;			PRINTFORMW 
+;			CFLAG:436 = 5
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:436 < 4 || FLAG:7 == 2)
+			IF PALAM:5 > 100000
+				IF RAND:3 == 0
+					PRINTFORMW 　未成熟な体とは裏腹に、杏の膣肉はプロデューサーによって開発され潤みきっている
+					PRINTFORMW 「ふぁっ%UNICODE(0x2661)%　あふっ%UNICODE(0x2661)%　あぅぅっ%UNICODE(0x2661)%」
+					PRINTFORMW 　生意気で怠ける事ばかり考えている杏だったが、膣肉の方はプロデューサーの躾けをしっかり覚えているらしく、従順に絡みつき奉仕していた
+				ELSEIF RAND:2 == 0
+					PRINTFORMW 「はひぃっ%UNICODE(0x2661)%　もっと突いてっ%UNICODE(0x2661)%　杏のおまんこ、突き壊してぇっ%UNICODE(0x2661)%」」
+				ELSE
+					PRINTFORMW 「好きっ%UNICODE(0x2661)%　好きぃっ%UNICODE(0x2661)%　プロデューサー、好きぃっ%UNICODE(0x2661)%」
+					PRINTFORMW 　プロデューサーの逸物に屈服し、完全に雌になってしまった杏は普段は口に出さないプロデューサーへの慕情をうわ言のように呟いている
+				ENDIF
+			ELSEIF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 「キスっ、キスもしてっ%UNICODE(0x2661)%　上と下の両方でプロデューサーを感じたいのっ%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「ふぁっ%UNICODE(0x2661)%　ズンズンくるぅ……%UNICODE(0x2661)%」
+				ENDIF
+			ELSE
+				IF RAND:2 == 0
+					PRINTFORMW 「プロデューサー、好きに動いていいよ」
+					PRINTFORMW 「……マグロじゃないよ？　プロデューサーの自主性を重んじてるんだよ？」
+				ELSE
+					PRINTFORMW 「プロデューサー、一杯動いて気持ちよくしてね%UNICODE(0x2661)%」
+					PRINTFORMW 「……いや、怠けてるんじゃなくて、プロデューサーの愛が欲しいなー、なんて」
+				ENDIF
+			ENDIF
+			CFLAG:436 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:436 < 3 || FLAG:7 == 2)
+			IF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 「キスっ、キスもしてっ%UNICODE(0x2661)%　上と下の両方でプロデューサーを感じたいのっ%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「ふぁっ%UNICODE(0x2661)%　ズンズンくるぅ……%UNICODE(0x2661)%」
+				ENDIF
+			ELSE
+				IF RAND:2 == 0
+					PRINTFORMW 「プロデューサー、好きに動いていいよ」
+					PRINTFORMW 「……マグロじゃないよ？　プロデューサーの自主性を重んじてるんだよ？」
+				ELSE
+					PRINTFORMW 「プロデューサー、一杯動いて気持ちよくしてね%UNICODE(0x2661)%」
+					PRINTFORMW 「……いや、怠けてるんじゃなくて、プロデューサーの愛が欲しいなー、なんて」
+				ENDIF
+			ENDIF
+			CFLAG:436 = 3
+		;それ以外
+		ELSEIF CFLAG:436 < 2 || FLAG:7 == 2
+				IF RAND:2 == 0
+					PRINTFORMW 「好き勝手しといてこっちにも動けってのはないんじゃない？」
+					PRINTFORMW 「せめてそっちで気持ちよくしてよー」
+				ELSE
+					PRINTFORMW 「あー、もうマグロでいいやー」
+				ENDIF
+			CFLAG:436 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;後背位 CFLAG437
+;-------------------------------------------------
+IF SELECTCOM == 21
+	;初めて
+	IF CFLAG:437 == 0
+		;処女(処女喪失処理が既に終了しているので、V経験1の場合)
+		IF EXP:0 == 1
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		;非処女
+		ELSE
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		ENDIF
+			CFLAG:437 = 1
+	;二回目以降
+	ELSE
+		;恋慕+V感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:4 >= 5 && (CFLAG:437 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:437 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:437 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:437 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:437 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:437 = 3
+		;それ以外
+		ELSEIF CFLAG:437 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:437 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;対面座位 CFLAG438
+;-------------------------------------------------
+IF SELECTCOM == 24
+	;初めて
+	IF CFLAG:438 == 0
+		;処女(処女喪失処理が既に終了しているので、V経験1の場合)
+		IF EXP:0 == 1
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		;非処女
+		ELSE
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		ENDIF
+			CFLAG:438 = 1
+	;二回目以降
+	ELSE
+		;恋慕+V感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:4 >= 5 && (CFLAG:438 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:438 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:438 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:438 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:438 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:438 = 3
+		;それ以外
+		ELSEIF CFLAG:438 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:438 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;背面座位 CFLAG439
+;-------------------------------------------------
+IF SELECTCOM == 25 && TEQUIP:57 == 0
+	;初めて
+	IF CFLAG:439 == 0
+		;処女(処女喪失処理が既に終了しているので、V経験1の場合)
+		IF EXP:0 == 1
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		;非処女
+		ELSE
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		ENDIF
+			CFLAG:439 = 1
+	;二回目以降
+	ELSE
+		;恋慕+V感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:4 >= 5 && (CFLAG:439 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:439 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:439 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:439 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:439 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:439 = 3
+		;それ以外
+		ELSEIF CFLAG:439 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:439 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;乱れ牡丹 CFLAG440
+;-------------------------------------------------
+IF SELECTCOM == 25 && TEQUIP:57
+	;初めて
+	IF CFLAG:440 == 0
+		;処女(処女喪失処理が既に終了しているので、V経験1の場合)
+		IF EXP:0 == 1
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		;非処女
+		ELSE
+			;合意
+			IF TALENT:152 == 1
+				PRINTFORMW 
+			ELSE
+				PRINTFORMW 
+			ENDIF
+		ENDIF
+			CFLAG:440 = 1
+	;二回目以降
+	ELSE
+		;恋慕+V感覚Lv5以上+露出癖Lv5以上
+		IF TALENT:85 == 1 && ABL:4 >= 5 && ABL:7 >= 5 && (CFLAG:440 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:440 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:440 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:440 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:440 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:440 = 3
+		;それ以外
+		ELSEIF CFLAG:440 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:440 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;手淫 CFLAG441
+;-------------------------------------------------
+IF SELECTCOM == 30
+	;初めて
+	IF CFLAG:441 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:441 = 1
+	;二回目以降
+	ELSE
+		;恋慕+奉仕精神Lv5以上
+		IF TALENT:85 == 1 && ABL:6 >= 5 && (CFLAG:441 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:441 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:441 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:441 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:441 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:441 = 3
+		;それ以外
+		ELSEIF CFLAG:441 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:441 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;フェラチオ CFLAG442
+;-------------------------------------------------
+IF SELECTCOM == 31
+	;初めて
+	IF CFLAG:442 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:442 = 1
+	;二回目以降
+	ELSE
+		;恋慕+奉仕精神Lv5以上
+		IF TALENT:85 == 1 && ABL:6 >= 5 && (CFLAG:442 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:442 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:442 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:442 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:442 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:442 = 3
+		;それ以外
+		ELSEIF CFLAG:442 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:442 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;パイズリ CFLAG443
+;-------------------------------------------------
+IF SELECTCOM == 32
+	;初めて
+	IF CFLAG:443 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:443 = 1
+	;二回目以降
+	ELSE
+		;恋慕+B感覚Lv5以上+奉仕精神Lv5以上
+		IF TALENT:85 == 1 && ABL:14 >= 5 && ABL:6 >= 5 && (CFLAG:443 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:443 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:443 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:443 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:443 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:443 = 3
+		;それ以外
+		ELSEIF CFLAG:443 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:443 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;素股 CFLAG444
+;-------------------------------------------------
+IF SELECTCOM == 33
+	;初めて
+	IF CFLAG:444 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:444 = 1
+	;二回目以降
+	ELSE
+		;恋慕+奉仕精神Lv5以上
+		IF TALENT:85 == 1 && ABL:6 >= 5 && (CFLAG:444 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:444 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:444 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:444 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:444 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:444 = 3
+		;それ以外
+		ELSEIF CFLAG:444 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:444 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;騎乗位 CFLAG445
+;-------------------------------------------------
+IF SELECTCOM == 34
+	;初めて
+	IF CFLAG:445 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:445 = 1
+	;二回目以降
+	ELSE
+		;恋慕+V感覚Lv5以上+奉仕精神Lv5以上
+		IF TALENT:85 == 1 && ABL:4 >= 5 && ABL:6 >= 5 && (CFLAG:445 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:445 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:445 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:445 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:445 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:445 = 3
+		;それ以外
+		ELSEIF CFLAG:445 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:445 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;泡踊り CFLAG446
+;-------------------------------------------------
+IF SELECTCOM == 35
+	;初めて
+	IF CFLAG:446 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:446 = 1
+	;二回目以降
+	ELSE
+		;恋慕+奉仕精神Lv5以上
+		IF TALENT:85 == 1 && ABL:6 >= 5 && (CFLAG:446 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:446 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:446 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:446 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:446 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:446 = 3
+		;それ以外
+		ELSEIF CFLAG:446 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:446 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;スパンキング CFLAG447
+;-------------------------------------------------
+IF SELECTCOM == 40
+	;初めて
+	IF CFLAG:447 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:447 = 1
+	;二回目以降
+	ELSE
+		;恋慕+マゾっ気Lv5以上
+		IF TALENT:85 == 1 && ABL:8 >= 5 && (CFLAG:447 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:447 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:447 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:447 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:447 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:447 = 3
+		;それ以外
+		ELSEIF CFLAG:447 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:447 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;アイマスク開始時 CFLAG448
+;-------------------------------------------------
+;開始時
+IF SELECTCOM == 43 && TEQUIP:43
+	;初めて
+	IF CFLAG:448 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:448 = 1
+	;二回目以降
+	ELSE
+		;恋慕+マゾっ気Lv5以上
+		IF TALENT:85 == 1 && ABL:8 >= 5 && (CFLAG:448 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:448 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:448 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:448 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:448 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:448 = 3
+		;それ以外
+		ELSEIF CFLAG:448 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:448 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;アイマスク終了時 CFLAG:449
+;-------------------------------------------------
+IF SELECTCOM == 43 && TEQUIP:43 == 0
+	;恋慕+マゾっ気Lv5以上
+	IF TALENT:85 == 1 && ABL:8 >= 5 && (CFLAG:449 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:449 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:449 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:449 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:449 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:449 = 3
+	;それ以外
+	ELSEIF CFLAG:449 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:449 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;ローション使用 CFLAG450
+;-------------------------------------------------
+IF SELECTCOM == 50
+	;親愛
+	IF TALENT:88 == 1 && (CFLAG:450 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:450 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:450 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:450 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:450 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:450 = 3
+	;それ以外
+	ELSEIF CFLAG:450 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:450 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;羞恥プレイ開始時 CFLAG451
+;-------------------------------------------------
+IF SELECTCOM == 57 && TEQUIP:57
+	;恋慕+露出癖Lv5以上
+	IF TALENT:85 == 1 && ABL:7 >= 5 && (CFLAG:451 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:451 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:451 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:451 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:451 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:451 = 3
+	;それ以外
+	ELSEIF CFLAG:451 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:451 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;羞恥プレイ終了時 CFLAG452
+;-------------------------------------------------
+IF SELECTCOM == 57 && TEQUIP:57 == 0
+	;恋慕+露出癖Lv5以上
+	IF TALENT:85 == 1 && ABL:7 >= 5 && (CFLAG:452 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:452 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:452 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:452 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:452 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:452 = 3
+	;それ以外
+	ELSEIF CFLAG:452 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:452 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;お風呂場プレイ開始時 CFLAG453
+;-------------------------------------------------
+IF SELECTCOM == 58 && TEQUIP:58
+	;親愛
+	IF TALENT:88 == 1 && (CFLAG:453 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:453 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:453 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:453 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:453 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:453 = 3
+	;それ以外
+	ELSEIF CFLAG:453 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:453 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;お風呂場プレイ終了時 CFLAG454
+;-------------------------------------------------
+IF SELECTCOM == 58 && TEQUIP:58 == 0
+	;親愛
+	IF TALENT:88 == 1 && (CFLAG:454 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:454 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:454 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:454 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:454 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:454 = 3
+	;それ以外
+	ELSEIF CFLAG:454 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:454 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;新妻プレイ開始時 CFLAG455
+;-------------------------------------------------
+IF SELECTCOM == 59 && TEQUIP:59
+	;親愛
+	IF TALENT:88 == 1 && (CFLAG:455 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:455 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:455 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:455 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:455 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:455 = 3
+	;それ以外
+	ELSEIF CFLAG:455 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:455 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;新妻プレイ終了時 CFLAG456
+;-------------------------------------------------
+IF SELECTCOM == 59 && TEQUIP:59 == 0
+	;親愛
+	IF TALENT:88 == 1 && (CFLAG:456 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:456 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:456 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:456 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:456 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:456 = 3
+	;それ以外
+	ELSEIF CFLAG:456 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:456 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;シックスナイン CFLAG457
+;-------------------------------------------------
+IF SELECTCOM == 69
+	;初めて
+	IF CFLAG:457 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:457 = 1
+	;二回目以降
+	ELSE
+		;恋慕+C感覚Lv5以上+奉仕精神Lv5以上
+		IF TALENT:85 == 1 && ABL:3 >= 5 && ABL:6 >= 5 && (CFLAG:457 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:457 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:457 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:457 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:457 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:457 = 3
+		;それ以外
+		ELSEIF CFLAG:457 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:457 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;イラマチオ CFLAG458
+;-------------------------------------------------
+IF SELECTCOM == 80
+	;初めて
+	IF CFLAG:458 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:458 = 1
+	;二回目以降
+	ELSE
+		;恋慕+奉仕精神Lv5以上
+		IF TALENT:85 == 1 && ABL:6 >= 5 && (CFLAG:458 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:458 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:458 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:458 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:458 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:458 = 3
+		;それ以外
+		ELSEIF CFLAG:458 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:458 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+
+
+
+;～～～～～～～～～～～～～～～～～～～～～～～～～
+;鬼畜系コマンド
+;～～～～～～～～～～～～～～～～～～～～～～～～～
+;-------------------------------------------------
+;アナル愛撫 CFLAG459
+;-------------------------------------------------
+IF SELECTCOM == 2
+	;初めて
+	IF CFLAG:459 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:459 = 1
+	;二回目以降
+	ELSE
+		;恋慕+A感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:5 >= 5 && (CFLAG:459 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:459 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:459 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:459 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:459 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:459 = 3
+		;それ以外
+		ELSEIF CFLAG:459 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:459 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;公開オナニー CFLAG460
+;-------------------------------------------------
+IF SELECTCOM == 3 && TEQUIP:18 == 0 && TEQUIP:53
+	;初めて
+	IF CFLAG:460 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:460 = 1
+	;二回目以降
+	ELSE
+		;恋慕+自慰中毒Lv5以上
+		IF TALENT:85 == 1 && ABL:10 >= 5 && (CFLAG:460 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:460 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:460 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:460 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:460 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:460 = 3
+		;それ以外
+		ELSEIF CFLAG:460 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:460 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;公開シャワーオナニー（公開除く） CFLAG461
+;-------------------------------------------------
+;シャワーオナニー
+IF SELECTCOM == 3 && TEQUIP:18 && TEQUIP:53
+	;初めて
+	IF CFLAG:461 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:461 = 1
+	;二回目以降
+	ELSE
+		;恋慕+自慰中毒Lv5以上
+		IF TALENT:85 == 1 && ABL:10 >= 5 && (CFLAG:461 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:461 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:461 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:461 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:461 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:461 = 3
+		;それ以外
+		ELSEIF CFLAG:461 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:461 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;フェラされる CFLAG462
+;-------------------------------------------------
+IF SELECTCOM == 4
+	;初めて
+	IF CFLAG:462 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:462 = 1
+	;二回目以降
+	ELSE
+		;恋慕+C感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:3 >= 5 && (CFLAG:462 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:462 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:462 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:462 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:462 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:462 = 3
+		;それ以外
+		ELSEIF CFLAG:462 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:462 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;アナルバイブ開始時 CFLAG463
+;-------------------------------------------------
+IF SELECTCOM == 13 && TEQUIP:13
+	;初めて
+	IF CFLAG:463 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:463 = 1
+	;二回目以降
+	ELSE
+		;恋慕+A感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:5 >= 5 && (CFLAG:463 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:463 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:463 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:463 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:463 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:463 = 3
+		;それ以外
+		ELSEIF CFLAG:463 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:463 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;アナルバイブ終了時 CFLAG464
+;-------------------------------------------------
+IF SELECTCOM == 13 && TEQUIP:13 == 0
+	;恋慕+A感覚Lv5以上
+	IF TALENT:85 == 1 && ABL:5 >= 5 && (CFLAG:464 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:464 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:464 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:464 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:464 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:464 = 3
+	;それ以外
+	ELSEIF CFLAG:464 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:464 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;搾乳機開始時 CFLAG465
+;-------------------------------------------------
+IF SELECTCOM == 16 && TEQUIP:16
+	;初めて
+	IF CFLAG:465 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:465 = 1
+	;二回目以降
+	ELSE
+		;恋慕+B感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:14 >= 5 && (CFLAG:465 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:465 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:465 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:465 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:465 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:465 = 3
+		;それ以外
+		ELSEIF CFLAG:465 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:465 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;搾乳機終了時 CFLAG466
+;-------------------------------------------------
+IF SELECTCOM == 16 && TEQUIP:16 == 0
+	;恋慕+B感覚Lv5以上
+	IF TALENT:85 == 1 && ABL:14 >= 5 && (CFLAG:466 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:466 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:466 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:466 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:466 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:466 = 3
+	;それ以外
+	ELSEIF CFLAG:466 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:466 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;オナホール開始時 CFLAG467
+;-------------------------------------------------
+IF SELECTCOM == 17 && TEQUIP:17
+	;初めて
+	IF CFLAG:467 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:467 = 1
+	;二回目以降
+	ELSE
+		;恋慕+C感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:3 >= 5 && (CFLAG:467 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:467 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:467 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:467 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:467 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:467 = 3
+		;それ以外
+		ELSEIF CFLAG:467 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:467 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;オナホール終了時 CFLAG468
+;-------------------------------------------------
+IF SELECTCOM == 17 && TEQUIP:17 == 0
+	;恋慕+C感覚Lv5以上
+	IF TALENT:85 == 1 && ABL:3 >= 5 && (CFLAG:468 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:468 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:468 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:468 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:468 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:468 = 3
+	;それ以外
+	ELSEIF CFLAG:468 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:468 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;アナルセックス CFLAG469
+;-------------------------------------------------
+IF SELECTCOM == 22
+	;初めて
+	IF CFLAG:469 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:469 = 1
+	;二回目以降
+	ELSE
+		;恋慕+A感覚Lv5以上
+		IF TALENT:85 == 1 && ABL:5 >= 5 && (CFLAG:469 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:469 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:469 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:469 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:469 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:469 = 3
+		;それ以外
+		ELSEIF CFLAG:469 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:469 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;逆レイプ CFLAG470
+;-------------------------------------------------
+IF SELECTCOM == 23
+	;初めて
+	IF CFLAG:470 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:470 = 1
+	;二回目以降
+	ELSE
+		;淫乱
+		IF TALENT:76 == 1 && (CFLAG:470 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:470 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:470 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:470 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:470 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:470 = 3
+		;それ以外
+		ELSEIF CFLAG:470 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:470 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;鞭 CFLAG471
+;-------------------------------------------------
+IF SELECTCOM == 41
+	;初めて
+	IF CFLAG:471 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:471 = 1
+	;二回目以降
+	ELSE
+		;恋慕+マゾっ気Lv5以上
+		IF TALENT:85 == 1 && ABL:8 >= 5 && (CFLAG:471 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:471 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:471 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:471 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:471 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:471 = 3
+		;それ以外
+		ELSEIF CFLAG:471 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:471 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;針 CFLAG472
+;-------------------------------------------------
+IF SELECTCOM == 42
+	;初めて
+	IF CFLAG:472 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:472 = 1
+	;二回目以降
+	ELSE
+		;恋慕+マゾっ気Lv5以上
+		IF TALENT:85 == 1 && ABL:8 >= 5 && (CFLAG:472 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:472 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:472 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:472 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:472 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:472 = 3
+		;それ以外
+		ELSEIF CFLAG:472 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:472 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;縄開始時 CFLAG473
+;-------------------------------------------------
+IF SELECTCOM == 44 && TEQUIP:44
+	;初めて
+	IF CFLAG:473 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:473 = 1
+	;二回目以降
+	ELSE
+		;恋慕+マゾっ気Lv5以上
+		IF TALENT:85 == 1 && ABL:8 >= 5 && (CFLAG:473 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:473 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:473 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:473 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:473 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:473 = 3
+		;それ以外
+		ELSEIF CFLAG:473 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:473 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;縄終了時 CFLAG:474
+;-------------------------------------------------
+IF SELECTCOM == 44 && TEQUIP:44 == 0
+	;恋慕+マゾっ気Lv5以上
+	IF TALENT:85 == 1 && ABL:8 >= 5 && (CFLAG:474 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:474 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:474 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:474 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:474 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:474 = 3
+	;それ以外
+	ELSEIF CFLAG:474 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:474 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;ボールギャグ開始時 CFLAG475
+;-------------------------------------------------
+IF SELECTCOM == 45 && TEQUIP:45
+	;初めて
+	IF CFLAG:475 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:475 = 1
+	;二回目以降
+	ELSE
+		;恋慕+マゾっ気Lv5以上
+		IF TALENT:85 == 1 && ABL:8 >= 5 && (CFLAG:475 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:475 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:475 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:475 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:475 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:475 = 3
+		;それ以外
+		ELSEIF CFLAG:475 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:475 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;ボールギャグ終了時 CFLAG:476
+;-------------------------------------------------
+IF SELECTCOM == 45 && TEQUIP:45 == 0
+	;恋慕+マゾっ気Lv5以上
+	IF TALENT:85 == 1 && ABL:8 >= 5 && (CFLAG:476 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:476 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:476 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:476 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:476 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:476 = 3
+	;それ以外
+	ELSEIF CFLAG:476 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:476 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;浣腸 CFLAG477
+;-------------------------------------------------
+IF SELECTCOM == 46 && TEQUIP:46
+	;恋慕+A感覚Lv5以上+マゾっ気Lv5以上
+	IF TALENT:85 == 1 && ABL:5 >= 5 && ABL:8 >= 5 && (CFLAG:477 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:477 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:477 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:477 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:477 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:477 = 3
+	;それ以外
+	ELSEIF CFLAG:477 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:477 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;排泄 CFLAG478
+;-------------------------------------------------
+IF TEQUIP:46 == 0 && SELECTCOM == 46
+	;恋慕+A感覚Lv5以上+マゾっ気Lv5以上
+	IF TALENT:85 == 1 && ABL:5 >= 5 && ABL:8 >= 5 && (CFLAG:478 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:478 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:478 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:478 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:478 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:478 = 3
+	;それ以外
+	ELSEIF CFLAG:478 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:478 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;媚薬使用 CFLAG479
+;-------------------------------------------------
+IF SELECTCOM == 51
+	;淫乱
+	IF TALENT:76 == 1 && (CFLAG:479 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:479 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:479 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:479 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:479 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:479 = 3
+	;それ以外
+	ELSEIF CFLAG:479 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:479 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;ビデオカメラ使用 CFLAG480
+;-------------------------------------------------
+IF SELECTCOM == 53 && TEQUIP:53
+	;恋慕+露出癖Lv5以上
+	IF TALENT:85 == 1 && ABL:7 >= 5 && (CFLAG:480 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:480 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:480 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:480 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:480 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:480 = 3
+	;それ以外
+	ELSEIF CFLAG:480 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:480 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;野外プレイ開始時 CFLAG481
+;-------------------------------------------------
+IF SELECTCOM == 54 && TEQUIP:54
+	;恋慕+露出癖Lv5以上
+	IF TALENT:85 == 1 && ABL:7 >= 5 && (CFLAG:481 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:481 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:481 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:481 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:481 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:481 = 3
+	;それ以外
+	ELSEIF CFLAG:481 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:481 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;野外プレイ終了時 CFLAG:482
+;-------------------------------------------------
+IF SELECTCOM == 54 && TEQUIP:54 == 0
+	;恋慕+露出癖Lv5以上
+	IF TALENT:85 == 1 && ABL:7 >= 5 && (CFLAG:482 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:482 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:482 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:482 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:482 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:482 = 3
+	;それ以外
+	ELSEIF CFLAG:482 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:482 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;助手を犯す CFLAG483
+;-------------------------------------------------
+IF SELECTCOM == 56
+	;初めて
+	IF CFLAG:483 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:483 = 1
+	;二回目以降
+	ELSE
+		;淫乱
+		IF TALENT:76 == 1 && (CFLAG:483 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:483 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:483 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:483 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:483 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:483 = 3
+		;それ以外
+		ELSEIF CFLAG:483 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:483 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;フィストファック CFLAG484
+;-------------------------------------------------
+IF SELECTCOM == 81
+	;初めて
+	IF CFLAG:484 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:484 = 1
+	;二回目以降
+	ELSE
+		;恋慕+V感覚Lv10以上+マゾッ気Lv5以上
+		IF TALENT:85 == 1 && ABL:4 >= 10 && ABL:8 >= 5 && (CFLAG:484 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:484 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:484 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:484 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:484 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:484 = 3
+		;それ以外
+		ELSEIF CFLAG:484 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:484 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;アナルフィスト CFLAG485
+;-------------------------------------------------
+IF SELECTCOM == 82
+	;初めて
+	IF CFLAG:485 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:485 = 1
+	;二回目以降
+	ELSE
+		;恋慕+A感覚Lv10以上+マゾッ気Lv5以上
+		IF TALENT:85 == 1 && ABL:5 >= 10 && ABL:8 >= 5 && (CFLAG:485 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:485 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:485 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:485 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:485 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:485 = 3
+		;それ以外
+		ELSEIF CFLAG:485 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:485 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;両穴フィスト CFLAG486
+;-------------------------------------------------
+IF SELECTCOM == 83
+	;初めて
+	IF CFLAG:486 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:486 = 1
+	;二回目以降
+	ELSE
+		;恋慕+V感覚Lv10以上+A感覚Lv10以上+マゾッ気Lv5以上
+		IF TALENT:85 == 1 && ABL:4 >= 10 && ABL:5 >= 10 && ABL:8 >= 5 && (CFLAG:486 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:486 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:486 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:486 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:486 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:486 = 3
+		;それ以外
+		ELSEIF CFLAG:486 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:486 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;触手召喚開始時 CFLAG487
+;-------------------------------------------------
+IF SELECTCOM == 100 && TEQUIP:90
+	;初めて
+	IF CFLAG:487 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:487 = 1
+	;二回目以降
+	ELSE
+		;淫乱
+		IF TALENT:76 == 1 && (CFLAG:487 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:487 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:487 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:487 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:487 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:487 = 3
+		;それ以外
+		ELSEIF CFLAG:487 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:487 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;触手召喚終了時 CFLAG:488
+;-------------------------------------------------
+IF SELECTCOM == 100 && TEQUIP:90 == 0
+	;淫乱
+	IF TALENT:76 == 1 && (CFLAG:488 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:488 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:488 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:488 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:488 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:488 = 3
+	;それ以外
+	ELSEIF CFLAG:488 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:488 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;利尿剤 CFLAG489
+;-------------------------------------------------
+IF SELECTCOM == 52
+	;淫乱
+	IF TALENT:76 == 1 && (CFLAG:489 < 5 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:489 = 5
+	;恋慕
+	ELSEIF TALENT:85 == 1 && (CFLAG:489 < 4 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:489 = 4
+	;合意or恋人
+	ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:489 < 3 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:489 = 3
+	;それ以外
+	ELSEIF CFLAG:489 < 2 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:489 = 2
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;放尿 CFLAG490
+;-------------------------------------------------
+IF SELECTCOM == 85
+	;初めて
+	IF CFLAG:490 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:490 = 1
+	;二回目以降
+	ELSE
+		;淫乱
+		IF TALENT:76 == 1 && (CFLAG:490 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:490 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:490 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:490 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:490 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:490 = 3
+		;それ以外
+		ELSEIF CFLAG:490 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:490 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;強制放尿 CFLAG491
+;-------------------------------------------------
+IF SELECTCOM == 85 && (TALENT:57 == 0 && ABL:0 >= 4 && ABL:1 >= 3 && ABL:8 >= 3) || (TALENT:57 && TEQUIP:22 == 0)
+	;初めて
+	IF CFLAG:491 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:491 = 1
+	;二回目以降
+	ELSE
+		;淫乱
+		IF TALENT:76 == 1 && (CFLAG:491 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:491 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:491 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:491 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:491 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:491 = 3
+		;それ以外
+		ELSEIF CFLAG:491 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:491 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;３P CFLAG492
+;-------------------------------------------------
+IF SELECTCOM == 64
+	;初めて
+	IF CFLAG:492 == 0
+		;合意
+		IF TALENT:152 == 1
+			PRINTFORMW 
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:492 = 1
+	;二回目以降
+	ELSE
+		;淫乱
+		IF TALENT:76 == 1 && (CFLAG:492 < 5 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:492 = 5
+		;恋慕
+		ELSEIF TALENT:85 == 1 && (CFLAG:492 < 4 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:492 = 4
+		;合意or恋人
+		ELSEIF (TALENT:152 == 1 || TALENT:153 == 1) && (CFLAG:492 < 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:492 = 3
+		;それ以外
+		ELSEIF CFLAG:492 < 2 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:492 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;@KOJO_MESSAGE_PALAMCNG関係（46をキャラ番号に置換）
+;パラメータ変動をトリガーにした口上
+;パラメータ変動後に口上を発動します
+;-------------------------------------------------
+@KOJO_MESSAGE_PALAMCNG_46
+;助手が調教した時に口上をスキップする（好みに応じて使う、行頭の;を消すとスキップするようになる）
+;SIF ASSI > 0 && ASSIPLAY
+;	RETURN 0 
+;ボールギャグ着用時には口上をスキップする（OFFだと口を塞いでるのに喋りまくる）
+SIF TEQUIP:45
+	RETURN 0
+;-------------------------------------------------
+;パラメータ変動時のセリフ CFLAG 341～396を使用
+;-------------------------------------------------
+;-------------------------------------------------
+;初めて好意がLV2超えた CFLAG341
+;-------------------------------------------------
+P = PALAM:15 + UP:15
+IF P > PALAMLV:2 && CFLAG:341 == 0
+	PRINTFORMW 「仲良くできそうな人だね」
+	PRINTFORMW 「よし！　打ち解けた記念として、今日は休日にしよう！」
+	CFLAG:341 = 1
+ENDIF
+;-------------------------------------------------
+;初めて生活がLV2超えた CFLAG342
+;-------------------------------------------------
+P = PALAM:16 + UP:16
+IF P > PALAMLV:2 && CFLAG:342 == 0
+	PRINTFORMW 
+	CFLAG:342 = 1
+ENDIF
+
+;-------------------------------------------------
+;初めて優位がLV2超えた CFLAG343
+;-------------------------------------------------
+P = PALAM:17 + UP:17
+IF P > PALAMLV:2 && CFLAG:343 == 0
+	PRINTFORMW 
+	CFLAG:343 = 1
+ENDIF
+
+;-------------------------------------------------
+;初めて潤滑がLV2超えた CFLAG344
+;-------------------------------------------------
+P = PALAM:3 + UP:3
+IF P > PALAMLV:2 && CFLAG:TARGET:344 == 0
+	;恋慕
+	IF TALENT:TARGET:85 == 1
+		;ローションを使った場合
+		IF SELECTCOM == 50
+			PRINTFORMW 
+		;それ以外
+		ELSE
+			PRINTFORMW 
+		ENDIF
+	;それ以外
+	ELSE
+		;ローションを使った場合
+		IF SELECTCOM == 50
+			PRINTFORMW 
+		;それ以外
+		ELSE
+			PRINTFORMW 
+		ENDIF
+	ENDIF
+		CFLAG:TARGET:344 = 1
+ENDIF
+
+;-------------------------------------------------
+;初めて欲情がLV2超えた CFLAG345
+;-------------------------------------------------
+P = PALAM:5 + UP:5
+IF P > PALAMLV:2 && CFLAG:345 == 0
+	;恋慕
+	IF TALENT:TARGET:85 == 1
+		;媚薬を使った場合
+		IF SELECTCOM == 51
+			PRINTFORMW 
+		;それ以外
+		ELSE
+			PRINTFORMW 
+		ENDIF
+	;それ以外
+	ELSE
+		;媚薬を使った場合
+		IF SELECTCOM == 51
+			PRINTFORMW 
+		;それ以外
+		ELSE
+			PRINTFORMW 
+		ENDIF
+	ENDIF
+		CFLAG:345 = 1
+ENDIF
+
+;-------------------------------------------------
+;初めて恥情がLV2超えた CFLAG345
+;-------------------------------------------------
+P = PALAM:8 + UP:8
+IF P > PALAMLV:2 && CFLAG:345 == 0
+	;恋慕
+	IF TALENT:TARGET:85 == 1
+		PRINTFORMW 「さ、さすがにちょっと恥ずかしいかなって……」
+	;それ以外
+	ELSE
+		PRINTFORMW 「さ、さすがにちょっと恥ずかしいかなって……」
+	ENDIF
+		CFLAG:345 = 1
+ENDIF
+
+;-------------------------------------------------
+;初めて恐怖がLV2超えた CFLAG346
+;-------------------------------------------------
+P = PALAM:10 + UP:10
+IF P > PALAMLV:2 && CFLAG:346 == 0
+	;恋慕
+	IF TALENT:TARGET:85 == 1
+		PRINTFORMW 「お、脅しつけたって、働いたりしないからねっ！」
+	;それ以外
+	ELSE
+		PRINTFORMW 「お、脅しつけたって、働いたりしないからねっ！」
+	ENDIF
+		CFLAG:346 = 1
+ENDIF
+
+;-------------------------------------------------
+;初めてC絶頂 CFLAG347
+;-------------------------------------------------
+IF NOWEX:0 > 0 && CFLAG:347 == 0
+	;恋慕
+	IF TALENT:TARGET:85 == 1
+		PRINTFORMW 「あっ、やっ、そんなに弄ったらぁっ%UNICODE(0x2661)%」
+		PRINTFORMW 　杏は細い体を震わせながら絶頂した
+	;それ以外
+	ELSE
+		PRINTFORMW 「あっ、やっ、そんなに弄ったらぁっ%UNICODE(0x2661)%」
+		PRINTFORMW 　杏は細い体を震わせながら絶頂した
+	ENDIF
+		CFLAG:347 = 1
+ENDIF
+
+;-------------------------------------------------
+;初めてV絶頂 CFLAG348
+;-------------------------------------------------
+IF NOWEX:1 > 0 && CFLAG:348 == 0
+	;恋慕
+	IF TALENT:TARGET:85 == 1
+		PRINTFORMW 「な、なんかくるっ、お腹の中っ、なんかくるぅっ%UNICODE(0x2661)%」
+		PRINTFORMW 「ふあぁぁっ%UNICODE(0x2661)%」
+	;それ以外
+	ELSE
+		PRINTFORMW 「な、なんかくるっ、お腹の中っ、なんかくるぅっ%UNICODE(0x2661)%」
+		PRINTFORMW 「ふあぁぁっ%UNICODE(0x2661)%」
+	ENDIF
+		CFLAG:348 = 1
+ENDIF
+
+;-------------------------------------------------
+;初めてA絶頂 CFLAG349
+;-------------------------------------------------
+IF NOWEX:2 > 0 && CFLAG:349 == 0
+	;恋慕
+	IF TALENT:TARGET:85 == 1
+		PRINTFORMW 「お、お尻っ、熱いよぉっ%UNICODE(0x2661)%　あうぅぅっ%UNICODE(0x2661)%」
+	;それ以外
+	ELSE
+		PRINTFORMW 「お、お尻っ、熱いよぉっ%UNICODE(0x2661)%　あうぅぅっ%UNICODE(0x2661)%」
+	ENDIF
+		CFLAG:TARGET:349 = 1
+ENDIF
+
+;-------------------------------------------------
+;初めてB絶頂 CFLAG350
+;-------------------------------------------------
+IF NOWEX:3 > 0 && CFLAG:350 == 0
+	;恋慕
+	IF TALENT:TARGET:85 == 1
+		PRINTFORMW 「だ、だめっ、そんなに乳首ばっかり弄ったら……んぅっ%UNICODE(0x2661)%」
+		PRINTFORMW 　プロデューサーの執拗な愛撫を受け、杏は背筋を震わせながら絶頂した
+	;それ以外
+	ELSE
+		PRINTFORMW 「だ、だめっ、そんなに乳首ばっかり弄ったら……んぅっ%UNICODE(0x2661)%」
+		PRINTFORMW 　プロデューサーの執拗な愛撫を受け、杏は背筋を震わせながら絶頂した
+	ENDIF
+		CFLAG:TARGET:350 = 1
+ENDIF
+
+;-------------------------------------------------
+;処女喪失(処女のみ) CFLAG351
+;-------------------------------------------------
+A = UP:11 + UP:12
+IF TFLAG:3 > 0 && CFLAG:351 == 0
+	;恋慕かつ主人のセックスによる処女喪失
+	IF TFLAG:20
+		;恋慕かつ反発感情未取得
+		IF TALENT:TARGET:85 == 1 && (A < 500 || TFLAG:150 == 1)
+			PRINTFORMW 「ここまでしちゃったんだから、杏を扶養家族にしてくれるよね%UNICODE(0x2661)%」
+		;恋慕かつ反発感情取得
+		ELSE
+			PRINTFORMW 「もうちょっと何とかならなかったのかな」
+			PRINTFORMW 「一応、一生に一度のイベントなんだよ？」
+		ENDIF
+	;指挿入れで処女喪失（反感がかなり少ない）
+	ELSEIF SELECTCOM == 8
+		;恋慕
+		IF TALENT:TARGET:85 == 1
+			PRINTFORMW 「んっ、大丈夫、あんまり痛くなかったから」
+		;それ以外
+		ELSE
+			PRINTFORMW 「……馬鹿」
+		ENDIF
+	;それ以外の時に処女喪失
+	ELSE
+		;恋慕
+		IF TALENT:TARGET:85 == 1
+			PRINTFORMW 「ちゃんとして欲しかったなー」
+		;それ以外
+		ELSE
+			PRINTFORMW 「……馬鹿」
+		ENDIF
+	ENDIF
+		CFLAG:TARGET:351 = 1
+ENDIF
+
+;-------------------------------------------------
+;セックスで射精させた CFLAG352 CFLAG353
+;-------------------------------------------------
+IF TFLAG:2 > 0
+	;アナルセックスか？（アナルセックス、正常位アナル、後背位アナル、対面座位アナル、背面座位アナル、騎乗位アナル）
+	IF SELECTCOM == 22 || SELECTCOM == 26 || SELECTCOM == 27 || SELECTCOM == 28 || SELECTCOM == 29 || SELECTCOM == 36
+		;恋慕
+		IF TALENT:TARGET:85 == 1 && (CFLAG:352 <= 3 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:352 = 4
+		;既成事実Lv3
+		ELSEIF MARK:2 == 3 && (CFLAG:352 <= 2 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:352 = 3
+		;それ以外
+		ELSEIF CFLAG:352 <= 1 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:352 = 2
+		ENDIF
+		;それ以外
+	ELSE
+		;恋慕
+		IF TALENT:TARGET:85 == 1 && (CFLAG:353 <= 3 || FLAG:7 == 2)
+			IF PALAM:5 > 100000
+				IF RAND:2 == 0
+					PRINTFORML 「あーーーーっ%UNICODE(0x2661)%%UNICODE(0x2661)%%UNICODE(0x2661)%」
+					PRINTFORMW 　杏は仰け反って白い喉を晒すと、小さな子宮を精液で埋め尽くされる感覚にびくびくと身を震わせた
+				ELSE
+					PRINTFORML 「た、種付けっ、種付けされてるっ%UNICODE(0x2661)%」
+					PRINTFORMW 「杏のおまんこ、プロデューサーの精子で一杯でっ%UNICODE(0x2661)%」
+					PRINTFORMW 「育児休暇確実だよぉっ%UNICODE(0x2661)%」
+				ENDIF
+			ELSEIF PALAM:5 > 30000
+				IF RAND:2 == 0
+					PRINTFORMW 「あっ%UNICODE(0x2661)%　熱いよっ%UNICODE(0x2661)%」
+					PRINTFORMW 「すっごい流れ込んでくるっ%UNICODE(0x2661)%」
+				ELSE
+					PRINTFORMW 「ふぁ……お腹たぷたぷ……%UNICODE(0x2661)%」
+				ENDIF
+			ELSE
+				IF RAND:2 == 0
+					PRINTFORMW 「んっ……出てる……%UNICODE(0x2661)%」
+					PRINTFORMW 　杏は目を細めて胎内にドクドクと流し込まれる精液の感触を味わっている
+				ELSE
+					PRINTFORML 「子供出来たら産休＆育児休暇……」
+					PRINTFORMW 「孕めー、孕めー」
+					PRINTFORMW 　杏はプロデューサーの精液を受け入れた下腹を撫で回し、呪文のように呟いている
+				ENDIF
+			ENDIF
+			CFLAG:353 = 4
+		;既成事実Lv3
+		ELSEIF MARK:2 == 3 && (CFLAG:353 <= 2 || FLAG:7 == 2)
+				IF RAND:2 == 0
+					PRINTFORMW 「んっ……出てる……%UNICODE(0x2661)%」
+					PRINTFORMW 　杏は目を細めて胎内にドクドクと流し込まれる精液の感触を味わっている
+				ELSE
+					PRINTFORML 「子供出来たら産休＆育児休暇……」
+					PRINTFORMW 「孕めー、孕めー」
+					PRINTFORMW 　杏はプロデューサーの精液を受け入れた下腹を撫で回し、呪文のように呟いている
+				ENDIF
+			CFLAG:353 = 3
+		;それ以外
+		ELSEIF CFLAG:353 <= 1 || FLAG:7 == 2
+			PRINTFORMW 「せ、せめて避妊してよぉっ！」
+			CFLAG:353 = 2
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;手で射精させた CFLAG354
+;-------------------------------------------------
+IF TFLAG:1 > 0
+	;奉仕精神Lv5
+	IF ABL:6 >= 5 && (CFLAG:354 <= 2 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:354 = 3
+	;奉仕精神Lv3
+	ELSEIF ABL:6 >= 3 && (CFLAG:354 <= 1 || FLAG:7 == 2)
+		PRINTFORMW 
+		CFLAG:354 = 2
+	;それ以外
+	ELSEIF CFLAG:354 <= 0 || FLAG:7 == 2
+		PRINTFORMW 
+		CFLAG:354 = 1
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;口で射精させた CFLAG355 CFLAG356
+;-------------------------------------------------
+IF TFLAG:0 > 0
+	;フェラ、イラマチオの場合
+	IF SELECTCOM == 31 || SELECTCOM == 80
+		;精液中毒Lv5
+		IF ABL:11 >= 5 && (CFLAG:355 < 5 || FLAG:7 == 2)
+			IF RAND:3 == 0
+				PRINTFORML 「んくっ……んっ……」
+				PRINTFORMW 「ふぁぁ……%UNICODE(0x2661)%　おいしい……%UNICODE(0x2661)%」
+				PRINTFORMW 　プロデューサーの精液を呑み干した杏は、とろんとした顔で呟いた
+			ELSEIF RAND:2 == 0
+				PRINTFORMW 「んっ……んっ……ぷはぁ……」
+				PRINTFORMW 「ね、プロデューサー、もっと出して%UNICODE(0x2661)%　全部飲んであげるから」
+			ELSE
+				PRINTFORMW 「ふぅ……%UNICODE(0x2661)%　口の中いっぱいにプロデューサーの味がする……%UNICODE(0x2661)%」
+			ENDIF
+			CFLAG:355 = 5
+		;精液中毒Lv3
+		ELSEIF ABL:11 >= 3 && (CFLAG:355 < 3 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「ふぅ……%UNICODE(0x2661)%　口の中いっぱいにプロデューサーの味がする……%UNICODE(0x2661)%」
+			ELSE
+				PRINTFORMW 「んっ……まだ少し残ってる……」
+				PRINTFORMW 　杏は唇をすぼめると、陰茎の中の残り汁まで啜りとった
+			ENDIF
+			CFLAG:355 = 3
+		;奉仕精神Lv3以上
+		ELSEIF ABL:6 >= 3 && (CFLAG:355 < 2 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「杏のお口、気持ちよかった？」
+			ELSE
+				PRINTFORMW 「んっ……まだ少し残ってる……」
+				PRINTFORMW 　杏は唇をすぼめると、陰茎の中の残り汁まで啜りとった
+			ENDIF
+			CFLAG:355 = 2
+		;それ以外
+		ELSEIF CFLAG:355 < 1 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「うぇぇ……酷い臭いがする……」
+			ELSE
+				PRINTFORMW 「げほっ、けほっ！」
+				PRINTFORMW 　口内に放たれた精液に杏はむせ返っている
+			ENDIF
+			CFLAG:355 = 1
+		ENDIF
+	;パイズリの場合
+	ELSEIF SELECTCOM == 32
+		;奉仕精神Lv5
+		IF ABL:6 >= 5 && (CFLAG:356 < 3 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「谷間がなくたって、やわらかくないわけじゃないもーん」
+				PRINTFORMW 　杏は飛び散った精液に汚れた顔のまま、にんまりと笑った
+			ELSE
+				PRINTFORMW 「おっぱいがなくてはパイズリで射精させる事はできない、そう思っていた時期もありました（どやっ）」
+				PRINTFORMW 　なだらかな胸を白濁液で染めたまま、杏はドヤ顔をしてみせた
+			ENDIF
+			CFLAG:356 = 3
+		;奉仕精神Lv3以上
+		ELSEIF ABL:TARGET:6 >= 3 && (CFLAG:356 < 2 || FLAG:7 == 2)
+			IF RAND:2 == 0
+				PRINTFORMW 「ふふっ、こんな平べったい胸で出しちゃうなんて、プロデューサーは変態だねっ！」
+			ELSE
+				PRINTFORMW 「おっぱいがなくてはパイズリで射精させる事はできない、そう思っていた時期もありました（どやっ）」
+				PRINTFORMW 　なだらかな胸を白濁液で染めたまま、杏はドヤ顔をしてみせた
+			ENDIF
+			CFLAG:356 = 2
+		;それ以外
+		ELSEIF CFLAG:356 < 1 || FLAG:7 == 2
+			IF RAND:2 == 0
+				PRINTFORMW 「杏の胸でも気持ちよくなれるんだ……」
+			ELSE
+				PRINTFORMW 「ふふっ、こんな平べったい胸で出しちゃうなんて、プロデューサーは変態だねっ！」
+			ENDIF
+			CFLAG:356 = 1
+		ENDIF
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;射精した(ふたなり/オトコのみ) CFLAG357
+;-------------------------------------------------
+IF TFLAG:10 > 0
+	;初めて
+	IF CFLAG:357 == 0
+		;恋慕
+		IF TALENT:85 == 1
+			PRINTFORMW 
+		;それ以外
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:357 = 1
+			RETURN 0
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:357 <= 2 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:357 = 3
+		;それ以外
+		ELSEIF CFLAG:357 <= 1 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:357 = 2
+		ENDIF
+			RETURN 0
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;噴乳した(母乳体質のみ) CFLAG358
+;-------------------------------------------------
+IF TFLAG:11 > 0
+	;初めて
+	IF CFLAG:TARGET:358 == 0
+		;従順Lv4以上
+		IF ABL:TARGET:0 >= 4
+			PRINTFORMW 
+		;それ以外
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:358 = 1
+			RETURN 0
+	;二回目以降
+	ELSE
+		;従順Lv4以上
+		IF ABL:TARGET:0 >= 4 && (CFLAG:358 <= 2 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:358 = 3
+		;それ以外
+		ELSEIF CFLAG:358 <= 1 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:358 = 2
+		ENDIF
+			RETURN 0
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;Ｃ感覚Lv5でＣ絶頂50以上 CFLAG359
+;-------------------------------------------------
+IF ABL:3 >= 5 && EX:0 >= 50 && NOWEX:0 > 0
+	;初めて
+	IF CFLAG:359 == 0
+		;恋慕
+		IF TALENT:85 == 1
+			PRINTFORMW 
+		;それ以外
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:359 = 1
+			RETURN 0
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:359 <= 2 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:359 = 3
+		;それ以外
+		ELSEIF CFLAG:359 <= 1 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:359 = 2
+		ENDIF
+			RETURN 0
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;Ｖ感覚Lv5でＶ絶頂50以上 CFLAG360
+;-------------------------------------------------
+IF ABL:4 >= 5 && EX:1 >= 50 && NOWEX:1 > 0
+	;初めて
+	IF CFLAG:360 == 0
+		;恋慕
+		IF TALENT:85 == 1
+			PRINTFORMW 
+		;それ以外
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:360 = 1
+			RETURN 0
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:360 <= 2 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:360 = 3
+		;それ以外
+		ELSEIF CFLAG:360 <= 1 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:360 = 2
+		ENDIF
+			RETURN 0
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;Ａ感覚Lv5でＡ絶頂50以上 CFLAG361
+;-------------------------------------------------
+IF ABL:5 >= 5 && EX:2 >= 50 && NOWEX:2 > 0
+	;初めて
+	IF CFLAG:361 == 0
+		;恋慕
+		IF TALENT:85 == 1
+			PRINTFORMW 
+		;それ以外
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:361 = 1
+			RETURN 0
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:361 <= 2 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:361 = 3
+		;それ以外
+		ELSEIF CFLAG:361 <= 1 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:361 = 2
+		ENDIF
+			RETURN 0
+	ENDIF
+ENDIF
+
+;-------------------------------------------------
+;Ｂ感覚Lv5でＢ絶頂50以上 CFLAG362
+;-------------------------------------------------
+IF ABL:14 >= 5 && EX:3 >= 50 && NOWEX:3 > 0
+	;初めて
+	IF CFLAG:362 == 0
+		;恋慕
+		IF TALENT:85 == 1
+			PRINTFORMW 
+		;それ以外
+		ELSE
+			PRINTFORMW 
+		ENDIF
+			CFLAG:362 = 1
+			RETURN 0
+	;二回目以降
+	ELSE
+		;恋慕
+		IF TALENT:85 == 1 && (CFLAG:362 <= 2 || FLAG:7 == 2)
+			PRINTFORMW 
+			CFLAG:362 = 3
+		;それ以外
+		ELSEIF CFLAG:362 <= 1 || FLAG:7 == 2
+			PRINTFORMW 
+			CFLAG:362 = 2
+		ENDIF
+			RETURN 0
+	ENDIF
+ENDIF
+
+

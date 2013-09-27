@@ -51,9 +51,10 @@ REND
 F = CHARANUM - F
 
 ;ここでストレス回復
-FOR LOCAL, 11, CHARANUM
-	CALL ストレス調整(LOCAL, -3)
-NEXT
+;FOR LOCAL, 11, CHARANUM
+;	CALL ストレス調整(LOCAL, -3)
+;NEXT
+CALL STATE_MANAGEMR("おやすみ")
 
 ;CFLAG:A:406 == 0 は個別日常メッセージが用意されていない、とする
 ;CFLAG:A:406 == 0 の時、以下の素質由来の共通メッセージが表示される
