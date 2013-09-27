@@ -677,6 +677,8 @@ namespace Utau.Eramakerview.GameData.Html
 
 				index = Array.IndexOf(output.pname[(int)CIntData.BASE], "気力");
 
+				// && output.chara[i].Base[index] != 0
+				//string ss = output.chara[i].NAME;
 				if (index != -1 && output.chara[i].Base[index] != 0)
 				{
 					eWriter.WriteLine("  <td width=180 style='width:135.0pt;padding:0mm 0mm 0mm 0mm'>");

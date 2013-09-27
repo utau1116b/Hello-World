@@ -50,6 +50,7 @@ namespace Utau.Eramakerview.GameData
 
 		MainForm mf;
 		int tmp;
+		int barval;
 
 		//
 		private const int ablIndex = 1;
@@ -92,6 +93,8 @@ namespace Utau.Eramakerview.GameData
 		private Dictionary<string, int> Dict = new Dictionary<string, int>();
 		private Dictionary<int, string> Dict2 = new Dictionary<int, string>();
 
+		private static Object lockObj = new Object();
+
 		//charaListを返す
 		public void GetCharaRef(out List<CharacterTemplate> chara)
 		{
@@ -131,7 +134,6 @@ namespace Utau.Eramakerview.GameData
 			{
 				ParamNameList[i] = new string[MaxDataList[i]];
 			}
-
 
 			//テストINVOKE
 			Parallel.Invoke(
@@ -518,15 +520,52 @@ namespace Utau.Eramakerview.GameData
 			string[] filepath = Directory.GetFiles(path, "Chara*", System.IO.SearchOption.AllDirectories);
 			//Parallel.ForEach(filepath.Select((s, i) => new { s, i }), paths =>
 
+			barval = 0;
+			//プログレスバーの最大値を設定
+			mf.SetBarMax(filepath.Length  * 10);
+			mf.SetBarMin(0);
+			mf.SetBarVal(0);
+			//var syncObject = new object();
+
 			Parallel.For(0, filepath.Length, i =>
 			{
-				string csvpath = filepath[i];
-				CharacterTemplate templ = null;
+				//lock (lockObj)
+				//{
+					string csvpath = filepath[i];
+					CharacterTemplate templ = null;
 
-				loadCharaDataTo(csvpath, out templ);
+					loadCharaDataTo(csvpath, out templ);
 
-				if (templ != null)
-					cTempList.Add(templ);
+					if (templ != null)
+						cTempList.Add(templ);
+
+					/*
+					System.Threading.Monitor.Enter(lockObj); // ロック取得
+					try
+					{
+						barval += 10;
+					 */
+						
+						System.Threading.Thread.Sleep(1);
+						mf.SetBarVal(barval);
+					/*
+					 * 
+					 * 
+					 * 
+					 * 
+					}
+					finally 
+					{
+						System.Threading.Monitor.Exit(lockObj);
+					}
+					 */ 
+					//lock (mf) 
+					//{
+						//barval += 10;
+						//mf.SetBarVal(barval);
+					//}
+				//}
+
 			});
 		}
 
@@ -774,12 +813,14 @@ namespace Utau.Eramakerview.GameData
 
 			templa = templb;
 
+			//barval += 10;
+			//mf.SetBarVal(barval);
+
 			//});
 		}//loadCharaDataTo
 
 		// 二つのKeyValuePair<string, int>を比較するためのメソッド
 		//static int CompareKeyValuePair(KeyValuePair<int, int> x, KeyValuePair<int, int> y);
-
 	}//class
 
 }//namespace

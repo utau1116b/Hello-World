@@ -53,7 +53,7 @@ namespace Utau.Eramakerview.Sub
 		{
 			while (!reader.EndOfStream) 
 			{
-				mForm.WriteLabel(reader.ReadLine());
+				//mForm.WriteLabel(reader.ReadLine());
 			}
 		}
 
